@@ -1,0 +1,124 @@
+ /* Ensure the A-Frame canvas takes up the full viewport */
+ html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+a-scene {
+    width: 100%;
+    height: 100%;
+}
+
+/* Style the floating form */
+#control-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black for dystopian feel */
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000; /* Ensure it’s above the A-Frame canvas */
+    font-family: 'Arial', sans-serif;
+    border: 1px solid #00ffff; /* Blue glow border to match fuel yard aesthetic */
+}
+
+#control-panel h2 {
+    margin-top: 0;
+    font-size: 1.2em;
+    text-align: center;
+    color: #00ffff; /* Match the blue glow */
+}
+
+#control-panel button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 0;
+    width: 100%;
+    font-size: 1em;
+}
+
+#control-panel button:hover {
+    background-color: #0056b3;
+}
+
+#control-panel .response {
+    margin-top: 10px;
+    padding: 5px;
+    border-top: 1px solid #fff;
+    word-wrap: break-word;
+}
+/* Custom Loading Screen */
+#aframeLoadingScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #1a1a1a; /* Dark gray background for dystopian feel */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000; /* Above everything else */
+      opacity: 1;
+      transition: opacity 1s ease-out; /* Fade out when loaded */
+  }
+
+  #aframeLoadingScreen.loaded {
+      opacity: 0;
+      pointer-events: none; /* Prevent interaction after loading */
+  }
+
+  #loading-logo {
+      font-family: 'Orbitron', sans-serif; /* Futuristic font (load via Google Fonts) */
+      font-size: 3em;
+      color: #00ffff; /* Blue glow to match fuel yard */
+      text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+      animation: flicker 2s infinite;
+      margin-bottom: 20px;
+  }
+
+  @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+          opacity: 1;
+          text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+      }
+      20%, 24%, 55% {
+          opacity: 0.5;
+          text-shadow: 0 0 5px #00ffff;
+      }
+  }
+
+  #loading-bar-container {
+      width: 300px;
+      height: 20px;
+      background-color: #333333;
+      border: 1px solid #00ffff;
+      border-radius: 10px;
+      overflow: hidden;
+  }
+
+  #loading-bar {
+      width: 0%;
+      height: 100%;
+      background-color: #00ffff;
+      box-shadow: 0 0 10px #00ffff;
+      transition: width 0.5s ease;
+  }
+
+  #loading-text {
+      color: #ffffff;
+      font-family: 'Arial', sans-serif;
+      font-size: 1.2em;
+      margin-top: 10px;
+  }
