@@ -1,0 +1,127 @@
+
+<html>
+<head>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+         <script src="components/drone.js"></script>  
+    <link rel="stylesheet" href="css/style.css">
+
+   
+
+        <!-- Load a futuristic font for the logo -->
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+        <title>Metal Throne</title> 
+
+</head>
+<body>
+    <!-- Custom Loading Screen -->
+    <div id="aframeLoadingScreen">
+      <div id="loading-logo">Metal Throne</div>
+      <div id="loading-bar-container">
+          <div id="loading-bar"></div>
+      </div>
+      <div id="loading-text">Loading Machine Hub...</div>
+  </div>
+    <a-scene keyboard-shortcuts="" screenshot="" xr-mode-ui="" device-orientation-permission-ui="">
+    <a-camera position="0 1.6 10" wasd-controls look-controls>
+    <a-box visible="false" id="box1" class="collidable" position="0 -1 -1" width="1" height="2" depth="1"></a-box>
+    </a-camera>
+       
+        <a-assets>
+
+    
+
+            <a-asset-item id="forklift-02glb" src="https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/a_forklift_a_smalle_0328181137_texture.glb"></a-asset-item>
+            <a-asset-item id="gocartglb" src="https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/two_seat_go_cart_wit_0328181118_texture.glb"></a-asset-item>
+<!---->
+            <a-asset-item id="robotglb" src="https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/Galactic_Sentinel.glb"></a-asset-item>
+
+            <a-asset-item id="prop_01glb" src="https://scottgrocott.github.io/metal_throne/assets/models/drone/prop_01.glb"></a-asset-item>
+            <a-asset-item id="body_01glb" src="https://scottgrocott.github.io/metal_throne/assets/models/drone/body_01.glb"></a-asset-item>
+
+            <a-asset-item id="fire_deptglb" src="https://scottgrocott.github.io/metal_throne/assets/models/fire_dept/00.glb"></a-asset-item>
+            <a-asset-item id="fire_dept_01glb" src="https://scottgrocott.github.io/metal_throne/assets/models/fire_dept_01/00.glb"></a-asset-item>
+            <a-asset-item id="fire_dept_01aglb" src="https://scottgrocott.github.io/metal_throne/assets/models/fire_dept_01a/00.glb"></a-asset-item>
+            <a-asset-item id="7207glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7207/00.glb"></a-asset-item>
+            <a-asset-item id="7207aglb" src="https://scottgrocott.github.io/metal_throne/assets/models/7207a/00.glb"></a-asset-item>
+            <a-asset-item id="7215glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7215/00.glb"></a-asset-item>
+            <a-asset-item id="7215aglb" src="https://scottgrocott.github.io/metal_throne/assets/models/7215a/00.glb"></a-asset-item>
+            <a-asset-item id="7000glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7000/00.glb"></a-asset-item>
+            <a-asset-item id="7010glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7010/00.glb"></a-asset-item>
+            <a-asset-item id="7020glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7020/00.glb"></a-asset-item>
+            <a-asset-item id="7030glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7030/00.glb"></a-asset-item>
+            <a-asset-item id="7200glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7200/00.glb"></a-asset-item>
+            <a-asset-item id="7230glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7230/00.glb"></a-asset-item>
+            <a-asset-item id="7208glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7208/00.glb"></a-asset-item>
+            <a-asset-item id="7290glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7290/00.glb"></a-asset-item>
+            <a-asset-item id="7291glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7291/00.glb"></a-asset-item>
+            <a-asset-item id="7330glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7330/00.glb"></a-asset-item>
+            <a-asset-item id="7331glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7331/00.glb"></a-asset-item>
+            <a-asset-item id="7332glb" src="https://scottgrocott.github.io/metal_throne/assets/models/7332/00.glb"></a-asset-item>
+            <a-asset-item id="sea_train_01glb" src="https://scottgrocott.github.io/metal_throne/assets/models/sea_train_01/00.glb"></a-asset-item>           
+            <img id="ground-texture" src="https://scottgrocott.github.io/metal_throne/assets/img/fuel_yard_upscale.png" crossorigin="anonymous">
+    </a-assets>
+
+<a-entity gltf-model="#forklift-02glb" position="-109.41943 1.00255 112.4286" scale="1.48377 1.48377 1.48377" id="forklift"></a-entity>
+         
+       <a-entity gltf-model="#gocartglb" id="gocart" position="0 0.54138 0"></a-entity>
+       <a-entity gltf-model="https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/Galactic_Sentinel.glb" position="5.45733 1.03371 0" id="robot">
+       <a-entity collider-check raycaster="objects: .collidable; showLine:true;" position="0 .25 0"></a-entity>
+       </a-entity>
+
+  <a-entity id="drone_wrapper" position="-70.82513 2.6244 60.17639" drone_func="">
+            <a-entity  id="prop_01" class="propeller" gltf-model="#prop_01glb" position="0.59017 0.1859 0.56051"></a-entity>
+            <a-entity  id="prop_02" class="propeller" gltf-model="#prop_01glb" position="-0.60429 0.1859 0.56051"></a-entity>
+            <a-entity  id="prop_03" class="propeller" gltf-model="#prop_01glb" position="-0.60429 0.1859 -0.56519"></a-entity>
+            <a-entity  id="prop_04" class="propeller" gltf-model="#prop_01glb" position="0.59378 0.1859 -0.56519"></a-entity>
+
+            <a-entity id="body_01" gltf-model="#body_01glb"></a-entity>
+</a-entity>
+
+
+          <a-entity id="buildings">      
+            <a-entity gltf-model="#fire_deptglb" position="-154.538 0 239.218" id="fire_dept" class="collidable"></a-entity>
+            <a-entity gltf-model="#fire_dept_01glb" id="fire_dept_01" position="-12.7498 0.51117 250.43003" class="collidable"></a-entity>
+            <a-entity id="fire_dept_01a" gltf-model="#fire_dept_01aglb" position="-49.049 0.36778 201.448" class="collidable"></a-entity>
+            <a-entity id="7207" gltf-model="#7207glb" position="-24.534 0 107.882" class="collidable"></a-entity>
+            <a-entity id="7207a" gltf-model="#7207aglb" position="-24.47012 0.32057 99.61409" class="collidable"></a-entity>
+            <a-entity id="7215" gltf-model="#7215glb" position="-73.51048 0.62904 184.79075" class="collidable"></a-entity>
+            <a-entity id="7215a" gltf-model="#7215aglb" position="-181.7037 0 147.4006" class="collidable"></a-entity>
+            <a-entity id="7000" gltf-model="#7000glb" position="73.49579 0.52302 213.82621" class="collidable"></a-entity>
+            <a-entity id="7010" gltf-model="#7010glb" position="92.37906 0.5355 264.29158" class="collidable"></a-entity>
+            <a-entity id="7020" gltf-model="#7020glb" position="38.77596 0.63361 230.59007" class="collidable"></a-entity>
+            <a-entity id="7030" gltf-model="#7030glb" position="38.79218 0.52435 214.56726" class="collidable"></a-entity>
+            <a-entity id="7200" gltf-model="#7200glb" position="30.28748 0.50423 157.27944" class="collidable"></a-entity>
+            <a-entity id="7230" gltf-model="#7230glb" position="30.20997 0.62251 138.21147" class="collidable"></a-entity>  
+            <a-entity id="7208" gltf-model="#7208glb" position="76.69358 0.64688 145.22456" class="collidable"></a-entity>
+            <a-entity id="7290" gltf-model="#7290glb" position="25.26337 0.4706 104.39384" class="collidable"></a-entity>
+            <a-entity id="7291" gltf-model="#7291glb" position="56.07697 0.53924 85.03245" class="collidable"></a-entity>
+            <a-entity id="7330" gltf-model="#7330glb" position="77.03785 0.67524 -82.36381" class="collidable"></a-entity>
+            <a-entity id="7331" gltf-model="#7331glb" position="51.82531 0.43752 -40.52044" class="collidable"></a-entity>
+            <a-entity id="7332" gltf-model="#7332glb" position="52.886 0.52139 -86.1239" class="collidable"></a-entity>
+            <a-entity id="sea_train_01" gltf-model="#sea_train_01glb" position="-58.95303 0.45957 -188.23395" class="collidable"></a-entity>
+          </a-entity> 
+          <a-entity id="roads"> 
+            <a-entity id="road_01" geometry="" position="5.43406 -0.03616 0" scale="9.4531 0.22543 1370.13282"></a-entity>
+            <a-entity id="road_02" geometry="" position="346.16741 -0.03616 72.78578" scale="9.4531 0.22543 672.06978" rotation="0 90 0"></a-entity>
+            <a-entity id="road_03" geometry="" position="-8.2783 -0.03616 274.07075" scale="9.4531 0.22543 1396.46159" rotation="0 90 0"></a-entity>
+            <a-entity id="corner_01" geometry="primitive: ring; radiusInner: 3; radiusOuter: 4.15; thetaLength: 90" position="0 64.71109 0" scale="35.49717 35.49717 35.49717" rotation="-90 0 0"></a-entity>
+        </a-entity> 
+          <a-entity id="ground" geometry="primitive: plane" material="offset: 0.08 -0.1; src: #ground-texture" scale="1382.44221 1382.44221 1382.44221" position="0.95887 0 0" rotation="-90 -90.00021045914971 90.00021045914971"></a-entity>          
+<a-entity id="tanks">
+<a-entity geometry="primitive: cylinder" material="shader: flat; color: silver" scale="13.10886 22.52704 13.10886" position="137.43613 10.59534 -6.735" class="collidable"></a-entity>
+<a-entity geometry="primitive: cylinder" material="shader: flat; color: silver" scale="13.10886 22.52704 13.10886" position="137.43613 10.59534 -55.06571" class="collidable"></a-entity>
+<a-entity geometry="primitive: cylinder" material="shader: flat; color: silver" scale="13.10886 22.52704 13.10886" position="137.43613 10.59534 -102.81642" class="collidable"></a-entity>
+
+
+
+</a-entity>
+</a-scene>
+
+
+
+<script src="js/util.js"></script> 
+
+</body>
+</html>
+
+
