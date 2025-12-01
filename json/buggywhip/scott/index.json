@@ -25,6 +25,7 @@
         "projects": [
           {
             "name": "BuggyWhip (AI Agent SaaS)",
+            "buggywhip_url": "https://scottgrocott.github.io/json/buggywhip/buggywhip",
             "urls": [
               "GitHub / Demo Available upon request"
             ],
@@ -38,6 +39,7 @@
           },
           {
             "name": "Metal Throne (Web-First FPS)",
+            "buggywhip_url": "https://scottgrocott.github.io/json/buggywhip/metal-throne",
             "urls": [
               "GitHub / Demo Available upon request"
             ],
