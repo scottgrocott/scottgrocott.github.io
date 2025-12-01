@@ -1,0 +1,1328 @@
+{
+      "generator": {
+    "name": "BuggyWhip",
+    "version": "0.1.2",
+    "lastUpdated": "2025-12-01"
+  },
+    "project": {
+        "title": "Metal Throne: Machine Hub",
+        "code": "metal-throne",
+        "version": "0.1.0",
+        "last_updated": "2025-11-26",
+        "author": "solo-dev @scott_grocott",
+        "description": "A 3D dystopian stealth-action FPS set inside an industrial airport fuel complex. The player must infiltrate progressively dangerous sectors,fight enemies, retrieve detonators, then plant them in the Fuel Core and escape before detonation.",
+        "genre_tags": [
+            "FPS",
+            "Stealth",
+            "Action",
+            "Single-player",
+            "Dystopian"
+        ],
+        "design_pillars": [
+            "Oppressive environmental atmosphere",
+            "High tension stealth and pacing shifts",
+            "Minimal combat until finale",
+            "Clarity and strong silhouette readability",
+            "HL2-style grounded analog machinery aesthetic"
+        ],
+        "target_experience": "Players feel hunted, resourceful, and pressured by industrial automation beyond human control.",
+        "core_gameplay_loop": [
+            "Simple sidearm weapon for conflict with enemies",
+            "Observe patterns and scan for safe routes",
+            "Move strategically using cover and elevation",
+            "Collect detonators to unlock final sequence",
+            "Final battle and escape countdown"
+        ],
+        "primary_player_abilities": [
+            "Walk, sprint, crouch, slide",
+            "Interact: shoot, open doors, pick up detonators",
+            "Environmental stealth: shadows, noise"
+        ]
+    },
+    "ai_production_assistant": {
+        "synopsis": "This JSON is the source of truth for a hybrid AI development pipeline, orchestrating both local and cloud models to optimize for speed, privacy, and capability.",
+        "environment": "Hybrid (Local Ollama + Cloud APIs)",
+        "strategy": "Task-Based Model Routing. Use Local LLMs for rapid iteration, modular function writing, and zero-latency tasks. Switch to Cloud LLMs for complex architectural planning, large-context debugging, or high-fidelity creative writing.",
+        "preferred_models": {
+            "tier_1_local_speed": [
+                "Llama-3",
+                "Mistral-7B",
+                "Phi-3"
+            ],
+            "tier_2_code_specialist": [
+                "DeepSeek-Coder-V2 (Local)",
+                "Claude-3.5-Sonnet (Cloud)"
+            ],
+            "tier_3_complex_reasoning": [
+                "Grok-Beta",
+                "GPT-4o",
+                "o1-preview"
+            ],
+            "creative_writing": [
+                "Llama-3-Instruct (Local)",
+                "Claude-3-Opus (Cloud)"
+            ]
+        },
+        "routing_logic": [
+            "IF task is 'single function' OR 'private' -> Use Local (Ollama)",
+            "IF task is 'system architecture' OR 'large refactor' -> Use Cloud",
+            "IF task is 'creative flavor text' -> Use Best Available"
+        ],
+        "active_contexts": [
+            "hybrid_workflow_management",
+            "modular_code_architecture",
+            "hl2_aesthetic_guidelines",
+            "level_progression_logic"
+        ]
+    },
+    "narrative": {
+        "setting": "Post-collapse industrial zone overrun by automated defense systems.",
+        "conflict": "Machines defend the refinery against all intruders. Humans are no longer expected.",
+        "win_state": "Survive the escape timer and exit the complex after planting detonators.",
+        "fail_state": "Detected and killed or time expires.",
+        "main_character": "Jake Jackson was 10 years old when his family was killed. The incident happened at the final stages of the \"Drone Wars\". This uprising of AI and robotics technology was the culimination of decades of adotption of automation. Every device that could be \"AI enhanced\" was mandated to be upgraded by law. This included everything from the microwave oven to the surface street transportation of all kinds. All planes,trains and automobiles were given AI networked automation. Jake was taken in by a family of the resistance culture and trained in the ways of kinetic and technological warfare against machines. ",
+        "story": "After the Drone Wars, pockets of human resistance remained but lived mainly underground.There are rumors of oaises of humanity still surviving above ground, but they are few and far between.Most activity in the resistance takes place via 'technological asassins'. These asassins are part of a vast and mysterious network of freedom fighters."
+    },
+    "visual_identity": {
+        "reference_style": "Half-Life 2 / Source Engine Aesthetic (City 17)",
+        "mood": "Oppressive industrial decay",
+        "color_palette": [
+            {
+                "name": "Concrete Grey",
+                "hex": "#7c8386",
+                "meaning": "Cold structural world"
+            },
+            {
+                "name": "Oxidized Teal",
+                "hex": "#486a70",
+                "meaning": "Aging machinery / ambient tones"
+            },
+            {
+                "name": "Hazard Orange",
+                "hex": "#d46a28",
+                "meaning": "Gameplay-critical objects & weak points"
+            },
+            {
+                "name": "Rust Brown",
+                "hex": "#5e4536",
+                "meaning": "Decay and industrial grit"
+            },
+            {
+                "name": "Alert Red",
+                "hex": "#a32e2e",
+                "meaning": "Danger & enemy awareness state"
+            }
+        ],
+        "lighting": "high noon clear sky with strong shadows and high contrast"
+    },
+    "tech_stack": {
+        "current": [
+            "A-Frame",
+            "Three.js (partial)",
+            "Node.js",
+            "Blender"
+        ],
+        "future_target": [
+            "Godot 4"
+        ],
+        "philosophy": "vision:develop web first version of game,with plan on reusing assets and abstract logic across all development phases.\nplan:iterate across web based engines in following order. 1.a-frame.js 2.three.js 3.babylon.js. Finally, use all assets and logic to build in Godot game engine."
+    },
+    "campaign_structure": {
+        "total_levels": 4,
+        "difficulty_curve": "Stealth tutorial → complex stealth → timed stealth → combat finale",
+        "levels": [
+            {
+                "id": "lvl_1_outskirts",
+                "title": "Level 1: The Outskirts",
+                "objective": "Avoid Patrol Bots (Red), recover detonator #1",
+                "primary_mechanics": [
+                    "line of sight stealth",
+                    "tutorial pacing"
+                ],
+                "enemy_type": "Patrol Bot (Red)",
+                "status": "planning",
+                "estimate_hours": 20
+            },
+            {
+                "id": "lvl_2_depot",
+                "title": "Level 2: Maintenance Depot",
+                "objective": "Recover detonator #2, use sound and height advantage",
+                "primary_mechanics": [
+                    "verticality",
+                    "distraction tools"
+                ],
+                "enemy_type": "Maintenance Bot (Green)",
+                "status": "planning",
+                "estimate_hours": 20,
+                "depends_on": [
+                    "lvl_1_outskirts"
+                ]
+            },
+            {
+                "id": "lvl_3_airfield",
+                "title": "Level 3: Drone Airfield",
+                "objective": "Recover detonator #3, dodge drones",
+                "primary_mechanics": [
+                    "timing windows",
+                    "sprint cover to cover"
+                ],
+                "enemy_type": "Guard Drone (Blue)",
+                "status": "planning",
+                "estimate_hours": 25,
+                "depends_on": [
+                    "lvl_2_depot"
+                ]
+            },
+            {
+                "id": "lvl_4_core",
+                "title": "Level 4: The Fuel Core",
+                "objective": "Plant all detonators, fight waves, escape",
+                "primary_mechanics": [
+                    "combat",
+                    "timed escape"
+                ],
+                "status": "planning",
+                "estimate_hours": 35,
+                "depends_on": [
+                    "lvl_3_airfield",
+                    "ai.bot_combat"
+                ]
+            }
+        ]
+    },
+    "enemy_ai": {
+        "type": "Finite State Machine (Baked, no RL/ML)",
+        "global_states": [
+            "idle",
+            "patrol",
+            "investigate",
+            "alert",
+            "combat",
+            "reset"
+        ],
+        "bots": [
+            {
+                "id": "bot_patrol",
+                "color": "Red",
+                "behavior": "Waypoints + vision cone",
+                "estimate_hours": 15
+            },
+            {
+                "id": "bot_maint",
+                "color": "Green",
+                "behavior": "Erratic movement + sound detection",
+                "estimate_hours": 15
+            },
+            {
+                "id": "bot_drone",
+                "color": "Blue",
+                "behavior": "Air spotlight search",
+                "estimate_hours": 20
+            },
+            {
+                "id": "bot_combat",
+                "behavior": "Universal combat + chase + shooting",
+                "estimate_hours": 20
+            }
+        ]
+    },
+    "area_player": {
+        "id": "area_player",
+        "area": "Player Controller",
+        "progress_percent": 25,
+        "estimate_hours_total": 40,
+        "tags": [
+            "gameplay",
+            "controls"
+        ],
+        "sub_projects": [
+            {
+                "id": "pl_movement",
+                "title": "FPS Movement (WASD + Crouch/Slide)",
+                "status": "in_production",
+                "estimate_hours": 10,
+                "progress_percent": 80
+            },
+            {
+                "id": "pl_interaction",
+                "title": "Raycast interaction (Pick up detonator, open doors)",
+                "status": "planning",
+                "estimate_hours": 8
+            },
+            {
+                "id": "pl_health",
+                "title": "Health system + Regenerative shield logic",
+                "status": "planning",
+                "estimate_hours": 6
+            }
+        ]
+    },
+    "area_level_flow": {
+        "id": "area_level_flow",
+        "area": "Campaign Progression (4 Levels)",
+        "progress_percent": 0,
+        "status": "planning",
+        "estimate_hours_total": 100,
+        "tags": [
+            "level_design",
+            "game_loop"
+        ],
+        "sub_projects": [
+            {
+                "id": "lvl_1_outskirts",
+                "title": "Level 1: The Outskirts",
+                "objective": "Avoid Patrol Bots (Red), Find Detonator #1",
+                "mechanic_focus": "Pure Stealth & Line of Sight",
+                "status": "planning",
+                "estimate_hours": 20
+            },
+            {
+                "id": "lvl_2_depot",
+                "title": "Level 2: Maintenance Depot",
+                "objective": "Avoid Maintenance Bots (Green), Find Detonator #2",
+                "mechanic_focus": "Verticality & Distraction",
+                "status": "planning",
+                "estimate_hours": 20,
+                "depends_on": [
+                    "lvl_1_outskirts"
+                ]
+            },
+            {
+                "id": "lvl_3_airfield",
+                "title": "Level 3: Drone Airfield",
+                "objective": "Evade Guard Drones (Blue), Find Detonator #3",
+                "mechanic_focus": "Timing & Sprinting (Cover to Cover)",
+                "status": "planning",
+                "estimate_hours": 25,
+                "depends_on": [
+                    "lvl_2_depot"
+                ]
+            },
+            {
+                "id": "lvl_4_core",
+                "title": "Level 4: The Fuel Core",
+                "objective": "Plant 3 Detonators, Defend Position, Escape",
+                "mechanic_focus": "Combat & Timed Escape",
+                "status": "planning",
+                "estimate_hours": 35,
+                "depends_on": [
+                    "lvl_3_airfield",
+                    "area_bots.bot_combat"
+                ]
+            }
+        ]
+    },
+    "area_bots": {
+        "id": "area_bots",
+        "area": "Enemy AI (Baked)",
+        "progress_percent": 5,
+        "estimate_hours_total": 80,
+        "tags": [
+            "ai",
+            "fsm"
+        ],
+        "sub_projects": [
+            {
+                "id": "bot_patrol",
+                "title": "Patrol Bot (Red): Waypoints + Vision Cone",
+                "status": "planning",
+                "estimate_hours": 15
+            },
+            {
+                "id": "bot_maint",
+                "title": "Maintenance Bot (Green): Erratic movement + 'Sound' detection",
+                "status": "planning",
+                "estimate_hours": 15
+            },
+            {
+                "id": "bot_drone",
+                "title": "Guard Drone (Blue): Raycast spotlight + Air patrol",
+                "status": "planning",
+                "estimate_hours": 20
+            },
+            {
+                "id": "bot_combat",
+                "title": "Universal Combat State: Shoot at player + Chase",
+                "status": "planning",
+                "estimate_hours": 20
+            },
+            {
+                "id": "bot_spawner",
+                "title": "Level 4 Wave Manager",
+                "status": "planning",
+                "estimate_hours": 10
+            }
+        ]
+    },
+    "next_milestones": [
+        {
+            "date": "TBD",
+            "title": "Level 1 (Outskirts) Playable Alpha"
+        },
+        {
+            "date": "TBD",
+            "title": "Enemy AI 'Alert' State Finalized"
+        },
+        {
+            "date": "TBD",
+            "title": "Level 4 Boss Sequence Prototype"
+        }
+    ],
+    "changelog": [
+        {
+            "date": "2025-11-26",
+            "version": "4.0.0",
+            "author": "solo-dev + Assistant",
+            "changes": [
+                "Restructured game loop into 4 distinct levels",
+                "Assigned 1 enemy type and 1 detonator per level (1-3)",
+                "Defined Level 4 as the 'Boss/Escape' finale",
+                "Established 'Half-Life 2' visual identity and color palette",
+                "Optimized AI Assistant config for Ollama (local) production"
+            ]
+        }
+    ],
+    "task_status": [
+        "todo",
+        "in_progress",
+        "blocked",
+        "review",
+        "done"
+    ],
+    "tasks": [
+        {
+            "id": "T001_level_blockout",
+            "title": "Greybox Level 1 Layout",
+            "description": "Basic terrain, walls, cover objects, patrol corridors, entry/exit flow.",
+            "priority": "high",
+            "estimate_hours": 6,
+            "status": "todo",
+            "assignee": "level_design",
+            "depends_on": [],
+            "model_recommendation": "Claude-3.5 or GPT-4o for layout planning"
+        },
+        {
+            "id": "T002_patrol_movement",
+            "title": "Patrol Bot Movement + Waypoint System",
+            "description": "Spline/waypoint navigation with looping patterns and pause durations.",
+            "priority": "high",
+            "estimate_hours": 6,
+            "status": "in_progress",
+            "progress_percent": 40,
+            "assignee": "ai_programming",
+            "depends_on": [],
+            "model_recommendation": "DeepSeek-Coder-V2 for code tasks"
+        },
+        {
+            "id": "T003_vision_cone_system",
+            "title": "Enemy Vision Cone Detection",
+            "description": "LOS raycast + cone mesh rendering + detection timer.",
+            "priority": "high",
+            "estimate_hours": 8,
+            "status": "todo",
+            "depends_on": [
+                "T002_patrol_movement"
+            ],
+            "assignee": "ai_programming",
+            "model_recommendation": "DeepSeek-Coder-V2"
+        },
+        {
+            "id": "T004_detection_fail_state",
+            "title": "Game Over on Detection",
+            "description": "Alert visual/audio + fade-to-black + restart checkpoint.",
+            "priority": "medium",
+            "estimate_hours": 4,
+            "status": "todo",
+            "depends_on": [
+                "T003_vision_cone_system"
+            ],
+            "assignee": "gameplay_systems",
+            "model_recommendation": "Llama-3 local"
+        },
+        {
+            "id": "T005_detonator_pickup",
+            "title": "Detonator #1 Interaction + UI Update",
+            "description": "Raycast pickup, SFX, HUD indicator (1/3 collected).",
+            "priority": "high",
+            "estimate_hours": 5,
+            "status": "todo",
+            "depends_on": [],
+            "assignee": "ui_dev",
+            "model_recommendation": "Claude-3 for UI text and interaction polish"
+        },
+        {
+            "id": "T006_stealth_visual_feedback",
+            "title": "Visibility Indicator + Shadow Feedback",
+            "description": "Indicator ring or vignette showing stealth safety level.",
+            "priority": "medium",
+            "estimate_hours": 6,
+            "status": "todo",
+            "depends_on": [
+                "T001_level_blockout"
+            ],
+            "assignee": "gameplay_systems",
+            "model_recommendation": "GPT-4o for visual readability iter"
+        },
+        {
+            "id": "T007_environment_kit",
+            "title": "Industrial Asset Kit (Modular)",
+            "description": "Concrete walls, pipe clusters, containers, fences.",
+            "priority": "low",
+            "estimate_hours": 15,
+            "status": "todo",
+            "depends_on": [],
+            "assignee": "3d_art",
+            "model_recommendation": "Llama-3-Instruct for asset prompt generation"
+        },
+        {
+            "id": "T008_skybox_pass",
+            "title": "Overcast HL2-style Skybox",
+            "priority": "low",
+            "estimate_hours": 4,
+            "status": "todo",
+            "assignee": "3d_art"
+        }
+    ],
+    "milestones": [
+        {
+            "id": "M001_level_1_vertical_slice",
+            "title": "Level 1 Playable Vertical Slice",
+            "deadline": "TBD",
+            "dependencies": [
+                "T001_level_blockout",
+                "T002_patrol_movement",
+                "T003_vision_cone_system",
+                "T005_detonator_pickup"
+            ]
+        }
+    ],
+    "review_focus_criteria": [
+        "Stealth clarity and fairness",
+        "Enemy predictability",
+        "Performance stability",
+        "Visual tone consistency"
+    ],
+    "assets": {
+        "blueprints": {
+            "fuel_complex_topdown": {
+                "name": "Fuel Complex Top-Down Blueprint",
+                "description": "Top-down schematic of the entire fuel complex layout, showing key areas, patrol routes, and player objectives.",
+                "image_url": "assets/blueprints/fuel_complex_topdown.png"
+            }
+        },
+        "classes": {
+            "prop": {
+                "prefix": "prop_",
+                "color": "#7c8386",
+                "icon": "cube"
+            },
+            "decal": {
+                "prefix": "dec_",
+                "color": "#5e4536",
+                "icon": "sticker"
+            },
+            "light": {
+                "prefix": "lgt_",
+                "color": "#d46a28",
+                "icon": "lightbulb"
+            },
+            "trigger": {
+                "prefix": "trg_",
+                "color": "#a32e2e",
+                "icon": "zap"
+            },
+            "audio_source": {
+                "prefix": "sfx_",
+                "color": "#486a70",
+                "icon": "volume-2"
+            },
+            "particle": {
+                "prefix": "prt_",
+                "color": "#d46a28",
+                "icon": "sparkles"
+            },
+            "enemy_spawn": {
+                "prefix": "spn_",
+                "color": "#a32e2e",
+                "icon": "skull"
+            },
+            "player_start": {
+                "prefix": "ply_",
+                "color": "#00ff00",
+                "icon": "user"
+            }
+        },
+        "library": {
+            "prop_7332": {
+                "class": "prop",
+                "name": "Building 7332",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7332/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7331": {
+                "class": "prop",
+                "name": "Building 7331",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7331/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7330": {
+                "class": "prop",
+                "name": "Building 7330",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7330/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7291": {
+                "class": "prop",
+                "name": "Building 7291",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7291/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7290": {
+                "class": "prop",
+                "name": "Building 7290",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7290/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7208": {
+                "class": "prop",
+                "name": "Building 7208",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7208/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7230": {
+                "class": "prop",
+                "name": "Building 7230",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7230/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7200": {
+                "class": "prop",
+                "name": "Building 7200",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7200/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7030": {
+                "class": "prop",
+                "name": "Building 7030",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7030/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7020": {
+                "class": "prop",
+                "name": "Building 7020",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7020/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7010": {
+                "class": "prop",
+                "name": "Building 7010",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7010/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7000": {
+                "class": "prop",
+                "name": "Building 7000",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7000/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7215a": {
+                "class": "prop",
+                "name": "Building 7215a",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7215a/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7215": {
+                "class": "prop",
+                "name": "Building 7215",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7215/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7207a": {
+                "class": "prop",
+                "name": "Building 7207a",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7207a/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_7207": {
+                "class": "prop",
+                "name": "Building 7207",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/7207/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_fire_dept_01a": {
+                "class": "prop",
+                "name": "3rd fire dept building modular section",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/fire_dept_01a/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_fire_dept_01": {
+                "class": "prop",
+                "name": "2nd fire dept building modular section",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/fire_dept_01/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            },
+            "prop_fire_dept": {
+                "class": "prop",
+                "name": "1st fire dept building modular section",
+                "url": "https://scottgrocott.github.io/metal_throne/assets/models/fire_dept/00.glb",
+                "thumbnail": "NULL",
+                "tags": [
+                    "modular",
+                    "structural"
+                ],
+                "scale_default": 1
+            }
+        },
+        "instances": {
+            "inst_7332": {
+                "asset_id": "prop_7332",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 52.886,
+                    "y": 0,
+                    "z": -86.1239
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7331": {
+                "asset_id": "prop_7331",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 51.82531,
+                    "y": 0,
+                    "z": -40.52044
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7330": {
+                "asset_id": "prop_7330",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 77.03785,
+                    "y": 0,
+                    "z": -82.36381
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7291": {
+                "asset_id": "prop_7291",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 56.07697,
+                    "y": 0,
+                    "z": 85.03245
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7290": {
+                "asset_id": "prop_7290",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 25.26337,
+                    "y": 0,
+                    "z": 104.39384
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7208": {
+                "asset_id": "prop_7208",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 76.69358,
+                    "y": 0,
+                    "z": 145.22456
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7230": {
+                "asset_id": "prop_7230",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 30.20997,
+                    "y": 0,
+                    "z": 138.21147
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7200": {
+                "asset_id": "prop_7200",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 30.28748,
+                    "y": 0,
+                    "z": 157.27944
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7030": {
+                "asset_id": "prop_7030",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 38.79218,
+                    "y": 0,
+                    "z": 214.56726
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7020": {
+                "asset_id": "prop_7020",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 38.77596,
+                    "y": 0,
+                    "z": 230.59007
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7010": {
+                "asset_id": "prop_7010",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 92.37906,
+                    "y": 0,
+                    "z": 264.29158
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7000": {
+                "asset_id": "prop_7000",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": 73.49579,
+                    "y": 0,
+                    "z": 213.82621
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7215a": {
+                "asset_id": "prop_7215a",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": -181.7037,
+                    "y": 0,
+                    "z": 147.4006
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7215": {
+                "asset_id": "prop_7215",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": -73.51048,
+                    "y": 0,
+                    "z": 184.79075
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7207a": {
+                "asset_id": "prop_7207a",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": -24.47012,
+                    "y": 0,
+                    "z": 99.61409
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_7207": {
+                "asset_id": "prop_7207",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": -24.534,
+                    "y": 0,
+                    "z": 107.882
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural",
+                    "fire_dept"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_fire_dept_01a": {
+                "asset_id": "prop_fire_dept_01a",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": -49.049,
+                    "y": 0,
+                    "z": 201.448
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural",
+                    "fire_dept"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_fire_dept_01": {
+                "asset_id": "prop_fire_dept_01",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": -12.7498,
+                    "y": 0,
+                    "z": 250.43003
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural",
+                    "fire_dept"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            },
+            "inst_fire_dept": {
+                "asset_id": "prop_fire_dept",
+                "level": "lvl_1_outskirts",
+                "position": {
+                    "x": -154.538,
+                    "y": 0,
+                    "z": 239.218
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": 1,
+                "bounding_box": {
+                    "x": 4,
+                    "y": 4,
+                    "z": 4
+                },
+                "tags": [
+                    "cover",
+                    "block_los",
+                    "structural",
+                    "fire_dept"
+                ],
+                "custom_properties": {
+                    "material_override": "rusty",
+                    "notes": "."
+                }
+            }
+        }
+    },
+    "prompt_templates": {
+        "generate_waypoints": "Using the top-down blueprint at {{assets.blueprints.fuel_complex_topdown.image_url}}, generate 6 patrol waypoints for the Red Patrol Bot that create tense near-miss moments...",
+        "asset_brief": "Create a detailed Blender modeling brief for a {{type}} that strictly follows the HL2 visual_identity palette and mood..."
+    }
+}
