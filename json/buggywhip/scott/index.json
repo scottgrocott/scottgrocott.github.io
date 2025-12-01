@@ -1,0 +1,263 @@
+{
+  "generator": {
+    "name": "BuggyWhip",
+    "version": "0.1.2",
+    "lastUpdated": "2025-11-30"
+  },
+  "profile": {
+    "name": "Scott Grocott",
+    "DOB": "1967-03-10",
+    "Sex": "M",
+    "Ethnicity": "American Caucasian, British, Norwegian descent",
+    "role": "Principal Engineer / Creative Technologist",
+    "location": "Central Coast, CA",
+    "url": "http://scottgrocott.com",
+    "purpose": "Private AI-driven personal operations system for managing home life, projects, goals, and resources. This file may contain sensitive personal information and will not be public."
+  },
+  "resume": {
+    "experience": [
+      {
+        "company": "Grocott Labs",
+        "location": "Remote / Online",
+        "title": "Principal Engineer / Indie Developer",
+        "dates": "2024-Current",
+        "summary": "Independent software studio focused on Local-First AI agents and WebGL game development.",
+        "projects": [
+          {
+            "name": "BuggyWhip (AI Agent SaaS)",
+            "urls": [
+              "GitHub / Demo Available upon request"
+            ],
+            "role": "Lead Developer / Architect",
+            "responsibilities": [
+              "Developing a Local-First AI Agent system using Node.js and Ollama for privacy-focused LLM interactions.",
+              "Architected a JSON-based logic layer for dynamic prompt augmentation and context injection.",
+              "Implemented an LLM-agnostic abstraction layer to switch between models (Llama 3, Mistral) seamlessly.",
+              "Built a RESTful API for agent communication and state management."
+            ]
+          },
+          {
+            "name": "Metal Throne (Web-First FPS)",
+            "urls": [
+              "GitHub / Demo Available upon request"
+            ],
+            "role": "Solo Developer & Writer",
+            "responsibilities": [
+              "Developing a browser-based Dystopian FPS using WebGL standards (Three.js/A-Frame).",
+              "Integrated LLM APIs in custom Web IDE/Level Editor for dynamic in-game debugging and development support agents.",
+              "Created 3D assets and environments using Blender.",
+              "Managed full-stack game architecture from concept to deployment."
+            ]
+          },
+          {
+            "name": "Mountain City - Web Video Series (@164cray network)",
+            "urls": [
+              "https://www.youtube.com/playlist?list=PL-yNgUt6tRBncXq2hemUEQ1Z7EBTUASs-",
+              "https://www.youtube.com/playlist?list=PL-yNgUt6tRBkBc4LchIJxcj37ca-G9wRK",
+              "https://www.youtube.com/playlist?list=PL-yNgUt6tRBm-AsNz5A_G-ISuZhzDHru4"
+            ],
+            "role": "Writer/Director/Producer",
+            "responsibilities": [
+              "Conceptualized flagship web video series for 164cray network.",
+              "Design and engineering of 1:64 scale miniature sets.",
+              "Conceptualized/Engineered realtime animation system for 1:64 scale vehicles.",
+              "Shooting, editing, and audio engineering."
+            ]
+          }
+        ]
+      },
+      {
+        "company": "164Cray! - Tiny Adventures",
+        "location": "Remote / Online",
+        "urls": [
+          "https://rumble.com/user/164cray",
+          "https://www.youtube.com/@164cray"
+        ],
+        "title": "Technical Producer / Creative Technologist",
+        "dates": "2021-Current",
+        "responsibilities": [
+          "Designed and engineered a magnetic mechanical animation system for 1:64 scale motion control.",
+          "Full-cycle video production and editing using DaVinci Resolve.",
+          "Sound design and audio engineering using Reason DAW.",
+          "Episodic content writing, set fabrication, and digital asset management."
+        ]
+      },
+      {
+        "company": "Club DV8",
+        "location": "Atascadero, CA",
+        "title": "Synthesizer/Guitarist & Technical Lead",
+        "dates": "2019-Current",
+        "responsibilities": [
+          "Developed a browser-based preset and setlist management system using Node.js and JavaScript.",
+          "Programmed custom MIDI logic applications for hardware integration.",
+          "Live stage performance and Roland GR-55 Guitar Synthesizer operation."
+        ]
+      },
+      {
+        "company": "Miners ACE Hardware",
+        "location": "Morro Bay, CA",
+        "title": "Operations & Logistics",
+        "dates": "2019-2025",
+        "responsibilities": [
+          "Maintained logistics and warehouse operations while pursuing independent software projects.",
+          "Customer service and inventory management."
+        ]
+      },
+      {
+        "company": "Consulting (Self-Employed)",
+        "location": "Central Coast, CA / Remote",
+        "title": "Senior Web Systems Engineer & Consultant",
+        "dates": "2010-2019",
+        "summary": "Provided full-stack engineering, database architecture, and e-commerce solutions for a diverse portfolio of clients.",
+        "clients": [
+          {
+            "name": "Floorie",
+            "dates": "2018-2019",
+            "role": "Consultant/Web Systems Engineer"
+          },
+          {
+            "name": "Arclight Media",
+            "dates": "2012-2018",
+            "details": "Maintained high-traffic sites using CodeIgniter, Drupal, and WordPress."
+          },
+          {
+            "name": "Innovation Management Group",
+            "dates": "2012-2018",
+            "details": "Full-stack development using PostgreSQL, PHP, and JavaScript."
+          },
+          {
+            "name": "Paso Robles Iron Works",
+            "dates": "2012-2018",
+            "details": "Custom web application development using PHP/CodeIgniter/MySQL."
+          },
+          {
+            "name": "FoxFury Lighting Solutions",
+            "dates": "2012-2016",
+            "details": "E-commerce maintenance and feature implementation."
+          },
+          {
+            "name": "BatchGeo",
+            "dates": "2014-2015",
+            "details": "Frontend and backend support for mapping data solutions (PHP/JS/MySQL)."
+          }
+        ]
+      },
+      {
+        "company": "Remtrol Inc.",
+        "location": "San Luis Obispo, CA",
+        "title": "Software Engineer",
+        "dates": "2002-2008",
+        "technologies": [
+          "Perl",
+          "Apache::ASP",
+          "MySQL",
+          "Flash MX",
+          "PHP"
+        ]
+      },
+      {
+        "company": "Web Associates",
+        "location": "San Luis Obispo, CA",
+        "title": "Web Engineering Consultant",
+        "dates": "2000-2002",
+        "technologies": [
+          "ColdFusion",
+          "JSP",
+          "QA"
+        ]
+      },
+      {
+        "company": "Cellular One",
+        "location": "San Luis Obispo, CA",
+        "title": "Software Engineer",
+        "dates": "2001-2002",
+        "technologies": [
+          "VB.NET",
+          "ASP.NET",
+          "SQL Server"
+        ]
+      },
+      {
+        "company": "C2ON, Incorporated",
+        "location": "Grover Beach, CA",
+        "title": "System Administrator/IT Manager",
+        "dates": "1998-2000",
+        "responsibilities": [
+          "LAN/WAN/Windows NT administration",
+          "System design and Quality Assurance"
+        ]
+      },
+      {
+        "company": "Cal. Coast Online Network",
+        "location": "Grover Beach, CA",
+        "title": "Web Designer",
+        "dates": "1997-1998",
+        "responsibilities": [
+          "Database-driven websites using ColdFusion"
+        ]
+      },
+      {
+        "company": "2 Dog’s Coffee",
+        "location": "Morro Bay, CA",
+        "title": "Programmer/Graphics Consultant",
+        "dates": "1996-1997",
+        "responsibilities": [
+          "Developed 3D chat rooms and website using VRML"
+        ]
+      }
+    ]
+  },
+  "domains": {
+    "home": {
+      "kitchenInventory": {
+        "lastAudit": null,
+        "categories": {
+          "pantry": [],
+          "refrigerated": [],
+          "frozen": [],
+          "spicesAndSeasonings": [],
+          "beverages": [],
+          "cleaningSupplies": []
+        },
+        "shoppingNeeds": [],
+        "alerts": {
+          "lowStock": [],
+          "expiringSoon": []
+        }
+      },
+      "homeProjects": {
+        "active": [],
+        "queued": [],
+        "completed": [],
+        "maintenanceSchedule": []
+      }
+    },
+    "work": {
+      "professionalProjects": {
+        "active": [],
+        "queued": [],
+        "completed": []
+      },
+      "clients": []
+    },
+    "finances": {
+      "accounts": {
+        "checking": [],
+        "savings": [],
+        "credit": [],
+        "business": []
+      },
+      "subscriptions": [],
+      "monthlyBudget": {
+        "housing": null,
+        "utilities": null,
+        "food": null,
+        "transportation": null,
+        "insurance": null,
+        "entertainment": null,
+        "other": null
+      },
+      "currentGoals": []
+    }
+  }
+}
