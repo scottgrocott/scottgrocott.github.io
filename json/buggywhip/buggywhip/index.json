@@ -1,0 +1,176 @@
+{
+  "generator": {
+    "name": "BuggyWhip",
+    "version": "0.1.2",
+    "lastUpdated": "2025-12-01"
+  },
+  "project": {
+    "title": "BuggyWhip – Local-First AI Agent Framework",
+    "code": "buggywhip",
+    "version": "0.2.0-alpha",
+    "last_updated": "2025-12-01",
+    "author": "solo-dev @scott_grocott",
+    "description": "Privacy-first, local-first AI agent system built on Node.js + Ollama. Enables fully offline, extensible personal agents using JSON-driven logic layers, dynamic prompt augmentation, and LLM-agnostic backends.",
+    "goals": [
+      "Ship a stable, user-friendly local-first agent runtime that works 100% offline",
+      "Perfect the JSON-based logic / context-injection system for maximum flexibility",
+      "Achieve seamless model switching (Llama 3, Mistral, Phi-3, Gemma, etc.) with zero config changes",
+      "Build a growing library of reusable agent templates and tools",
+      "Eventually release as open-source with optional SaaS dashboard"
+    ]
+  },
+  "tech_stack": {
+    "core": [
+      "Node.js 20+",
+      "Ollama (primary) + OpenAI/Anthropic fallbacks",
+      "SQLite (local state)",
+      "JSONLogic + custom augmentation layer",
+      "Express-based REST API (internal)",
+      "Vanilla JS / EJS frontend (admin UI)",
+      "Electron (future desktop wrapper)"
+    ],
+    "philosophy": "Zero cloud dependency by default · Everything stored as readable JSON · Human + machine readable · Hot-swappable models · Extensible via simple JSON tool definitions"
+  },
+  "changelog": [
+    {
+      "date": "2025-12-01",
+      "version": "0.2.0-alpha",
+      "author": "scott_grocott",
+      "changes": [
+        "Refactored project profile to reflect true BuggyWhip scope",
+        "Replaced placeholder Metal Throne tasks with real roadmap",
+        "Updated version and generator to 0.1.2"
+      ]
+    },
+    {
+      "date": "2025-11-30",
+      "version": "0.1.1",
+      "author": "scott_grocott",
+      "changes": [
+        "Initial BuggyWhip core runtime functional",
+        "JSON logic layer + dynamic context injection working"
+      ]
+    }
+  ],
+  "task_status": [
+    "todo",
+    "in_progress",
+    "blocked",
+    "review",
+    "done"
+  ],
+  "tasks": [
+    {
+      "id": "BW001",
+      "title": "Stabilize Ollama streaming + error recovery",
+      "description": "Graceful handling of model crashes, timeouts, and auto-restart. Add watchdog + fallback to smaller model on OOM.",
+      "priority": "critical",
+      "estimate_hours": 8,
+      "status": "in_progress",
+      "progress_percent": 60,
+      "assignee": "scott_grocott",
+      "depends_on": [],
+      "model_recommendation": "DeepSeek-Coder-V2 + Llama-3.1-70B for debugging"
+    },
+    {
+      "id": "BW002",
+      "title": "Implement persistent conversation memory with vector + keyword hybrid search",
+      "description": "SQLite + embeddings (nomic-embed-text local) for fast context retrieval across sessions.",
+      "priority": "high",
+      "estimate_hours": 12,
+      "status": "todo",
+      "assignee": "scott_grocott",
+      "depends_on": [],
+      "model_recommendation": "Claude-3.5 Sonnet for architecture refinement"
+    },
+    {
+      "id": "BW003",
+      "title": "Tool / Function calling abstraction layer (v1)",
+      "description": "Standardized JSON schema for tools, auto-prompt injection, and result parsing. Start with file read/write, shell exec, web search (optional).",
+      "priority": "high",
+      "estimate_hours": 10,
+      "status": "in_progress",
+      "progress_percent": 30,
+      "assignee": "scott_grocott",
+      "depends_on": [],
+      "model_recommendation": "Llama-3.1-70B or Mistral-Large"
+    },
+    {
+      "id": "BW004",
+      "title": "Agent template system & marketplace structure",
+      "description": "Folder-based templates with manifest.json, auto-discovery, one-click import/export.",
+      "priority": "high",
+      "estimate_hours": 10,
+      "status": "todo",
+      "assignee": "scott_grocott",
+      "depends_on": ["BW003"],
+      "model_recommendation": "Grok-4 for UX flow ideas"
+    },
+    {
+      "id": "BW005",
+      "title": "Basic Electron wrapper + auto-updates",
+      "description": "Package as cross-platform desktop app with tray icon and global hotkey trigger.",
+      "priority": "medium",
+      "estimate_hours": 15,
+      "status": "todo",
+      "assignee": "scott_grocott",
+      "depends_on": ["BW001"],
+      "model_recommendation": "Claude-3.5 for Electron best practices"
+    },
+    {
+      "id": "BW006",
+      "title": "Documentation site (scottgrocott.github.io/buggywhip)",
+      "description": "Clean MkDocs or Docusaurus site with getting-started, template format spec, examples.",
+      "priority": "medium",
+      "estimate_hours": 12,
+      "status": "todo",
+      "assignee": "scott_grocott",
+      "depends_on": [],
+      "model_recommendation": "GPT-4o for writing + structure"
+    },
+    {
+      "id": "BW007",
+      "title": "First 5 official agent templates",
+      "description": "Personal Assistant, Code Reviewer, Writing Editor, Home Ops (inventory/projects), Research Agent.",
+      "priority": "high",
+      "estimate_hours": 20,
+      "status": "todo",
+      "assignee": "scott_grocott",
+      "depends_on": ["BW003", "BW004"],
+      "model_recommendation": "Claude-3.5 for prompt engineering"
+    },
+    {
+      "id": "BW008",
+      "title": "Public GitHub repo cleanup & open-source launch",
+      "description": "Remove any secrets, add LICENSE (MIT), CONTRIBUTING.md, issue templates.",
+      "priority": "medium",
+      "estimate_hours": 6,
+      "status": "todo",
+      "assignee": "scott_grocott",
+      "depends_on": ["BW001", "BW006"]
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M01",
+      "title": "Alpha – 'It works reliably on my machine'",
+      "deadline": "2025-12-20",
+      "dependencies": ["BW001", "BW003"],
+      "description": "Core runtime stable, tool calling works, no crashes during normal use."
+    },
+    {
+      "id": "M02",
+      "title": "Beta – Public GitHub release + 5 templates",
+      "deadline": "2026-01-31",
+      "dependencies": ["M01", "BW002", "BW004", "BW006", "BW007", "BW008"],
+      "description": "Open-source launch with documentation and usable templates."
+    },
+    {
+      "id": "M03",
+      "title": "v1.0 – Electron app + auto-update",
+      "deadline": "2026-03-15",
+      "dependencies": ["M02", "BW005"],
+      "description": "One-click desktop install for non-technical users."
+    }
+  ]
+}
