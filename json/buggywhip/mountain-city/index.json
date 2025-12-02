@@ -118,19 +118,19 @@
             },
             {
                 "id": 10,
-                "dealershipName": "Ferrari Motors",
-                "familyName": "Ferrari",
+                "dealershipName": "Tortellini Motors",
+                "familyName": "Tortellini",
                 "ethnicity": "Italian",
                 "carManufacturer": "Ferrari",
-                "restaurantName": "Ristorante Ferrari"
+                "restaurantName": "Ristorante Tortellini"
             },
             {
                 "id": 11,
-                "dealershipName": "Lamborghini Autos",
-                "familyName": "Lamborghini",
+                "dealershipName": "Boss Autos",
+                "familyName": "Boss",
                 "ethnicity": "Italian",
                 "carManufacturer": "Lamborghini",
-                "restaurantName": "Trattoria Lamborghini"
+                "restaurantName": "Boss Trattoria"
             },
             {
                 "id": 12,
@@ -222,6 +222,10 @@
             }
         ]
     },
+	"autopia":{
+		"description":"A large island nation in the middle of the ocean. Autopia is a socially stratified and car culture dominates daily life. A port city, an inland desert, a mountain filled northern region (The location of Mountain City), a large deep canyon region in the desert. Very mysterious",
+		"url":"./autopia.json"
+	}
     "factions": {
         "dealershipFamilies": {
             "description": "Each ethnic family owns dealership + restaurant tied to national cuisine and car manufacturer. Economic and political dynasties shape town culture.",
@@ -236,8 +240,8 @@
                 "Choi",
                 "Dupont",
                 "Renault",
-                "Ferrari",
-                "Lamborghini",
+                "Tortellini",
+                "Boss",
                 "Winston",
                 "Rover",
                 "Schneider",
