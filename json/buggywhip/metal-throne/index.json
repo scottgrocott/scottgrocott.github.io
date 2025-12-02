@@ -395,7 +395,7 @@
             "title": "Greybox Level 1 Layout",
             "description": "Basic terrain, walls, cover objects, patrol corridors, entry/exit flow.",
             "priority": "high",
-            "estimate_hours": 6,
+            "estimate_hours": 20,
             "status": "todo",
             "assignee": "level_design",
             "depends_on": [],
@@ -406,9 +406,8 @@
             "title": "Patrol Bot Movement + Waypoint System",
             "description": "Spline/waypoint navigation with looping patterns and pause durations.",
             "priority": "high",
-            "estimate_hours": 6,
+            "estimate_hours": 20,
             "status": "in_progress",
-            "progress_percent": 40,
             "assignee": "ai_programming",
             "depends_on": [],
             "model_recommendation": "DeepSeek-Coder-V2 for code tasks"
@@ -1321,6 +1320,17 @@
             }
         }
     },
+	"sprints": [
+  {
+    "id": "sprint_01",
+    "name": "Sprint 01 — Level 1 Playable Greybox Alpha",
+    "start_date": "2026-01-01",  
+    "end_date": "2026-01-31", 
+    "goal": "everything will still be basically primitives with simple shooting,detonator retrieval, basic hud updates, one basic enemy",
+    "tasks_assigned": ["T001_level_blockout", "T002_patrol_movement","T003_vision_cone_system","T005_detonator_pickup"],
+    "burn_down": []  
+  }
+]
     "prompt_templates": {
         "generate_waypoints": "Using the top-down blueprint at {{assets.blueprints.fuel_complex_topdown.image_url}}, generate 6 patrol waypoints for the Red Patrol Bot that create tense near-miss moments...",
         "asset_brief": "Create a detailed Blender modeling brief for a {{type}} that strictly follows the HL2 visual_identity palette and mood..."
