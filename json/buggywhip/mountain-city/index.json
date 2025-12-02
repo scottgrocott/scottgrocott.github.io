@@ -1,0 +1,255 @@
+{
+    "generator": {
+        "name": "BuggyWhip",
+        "version": "0.1.1",
+        "lastUpdated": "2025-11-30"
+    },
+    "project": {
+        "title": "Mountain City - Web Video Series (@164cray network)",
+        "code": "mountain-city",
+        "version": "0.1.0",
+        "last_updated": "2025-12-01",
+        "author": "Scott Grocott x- @scott_grocott",
+        "description": "Mountain City is on the island of Autopia. Autopia is a socially stratified island nation where car culture dominates daily life. The city is known for its towering skyscrapers, sprawling highways, and dense urban environment filled with neon lights and bustling streets. The story follows a lone protagonist navigating the dangerous underbelly of Mountain City, uncovering conspiracies tied to the powerful automotive families that control the city's economy and politics.",
+        "genre_tags": [
+            "Animation",
+            "Live-Action",
+            "Action",
+            "Car Chase",
+            "Surealism"
+        ],
+        "production_design": [
+            "Miniature live sets with practical effects",
+            "Digital effects to enhance scale and atmosphere",
+            "Audio/Script production approach. Modeled after radio drama and 'South Park'.",
+            "It's all about the cars: custom builds, stunts, chases. Anytime we can focus on vehicles, we do. Car action first and narrative second.",
+            "car culture as worldbuilding: the social dynamics, fashion, music, and architecture are all influenced by automotive themes."
+        ],
+        "series_arc": [
+        "The whole series will be in 3 acts.",
+        "Act 1 introduces the world and characters.Most of the primary action will take place in the wooded outskirts of the city,with occasional cutaways to the city for establishing various elements. The primary location is the 'A.O.K. Kampground' this camping facility is a more affordable, open to everyone (meaning all makes and models of cars). The campground,is ajacent to a giant recreational area for auto enthusiasts. Campers bring their vehicle to enjoy all kinds of auto performance activity.",
+        "Act 2 Takes our main character from the outskirts into the heart of Mountain City. Here, the protagonist uncovers deeper conspiracies involving the powerful automotive families that control the city. High-speed chases through neon-lit streets, daring escapes, and intense confrontations define this act.This culminates in a showdown with leader of the Ferrari family, revealing their plans to monopolize the city's automotive industry.",
+        "Act 3 Adds the final twist in that the city is taken over by a new more powerful boss.'Chad Boss' to be exact. Chad moves in with his Lamborghini operation (up until this point in the series Lamborghini has not be seen or spoken of because Chad had not been called in yet) and begins to battle the powers that be to get the city under his control in a high-stakes showdown that reshapes Mountain City."
+    ],
+        "characters": [
+            "protagonist: TBD",
+            "protagonist: friend group (from the campground) TBD",
+            "primary antagonist: Joey Tortellini (Ferrari Family Leader)"
+        ],
+        "primary_player_abilities": [
+            "Walk, sprint, crouch, slide",
+            "Interact: shoot, open doors, pick up detonators",
+            "Environmental stealth: shadows, noise"
+        ]
+    },
+    "worldAssets": {
+        "carDealerships": [
+            {
+                "id": 1,
+                "dealershipName": "Nakamura Motors",
+                "familyName": "Nakamura",
+                "ethnicity": "Japanese",
+                "carManufacturer": "Toyota",
+                "restaurantName": "Nakamura Sushi House"
+            },
+            {
+                "id": 2,
+                "dealershipName": "Miyazaki Autos",
+                "familyName": "Miyazaki",
+                "ethnicity": "Japanese",
+                "carManufacturer": "Honda",
+                "restaurantName": "Miyazaki Ramen House"
+            },
+            {
+                "id": 3,
+                "dealershipName": "Kawasaki Automotive",
+                "familyName": "Kawasaki",
+                "ethnicity": "Japanese",
+                "carManufacturer": "Nissan",
+                "restaurantName": "Kawasaki Teppanyaki Grill"
+            },
+            {
+                "id": 4,
+                "dealershipName": "Suzuki Motors",
+                "familyName": "Suzuki",
+                "ethnicity": "Japanese",
+                "carManufacturer": "Suzuki",
+                "restaurantName": "Suzuki Tempura and Soba"
+            },
+            {
+                "id": 5,
+                "dealershipName": "Mitsubishi Motors",
+                "familyName": "Mitsubishi",
+                "ethnicity": "Japanese",
+                "carManufacturer": "Mitsubishi",
+                "restaurantName": "Mitsubishi Izakaya"
+            },
+            {
+                "id": 6,
+                "dealershipName": "Kim Motors",
+                "familyName": "Kim",
+                "ethnicity": "Korean",
+                "carManufacturer": "Hyundai",
+                "restaurantName": "Kim's Bulgogi Palace"
+            },
+            {
+                "id": 7,
+                "dealershipName": "Choi Autohaus",
+                "familyName": "Choi",
+                "ethnicity": "Korean",
+                "carManufacturer": "Kia",
+                "restaurantName": "Choi's Kimchi Bistro"
+            },
+            {
+                "id": 8,
+                "dealershipName": "Dupont Automobiles",
+                "familyName": "Dupont",
+                "ethnicity": "French",
+                "carManufacturer": "Peugeot",
+                "restaurantName": "Le Bistro Dupont"
+            },
+            {
+                "id": 9,
+                "dealershipName": "Renault Motors",
+                "familyName": "Renault",
+                "ethnicity": "French",
+                "carManufacturer": "Renault",
+                "restaurantName": "Renault Café de Paris"
+            },
+            {
+                "id": 10,
+                "dealershipName": "Ferrari Motors",
+                "familyName": "Ferrari",
+                "ethnicity": "Italian",
+                "carManufacturer": "Ferrari",
+                "restaurantName": "Ristorante Ferrari"
+            },
+            {
+                "id": 11,
+                "dealershipName": "Lamborghini Autos",
+                "familyName": "Lamborghini",
+                "ethnicity": "Italian",
+                "carManufacturer": "Lamborghini",
+                "restaurantName": "Trattoria Lamborghini"
+            },
+            {
+                "id": 12,
+                "dealershipName": "Winston Motors",
+                "familyName": "Winston",
+                "ethnicity": "British",
+                "carManufacturer": "Aston Martin",
+                "restaurantName": "Winston's British Pub"
+            },
+            {
+                "id": 13,
+                "dealershipName": "Rover Autos",
+                "familyName": "Rover",
+                "ethnicity": "British",
+                "carManufacturer": "Land Rover",
+                "restaurantName": "The Rover Roast House"
+            },
+            {
+                "id": 14,
+                "dealershipName": "Schneider Motors",
+                "familyName": "Schneider",
+                "ethnicity": "German",
+                "carManufacturer": "BMW",
+                "restaurantName": "Schneider's Bratwurst Haus"
+            },
+            {
+                "id": 15,
+                "dealershipName": "Volkswagen Autowerks",
+                "familyName": "Volkswagen",
+                "ethnicity": "German",
+                "carManufacturer": "Volkswagen",
+                "restaurantName": "Volkswagen Wurst und Bier"
+            },
+            {
+                "id": 16,
+                "dealershipName": "Eriksson Autos",
+                "familyName": "Eriksson",
+                "ethnicity": "Swedish",
+                "carManufacturer": "Volvo",
+                "restaurantName": "Eriksson Smorgasbord Café"
+            },
+            {
+                "id": 17,
+                "dealershipName": "Svensson Motors",
+                "familyName": "Svensson",
+                "ethnicity": "Swedish",
+                "carManufacturer": "Saab",
+                "restaurantName": "Svensson Herring Haven"
+            },
+            {
+                "id": 18,
+                "dealershipName": "Johnson Motors",
+                "familyName": "Johnson",
+                "ethnicity": "American",
+                "carManufacturer": "Ford",
+                "restaurantName": "Johnson's All-American Diner"
+            },
+            {
+                "id": 19,
+                "dealershipName": "Smith Automotive",
+                "familyName": "Smith",
+                "ethnicity": "American",
+                "carManufacturer": "Chevrolet",
+                "restaurantName": "Smith's Classic BBQ Pit"
+            },
+            {
+                "id": 20,
+                "dealershipName": "Miller Motors",
+                "familyName": "Miller",
+                "ethnicity": "American",
+                "carManufacturer": "Chrysler",
+                "restaurantName": "Miller's Roadside Grill"
+            },
+            {
+                "id": 21,
+                "dealershipName": "Brown Autos",
+                "familyName": "Brown",
+                "ethnicity": "American",
+                "carManufacturer": "GMC",
+                "restaurantName": "Brown's Southern Comfort Kitchen"
+            },
+            {
+                "id": 22,
+                "dealershipName": "Anderson Motors",
+                "familyName": "Anderson",
+                "ethnicity": "American",
+                "carManufacturer": "Dodge",
+                "restaurantName": "Anderson's Burger Barn"
+            }
+        ]
+    },
+    "factions": {
+        "dealershipFamilies": {
+            "description": "Each ethnic family owns dealership + restaurant tied to national cuisine and car manufacturer. Economic and political dynasties shape town culture.",
+            "coreRule": "Family last names correspond to national cuisine; manufacturer matches origin country.",
+            "families": [
+                "Nakamura",
+                "Miyazaki",
+                "Kawasaki",
+                "Suzuki",
+                "Mitsubishi",
+                "Kim",
+                "Choi",
+                "Dupont",
+                "Renault",
+                "Ferrari",
+                "Lamborghini",
+                "Winston",
+                "Rover",
+                "Schneider",
+                "Volkswagen",
+                "Eriksson",
+                "Svensson",
+                "Johnson",
+                "Smith",
+                "Miller",
+                "Brown",
+                "Anderson"
+            ]
+        }
+    }
+}
