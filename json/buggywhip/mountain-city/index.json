@@ -224,7 +224,7 @@
     },
 	"autopia":{
 		"description":"A large island nation in the middle of the ocean. Autopia is a socially stratified and car culture dominates daily life. A port city, an inland desert, a mountain filled northern region (The location of Mountain City), a large deep canyon region in the desert. Very mysterious",
-		"url":"./autopia.json"
+		"url":"https://scottgrocott.github.io/json/buggywhip/mountain-city/autopia.json"
 	}
     "factions": {
         "dealershipFamilies": {

@@ -1,5 +1,128 @@
 {
-	"purpose for this file":"this file contains all relevent data for 'Autopia' the universe the the web series 'Mountain City' is set in.",
-	"location":"pacific ocean, between Austrailia and Hawaii",
-	"geography":"basically a mini Austrailia."
+  "generator": {
+    "name": "BuggyWhip",
+    "version": "0.1.0"
+  },
+  "profile": {
+    "name": "Autopia",
+    "type": "Geopolitical Region / Island Nation",
+    "id": "urn:uuid:autopia-island",
+    "location": "Pacific Ocean (Coordinates Classified)",
+    "motto": "Vincit Qui Patitur (He Who Endures, Wins... usually the race)",
+    "population": {
+      "total": 500000,
+      "vehicles": 1500000,
+      "ratio": "3:1 (Cars per Capita)"
+    }
+  },
+  "network": {
+    "parent": {
+      "rel": "setting-for",
+      "name": "Mountain City Series",
+      "href": "https://scottgrocott.github.io/json/buggywhip/mountain-city/"
+    },
+    "root": {
+      "rel": "creator",
+      "name": "Scott Grocott",
+      "href": "https://scottgrocott.github.io/json/buggywhip/scott/"
+    }
+  },
+  "geography": {
+    "summary": "A terra-formed diverse biome island designed specifically for automotive testing and lifestyle. The island is ringed by 'The Beltway' (Highway 1) and divided into 5 distinct 'Driving Zones'.",
+    "regions": [
+      {
+        "name": "Port Injection",
+        "terrain": "Urban / Coastal / Tarmac",
+        "biome": "Metropolis",
+        "drivingStyle": "Street / Drift / Drag",
+        "dominantVehicles": ["JDM Tuners", "Euro Hot Hatches", "VIP Sedans"],
+        "description": "The capital city. A neon-drenched coastal metropolis where zoning laws require every building to have a garage on the first floor. Traffic lights are drag trees. The police drive high-speed interceptors (GTRs/Porsches).",
+        "landmarks": [
+          "The Turbo Terminal (Shipping docks for vehicle imports)",
+          "Redline District (Underground street racing hub)",
+          "The Spiral (A massive multi-level parking structure/residential complex)"
+        ]
+      },
+      {
+        "name": "The Gasket Gulch",
+        "terrain": "Desert / Sand / Rock",
+        "biome": "Arid Wasteland",
+        "drivingStyle": "Baja / Pre-runner / Mad Max",
+        "dominantVehicles": ["Trophy Trucks", "Dune Buggies", "Rat Rods"],
+        "description": "The lawless interior. No paved roads exist here. Fuel is currency. The inhabitants live in fortified scrapyards. It is the graveyard for cars that fail inspection in the city.",
+        "landmarks": [
+          "Rust Valhalla (Massive scrapyard)",
+          "The Dune Sea (Open freeride zone)",
+          "Injector Falls (An oasis, but for fuel refining)"
+        ]
+      },
+      {
+        "name": "Apex Peaks",
+        "terrain": "Mountain / Snow / Asphalt",
+        "biome": "Alpine",
+        "drivingStyle": "Touge / Rally / Hillclimb",
+        "dominantVehicles": ["AWD Rally Cars", "Lightweight RWD Sports", "Kei Trucks"],
+        "description": "A winding mountain range that separates the coast from the desert. Home to the wealthy and the skilled. The roads are technical, narrow, and often icy. 'The Pass' is the only paved route through the mountains.",
+        "landmarks": [
+          "The Hairpin Hotel (Luxury resort at the summit)",
+          "Drift King's Lookout",
+          "Black Ice Bridge"
+        ]
+      },
+      {
+        "name": "Torque Timberlands",
+        "terrain": "Mud / Deep Forest / River",
+        "biome": "Rainforest",
+        "drivingStyle": "Overlanding / Rock Crawling / Mudding",
+        "dominantVehicles": ["Lifted 4x4s", "Unimogs", "Jeeps", "Land Rovers"],
+        "description": "A dense, wet forest region. Travel here is measured in 'obstacles per mile' rather than MPH. The culture is cooperative; drivers must use winches and recovery gear to help each other traverse the terrain.",
+        "landmarks": [
+          "The Bog (An infamous mud pit that swallows cars)",
+          "Winch Hill",
+          "Camp Diff-Lock"
+        ]
+      },
+      {
+        "name": "Velocity Flats",
+        "terrain": "Salt Flat / Dry Lake Bed",
+        "biome": "Plains",
+        "drivingStyle": "Top Speed / Drag",
+        "dominantVehicles": ["Streamliners", "Hypercars", "Jet Cars"],
+        "description": "A massive, flat expanse of white salt. There are no speed limits because there are no lanes. This is the testing ground for experimental engineering and land speed records.",
+        "landmarks": [
+          "The 300MPH Club House",
+          "The Measuring Mile",
+          "Crash Site Alpha (A monument to failed attempts)"
+        ]
+      }
+    ]
+  },
+  "infrastructure": {
+    "roads": {
+      "Highway 1 (The Beltway)": "A 12-lane superhighway orbiting the island. 6 lanes clockwise, 6 lanes counter-clockwise. Minimum speed limit: 80 MPH.",
+      "Route 666 (The Dragon)": "The mountain pass connecting Port Injection to The Gasket Gulch. 300 corners in 30 miles.",
+      "The Overland Trail": "A GPS-marked dirt route connecting the Timberlands to the Desert."
+    },
+    "services": {
+      "Fuel": "Available everywhere. 100 Octane is standard. 87 Octane is illegal.",
+      "Repair": "Every town center is a mechanic shop. Restaurants usually double as oil-change pits."
+    },
+    "lawEnforcement": {
+      "Highway Patrol": "Lamborghini Huracans & Dodge Chargers.",
+      "Off-Road Response": "Ford Raptors & Local Motors Rally Fighters.",
+      "Philosophy": "They don't pull you over for speeding; they pull you over for driving a boring car."
+    }
+  },
+  "culture": {
+    "socialHierarchy": [
+      "The Fabricators (Top tier - those who build)",
+      "The Tuners (Middle tier - those who improve)",
+      "The Drivers (Working class - those who operate)",
+      "The Commuters (Lowest class - those who drive purely for transport)"
+    ],
+    "economy": {
+      "currency": "Credits (Digital)",
+      "commodities": ["Tires", "Nitrous", "Rare Parts", "Vintage Chassis"]
+    }
+  }
 }
