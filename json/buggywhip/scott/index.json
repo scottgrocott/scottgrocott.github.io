@@ -2,7 +2,7 @@
   "generator": {
     "name": "BuggyWhip",
     "version": "0.1.2",
-    "lastUpdated": "2025-12-01T12:00:00Z"
+    "lastUpdated": "12/4/2025 10:30 AM PST"
   },
   "profile": {
     "name": "Scott Grocott",
@@ -65,6 +65,15 @@
               "Design and engineering of 1:64 scale miniature sets.",
               "Conceptualized/Engineered realtime animation system for 1:64 scale vehicles.",
               "Shooting, editing, and audio engineering."
+            ]
+          },
+                    {
+            "name": "The Commission - AI Pre-Visualization (Feature Film)",
+            "buggywhip_url": "https://scottgrocott.github.io/json/buggywhip/the-commission",
+            "role": "Co-Producer/AI Visual Effects Supervisor/AI Prompt Engineer/Character Actor",
+            "responsibilities": [
+              "AI prompt engineering and generation of visual effects assets",
+              "Character acting in key supporting role"
             ]
           }
         ]
