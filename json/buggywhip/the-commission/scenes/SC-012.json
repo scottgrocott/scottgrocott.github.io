@@ -1,0 +1,170 @@
+{
+  "sceneId": "SC-012",
+  "sequence": 12,
+  "title": "Clear Coat & Kenny Visits the Studio",
+  "pageEst": 4.0,
+
+  "screenplay": {
+    "rawText": "INT. JASON’S ART STUDIO – DAY\nJason applies a clear coat to his finished painting when his artist friend Kenny arrives. They discuss the mysterious commission, the NDA, the cash payment, and the upcoming marketing events. Kenny reacts strongly to the money and contract, meets Stacey, and agrees to help Jason with the photography stunt.",
+    "slugline": {
+      "location": "Jason’s Art Studio",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+    "actions": [
+      "Jason begins applying high gloss varnish with a large brush.",
+      "The painting's colors intensify as the clear coat spreads.",
+      "Kenny arrives at the open studio door.",
+      "Jason invites Kenny in.",
+      "Kenny asks about the painting and the buyer.",
+      "Jason explains the NDA and shows Kenny the contract.",
+      "Kenny reads the contract and reacts to the $20k value.",
+      "Jason picks up the $15k in cash and dumps it in Kenny’s lap.",
+      "Kenny reacts with shock and excitement.",
+      "Kenny notices Stacey filming.",
+      "Jason introduces Stacey.",
+      "Kenny greets Stacey and continues reading the contract.",
+      "Jason asks Kenny to help with the 'dangerous neighborhood' photoshoot.",
+      "Kenny agrees and asks about the timing.",
+      "Jason explains the order of marketing events.",
+      "Kenny leaves abruptly after a brief exchange.",
+      "Jason returns to finishing the clear coat.",
+      "Stacey asks about Kenny.",
+      "Jason explains their long friendship.",
+      "Jason finishes the clear coat and celebrates.",
+      "Jason states he will sign the back tomorrow."
+    ],
+    "dialogue": [
+      {
+        "character": "KENNY",
+        "lines": [
+          "Hey—— what’s hapennin!?",
+          "What are you working on?",
+          "Nice! A new buyer, who is it?",
+          "What do you mean, you can’t talk about it?",
+          "I’ve never heard of such a thing.",
+          "What else did you sign up for?",
+          "Let me see that..",
+          "Twenty grand for all of this? Are you serious? For just the one painting?",
+          "Paid in cash!?",
+          "What the fuck! This is crazy!",
+          "I’m sorry, who are you?",
+          "What else is in here?",
+          "Three marketing events? Why?",
+          "Shit neighborhood? Around here?",
+          "Yes. Sure.. When?",
+          "What about this art show?",
+          "Art show? Easy!",
+          "Okay, well then. I better run. Gotta get back to work."
+        ]
+      },
+      {
+        "character": "JASON",
+        "lines": [
+          "Hey Kenny! Come in.",
+          "I’m just finishing up a commission for a new buyer.",
+          "He’s a new buyer.. I can’t really talk about it.",
+          "I signed an NDA.. I can’t talk about the buyer.",
+          "Here. It’s all here. Well, except the buyer’s name, it’s not written on the contract.",
+          "Yes! It caught me off guard too.",
+          "Yep.",
+          "I know—— It’s pretty exciting!",
+          "Hey—— will you help me with the second marketing stunt? I need to do a photo shoot in a shit neighborhood.",
+          "Yes, I need to figure that part out.. Will you help?",
+          "In a few days.. I’ll be doing a podcast first. Then we’ll go.",
+          "Okay, see ya!",
+          "He’s a local artist.. I’ve been hanging out with Kenny for fifteen years now.. He’s like a brother..",
+          "Okay— clear coat done!",
+          "Tomorrow I’ll sign the backside and it’ll be finished."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "Bye.",
+          "He’s an interesting guy.. How do you know him?"
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason clear coats the painting as his longtime friend Kenny visits. Kenny learns about the NDA, sees the massive cash payment, and reacts with astonishment. Jason recruits Kenny for the dangerous-neighborhood photo shoot. Their dynamic highlights Jason’s secrecy, rising stakes, and the surreal nature of the commission. Jason finishes the clear coat and prepares to sign the painting the next day.",
+    "beatPurpose": "Introduce Kenny as a significant supporting character; validate the bizarre nature of the contract through an outside perspective; escalate stakes for upcoming marketing events; reinforce secrecy and mystery around the buyer.",
+    "conflict": "Curiosity vs. secrecy — Kenny wants details; Jason is bound by NDA. Subtext: Is Jason in over his head?",
+    "stakes": "The NDA and unusual demands deepen mystery; the marketing events are now real obligations; Jason must finish all requirements on time.",
+    "outcome": "Jason finishes clear coat; Kenny agrees to help with the dangerous neighborhood shoot; story moves toward marketing phase.",
+    "themes": [
+      "Surreal opportunity",
+      "Friendship under strange circumstances",
+      "Art world absurdity",
+      "The tension between secrecy and curiosity",
+      "Escalating stakes"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Stacey Morrison", "Kenny"],
+    "newIntroductions": ["Kenny"],
+    "revealedBackstory": [
+      "Kenny is a local artist and one of Jason’s closest friends for 15 years.",
+      "Jason cannot disclose the buyer’s name due to the NDA.",
+      "The commission totals $20,000, including the documentary and bonus.",
+      "Jason still has $15,000 in cash on-site."
+    ],
+    "emotionalShifts": {
+      "Jason Towne": "Focused → proud → slightly guilty → excited → relieved",
+      "Stacey Morrison": "Neutral → observant → curious → amused",
+      "Kenny": "Casual → curious → shocked → excited → supportive"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s art studio interior"],
+    "props": [
+      "Commission painting",
+      "Clear coat varnish",
+      "Large brush",
+      "Contract",
+      "Stacks of cash ($15k)",
+      "Workbench",
+      "Dropper bottles and painting tools"
+    ],
+    "technology": ["Camera/documentary gear"],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "Clear coat marks near-final completion before marketing events.",
+      "Kenny becomes involved in marketing event #2.",
+      "Confirms Jason still has $15k cash from Franklin's payment.",
+      "Expands the mystery around Franklin Stevenson and the NDA."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [
+      "Slight gloss shimmer on painting as the varnish goes on"
+    ],
+    "SFX": [
+      "Brush spreading varnish",
+      "Cash slapping into Kenny's lap",
+      "Studio ambience"
+    ],
+    "music": [
+      "Warm, upbeat cue for Kenny’s arrival",
+      "Curiosity motif during NDA/contract discussion"
+    ],
+    "cameraIdeas": [
+      "Macro shots of varnish bringing colors to life",
+      "Handheld documentary style during Jason–Kenny banter",
+      "Medium two-shot when Jason dumps cash into Kenny’s lap",
+      "Over-the-shoulder shots of contract pages"
+    ],
+    "setRequirements": [
+      "Painting station with table",
+      "Gloss varnish setup",
+      "Contract papers",
+      "Stacks of prop cash",
+      "Open studio door for Kenny entrance"
+    ]
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "sceneId": "SC-009",
+  "sequence": 9,
+  "title": "Victory at the Dumpster",
+  "pageEst": 0.6,
+
+  "screenplay": {
+    "rawText": "EXT. JASON’S ART STUDIO – MORNING\nJason arrives in his truck, cheerful and energized. He proudly gestures toward the dumpster, noticing there is no trash scattered as in previous days.",
+    "slugline": {
+      "location": "Outside Jason’s Art Studio",
+      "interiorExterior": "EXT",
+      "timeOfDay": "MORNING"
+    },
+    "actions": [
+      "Jason pulls into the parking lot.",
+      "He exits the truck quickly and proudly gestures toward the dumpster.",
+      "He points out the lack of scattered trash.",
+      "Stacey affirms his 'victory' from the previous day's deterrent.",
+      "Jason smiles confidently.",
+      "They head inside to begin painting."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "Look, not trash!",
+          "(With a smile) Yes I did. I did win."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "Yes! You won the battle with your bag of shit.",
+          "Haha! Let’s get started."
+        ]
+      },
+      {
+        "character": "JASON",
+        "lines": [
+          "Yes, let’s paint."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason arrives ecstatic to see no trash around his dumpster, confirming that his crude deterrent worked. The moment becomes a humorous victory beat between him and Stacey before they continue the painting process.",
+    "beatPurpose": "Release tension from the previous disturbing revelation; build camaraderie between Jason and Stacey; close the ‘trash conflict’ mini-arc.",
+    "conflict": "Resolved — the dumpster problem is temporarily fixed.",
+    "stakes": "The emotional environment stabilizes, allowing Jason to refocus on painting.",
+    "outcome": "Jason’s mood lifts, and painting can resume.",
+    "themes": [
+      "Small victories",
+      "Dark humor",
+      "Improvised solutions",
+      "Building rapport"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Stacey Morrison"],
+    "newIntroductions": [],
+    "revealedBackstory": [],
+    "emotionalShifts": {
+      "Jason Towne": "Excited → triumphant → ready to work",
+      "Stacey Morrison": "Playful → amused → supportive"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s art studio exterior and dumpster area"],
+    "props": [
+      "Jason’s truck",
+      "Dumpster (clean area)"
+    ],
+    "technology": [],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "Concludes the trash problem storyline from SC-004, SC-006, and SC-008.",
+      "Sets up a more optimistic tone for the next painting session."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [],
+    "SFX": [
+      "Truck engine turning off",
+      "Morning ambience"
+    ],
+    "music": [
+      "Light, upbeat cue signifying small victory"
+    ],
+    "cameraIdeas": [
+      "Reveal shot of the clean dumpster area.",
+      "Medium shot capturing Jason’s proud expression.",
+      "Documentary-style banter between Jason and Stacey."
+    ],
+    "setRequirements": [
+      "Truck",
+      "Clean dumpster setup",
+      "Parking lot"
+    ]
+  }
+}

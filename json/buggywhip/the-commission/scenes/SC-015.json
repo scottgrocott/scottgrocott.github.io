@@ -1,0 +1,123 @@
+{
+  "sceneId": "SC-015",
+  "sequence": 15,
+  "title": "Martin’s Art Knowing Article",
+  "pageEst": 2.3,
+
+  "screenplay": {
+    "rawText": "Jason reads Martin Jenkins’ published article in Art Knowing Magazine, reacting to the mix of insult, backhanded praise, and unexpected validation. This completes Marketing Event #1 and sets up the next task: the dangerous-neighborhood photo shoot.",
+    "slugline": {
+      "location": "Jason's Art Studio",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+
+    "actions": [
+      "Jason stands in his studio, holding the fresh issue of Art Knowing Magazine.",
+      "He flips to the article — a full-page spread with a photo of him and the painting taken during the podcast.",
+      "Jason quietly reads the article aloud, skimming selective portions.",
+      "Stacks of cash still sit on his workbench near the commission contract.",
+      "He moves the stacks aside to read the next required marketing event.",
+      "Jason thinks through locations for a 'dangerous neighborhood,' finally settling on the train tunnel near the station."
+    ],
+
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "Um... not bad. Works for me.",
+          "..That was marketing event #1 complete.",
+          "Marketing event #1: Do Drunken Art Critic podcast...",
+          "..Yep, that’s one down.",
+          "Now for marketing event #2: Do a photo shoot in a bad part of town.",
+          "There aren’t any bad neighborhoods around here...",
+          "Wait! I know a place...",
+          "The train tunnel next to the train station should work.",
+          "Yep, that’s the plan."
+        ]
+      }
+    ]
+  },
+
+  "articleContent": {
+    "title": "Art Knowing Magazine – Feature by Martin Jenkins",
+    "author": "Martin Jenkins",
+    "summary": "Martin’s article recounts the podcast experience, initially describing Jason as a presumed dimwit—consistent with Martin’s harsh editorial persona. Across the article, however, Martin acknowledges Jason’s above-average intellect, thoughtful process, and a painting that 'grew on him'. He compares the work to process-driven artists of the Painters Painting era. The article concludes with a mix of alcohol-driven honesty and reluctant admiration.",
+    "tone": [
+      "Backhanded",
+      "Pretentious",
+      "Humorous",
+      "Philosophical"
+    ],
+    "fullText": [
+      "I had the opportunity to sit with Jason Towne on my podcast to discuss his artwork, his thoughts, and have a deluge of scrumptious Pinot Noir.",
+      "We began our conversation with my certainty of Jason’s dim wit. As my readers know, I do this with all artists. The artist gets no benefit of the doubt from me until we speak. The artist gets no freebies. You are an idiot, or you’re not. My assumption is firmly grounded in this reality—most artists are imbeciles. If you take offense to this—you might be stupid too.",
+      "Jason’s newest painting was present for our conversation. It had an effect on me. The coloration was striking... several notches away from magnificent, but it works well enough.",
+      "Jason dispelled my assumption that he possesses a dimwit. He is quite normal—his intellect is a smidge above average. Jason should receive this praise as a high honor.",
+      "His focus on layered process reminds me of the documentary Painters Painting—an era when artists cared about expression rather than fame.",
+      "Jason’s painting began to grow on me as we spoke. This frequently happens. A work whispers to be viewed again. Given enough time, it might surprise us.",
+      "Jason also helped me drop my shield enough to take in his work on a deeper level. Or perhaps the Pinot Noir did. Until next time, keep the drinks flowing. —Martin Jenkins"
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason reads Martin's published article, which is simultaneously insulting and complimentary. Jason interprets it as a win, marking the completion of Marketing Event #1. He consults the contract and begins planning the next required stunt: a photo shoot in a 'dangerous' location.",
+    "beatPurpose": "Provide closure on the podcast arc; validate Jason’s efforts; move the story into Marketing Event #2.",
+    "conflict": "Internal — Jason processes the weird and insulting-but-positive nature of Martin’s feedback.",
+    "stakes": "Completion of each marketing event is tied to receiving the bonus and fulfilling Franklin’s strict commission requirements.",
+    "outcome": "Jason accepts the event as successfully completed and identifies the next marketing task.",
+    "tone": [
+      "Reflective",
+      "Comedic",
+      "Sardonic",
+      "Light-forward-moving"
+    ],
+    "themes": [
+      "Perception vs reality",
+      "The absurdity of the art world",
+      "Validation through unlikely sources",
+      "Obligation vs creativity"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne"],
+    "mentioned": ["Martin Jenkins", "Franklin Stevenson", "Catherine Thompson"],
+    "revealedBackstory": [],
+    "emotionalShifts": {
+      "Jason Towne": "Curious → Amused → Satisfied → Motivated"
+    }
+  },
+
+  "worldbuilding": {
+    "props": [
+      "Art Knowing Magazine",
+      "Stacks of cash ($15,000)",
+      "Commission contract",
+      "Jason’s workbench"
+    ],
+    "locations": [
+      "Jason’s art studio",
+      "Reference to the upcoming train station tunnel"
+    ],
+    "continuityLinks": [
+      "Completes Marketing Event #1.",
+      "Sets up the 'dangerous neighborhood' photo shoot for Marketing Event #2.",
+      "Article content ties back to SC-014."
+    ]
+  },
+
+  "productionNotes": {
+    "cameraIdeas": [
+      "Close-up on the magazine cover",
+      "Insert shots of highlighted lines in Martin’s article",
+      "Over-the-shoulder as Jason reads",
+      "Slow zoom as Jason realizes he knows the perfect 'dangerous' location"
+    ],
+    "setRequirements": [
+      "Studio lighting dim but natural",
+      "Magazine copy with mock article layout",
+      "Cash bundles and contract on table"
+    ]
+  }
+}

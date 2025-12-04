@@ -1,0 +1,90 @@
+{
+  "sceneId": "SC-004",
+  "sequence": 4,
+  "title": "Day Two of Painting",
+  "pageEst": 0.8,
+
+  "screenplay": {
+    "rawText": "EXT. OUTSIDE JASON’S ART STUDIO - DAY\nJason arrives in his truck, steps out, and immediately notices trash scattered around the dumpster. He vents his frustration about people rummaging through his garbage.",
+    "slugline": {
+      "location": "Outside Jason’s Art Studio",
+      "interiorExterior": "EXT",
+      "timeOfDay": "DAY"
+    },
+    "actions": [
+      "Jason drives up to his art studio.",
+      "He parks his truck and jumps out.",
+      "Jason notices trash scattered near the dumpster.",
+      "He expresses anger and disgust.",
+      "He resolves to clean it up later."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "Look at this shit! I’m so sick of people going through my trash, and spreading it all over the damn place.",
+          "..I’ll clean this up in a bit."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason arrives for Day Two of painting and becomes annoyed by trash scattered around his studio dumpster — a recurring frustration that adds stress to an already high-pressure commission.",
+    "beatPurpose": "Show Jason’s rising stress level and humanize his daily obstacles; contrast mundane frustrations with the looming high-stakes contract.",
+    "conflict": "Jason vs. unknown dumpster scavengers; Jason vs. stress.",
+    "stakes": "Emotional bandwidth and focus — important as he attempts to meet the tight painting deadline.",
+    "outcome": "Jason sets frustration aside temporarily so he can continue his work.",
+    "themes": [
+      "Distraction",
+      "Everyday chaos",
+      "Maintaining focus under pressure"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne"],
+    "newIntroductions": [],
+    "revealedBackstory": [
+      "People frequently go through Jason’s trash — indicating possible homelessness, neighborhood issues, or someone watching him."
+    ],
+    "emotionalShifts": {
+      "Jason Towne": "Neutral → irritated → resigned"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": [
+      "Jason’s art studio exterior",
+      "Parking lot area",
+      "Dumpster zone"
+    ],
+    "props": [
+      "Jason’s truck",
+      "Scattered trash",
+      "Dumpster"
+    ],
+    "technology": [],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "Builds tension as Jason attempts to meet the painting deadline.",
+      "Hints at possible surveillance, neighborhood issues, or foreshadowed conflict."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [],
+    "SFX": ["Truck engine shutoff", "Outdoor ambience", "Rustling trash"],
+    "music": ["Low, slightly comedic frustration cue OR subtle tension drone"],
+    "cameraIdeas": [
+      "Low-angle wide shot of Jason stepping out of the truck.",
+      "Push-in shot as Jason notices the scattered trash.",
+      "Handheld for natural realism."
+    ],
+    "setRequirements": [
+      "Truck",
+      "Parking lot area",
+      "Dumpster with scattered trash"
+    ]
+  }
+}

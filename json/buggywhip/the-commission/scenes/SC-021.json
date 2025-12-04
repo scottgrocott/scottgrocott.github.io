@@ -1,0 +1,94 @@
+{
+  "scene_id": "SC-021",
+  "title": "Outside the Art Show",
+  "logline": "Jason leaves the chaotic reception frustrated and determined to contact the artist who warned him about a possible scam.",
+  "setting": {
+    "location": "Sidewalk Near the Art Show",
+    "environment": "Nighttime street outside the gallery; quiet compared to the chaos inside; Jason’s truck parked nearby.",
+    "time_of_day": "Night"
+  },
+  "characters": {
+    "JASON_TOWNE": {
+      "role": "Protagonist",
+      "mood": "Frustrated, agitated, distrustful",
+      "objective": "Escape the art show and contact the New York artist about the alleged scam."
+    },
+    "STACEY": {
+      "role": "Documentarian",
+      "mood": "Concerned, observant",
+      "objective": "Support Jason and follow the unfolding story."
+    }
+  },
+  "story_beats": [
+    {
+      "beat_id": "B1",
+      "description": "Jason walks out of the reception, clearly overwhelmed and upset."
+    },
+    {
+      "beat_id": "B2",
+      "description": "Stacey checks in, trying to understand Jason's emotional state."
+    },
+    {
+      "beat_id": "B3",
+      "description": "Jason vents about the stunt and expresses his disgust with the spectacle."
+    },
+    {
+      "beat_id": "B4",
+      "description": "Jason resolves to call the artist Mary mentioned to understand the scam."
+    },
+    {
+      "beat_id": "B5",
+      "description": "Jason fights with his dying key fob again, mirroring earlier scenes."
+    },
+    {
+      "beat_id": "B6",
+      "description": "Jason and Stacey leave to head back to the studio."
+    }
+  ],
+  "dialogue": [
+    {
+      "character": "STACEY",
+      "line": "..You’re obviously frustrated."
+    },
+    {
+      "character": "JASON",
+      "line": "Frustrated? Yes. I don’t want attention on my art because it’s part of a stunt. It’s super fuckin lame."
+    },
+    {
+      "character": "STACEY",
+      "line": "What now?"
+    },
+    {
+      "character": "JASON",
+      "line": "I’m going back to my studio to call this other artist who got scammed."
+    },
+    {
+      "character": "JASON",
+      "line": "Dammit! Why do I keep forgetting to replace this fuckin battery?"
+    },
+    {
+      "character": "JASON",
+      "line": "Okay, let's go."
+    }
+  ],
+  "props": [
+    "Jason’s malfunctioning key fob",
+    "Jason’s truck",
+    "Stacey’s camera bag"
+  ],
+  "themes": [
+    "Disillusionment with the art world",
+    "Manipulation",
+    "Growing paranoia",
+    "Artist integrity vs spectacle"
+  ],
+  "continuity": {
+    "previous_scene": "SC-020",
+    "next_scene": "SC-022",
+    "setup_payoffs": {
+      "Key fob battery recurring gag": "Continues to reinforce Jason’s distractibility/chaos.",
+      "Mary’s warning": "Sets up Jason’s call to the scammed artist.",
+      "Jason’s frustration with theatrics": "Motivates him to take action."
+    }
+  }
+}

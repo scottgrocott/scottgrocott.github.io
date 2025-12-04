@@ -1,0 +1,90 @@
+{
+  "scene_id": "SC-022",
+  "title": "On the Way Back to the Art Studio",
+  "logline": "Jason and Stacey drive through the night as Jason tries to make sense of the bizarre events and the possibility that he’s caught in a scam.",
+  "setting": {
+    "location": "Jason’s Truck",
+    "environment": "Night; dim interior cab light from passing streetlights; quiet road.",
+    "time_of_day": "Night"
+  },
+  "characters": {
+    "JASON_TOWNE": {
+      "role": "Protagonist",
+      "mood": "Agitated, tense, introspective",
+      "objective": "Understand whether he’s been pulled into an elaborate scam."
+    },
+    "STACEY": {
+      "role": "Documentarian",
+      "mood": "Calm, probing, concerned",
+      "objective": "Draw out Jason’s thought process for clarity and documentation."
+    }
+  },
+  "story_beats": [
+    {
+      "beat_id": "B1",
+      "description": "Jason drives fast but carefully, clearly deep in thought."
+    },
+    {
+      "beat_id": "B2",
+      "description": "Stacey asks Jason to articulate what he's thinking."
+    },
+    {
+      "beat_id": "B3",
+      "description": "Jason expresses his confusion and anger over what’s unfolding."
+    },
+    {
+      "beat_id": "B4",
+      "description": "Stacey probes directly: Jason might be part of a scam."
+    },
+    {
+      "beat_id": "B5",
+      "description": "Jason confirms his fears and states his intention to investigate."
+    }
+  ],
+  "dialogue": [
+    {
+      "character": "STACEY",
+      "line": "Walk me through your thought process."
+    },
+    {
+      "character": "JASON",
+      "line": "I want to figure out what the hell is going on."
+    },
+    {
+      "character": "STACEY",
+      "line": "You said you think you’re getting scammed. Tell me about that."
+    },
+    {
+      "character": "JASON",
+      "line": "You heard it. You were standing there. I was just told about a scam that sounds painfully familiar."
+    },
+    {
+      "character": "STACEY",
+      "line": "Yeah, I did hear that."
+    },
+    {
+      "character": "JASON",
+      "line": "That’s my thought process. I want to know if I’m getting scammed."
+    }
+  ],
+  "props": [
+    "Dashboard lights",
+    "Stacey’s camera bag on the floor",
+    "Jason’s phone clipped to the dash"
+  ],
+  "themes": [
+    "Paranoia vs reality",
+    "Trust in the art world",
+    "The hidden cost of opportunity",
+    "Jason’s internal unraveling"
+  ],
+  "continuity": {
+    "previous_scene": "SC-021",
+    "next_scene": "SC-023",
+    "setup_payoffs": {
+      "Mary’s warning": "Continues to drive Jason’s suspicion.",
+      "Jason’s frustration with theatrics": "Motivates his desire to get answers.",
+      "Escalation of tension": "Journey becomes transitional movement toward confrontation."
+    }
+  }
+}

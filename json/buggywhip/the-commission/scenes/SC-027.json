@@ -1,0 +1,198 @@
+{
+  "scene_id": "SC-027",
+  "title": "Franklin’s Revelation",
+  "logline": "Inside Jason’s studio, Franklin reveals the elaborate truth behind the so-called scam: the fake conflict, the staged theft, the mugging, the actors, and his secret goal to launch Jason’s career through a documentary series.",
+  "setting": {
+    "location": "Jason’s Art Studio — Lounge Area",
+    "environment": "Calm but tense atmosphere; studio lights partially on; everyone gathered after the chaotic heist.",
+    "time_of_day": "Day"
+  },
+  "characters": {
+    "JASON_TOWNE": {
+      "role": "Protagonist",
+      "mood": "Frustrated, betrayed, slowly understanding",
+      "objective": "Get answers from Franklin; determine what is real."
+    },
+    "FRANKLIN_B_STEVENSON": {
+      "role": "Mastermind / Manipulator",
+      "mood": "Calm, confident, theatrical",
+      "objective": "Reveal the truth, secure Jason’s trust, and finalize his deal."
+    },
+    "STACEY": {
+      "role": "Documentarian / Participant",
+      "mood": "Guilty, apologetic",
+      "objective": "Come clean as part of Franklin’s reveal."
+    },
+    "CATHERINE": {
+      "role": "Co-conspirator",
+      "mood": "Composed, supportive of Franklin",
+      "objective": "Help ease Jason into accepting the truth."
+    },
+    "KENNY": {
+      "role": "Jason’s friend / Victim of mugging",
+      "mood": "Confused, annoyed, reactive",
+      "objective": "Understand Franklin’s motives; defend Jason."
+    }
+  },
+  "story_beats": [
+    { "beat_id": "B1", "description": "Everyone settles into the studio; tension fills the room." },
+    { "beat_id": "B2", "description": "Franklin congratulates Jason, triggering Jason’s anger." },
+    { "beat_id": "B3", "description": "Franklin hands Jason a bag with the promised $50k reward." },
+    { "beat_id": "B4", "description": "Jason accuses him of giving more fake cash." },
+    { "beat_id": "B5", "description": "Franklin reveals Randal was an actor working for him." },
+    { "beat_id": "B6", "description": "Stacey and Catherine confess they were also hired by Franklin." },
+    { "beat_id": "B7", "description": "Jason confronts Catherine; Catherine frames the project as art." },
+    { "beat_id": "B8", "description": "Franklin claims Jason breaking the contract was planned." },
+    { "beat_id": "B9", "description": "Franklin explains his philosophy: Jason was 'stuck' and needed to be pushed." },
+    { "beat_id": "B10", "description": "Jason demands to know Franklin’s true motive." },
+    { "beat_id": "B11", "description": "Franklin reveals he is producing a documentary series about 'scam artists'." },
+    { "beat_id": "B12", "description": "Franklin explains the studio deal and the $100k-per-doc budget." },
+    { "beat_id": "B13", "description": "Jason wrestles with the ethics but acknowledges the payoff." },
+    { "beat_id": "B14", "description": "Franklin expresses admiration and hints at a future friendship." },
+    { "beat_id": "B15", "description": "Franklin asks Jason for a favor, ending the scene on suspense." }
+  ],
+  "dialogue": [
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "I want to start by saying, BRAVO!"
+    },
+    {
+      "character": "JASON",
+      "line": "Bravo? You scammed me with fake cash! You scammed her too!"
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "Oh yes... Here’s the fifty thousand dollar reward for stealing the painting."
+    },
+    {
+      "character": "JASON",
+      "line": "What— more bullshit money? I think you need to leave."
+    },
+    {
+      "character": "KENNY",
+      "line": "Yeah, what’s with all the fake paper?"
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "You think it’s fake? Why’s that?"
+    },
+    {
+      "character": "JASON",
+      "line": "I assumed so after all this bullshit. I talked to another artist, Randal. He told me about your scam."
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "Did you inspect the cash? It's real."
+    },
+    {
+      "character": "JASON",
+      "line": "I inspected it. It’s good prop money."
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "It’s real… You were made to think it’s not. Randal works for me."
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "Also, Stacey and Catherine work for me. They’re being well paid."
+    },
+    {
+      "character": "STACEY",
+      "line": "Sorry, I couldn’t tell you anything."
+    },
+    {
+      "character": "JASON",
+      "line": "So it’s all a setup!? You too? What’s in this for you?"
+    },
+    {
+      "character": "CATHERINE",
+      "line": "Yes, I’m happy to be involved. I’m not an art dealer—I’m an artist too."
+    },
+    {
+      "character": "JASON",
+      "line": "Okay… But I just broke the contract by stealing the painting back."
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "True. But that was part of my plan. Even the security guard was instructed to let only you steal it."
+    },
+    {
+      "character": "JASON",
+      "line": "Why?"
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "You were stuck. You've been waiting for good things to happen. Now you've launched."
+    },
+    {
+      "character": "JASON",
+      "line": "So you think all this bullshit was necessary? You robbed us!"
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "I know. But you were in a holding-pattern. I broke you out."
+    },
+    {
+      "character": "JASON",
+      "line": "What’s in this for you?"
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "I pitched a documentary series. Artists who think they’re being scammed. The studio loved it."
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "They gave me a $100,000 budget for each documentary."
+    },
+    {
+      "character": "JASON",
+      "line": "So you're a filmmaker… not an art collector?"
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "I'm both. And I want the world to know you."
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "Take the money. Your documentary will help people. I’ll cherish your commission."
+    },
+    {
+      "character": "JASON",
+      "line": "Well… it’s been a crazy few weeks. But it’s paid off."
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "Wonderful. I sense a potential friendship in our future."
+    },
+    {
+      "character": "JASON",
+      "line": "Maybe so… What happens now?"
+    },
+    {
+      "character": "FRANKLIN B. STEVENSON",
+      "line": "I have a favor to ask you…"
+    }
+  ],
+  "props": [
+    "Bag of real cash ($50,000)",
+    "Original contract",
+    "Camera equipment",
+    "Jason’s stolen-and-returned painting"
+  ],
+  "themes": [
+    "Manipulation as art",
+    "Blurred lines between truth and performance",
+    "Rise through chaos",
+    "The ethics of mentorship and exploitation"
+  ],
+  "continuity": {
+    "previous_scene": "SC-026",
+    "next_scene": "SC-028",
+    "setup_payoffs": {
+      "Randal’s warning": "Revealed as part of Franklin’s deception.",
+      "Fake vs real cash": "Revealed as psychological manipulation.",
+      "Security guard": "Was secretly instructed to allow Jason’s theft.",
+      "Catherine/Stacey’s roles": "Payoff to earlier suspicions about loyalty."
+    }
+  }
+}

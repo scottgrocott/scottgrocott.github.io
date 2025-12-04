@@ -1,0 +1,148 @@
+{
+  "sceneId": "SC-007",
+  "sequence": 7,
+  "title": "Line-Work and Illustration Phase",
+  "pageEst": 4.0,
+
+  "screenplay": {
+    "rawText": "INT. JASON’S ART STUDIO – MORNING\nJason sets up a plastic folding table, moves the commission onto it, and begins the slow, meticulous illustration phase. A random guy interrupts asking if the studio is a bike shop. Jason and Stacey discuss time-lapse footage and the nature of his 'Illustrated Abstraction' style.",
+    "slugline": {
+      "location": "Jason’s Art Studio (interior)",
+      "interiorExterior": "INT",
+      "timeOfDay": "MORNING"
+    },
+    "actions": [
+      "Jason unfolds and sets up a plastic table in the center of the studio.",
+      "He assesses the work-in-progress painting on the wall.",
+      "He removes the painting from the wall and positions it flat on the table.",
+      "A random man appears at the open studio door asking if it's a bike shop.",
+      "Jason gives a dry, comedic response and the man leaves confused.",
+      "Jason and Stacey discuss using time-lapse for this slower process.",
+      "Jason prepares dropper bottles, gloves, and paint in tiny plastic shot glasses.",
+      "He explains the purpose of the illustration phase.",
+      "Jason studies the brush strokes with intense concentration.",
+      "He begins laying down detailed line-work.",
+      "A long painting session (2 hours) unfolds, partially shown as a time-lapse.",
+      "Stacey asks about the origin of the style name 'Illustrated Abstraction.'",
+      "Jason explains the combination of colorfield, action painting, and illustration.",
+      "He ends the day’s work."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "There.. That’ll give me enough room to walk around the painting.",
+          "It feels good to see a work-in-progress the next day, and still like it.. ..Sometimes that’s not the case.",
+          "It’s much easier to work on it like this.. It’s better to lie it flat for this part.",
+          "That’s right.. I was a bike shop 5 or 6 years ago. But now—— no bikes.",
+          "You’d be surprised how often that happens.",
+          "You’re probably going to time-laps this part.",
+          "Day one and day two of painting was just the start. That part is fast. This part is much slower.. The line-work here is tedious.. I’d estimate this part taking 30 to 50 hours to be completely finished. Plus, I’m usually good for about 2 or 3 hours of painting at a time.. Time-laps footage will be more interesting.. No need to bore anyone.",
+          "This is where I illustrate the abstracted brush strokes that I painted yesterday. I do this by outlining the brush strokes and add in various details..",
+          "This should be fun!.. It always is.",
+          "I love colorfield paintings.. That’s where I started. That’s what I was doing on day one. I also love action paintings—— also known as abstract expressionism. That’s mostly what I did with the large brush strokes on day two. Now I’m onto the illustration phase. It’s drawing basically. Drawing brush strokes.",
+          "That’s it for today.."
+        ]
+      },
+      {
+        "character": "RANDOM GUY",
+        "lines": [
+          "Hey, is this a bike shop?",
+          "So it’s not a bike shop?",
+          "(confused) um, okay?"
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "Why’s that?",
+          "Yeah, no problem.. I’ll edit it down to keep it interesting.",
+          "How do you describe this part of your process?",
+          "Tell me about why you call this style Illustrated Abstraction."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason begins the detailed illustration phase, explaining its purpose and complexity. A humorous interruption occurs when a man mistakes the studio for a bike shop. Jason elaborates on his artistic lineage and work ethic while Stacey captures footage.",
+    "beatPurpose": "Deep character development through artistic exposition; show the shift from expressive chaos to precision detail; add humor via interruption; reinforce the documentary dynamic.",
+    "conflict": "Internal: Jason must remain focused during slow, tedious work. External: interruptions and ongoing stress from the studio environment.",
+    "stakes": "Maintaining workflow over long hours; staying mentally sharp through a slow, detail-oriented stage crucial to the commission.",
+    "outcome": "Jason completes a portion of the line-work and ends the day satisfied.",
+    "themes": [
+      "Precision vs. spontaneity",
+      "The meditative nature of art",
+      "Balancing patience with productivity",
+      "Humor in the mundane",
+      "Evolution of artistic style"
+    ]
+  },
+
+  "characters": {
+    "present": [
+      "Jason Towne",
+      "Stacey Morrison",
+      "Random Guy"
+    ],
+    "newIntroductions": ["Random Guy"],
+    "revealedBackstory": [
+      "Jason's studio used to be a bike shop 5–6 years ago.",
+      "Jason’s style integrates colorfield, action painting, and illustration."
+    ],
+    "emotionalShifts": {
+      "Jason Towne": "Focused → amused → patient → thoughtful → satisfied",
+      "Stacey Morrison": "Curious → professional → engaged",
+      "Random Guy": "Confused → embarrassed → exits"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s Art Studio interior"],
+    "props": [
+      "Plastic folding table",
+      "Commission painting",
+      "Dropper bottles",
+      "Paper plate palette",
+      "Plastic shot glasses",
+      "Rubber gloves",
+      "Camera equipment",
+      "Open studio doorway"
+    ],
+    "technology": ["Time-lapse filming setup"],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "Continues the painting’s day-by-day progression.",
+      "Reveals Jason’s earlier business history as a bike shop owner.",
+      "Deepens the understanding of his artistic process and philosophy.",
+      "Shows Stacey continuing documentation for the eventual documentary."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": ["Time-lapse footage segments"],
+    "SFX": [
+      "Paint shaking in dropper bottles",
+      "Glove snap",
+      "Brush on canvas",
+      "Studio ambience"
+    ],
+    "music": [
+      "Light, rhythmic track during time-lapse",
+      "Warm contemplative cue during Jason’s explanations"
+    ],
+    "cameraIdeas": [
+      "Time-lapse overhead wide shot of Jason painting",
+      "Close-ups of line-work detail",
+      "Rack focus from Jason to painting strokes",
+      "Documentary-style handheld shots",
+      "Comedic cutaway when Jason stares into camera after Random Guy's question"
+    ],
+    "setRequirements": [
+      "Folding table",
+      "Dropper bottle station",
+      "Studio door visible for Random Guy entrance",
+      "Camera tripods and handheld rig"
+    ]
+  }
+}

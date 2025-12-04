@@ -1,0 +1,81 @@
+{
+  "sceneId": "SC-003",
+  "sequence": 3,
+  "title": "Day One of Painting the Commission",
+  "pageEst": 1.8,
+
+  "screenplay": {
+    "rawText": "EXT. JASON’S ART STUDIO - DAY\nJason sets up to paint outside using exploding spray paint cans as an underpainting technique. Stacey films as he detonates multiple cans onto a fresh 48x60 canvas.",
+    "slugline": {
+      "location": "Jason’s Art Studio (exterior)",
+      "interiorExterior": "EXT",
+      "timeOfDay": "DAY"
+    },
+    "actions": [
+      "Jason prepares an outdoor painting area.",
+      "Stacey finishes setting up her documentary camera gear.",
+      "Jason positions a fresh 48x60 canvas.",
+      "Jason smashes spray paint cans onto an exposed nail, causing them to explode paint across the canvas.",
+      "Can after can bursts open, coating the entire surface with a chaotic underpainting.",
+      "Stacey circles the setup capturing different angles.",
+      "Jason finishes the process and examines the results proudly."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "Good timing. I’m just about to start painting.",
+          "This is the underpainting process.",
+          "I like to start with a colorfield for the first layer..",
+          "..looks like fun huh?",
+          "I think that’s it.. ..What do you think?",
+          "Cool.. ..That’s it for today."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "Great—— I’m all set.",
+          "What is it that you’re doing here?",
+          "It does!",
+          "I like it!"
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason begins the first day of his painting process by creating an explosive underpainting using spray paint cans detonated on a nail. Stacey documents the unusual method.",
+    "beatPurpose": "Show Jason’s artistic process; demonstrate commitment to the contract; establish the documentary’s tone as hands-on and intimate.",
+    "conflict": "None directly, but subtle pressure: the two-week deadline is now active.",
+    "stakes": "Jason must begin strong to hit the tight commission timeline; this is Day One of the two-week challenge.",
+    "outcome": "Jason completes his first layer; Stacey captures successful footage.",
+    "themes": [
+      "Creativity through chaos",
+      "Work ethic",
+      "Art as performance",
+      "The pressure of deadlines"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Stacey Morrison"],
+    "newIntroductions": [],
+    "revealedBackstory": [],
+    "emotionalShifts": {
+      "Jason Towne": "Focused → playful → satisfied",
+      "Stacey Morrison": "Curious → amused → supportive"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s Art Studio exterior painting area"],
+    "props": [
+      "48x60 canvas",
+      "Spray paint cans",
+      "Wood board with protruding nail",
+      "Rubber gloves",
+      "Camera equipment"
+    ],
+    "technology": ["Documentary camera rig"],
+    "facti

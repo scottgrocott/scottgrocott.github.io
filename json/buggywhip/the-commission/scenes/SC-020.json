@@ -1,0 +1,140 @@
+{
+  "scene_id": "SC-020",
+  "title": "Art Show Reception",
+  "logline": "Jason’s art reception turns into a public circus when Catherine announces a $50,000 challenge to steal his painting, causing Jason’s anxiety to spike as he learns the scheme may echo an art scam from New York.",
+  "setting": {
+    "location": "Art Show Gallery, Evening",
+    "environment": "Crowded, lively art opening with snacks, chatter, and Jason’s paintings hung throughout the space.",
+    "time_of_day": "Evening"
+  },
+  "characters": {
+    "JASON_TOWNE": {
+      "role": "Protagonist",
+      "mood": "Anxious, frustrated, disoriented",
+      "objective": "Maintain composure at his reception; understand Franklin’s game; protect his artwork."
+    },
+    "STACEY": {
+      "role": "Documentarian",
+      "mood": "Observant",
+      "objective": "Capture Jason’s reactions and the events of the reception."
+    },
+    "CATHERINE": {
+      "role": "Agent / Presenter",
+      "mood": "Confident, performative",
+      "objective": "Announce Franklin’s planned challenge to the art show audience."
+    },
+    "DAVID_GILL": {
+      "role": "New Character / Attendee",
+      "mood": "Sarcastic, eccentric",
+      "objective": "Engage Jason intellectually; introduce his peculiar humor."
+    },
+    "MARY_RIOS": {
+      "role": "Artist friend",
+      "mood": "Concerned",
+      "objective": "Warn Jason about a similar scam she’s heard of."
+    }
+  },
+  "story_beats": [
+    {
+      "beat_id": "B1",
+      "description": "Jason arrives at his packed art show, anxious about the impending theft announcement."
+    },
+    {
+      "beat_id": "B2",
+      "description": "Jason meets David Gill at the snack table, sharing a humorous exchange about charcuterie."
+    },
+    {
+      "beat_id": "B3",
+      "description": "Catherine interrupts the room with the announcement: $50,000 to anyone who steals Jason’s painting."
+    },
+    {
+      "beat_id": "B4",
+      "description": "Guests rush to grab Catherine’s cards, escalating the chaotic atmosphere."
+    },
+    {
+      "beat_id": "B5",
+      "description": "Mary Rios approaches Jason, warning him of a similar staged-theft scam her friend experienced."
+    },
+    {
+      "beat_id": "B6",
+      "description": "Catherine announces a guard will be posted, making the challenge seem more theatrical and absurd."
+    },
+    {
+      "beat_id": "B7",
+      "description": "Jason panics and exits abruptly, requesting Mary text him the contact info."
+    }
+  ],
+  "dialogue": [
+    {
+      "character": "DAVID",
+      "line": "Great charcuterie board."
+    },
+    {
+      "character": "JASON",
+      "line": "Yes, it’s quite a spread."
+    },
+    {
+      "character": "DAVID",
+      "line": "What do you think charcuterie means?"
+    },
+    {
+      "character": "JASON",
+      "line": "Um, piles of fatty meats and cheeses with sprinkles of fruit."
+    },
+    {
+      "character": "DAVID",
+      "line": "..Well no, it means platter of assorted appetizers."
+    },
+    {
+      "character": "CATHERINE",
+      "line": "Hello everyone... One of you will be fifty thousand dollars richer soon."
+    },
+    {
+      "character": "CATHERINE",
+      "line": "If any of you can steal this painting, we will pay you fifty thousand dollars in cash once you’ve stolen it without getting caught."
+    },
+    {
+      "character": "MARY",
+      "line": "I’ve heard this before. My friend in New York went through something like this. It was all a scam."
+    },
+    {
+      "character": "JASON",
+      "line": "I can’t believe this… That fucking prick."
+    },
+    {
+      "character": "CATHERINE",
+      "line": "A guard will be posted at the show. We can’t make stealing this painting too easy."
+    },
+    {
+      "character": "JASON",
+      "line": "I’ve got to get out of here… Will you text me Randal’s info?"
+    },
+    {
+      "character": "MARY",
+      "line": "Sure."
+    }
+  ],
+  "props": [
+    "Charcuterie board",
+    "Bruschetta",
+    "Business cards (Catherine)",
+    "Displayed paintings including the commission",
+    "Wine glasses",
+    "Snack table"
+  ],
+  "themes": [
+    "Artworld absurdity",
+    "Trust and deception",
+    "Performance vs authenticity",
+    "The commodification of creative work"
+  ],
+  "continuity": {
+    "previous_scene": "SC-019",
+    "next_scene": "SC-021",
+    "setup_payoffs": {
+      "dummy_phone": "Sets up trust/deception motifs; Jason’s paranoia increases.",
+      "Franklin's announcement": "This scene executes the theft challenge setup.",
+      "Mary’s warning": "Foreshadows a larger con or reveal later in the story."
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "sceneId": "SC-006",
+  "sequence": 6,
+  "title": "Day Three of Painting",
+  "pageEst": 0.7,
+
+  "screenplay": {
+    "rawText": "EXT. OUTSIDE JASON’S ART STUDIO – DAY\nJason arrives at his studio and immediately notices that someone has once again scattered trash all over the area by his dumpster. He becomes angry and vents his frustration on camera.",
+    "slugline": {
+      "location": "Outside Jason’s Art Studio",
+      "interiorExterior": "EXT",
+      "timeOfDay": "DAY"
+    },
+    "actions": [
+      "Jason drives into the parking lot.",
+      "He gets out of his truck visibly irritated.",
+      "Jason spots trash scattered everywhere near the dumpster.",
+      "He expresses anger and disbelief.",
+      "The camera pans to the mess on the ground."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "Can you believe these assholes!?"
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason arrives for Day Three of painting and once again finds trash spread across his parking lot. His growing frustration hints at external pressures beyond the commission itself.",
+    "beatPurpose": "Escalate Jason’s environmental stress; reinforce a recurring annoyance that may later become thematically or plot-relevant.",
+    "conflict": "Jason vs. whoever keeps rummaging through his trash; Jason vs. mounting stress.",
+    "stakes": "Mental fatigue is accumulating — a subtle threat to both his timeline and emotional stability.",
+    "outcome": "Jason is angered, and the tension surrounding the trash continues to rise.",
+    "themes": [
+      "Loss of control",
+      "External pressure",
+      "Daily chaos interrupting creativity"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne"],
+    "newIntroductions": [],
+    "revealedBackstory": [
+      "The trash scavenging problem is persistent over multiple days."
+    ],
+    "emotionalShifts": {
+      "Jason Towne": "Annoyed → Angry → Resigned"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": [
+      "Parking lot outside Jason’s Art Studio",
+      "Dumpster area"
+    ],
+    "props": [
+      "Jason’s truck",
+      "Scattered trash",
+      "Dumpster"
+    ],
+    "technology": [],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "This reinforces the ongoing trash problem from SC-004.",
+      "The day-by-day progression toward the painting deadline continues."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [],
+    "SFX": [
+      "Truck engine",
+      "Footsteps on pavement",
+      "Outdoor ambience"
+    ],
+    "music": [
+      "Short tension sting or comedic frustration cue"
+    ],
+    "cameraIdeas": [
+      "Follow Jason out of the truck with a handheld shot.",
+      "Pan to the trash in a reveal moment.",
+      "Medium close-up on Jason for emotional emphasis."
+    ],
+    "setRequirements": [
+      "Truck",
+      "Trash littered around the dumpster",
+      "Parking lot layout"
+    ]
+  }
+}

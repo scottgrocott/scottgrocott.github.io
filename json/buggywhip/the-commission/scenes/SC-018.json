@@ -1,0 +1,146 @@
+{
+  "sceneId": "SC-018",
+  "sequence": 18,
+  "title": "Installing the Art Show",
+  "pageEst": 4.1,
+
+  "screenplay": {
+    "rawText": "Jason and Stacey enter the art show space to hang Jason’s work. While installing the show, Stacey interviews him about his purpose as an artist, his philosophy on showing and selling work, and the meaning of public presentation. The moment ends with Franklin texting Jason, insisting they discuss the mysterious upcoming announcement.",
+    "slugline": {
+      "location": "Art Show Space",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+
+    "actions": [
+      "Jason enters the gallery space carrying artwork.",
+      "He scans the room, impressed by the large, well-lit white walls.",
+      "Stacey follows, filming and asking questions.",
+      "Jason begins unpacking paintings and planning the layout.",
+      "He hangs major pieces one at a time, moving deliberately through the space.",
+      "Stacey interviews him casually as he works.",
+      "Jason expresses his artistic philosophy and his feelings regarding public art presentation and selling.",
+      "Stacey admires the completed hanging and identifies her favorite piece.",
+      "Jason gifts the piece to her and marks it sold with a red dot.",
+      "Jason receives a text from Franklin requesting a call to discuss 'the announcement.'",
+      "Jason responds and speculates with Stacey about what the announcement could be.",
+      "They finish packing up tools and exit the gallery."
+    ],
+
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "Well, Franklin certainly selected a great place for an art show.",
+          "The walls are large, and well lit. It’s a great location.",
+          "..My goals? The first goal is to make the space as beautiful and interesting as possible.",
+          "The main goal is to have my work in public spaces. So many artists make art, but few ever show their work in public.",
+          "Whenever I feel like I’m failing, it’s always because I’m not showing my artwork in public enough.",
+          "It does feel good to sell my artwork.",
+          "Let me put it this way... Think about all the things people can spend their money on—TVs, entertainment, vacations, cars, rent, anything.",
+          "With all the options a buyer has, and they choose to buy art— that’s powerful. It’s an honor to sell art.",
+          "Well, I think that’s it.. The show is up.. What do you think?",
+          "Consider it yours. You can have it once the show ends.",
+          "(Texting) I’ll give you a call when I get back to the studio.",
+          "What do you think this announcement is?",
+          "Inspired the art? Discovered me?",
+          "Okay, sorry. I didn’t mean to put you on the spot.",
+          "I guess there’s only one way to find out. I’ll call him when we get back to the studio."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "What makes it great?",
+          "What are your goals when hanging an art installation?",
+          "What about selling your work?",
+          "Why is that?",
+          "I love it... Especially that one.",
+          "That one is my favorite. It speaks to me.",
+          "You don’t have to do that, I want to pay for it.",
+          "Well thank you. I’m excited!",
+          "I think Franklin might say he inspired your show, or inspired the painting he commissioned.",
+          "He might announce that he discovered you so that you’ll sign up with him and Catherine to sell more of your work.",
+          "I don’t know, I’m not sure.",
+          "I’m just guessing because you asked."
+        ]
+      },
+      {
+        "character": "FRANKLIN",
+        "lines": [
+          "(Text) Call me when you finish hanging the art show so we can discuss the coming announcement.",
+          "(Text) Okay, talk soon."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason and Stacey install Jason’s art show while discussing artistic purpose, public exposure, and the emotional meaning of selling art. The show looks strong, and Jason gifts a piece to Stacey. A text from Franklin introduces tension: the mysterious announcement is imminent.",
+    "beatPurpose": "Complete the setup for Marketing Event #3; reveal Jason’s artistic values; deepen Jason–Stacey relationship; escalate tension regarding Franklin’s unknown intentions.",
+    "conflict": "Internal and anticipatory — Jason worries about Franklin’s secret announcement.",
+    "stakes": "Jason’s reputation and contractual obligations hinge on the success of the art show and whatever Franklin intends to reveal.",
+    "outcome": "Show is successfully installed; Jason prepares to contact Franklin.",
+    "tone": [
+      "Professional",
+      "Warm",
+      "Reflective",
+      "Slightly anxious"
+    ],
+    "themes": [
+      "Art as public expression",
+      "Value of creativity",
+      "Purpose of selling art",
+      "Anticipation of the unknown",
+      "Mentorship vs manipulation"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Stacey"],
+    "mentioned": ["Franklin Stevenson", "Catherine Thompson"],
+    "emotionalShifts": {
+      "Jason": "Focused → Philosophical → Proud → Generous → Anxious → Determined",
+      "Stacey": "Curious → Admiring → Appreciative → Supportive"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": [
+      "Professional gallery-style art show space",
+      "Large white exhibition walls",
+      "Perfect overhead gallery lighting"
+    ],
+    "props": [
+      "Jason’s toolbox",
+      "Multiple paintings of various sizes",
+      "Red dot stickers",
+      "Jason’s phone with Franklin’s text exchange"
+    ],
+    "continuityLinks": [
+      "Scene leads directly to Jason calling Franklin (SC-019).",
+      "Art show installation fulfills the setup for Marketing Event #3.",
+      "Stacey receiving a painting builds their personal connection."
+    ]
+  },
+
+  "productionNotes": {
+    "cameraIdeas": [
+      "Wide shots of the open gallery space.",
+      "Time-lapse of Jason hanging multiple pieces.",
+      "Insert shot of Stacey’s favorite painting.",
+      "Phone close-up showing Franklin’s text messages.",
+      "Soft tracking shot as Jason places the final painting."
+    ],
+    "lighting": [
+      "Even, high-quality gallery lighting throughout.",
+      "Natural fill from large open space."
+    ],
+    "setRequirements": [
+      "Gallery walls with hooks/rails",
+      "Jason’s paintings (12–15 large pieces)",
+      "Red dot sale stickers",
+      "Jason’s toolbox and hanging supplies"
+    ]
+  }
+}

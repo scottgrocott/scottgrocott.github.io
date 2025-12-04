@@ -1,0 +1,91 @@
+{
+  "sceneId": "SC-013",
+  "sequence": 13,
+  "title": "Signing the Painting & Podcast Prep",
+  "pageEst": 1.0,
+
+  "screenplay": {
+    "rawText": "INT. JASON’S ART STUDIO – DAY\nJason checks that the painting is fully dry, signs and dates the backside, and acknowledges that the artwork is now officially completed. He reflects on the surreal fact that Franklin and Catherine secured him a spot on the Drunken Art Critic podcast.",
+    "slugline": {
+      "location": "Jason’s Art Studio",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+    "actions": [
+      "Jason walks over to the finished painting.",
+      "He gently touches the dried surface.",
+      "Jason picks up the painting and flips it around to show the backside.",
+      "He uses a Sharpie to sign and date the piece.",
+      "Jason steps back and acknowledges the piece is fully complete.",
+      "He begins mentally preparing for his appearance on the Drunken Art Critic podcast."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "It’s dry.. Looks great.",
+          "Now it’s done..",
+          "Time to get ready for the Drunken Art Critic podcast.",
+          "I’m impressed Franklin and Catherine were able to get me on his podcast."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason verifies the painting is dry, signs the canvas, and officially completes the piece. He shifts his attention to preparing for the Drunken Art Critic podcast, acknowledging the unusual influence Franklin and Catherine seem to have in the art world.",
+    "beatPurpose": "Signals completion of the artwork and initiates the next narrative phase focused on public-facing marketing obligations.",
+    "conflict": "Internal tension — Jason’s curiosity about Franklin and Catherine’s mysterious connections grows.",
+    "stakes": "Jason must now represent the work publicly, increasing pressure and exposure.",
+    "outcome": "Painting is fully complete; Jason transitions into media/promotion phase.",
+    "themes": [
+      "Completion",
+      "Transition",
+      "Suspicion",
+      "The power behind the mysterious buyers"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne"],
+    "newIntroductions": [],
+    "revealedBackstory": [],
+    "emotionalShifts": {
+      "Jason Towne": "Satisfied → reflective → anticipatory"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s art studio interior"],
+    "props": [
+      "Finished painting",
+      "Sharpie marker",
+      "Workbench or flat surface"
+    ],
+    "continuityLinks": [
+      "Follows SC-012 immediately — clear coat drying.",
+      "Marks successful completion of commission artwork.",
+      "Leads directly into Marketing Event #1: the Drunken Art Critic podcast."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [],
+    "SFX": [
+      "Marker writing on canvas"
+    ],
+    "music": [
+      "Soft contemplative cue emphasizing completion"
+    ],
+    "cameraIdeas": [
+      "Close-up of Jason’s fingers brushing the glossy surface",
+      "Macro shot of the signature being applied",
+      "Low-angle shot of Jason holding the completed painting"
+    ],
+    "setRequirements": [
+      "Painting positioned on wall or work table",
+      "Sharpie",
+      "Studio lighting highlighting varnished surface"
+    ]
+  }
+}

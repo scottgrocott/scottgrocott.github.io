@@ -1,0 +1,183 @@
+{
+  "sceneId": "SC-016",
+  "sequence": 16,
+  "title": "Photo Shoot at the Train Yard Tunnel",
+  "pageEst": 5.2,
+
+  "screenplay": {
+    "rawText": "Jason, Kenny, and Stacey head to the railroad tunnel at night for Marketing Event #2—a ‘dangerous neighborhood’ photoshoot. The shoot is interrupted by an actual mugger who steals their cash and phones, except for Jason’s hidden backup phone. Stacey reveals she captured the whole event on her concealed body cam.",
+    "slugline": {
+      "location": "Train Yard Tunnel",
+      "interiorExterior": "EXT",
+      "timeOfDay": "NIGHT"
+    },
+
+    "actions": [
+      "Jason parks the truck a block away from the train yard tunnel.",
+      "The trio step out into the dimly lit industrial night.",
+      "Kenny questions Jason about the plan.",
+      "They walk 100 yards to the arched brick tunnel, dim light spilling in.",
+      "Jason props the 48x60 painting inside the tunnel to create the desired ‘dangerous’ look.",
+      "Jason hands Kenny his phone to take the photos.",
+      "The photoshoot begins—Kenny circling, firing off shots.",
+      "Jason reviews and approves the photos.",
+      "A RANDOM GUY suddenly emerges from the dark edge of the tunnel, demanding cash and phones.",
+      "Jason and Kenny tell him to fuck off.",
+      "The Random Guy reveals a pistol tucked into his waistband.",
+      "Jason, Kenny, and Stacey surrender their phones and cash.",
+      "Random Guy flees into the darkness.",
+      "Kenny berates Jason for manifesting an actual bad neighborhood.",
+      "Jason is stunned the mugger didn’t even consider stealing the painting.",
+      "Kenny mocks the idea of anyone running off with a 5-foot canvas.",
+      "Jason reveals he still has a backup phone—his ‘dummy phone’ strategy.",
+      "Kenny demands Jason send him the video of the girl using a dummy phone.",
+      "Stacey reveals she still has body cam footage capturing everything.",
+      "The group heads back to the truck.",
+      "Jason struggles with the low-battery key fob before unlocking the truck.",
+      "Jason declares Marketing Event #2 complete."
+    ],
+
+    "dialogue": [
+      {
+        "character": "KENNY",
+        "lines": [
+          "What’s the plan?",
+          "Bad neighborhood? There’s no such thing in this town.",
+          "A phone? You’re using a phone? Why not a quality camera?",
+          "So you couldn’t find a ghetto neighborhood—instead you made the photo shoot ghetto.",
+          "I think that’s good enough. What do you think?",
+          "Great job Jason!",
+          "You willed this place into a shit neighborhood.",
+          "You think he's going to run down the street with a five foot tall painting?",
+          "Are you serious? That fucker just took my new phone.",
+          "Um, yeah it sucks! I just got that phone.",
+          "Just in case? Send me the video.",
+          "Footage? Screw the footage. I want my damn phone back."
+        ]
+      },
+      {
+        "character": "JASON",
+        "lines": [
+          "Get to the tunnel, set up a quick photo shoot... I need photos for the buyer and my Instagram account.",
+          "The contract says to do a photo shoot in a 'bad neighborhood.'",
+          "I know. It’s the perception I’m looking for here.",
+          "Here. Get a few good shots of me with the painting.",
+          "This is what I have... It’s a newish phone. It'll be good enough.",
+          "Yes... Will you just take a few shots?",
+          "Good! These look great. Thanks!.. I think we’re done here.",
+          "Fuck you.",
+          "Stay the fuck away from us.",
+          "Come on, I have no such power...",
+          "Can you believe that guy? He didn't even consider stealing my painting.",
+          "I don’t know!? Just thought he’d consider it.",
+          "I know. You’re right... but he didn’t even consider it.",
+          "He did take my phone. I had an old backup phone in my other pocket.",
+          "I keep a dummy phone on me just in case.",
+          "Ya, I saw a video of a girl on a bus use a dummy phone during a robbery.",
+          "I will.",
+          "Too bad we lost your doc footage.",
+          "Nice! You captured everything?",
+          "Even the mugging?",
+          "That’s gunna be great footage.",
+          "I keep forgetting to get a new battery for this.",
+          "Okay, we did it! Marketing event #2 is done."
+        ]
+      },
+      {
+        "character": "RANDOM GUY",
+        "lines": [
+          "Give me your cash and your phones.",
+          "How about now? Give me your phones and cash."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "Only lost the footage on my phone. For this shoot I also wore a body cam.",
+          "Yep.",
+          "All of it."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason, Kenny, and Stacey attempt to simulate a dangerous environment for Marketing Event #2. Ironically, they encounter a real mugger who steals their phones and cash. Jason reveals he carries a dummy phone for situations like this. Stacey captured the entire event on a body cam—potentially powerful documentary footage. Despite the chaos, Jason marks the event as successfully completed.",
+    "beatPurpose": "Escalate stakes; introduce real danger; inject dark comedy; reinforce how surreal and risky the commission has become.",
+    "conflict": "A real mugger threatens the group, turning the staged event into reality.",
+    "stakes": "Physical danger; loss of phones and cash; potential derailment of the commission timeline.",
+    "outcome": "The event is ironically over-completed. They lose valuables but gain unexpected documentary footage.",
+    "tone": [
+      "Dark comedy",
+      "Tense",
+      "Absurd",
+      "Edgy",
+      "Ironic"
+    ],
+    "themes": [
+      "Artifice vs reality",
+      "Danger as performance",
+      "Preparedness vs naivety",
+      "Absurdity of artistic requirements"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Kenny", "Stacey", "Random Guy"],
+    "newIntroductions": ["Random Guy"],
+    "emotionalShifts": {
+      "Jason Towne": "Focused → Amused → Confident → Shocked → Resigned → Pragmatic",
+      "Kenny": "Annoyed → Critical → Amused → Violent anger → Practical anger",
+      "Stacey": "Professional → Concerned → Relieved",
+      "Random Guy": "Threatening → Gone"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": [
+      "Train yard tunnel",
+      "Industrial surrounding area",
+      "Jason’s truck with failing key fob"
+    ],
+    "props": [
+      "48x60 painting",
+      "Phones (Jason’s dummy phone + real phones)",
+      "Cash",
+      "Jason’s glitchy key fob",
+      "Stacey’s body cam"
+    ],
+    "continuityLinks": [
+      "This completes Marketing Event #2.",
+      "Body cam footage becomes relevant for the documentary arc.",
+      "Connects back to SC-015 decision to use the train tunnel."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [],
+    "SFX": [
+      "Distant train hums",
+      "Urban ambience",
+      "Footsteps in the tunnel",
+      "Key fob low-battery beep"
+    ],
+    "lighting": [
+      "Cold industrial tunnel lighting",
+      "Spot-lit painting",
+      "Shadow-heavy corners for the mugger reveal"
+    ],
+    "cameraIdeas": [
+      "Tracking shot walking toward the tunnel",
+      "Flash-like strobe of phone photography",
+      "Sudden whip-pan to the mugger",
+      "Shaky cam during confrontation",
+      "Body cam POV playback for later episodes/scenes"
+    ],
+    "setRequirements": [
+      "Brick arch tunnel",
+      "Dim overhead lights",
+      "Phone camera props",
+      "Fake gun prop"
+    ]
+  }
+}

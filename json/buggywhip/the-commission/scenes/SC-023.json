@@ -1,0 +1,192 @@
+{
+  "scene_id": "SC-023",
+  "title": "Back at the Art Studio",
+  "logline": "Jason returns to his studio in a panic, contacts Randal, and learns the devastating truth: the entire commission deal — including the cash — is fake.",
+  "setting": {
+    "location": "Jason’s Art Studio — Exterior/Interior",
+    "environment": "Quiet night, studio lights dim except for artwork spots.",
+    "time_of_day": "Night"
+  },
+  "characters": {
+    "JASON_TOWNE": {
+      "role": "Protagonist",
+      "mood": "Anxious, unraveling, then resolute",
+      "objective": "Confirm whether he is being scammed and decide what to do about the commission."
+    },
+    "STACEY": {
+      "role": "Documentarian",
+      "mood": "Concerned, steady",
+      "objective": "Support Jason while navigating unclear loyalties."
+    },
+    "RANDAL": {
+      "role": "Artist victim of previous scam",
+      "mood": "Blunt, guarded",
+      "objective": "Warn Jason without revealing his own involvement."
+    },
+    "KENNY": {
+      "role": "Friend and fellow artist",
+      "mood": "Ride-or-die, impulsive",
+      "objective": "Help Jason get his painting back."
+    }
+  },
+  "story_beats": [
+    {
+      "beat_id": "B1",
+      "description": "Jason and Stacey arrive at the studio; Jason is pacing and agitated."
+    },
+    {
+      "beat_id": "B2",
+      "description": "Jason texts Randal, hoping he’s awake despite the time difference."
+    },
+    {
+      "beat_id": "B3",
+      "description": "Randal FaceTimes Jason and confirms the scam mirrors Jason’s situation."
+    },
+    {
+      "beat_id": "B4",
+      "description": "Randal reveals the cash is prop money, based on the contract spelling 'ca$h.'"
+    },
+    {
+      "beat_id": "B5",
+      "description": "Jason realizes the entire deal is fraudulent and suspects Stacey temporarily."
+    },
+    {
+      "beat_id": "B6",
+      "description": "Jason decides he needs to steal his own painting back."
+    },
+    {
+      "beat_id": "B7",
+      "description": "Jason calls Kenny for help, who enthusiastically agrees."
+    }
+  ],
+  "dialogue": [
+    {
+      "character": "JASON",
+      "line": "I have to talk to this guy."
+    },
+    {
+      "character": "JASON",
+      "line": "(Text) Hi Randal. We have a mutual artist friend who just told me about a scam you were involved in. I think I’m being scammed by the same people. Do you have time to talk?"
+    },
+    {
+      "character": "RANDAL",
+      "line": "Hey, what’s your name?"
+    },
+    {
+      "character": "JASON",
+      "line": "I’m Jason, we’re both friends with Mary Rios."
+    },
+    {
+      "character": "RANDAL",
+      "line": "Okay, so you’re getting scammed?"
+    },
+    {
+      "character": "JASON",
+      "line": "I don’t know. I hope not. What happened to you?"
+    },
+    {
+      "character": "RANDAL",
+      "line": "They offered me a pile of cash. Lots of it."
+    },
+    {
+      "character": "JASON",
+      "line": "Shit! That’s what’s happening to me… But I have the cash. What’s the scam part?"
+    },
+    {
+      "character": "RANDAL",
+      "line": "They offered fifty grand to anyone who stole my painting."
+    },
+    {
+      "character": "JASON",
+      "line": "Same here! They just announced the same thing tonight!"
+    },
+    {
+      "character": "RANDAL",
+      "line": "You think the cash saved you."
+    },
+    {
+      "character": "JASON",
+      "line": "Yeah. I have their money."
+    },
+    {
+      "character": "RANDAL",
+      "line": "Oh, you think that cash is real?"
+    },
+    {
+      "character": "JASON",
+      "line": "Yeah."
+    },
+    {
+      "character": "RANDAL",
+      "line": "It’s not real money. It’s prop ca$h."
+    },
+    {
+      "character": "JASON",
+      "line": "No fucking way! It’s fake?"
+    },
+    {
+      "character": "RANDAL",
+      "line": "Look at your contract. They spell cash with a money symbol. That’s the trademark for a prop ca$h company."
+    },
+    {
+      "character": "JASON",
+      "line": "I thought they were just being creative."
+    },
+    {
+      "character": "JASON",
+      "line": "Fucking assholes! I don’t understand this scam!"
+    },
+    {
+      "character": "RANDAL",
+      "line": "I can’t say."
+    },
+    {
+      "character": "JASON",
+      "line": "You can’t say, or you won’t say?"
+    },
+    {
+      "character": "STACEY",
+      "line": "This is all news to me too. I can’t imagine we’d get scammed by someone who’d want video evidence of it."
+    },
+    {
+      "character": "JASON",
+      "line": "Good point… I just don’t feel good about this deal anymore."
+    },
+    {
+      "character": "JASON",
+      "line": "I know what has to be done! I’m going to take my painting back. You’re gunna scam me? Fuck you!"
+    },
+    {
+      "character": "KENNY",
+      "line": "Sweet! You want the fifty grand?"
+    },
+    {
+      "character": "JASON",
+      "line": "No — it’s a scam. Everything is fake."
+    }
+  ],
+  "props": [
+    "Stacks of prop ca$h",
+    "Jason’s contract",
+    "Studio lighting",
+    "Jason’s phone",
+    "Workbench clutter"
+  ],
+  "themes": [
+    "Illusion vs reality",
+    "Artist vulnerability",
+    "Exploitation in creative fields",
+    "Friendship and loyalty",
+    "Turning paranoia into action"
+  ],
+  "continuity": {
+    "previous_scene": "SC-022",
+    "next_scene": "SC-024",
+    "setup_payoffs": {
+      "Prop ca$h spelling": "Revealed as fraudulent trademark.",
+      "Mary’s warning": "Proves valid.",
+      "Stacey filming everything": "Raises questions about her involvement.",
+      "Jason’s distrust": "Pushes him toward decisive action."
+    }
+  }
+}

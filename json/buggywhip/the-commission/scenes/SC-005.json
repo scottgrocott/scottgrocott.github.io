@@ -1,0 +1,118 @@
+{
+  "sceneId": "SC-005",
+  "sequence": 5,
+  "title": "Brush Stroke Process",
+  "pageEst": 2.4,
+
+  "screenplay": {
+    "rawText": "INT. JASON’S ART STUDIO – DAY\nJason prepares the commission inside his studio, meticulously lighting the canvas. He mixes paint on a paper plate and begins applying expressive brush strokes while Stacey films.",
+    "slugline": {
+      "location": "Jason’s Art Studio (interior)",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+    "actions": [
+      "Jason positions the commission painting on the wall under perfect lighting.",
+      "He prepares a palette using a paper plate.",
+      "He discusses the importance of expressive brush strokes.",
+      "Jason steps toward and away from the canvas multiple times, studying its composition.",
+      "Stacey moves around the studio capturing artistic angles.",
+      "Jason begins adding brush strokes quietly and intentionally.",
+      "He steps back repeatedly to evaluate progress.",
+      "Jason reflects aloud on balancing focus and flow.",
+      "He adds several more brush strokes.",
+      "Stacey asks him about artistic fulfillment.",
+      "Jason explains the emotional nature of knowing when a step is complete.",
+      "Jason sets down his palette and cleans his brush in a water jar.",
+      "He announces he is done for the day."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "Now for the brush strokes part of the process.. This part is about expression of movement.. Maybe it’s the most important step? Well, at least important for figuring out the general composition.",
+          "I think that works..",
+          "I have to focus on the brush strokes enough to make interesting marks.. ..But, not so much focus that I put unwanted tension into the piece.. I’m looking for the balance between focus and flow.",
+          "I’m pretty happy with that..",
+          "This part.. The process of painting.. Working through a new piece. It’s fulfilling, only if I can keep it playful.",
+          "(Contemplating) I think this part is done..",
+          "(Contemplating) So far I think it’s working.",
+          "Well.. It’s a feeling. It will feel right. Not sure if that makes sense? When I look at the painting, I ask myself, What’s missing?.. What’s next?.. If nothing seems to be missing, I feel contentment.. Then I know it’s time to stop.. I actually feel that way now..",
+          "..Yep, that’s it for today."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "What part of being an artist is most fulfilling to you?",
+          "How do you know when each step of your process is complete?"
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason advances to the brush stroke stage of the commission, emphasizing movement, intuition, and the emotional ‘feel’ that guides his process. Stacey documents his artistic philosophy.",
+    "beatPurpose": "Reveal Jason’s artistic mindset and process; deepen character insight; show the authenticity and philosophy that Franklin is paying for.",
+    "conflict": "Internal — Jason balancing control vs. flow; pressure of the deadline vs. maintaining joy.",
+    "stakes": "Creative integrity under time pressure; maintaining emotional and mental clarity.",
+    "outcome": "Jason completes this stage of the painting and ends the day satisfied.",
+    "themes": [
+      "Artistic intuition",
+      "Balance between discipline and play",
+      "Process over product",
+      "Mindfulness in creative work"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Stacey Morrison"],
+    "newIntroductions": [],
+    "revealedBackstory": [],
+    "emotionalShifts": {
+      "Jason Towne": "Focused → contemplative → satisfied",
+      "Stacey Morrison": "Observational → curious → engaged"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s art studio interior"],
+    "props": [
+      "Commission painting",
+      "Perfect lighting setup",
+      "Paper plate paint palette",
+      "Brushes",
+      "Jar of water",
+      "Stacey’s camera equipment"
+    ],
+    "technology": ["Documentary camera gear"],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "Builds on the painting's day-by-day progress toward the two-week deadline.",
+      "Establishes Jason’s artistic philosophy — important for later conflict and documentary themes."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [],
+    "SFX": [
+      "Soft brush strokes",
+      "Studio ambience",
+      "Camera lens adjustments",
+      "Running water or brush rinsing"
+    ],
+    "music": ["Soft contemplative cue; meditative artistic mood"],
+    "cameraIdeas": [
+      "Slow dolly in as Jason describes focus vs. flow",
+      "Over-the-shoulder shots of the brush marks forming",
+      "Close-up on Jason’s eyes tracking the composition",
+      "Handheld B-roll of Stacey filming"
+    ],
+    "setRequirements": [
+      "Studio lighting rig",
+      "Canvas on wall",
+      "Painting tools",
+      "Documentary setup"
+    ]
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "sceneId": "SC-017",
+  "sequence": 17,
+  "title": "Buyer Sets Up Art Show",
+  "pageEst": 3.1,
+
+  "screenplay": {
+    "rawText": "Catherine visits Jason’s studio to check on the completed commission and inform him of the upcoming art show. She reveals that Franklin will be announcing an unknown 'challenge' at the show, but refuses — or is unable — to explain it. Jason is unsettled but agrees to hang the show.",
+    "slugline": {
+      "location": "Jason’s Art Studio",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+
+    "actions": [
+      "Jason sits at his workbench writing in a notebook.",
+      "Catherine appears at the open studio door, cheerful and energetic.",
+      "Jason invites her in.",
+      "Catherine immediately brings up last night’s mugging, revealing Stacey told her.",
+      "Jason downplays the situation.",
+      "Catherine asks to see the commission.",
+      "They walk to the painting hung on the wall.",
+      "Catherine admires the artwork enthusiastically.",
+      "She gives Jason details about the upcoming art show: location, capacity, expectations.",
+      "Catherine insists the commissioned painting must be the focal piece.",
+      "Jason agrees.",
+      "She then reveals that Franklin will make an 'important announcement' at the reception.",
+      "Jason presses for details; Catherine refuses — claiming she herself doesn’t know yet.",
+      "She gives Jason a card with show details.",
+      "Catherine encourages Jason not to worry (while ironically telling him to worry later), then exits.",
+      "Jason stands alone, staring at the card, uneasy about what’s coming."
+    ],
+
+    "dialogue": [
+      {
+        "character": "CATHERINE",
+        "lines": [
+          "Hello! Hello!",
+          "I heard you got robbed last night.",
+          "Oh, Stacey told me about it.",
+          "I’m here to see the commission. I’d love to see it.",
+          "Wow. I love it! Great work darling.",
+          "It’s here in town. They’re ready for you to hang the show.",
+          "They have enough space for 12 to 15 large paintings, and many more smaller ones.",
+          "Make sure this commission is the most prominent painting in the show.",
+          "Once the show is up, I’ll be making an important announcement at the reception.",
+          "We’re going to announce a challenge.",
+          "I cannot.",
+          "Because dear… Franklin is having me announce a challenge. That’s all I know.",
+          "Be patient.",
+          "Here are the show details. Who the contact is, and where to go.",
+          "Don’t worry yourself, there’s plenty of time for that later.",
+          "I’m kidding… Hang the show… It’s going to be beautiful.",
+          "Fantastic!.. See you both soon."
+        ]
+      },
+      {
+        "character": "JASON",
+        "lines": [
+          "Hi Catherine. Come on in.",
+          "Uh, yeah.. How’d you know about that?",
+          "It’s true. No big deal. What can I do for you?",
+          "Sure! The commission is over here.",
+          "Thank you.. Tell me about this art show you’re setting up.",
+          "Sounds good. I can have the show ready right away.",
+          "You got it. That’s the plan.",
+          "Announcement? What is it?",
+          "I don’t understand.. Tell me about it.",
+          "Why not tell me? What’s with the secrecy?",
+          "I don’t like this. I’m not sure if it’s something I want to hear anyway.",
+          "Thank you.",
+          "Worry later?",
+          "Of course.. I’ll get it done."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Catherine visits Jason to inspect the finished commission and to give him details about the art show he must set up for Marketing Event #3. She teases an upcoming 'challenge' Franklin will announce at the reception. Jason grows uneasy as the strangeness and secrecy increase.",
+    "beatPurpose": "Bridge scene setting up the final marketing event; expand mystery; maintain forward momentum.",
+    "conflict": "Jason is concerned about the unknown 'challenge', but Catherine is evasive.",
+    "stakes": "Jason’s bonus, obligations, and potentially public reputation depend on executing this art show correctly.",
+    "outcome": "Jason accepts the task but is unsettled by the unknown challenge.",
+    "tone": [
+      "Warm but uneasy",
+      "Mysterious",
+      "Professional",
+      "Slightly comedic"
+    ],
+    "themes": [
+      "Creative ambition vs external control",
+      "The unknown as pressure",
+      "Trust and secrecy",
+      "Artistic obligation"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Catherine Thompson"],
+    "mentioned": ["Stacey", "Franklin Stevenson"],
+    "emotionalShifts": {
+      "Jason": "Calm → Proud → Curious → Uneasy → Determined",
+      "Catherine": "Warm → Professional → Cryptic → Encouraging"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": [
+      "Jason’s studio interior",
+      "Display area where the commission hangs"
+    ],
+    "props": [
+      "Commission painting",
+      "Catherine’s card with show details",
+      "Jason’s notebook",
+      "Stacks of cash still nearby (optional continuity)"
+    ],
+    "continuityLinks": [
+      "Event follows the photo-shoot robbery from SC-016.",
+      "Prepares for Marketing Event #3: the Art Show.",
+      "Introduces the mysterious 'challenge' to be revealed."
+    ]
+  },
+
+  "productionNotes": {
+    "cameraIdeas": [
+      "Over-the-shoulder on Jason writing before Catherine arrives.",
+      "Slow dolly-in as Catherine admires the painting.",
+      "Insert shot of the card with the show details.",
+      "Lingering close-up on Jason’s concerned face as she leaves."
+    ],
+    "lighting": [
+      "Warm interior studio lighting",
+      "Soft key on the commission painting"
+    ],
+    "setRequirements": [
+      "Commission painting mounted on wall",
+      "Card with printed gallery info",
+      "Jason’s workbench and notebook"
+    ]
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "sceneId": "SC-019",
+  "sequence": 19,
+  "title": "Call with Franklin About His Announcement",
+  "pageEst": 4.0,
+
+  "screenplay": {
+    "rawText": "Jason calls Franklin to discuss the mysterious announcement Catherine hinted at. Franklin congratulates Jason for completing the commission on time, grants the full bonus, then reveals the shocking truth: he plans to publicly offer a $50,000 prize to anyone who can successfully steal Jason’s commissioned painting from the art show.",
+    "slugline": {
+      "location": "Jason’s Art Studio",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+
+    "actions": [
+      "Jason pulls out his phone and dials Franklin.",
+      "The phone rings and Franklin answers promptly.",
+      "Franklin congratulates Jason for earning the $5,000 bonus.",
+      "The tone abruptly shifts when Franklin reveals his 'announcement.'",
+      "Jason reacts with growing disbelief and anger.",
+      "Franklin frames the theft challenge as performance art — drama as his artistic medium.",
+      "He demands that Jason fulfill his contract and attend the reception.",
+      "Franklin abruptly hangs up.",
+      "Jason turns to Stacey, stunned and spiraling.",
+      "Stacey confirms the situation is indeed strange.",
+      "Jason asks Stacey to stop filming so he can decompress."
+    ],
+
+    "dialogue": [
+      {
+        "character": "FRANKLIN",
+        "lines": [
+          "Hello Jason.",
+          "Fantastic! My commission is finished on time, and you have earned your five thousand dollar bonus. Congratulations!",
+          "Easy, yes. The bonus was for my peace of mind. I wanted you to stay focused.",
+          "Of course... I meant no offence.",
+          "Such a perfect segway to my announcement... I’m offering a fifty thousand dollar prize to anyone who can steal our commission from the current art show.",
+          "Yes! Isn’t that exciting?",
+          "You say crazy... I say what a fun story we’ll have to tell when this is all over.",
+          "That’s lazy thinking... I am an art collector, and I love doing business with artists to support their creativity.",
+          "However, I am an artist too. My medium is different than yours.",
+          "My medium is brewing drama for the story. This is our story.",
+          "You can call it what you want. I just need you to fulfill the contract.",
+          "Be present at the art reception for the announcement.",
+          "Fantastic! Good day."
+        ]
+      },
+      {
+        "character": "JASON",
+        "lines": [
+          "Hey, Franklin. How are you?",
+          "Well I appreciate the bonus. It was easy enough, I usually paint these pieces within two weeks anyway.",
+          "I understand why you might think that, but I’m not focused by the money.",
+          "I’ve spent so many years making art with very little monetary return on my investment.",
+          "Wait— what!? Are you serious?",
+          "You pay me a total of twenty grand for a commission. Then, before you take possession, you’re going to prompt someone to steal it for fifty grand?",
+          "Exciting?! It’s fucking mad. You’re crazy!",
+          "Sure, drop a total of seventy grand for a painting you’ll never have — for a story to tell. That does sound crazy to me.",
+          "Your art is a drama show? You’re bonkers.",
+          "I’ll be there.",
+          "Can you believe this?",
+          "Am I crazy?... This is crazy."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "Very odd.",
+          "Sure."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason confronts Franklin about the mysterious 'announcement' coming at the art show. Franklin reveals a shocking twist: he will publicly offer $50,000 to anyone who can steal the commissioned painting from the gallery. Franklin frames the act as 'art' itself — drama as his medium. Jason is horrified, bewildered, and emotionally shaken.",
+    "beatPurpose": "Escalate the stakes dramatically; reveal Franklin’s philosophy; transform the commission from a quirky job into a dangerous and chaotic artistic experiment.",
+    "conflict": "Jason’s desire for stability and professionalism clashes with Franklin’s chaotic, manipulative, performance-art worldview.",
+    "stakes": [
+      "The painting may actually be stolen.",
+      "Jason’s reputation and safety are now at risk.",
+      "The entire project has turned into a volatile spectacle."
+    ],
+    "outcome": "Jason is furious but contractually trapped. He must attend the reception and face the theft challenge being announced.",
+    "tone": [
+      "Tense",
+      "Absurd",
+      "Darkly comedic",
+      "Philosophical",
+      "Chaotic"
+    ],
+    "themes": [
+      "Art vs chaos",
+      "Artist exploitation",
+      "The spectacle of wealth",
+      "Boundaries of artistic performance",
+      "Moral discomfort vs contractual obligation"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Stacey"],
+    "remote": ["Franklin Stevenson"],
+    "emotionalShifts": {
+      "Jason": "Hopeful → Appreciated → Confused → Shocked → Angry → Existential crisis",
+      "Franklin": "Congratulatory → Manipulative → Philosophical → Demanding",
+      "Stacey": "Supportive → Concerned"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": [
+      "Jason’s studio interior"
+    ],
+    "props": [
+      "Jason’s phone",
+      "Stacks of cash (still in studio)",
+      "Notebook",
+      "Camera equipment (Stacey)"
+    ],
+    "continuityLinks": [
+      "This follows SC-018 (installing the show).",
+      "Leads directly to the art reception scene where Franklin makes the announcement.",
+      "Introduces real-world danger and potential for criminal chaos at the show."
+    ]
+  },
+
+  "productionNotes": {
+    "cameraIdeas": [
+      "Close-up on Jason’s phone during the call.",
+      "Split-shot style staging: Jason isolated vs Franklin’s powerful voice.",
+      "Push-in on Jason’s face as Franklin reveals the $50k theft challenge.",
+      "Cut to Stacey reacting silently while filming."
+    ],
+    "soundDesign": [
+      "Subtle tension drone under Franklin’s shocking lines.",
+      "Room tone that emphasizes Jason’s isolation."
+    ],
+    "setRequirements": [
+      "Jason’s studio in modest working condition",
+      "Visible paintings and workspace"
+    ]
+  }
+}

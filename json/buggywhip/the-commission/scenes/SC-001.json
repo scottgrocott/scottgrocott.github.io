@@ -1,0 +1,70 @@
+{
+  "sceneId": "SC-001",
+  "sequence": 1,
+  "title": "Jason Runs With Painting",
+  "pageEst": 1.2,
+
+  "screenplay": {
+    "rawText": "EXT. STREETS OF SAN LUIS OBISPO - DAY\nJason Towne runs full-speed carrying a huge 48x60 painting. Sweating, panicked, weaving through downtown. Narration reflects regret and fear.\nFade to black.",
+    "slugline": {
+      "location": "Streets of San Luis Obispo",
+      "interiorExterior": "EXT",
+      "timeOfDay": "DAY"
+    },
+    "actions": [
+      "Jason runs full speed carrying a massive painting.",
+      "He looks over his shoulder—someone or something is after him.",
+      "He maneuvers through downtown streets.",
+      "His internal narration reveals regret and high stakes.",
+      "Fade to black transitions into the next scene."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON (V.O.)",
+        "lines": [
+          "How could a commissioned painting get me here?",
+          "How did I let this happen?.."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason is fleeing with a large painting, terrified and sweating. His narration hints at a disastrous commission deal. The moment cuts abruptly to a flashback.",
+    "beatPurpose": "Hook the audience with immediate danger; pose a mystery about how a simple art commission went wrong.",
+    "conflict": "Unseen pursuers or consequences are chasing Jason.",
+    "stakes": "His safety, career, and sense of trust in the commission process.",
+    "outcome": "Scene ends unresolved; transitions to backstory.",
+    "themes": ["Art vs commerce", "Suspicion", "Regret", "Mystery"]
+  },
+
+  "characters": {
+    "present": ["Jason Towne"],
+    "newIntroductions": ["Jason Towne"],
+    "revealedBackstory": [],
+    "emotionalShifts": {
+      "Jason Towne": "Fearful, desperate, regretful"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Downtown San Luis Obispo"],
+    "props": ["48x60 commissioned painting"],
+    "technology": [],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "This scene pays off later when the consequences of the commission are revealed."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": ["Potential motion blur for chase", "Color grading for hot daylight"],
+    "SFX": ["Footsteps", "Breathing", "City ambience"],
+    "music": ["Tense percussive chase cue"],
+    "cameraIdeas": [
+      "Handheld follow shot through downtown",
+      "Over-the-shoulder POV of Jason checking behind him"
+    ],
+    "setRequirements": ["City street, large painting prop"]
+  }
+}

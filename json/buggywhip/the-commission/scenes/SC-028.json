@@ -1,0 +1,158 @@
+{
+  "scene_id": "SC-028",
+  "title": "Meeting with Drew Davis About a Commission",
+  "logline": "Jason, now fully in on Franklin’s operation, arrives as an art dealer to recruit another artist—Drew Davis—into the same dramatic commission setup. Stacey films as Jason replicates the exact structure of the deception used on him.",
+  "setting": {
+    "location": "Drew Davis Fine Art Studio",
+    "environment": "Bright, professional, and clean studio with canvases, paint carts, and photo lights. Calm atmosphere before the reveal.",
+    "time_of_day": "Day"
+  },
+  "characters": {
+    "JASON_TOWNE": {
+      "role": "Art dealer / Now co-conspirator",
+      "mood": "Confident, playful, mischievous",
+      "objective": "Recruit Drew Davis into Franklin’s constructed documentary cycle."
+    },
+    "DREW_DAVIS": {
+      "role": "New artist / Unknowing participant",
+      "mood": "Professional, curious, cautiously optimistic",
+      "objective": "Evaluate a potential commission offer."
+    },
+    "STACEY": {
+      "role": "Documentarian / Returning collaborator",
+      "mood": "Professional with mild amusement",
+      "objective": "Capture this new process as it repeats with a new artist."
+    }
+  },
+  "story_beats": [
+    { "beat_id": "B1", "description": "Stacey prepares Drew for filming with a mic check." },
+    { "beat_id": "B2", "description": "Jason arrives dressed like an art dealer, revealing his new role." },
+    { "beat_id": "B3", "description": "Jason introduces himself and sits with Drew to discuss a commission." },
+    { "beat_id": "B4", "description": "Jason introduces Franklin B. Stevenson as the client he represents." },
+    { "beat_id": "B5", "description": "Jason begins laying out the offer with stacked ca$h on the table." },
+    { "beat_id": "B6", "description": "Drew is surprised but receptive to the generous offer." },
+    { "beat_id": "B7", "description": "Jason adds filming rights and a completion bonus." },
+    { "beat_id": "B8", "description": "Jason presents the contract, mirroring the start of his own journey." },
+    { "beat_id": "B9", "description": "Stacey and Jason share a knowing, mischievous moment." },
+    { "beat_id": "B10", "description": "Drew begins reading the contract as the scene fades out." },
+    { "beat_id": "B11", "description": "The story closes with the implied cycle repeating—'the end... sort of.'" }
+  ],
+  "dialogue": [
+    {
+      "character": "STACEY",
+      "line": "Give me a mic check."
+    },
+    {
+      "character": "DREW",
+      "line": "Hello, can you hear this?"
+    },
+    {
+      "character": "STACEY",
+      "line": "Yes, good."
+    },
+    {
+      "character": "JASON",
+      "line": "Hello Drew."
+    },
+    {
+      "character": "DREW",
+      "line": "Hello, come in."
+    },
+    {
+      "character": "JASON",
+      "line": "Thanks for meeting with me today."
+    },
+    {
+      "character": "DREW",
+      "line": "No problem. I’m happy to discuss the commission you mentioned."
+    },
+    {
+      "character": "JASON",
+      "line": "Yes, let’s have a seat and we’ll discuss the terms of our commission."
+    },
+    {
+      "character": "JASON",
+      "line": "I’m representing an art collector named Franklin B. Stevenson... He has an offer for you."
+    },
+    {
+      "character": "DREW",
+      "line": "I’m interested. What’s Franklin’s offer?"
+    },
+    {
+      "character": "JASON",
+      "line": "Franklin is offering you ten thousand dollars for a 48x60 inch commission."
+    },
+    {
+      "character": "stage_direction",
+      "line": "Jason opens a case and begins stacking ca$h on the table."
+    },
+    {
+      "character": "DREW",
+      "line": "Wow—okay."
+    },
+    {
+      "character": "JASON",
+      "line": "Plus five thousand dollars to allow Stacey here to film the process."
+    },
+    {
+      "character": "DREW",
+      "line": "So far I’m here with you."
+    },
+    {
+      "character": "JASON",
+      "line": "And a five thousand dollar bonus to finish the commission within two weeks."
+    },
+    {
+      "character": "DREW",
+      "line": "Are you serious? Wow!"
+    },
+    {
+      "character": "JASON",
+      "line": "Yes, Franklin is serious. He loves your work."
+    },
+    {
+      "character": "DREW",
+      "line": "Great, where do we start?"
+    },
+    {
+      "character": "JASON",
+      "line": "Glad you asked... we have a contract with all the pertinent details."
+    },
+    {
+      "character": "stage_direction",
+      "line": "Jason slides the contract across the table."
+    },
+    {
+      "character": "JASON",
+      "line": "We just need you to read and sign this contract."
+    },
+    {
+      "character": "DREW",
+      "line": "Okay, what do we have here?"
+    }
+  ],
+  "props": [
+    "Stacks of ca$h",
+    "Leather portfolio case",
+    "Film equipment",
+    "Wireless microphone",
+    "Commission contract"
+  ],
+  "themes": [
+    "Cycles of mentorship and manipulation",
+    "Art as spectacle",
+    "The passing of the torch",
+    "Performance becoming reality"
+  ],
+  "continuity": {
+    "previous_scene": "SC-027",
+    "next_scene": null,
+    "setup_payoffs": {
+      "Jason becoming part of Franklin’s system": "Jason now plays the 'Franklin role' to recruit a new artist.",
+      "Stacey filming the next artist": "The documentary series concept continues.",
+      "Ca$h stacks": "Reused as the dramatic hook for the new artist.",
+      "Contract mimicry": "Exact replay of the opening setup from Jason’s own arc."
+    }
+  },
+  "ending_note": "THE END... sort of."
+}

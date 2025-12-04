@@ -1,0 +1,141 @@
+{
+  "sceneId": "SC-008",
+  "sequence": 8,
+  "title": "Morning Journal and Poop Bag Solution",
+  "pageEst": 3.2,
+
+  "screenplay": {
+    "rawText": "INT. JASON’S ART STUDIO – MORNING\nStacey enters the dim studio as Jason finishes writing in a notebook. He explains his need to clear his head and his frustration with dumpster diving. He abruptly exits and is later found crouched over a trash can. Jason admits he defecates in a bag to deter dumpster divers, shocking Stacey. After disposing of the bag, he resumes painting.",
+    "slugline": {
+      "location": "Jason’s Art Studio",
+      "interiorExterior": "INT",
+      "timeOfDay": "MORNING"
+    },
+    "actions": [
+      "Stacey enters the dimly lit studio.",
+      "Jason sits at his workbench, writing in a notebook.",
+      "He finishes a page and finally acknowledges Stacey.",
+      "Jason explains his stream-of-consciousness journaling ritual.",
+      "He mentions the recurring trash problem and says he's going to 'fix it.'",
+      "Jason prepares to paint: puts on gloves, shakes dropper bottle, pours paint.",
+      "Jason suddenly announces he's stepping away and goes into the back room.",
+      "Stacey waits, then goes to check on him.",
+      "She finds Jason crouched over a trash can, telling her not to come in.",
+      "Jason emerges tying off a plastic garbage bag.",
+      "Jason reluctantly admits he defecated in a bag as a deterrent for dumpster scavengers.",
+      "Stacey reacts with disgust.",
+      "Jason confidently asserts that the method works and he's done it before.",
+      "Jason takes the tied bag out to the dumpster and throws it away.",
+      "He discards his gloves and puts on a clean pair.",
+      "The painting process resumes, then transitions into time-lapse.",
+      "Title card or transition: Day 5 of painting."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "Hi! I was just clearing my head before getting started on the painting.",
+          "Anything bouncing around in my head needs to get out before I start painting.. I was just writing a stream of conciseness until I started writing about all the trash around my dumpster again today.. I’m going to fix that. The dumpster diving is going to stop.",
+          "Um.. I shouldn’t say.. No, I’m not going to say. Okay, time to paint!",
+          "I’ll be right back!",
+          "Don’t come back here! I’ll be out in a minute.",
+          "Uh.. When the um.. When people dig threw my dumpster and throw trash all over the place, I.. I shit in a bag for them to find the next time they make a mess.",
+          "I know.. It’s gross. But it works. This stops the dumpster diving for a few months.. Believe me, it works.",
+          "Yep! Well, yes a few times. It really works.",
+          "Haha—— Yes. New gloves, of course!",
+          "I know.. It really is.. ..Anyway, time to paint."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "Clear your head of what?",
+          "Fix it? Fix it how?",
+          "Sorry about what? What were you doing?",
+          "What? Gross!",
+          "You’ve done this before?",
+          "Pease tell me you’re going to change your gloves.",
+          "So gross."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason begins his morning with journaling to clear his mind, revealing ongoing frustration with dumpster divers. His solution — defecating in a bag as a deterrent — shocks Stacey and introduces a dark comedic edge to his character. After disposing of the bag, Jason resumes painting.",
+    "beatPurpose": "Expose Jason’s psychologically unstable but oddly practical side; deepen the documentary’s tone by introducing absurd, disturbing realism; maintain the progression of the painting schedule.",
+    "conflict": "Jason vs. dumpster divers; Jason’s internal instability; Stacey’s discomfort with his increasingly strange behavior.",
+    "stakes": "Jason’s mental state is degrading as pressure mounts; the documentary now has an unexpected and volatile subject.",
+    "outcome": "Jason resets emotionally (in his own way) and returns to work; tension increases between Jason’s artist persona and his private eccentricities.",
+    "themes": [
+      "Stress under pressure",
+      "Humor in discomfort",
+      "Coping mechanisms (healthy or not)",
+      "Creative ritual",
+      "Documentary vérité — capturing the unfiltered truth"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Stacey Morrison"],
+    "newIntroductions": [],
+    "revealedBackstory": [
+      "Jason journals frequently to clear his mind before painting.",
+      "Dumpster diving has been a consistent issue.",
+      "Jason has used the 'poop bag' deterrent multiple times.",
+      "Jason experiences intrusive or distracting thoughts he needs to purge before working."
+    ],
+    "emotionalShifts": {
+      "Jason Towne": "Calm → introspective → flustered → secretive → unapologetically gross → cheerful → refocused",
+      "Stacey Morrison": "Neutral → curious → concerned → disgusted → uneasy → resigned"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s art studio interior", "Back room", "Dumpster outside"],
+    "props": [
+      "Notebook",
+      "Workbench",
+      "Rubber gloves",
+      "Dropper bottles",
+      "Plastic shot glasses",
+      "Trash can",
+      "Plastic garbage bags"
+    ],
+    "technology": ["Documentary camera equipment"],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "Escalation of the trash/dumpster storyline from SC-004 and SC-006.",
+      "Deepens psychological portrait of Jason leading into later conflict or breakdown.",
+      "Progression toward Day 5 of the painting process."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": ["Time-lapse sequences"],
+    "SFX": [
+      "Room ambience",
+      "Glove snaps",
+      "Paint shaking",
+      "Trash bag rustling"
+    ],
+    "music": [
+      "Subtle dark comedic cue",
+      "Tension drone under bathroom/back room moment"
+    ],
+    "cameraIdeas": [
+      "Slow push-in as Jason writes in his notebook.",
+      "Awkward documentary handheld when Stacey finds Jason in the back room.",
+      "Cutaway to Stacey’s reaction for comedic effect.",
+      "Time-lapse transition to signify Day 5."
+    ],
+    "setRequirements": [
+      "Dimly lit studio setup",
+      "Back room area",
+      "Workbench",
+      "Notebook",
+      "Painting workspace",
+      "Dumpster location"
+    ]
+  }
+}

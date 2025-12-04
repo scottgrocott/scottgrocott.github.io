@@ -1,0 +1,221 @@
+{
+  "scene_id": "SC-026",
+  "title": "The Art Show Heist",
+  "logline": "Jason, Kenny, and Stacey attempt to steal Jason’s own commissioned painting back from the guarded art show. The plan collapses instantly, triggering a chaotic foot chase that ends with an unexpected confrontation outside Jason’s studio.",
+  "setting": {
+    "location": "Art Show — Exterior and Interior, Downtown",
+    "environment": "Daytime; large gallery space with bright walls; energetic atmosphere with visitors and a stationed security guard.",
+    "time_of_day": "Day"
+  },
+  "characters": {
+    "JASON_TOWNE": {
+      "role": "Protagonist",
+      "mood": "Amped, anxious, improvisational",
+      "objective": "Steal his own painting back."
+    },
+    "KENNY": {
+      "role": "Co-conspirator (The Decoy)",
+      "mood": "Pumped, chaotic, loyal",
+      "objective": "Create a distraction—unwittingly serving as bait."
+    },
+    "STACEY": {
+      "role": "Documentarian",
+      "mood": "Focused, alert, committed",
+      "objective": "Capture the unfolding chaos and stay with Jason’s team."
+    },
+    "CATHERINE": {
+      "role": "Art Dealer",
+      "mood": "Calm, smug, controlled",
+      "objective": "Reveal Franklin and maintain authority."
+    },
+    "FRANKLIN_B_STEVENSON": {
+      "role": "Buyer / Puppet Master",
+      "mood": "Mysterious, theatrical, self-assured",
+      "objective": "Reveal his motives and reassert control over the narrative."
+    },
+    "SECURITY_GUARD": {
+      "role": "Obstacle",
+      "mood": "Amused but firm",
+      "objective": "Stop any attempt to steal the painting."
+    }
+  },
+  "story_beats": [
+    {
+      "beat_id": "B1",
+      "description": "Kenny psychs himself up outside the art show."
+    },
+    {
+      "beat_id": "B2",
+      "description": "Kenny charges in to steal the painting."
+    },
+    {
+      "beat_id": "B3",
+      "description": "Security stops Kenny immediately."
+    },
+    {
+      "beat_id": "B4",
+      "description": "Their scuffle creates an opening; Jason seizes the painting and bolts."
+    },
+    {
+      "beat_id": "B5",
+      "description": "Jason tries to escape via truck but the broken key fob fails."
+    },
+    {
+      "beat_id": "B6",
+      "description": "Jason, Kenny, and Stacey sprint 12 blocks back to the studio with the painting."
+    },
+    {
+      "beat_id": "B7",
+      "description": "They arrive only to find Catherine and Franklin waiting outside."
+    },
+    {
+      "beat_id": "B8",
+      "description": "Franklin reveals he orchestrated the mugging; he returns Kenny’s stolen phone and cash."
+    },
+    {
+      "beat_id": "B9",
+      "description": "Franklin asks them all to go inside so he can explain everything."
+    }
+  ],
+  "dialogue": [
+    {
+      "character": "KENNY",
+      "line": "(to himself) Fast— move fast."
+    },
+    {
+      "character": "JASON",
+      "line": "Okay, let’s get my painting back."
+    },
+    {
+      "character": "KENNY",
+      "line": "Yep, I’m gonna grab it."
+    },
+    {
+      "character": "KENNY",
+      "line": "What’s that guy up to?"
+    },
+    {
+      "character": "KENNY",
+      "line": "(under his breath) You’re coming with me."
+    },
+    {
+      "character": "SECURITY_GUARD",
+      "line": "Nope."
+    },
+    {
+      "character": "SECURITY_GUARD",
+      "line": "Not today buddy."
+    },
+    {
+      "character": "KENNY",
+      "line": "Run!"
+    },
+    {
+      "character": "KENNY",
+      "line": "Haha! You fucked up!"
+    },
+    {
+      "character": "JASON",
+      "line": "SHIT!"
+    },
+    {
+      "character": "KENNY",
+      "line": "Why are we running?"
+    },
+    {
+      "character": "JASON",
+      "line": "My fucking key fob took a shit!"
+    },
+    {
+      "character": "KENNY",
+      "line": "What do you mean— you sacrificed me to that guy?"
+    },
+    {
+      "character": "JASON",
+      "line": "Sorry. I figured you’d distract him long enough for me to grab the painting."
+    },
+    {
+      "character": "KENNY",
+      "line": "You prick! You could have told me."
+    },
+    {
+      "character": "CATHERINE",
+      "line": "Jason, you’re back. You’ve all been such busy little bees."
+    },
+    {
+      "character": "JASON",
+      "line": "What are you doing here?"
+    },
+    {
+      "character": "CATHERINE",
+      "line": "I’m here to introduce you to the buyer, Franklin B. Stevenson."
+    },
+    {
+      "character": "KENNY",
+      "line": "That’s the guy who robbed us! Where’s my phone asshole!?"
+    },
+    {
+      "character": "FRANKLIN_B_STEVENSON",
+      "line": "Hi Jason… Kenny… Stacey."
+    },
+    {
+      "character": "JASON",
+      "line": "You scammed me! This is my painting— the deal is off."
+    },
+    {
+      "character": "FRANKLIN_B_STEVENSON",
+      "line": "No, the deal is still valid."
+    },
+    {
+      "character": "KENNY",
+      "line": "Are you deaf? No deal!"
+    },
+    {
+      "character": "FRANKLIN_B_STEVENSON",
+      "line": "Kenny— stop. Here’s your phone, and the thirty bucks you handed over in the tunnel."
+    },
+    {
+      "character": "KENNY",
+      "line": "Sweet! …Why the hell did you rob us?"
+    },
+    {
+      "character": "FRANKLIN_B_STEVENSON",
+      "line": "It was part of the story we were creating together."
+    },
+    {
+      "character": "KENNY",
+      "line": "You robbed us for the doc?"
+    },
+    {
+      "character": "FRANKLIN_B_STEVENSON",
+      "line": "Yes I did. We all need to talk. Shall we all go inside?"
+    },
+    {
+      "character": "JASON",
+      "line": "Um… I guess. Sure, let’s hear it."
+    }
+  ],
+  "props": [
+    "Commission painting (48x60 canvas)",
+    "Jason’s failing key fob",
+    "Kenny’s returned phone",
+    "Kenny’s returned $30",
+    "Stacey’s camera gear"
+  ],
+  "themes": [
+    "Chaos as performance",
+    "Art vs manipulation",
+    "Desperation and ingenuity",
+    "Control vs autonomy",
+    "Friendship under duress"
+  ],
+  "continuity": {
+    "previous_scene": "SC-025",
+    "next_scene": "SC-027",
+    "setup_payoffs": {
+      "Broken key fob": "Forces the foot chase.",
+      "Stacey’s loyalty": "She runs with Jason instead of alerting Franklin.",
+      "Franklin’s mugging": "Revealed to be staged and intentional."
+    }
+  }
+}

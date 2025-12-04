@@ -1,0 +1,88 @@
+{
+  "sceneId": "SC-010",
+  "sequence": 10,
+  "title": "Time-Lapse Progression (Days 6–12)",
+  "pageEst": 0.9,
+
+  "screenplay": {
+    "rawText": "INT. JASON’S ART STUDIO – MORNING\nJason continues painting the commission. A time-lapse sequence shows the progression of the artwork over several days: Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, and Day 12—each indicated by title cards.",
+    "slugline": {
+      "location": "Jason’s Art Studio (interior)",
+      "interiorExterior": "INT",
+      "timeOfDay": "MORNING (various days)"
+    },
+    "actions": [
+      "Jason works on increasingly detailed sections of the painting.",
+      "Camera captures a time-lapse of Jason moving around the canvas.",
+      "Lighting shifts subtly to show different days and sessions.",
+      "Title cards display: DAY 6, DAY 7, DAY 8, DAY 9, DAY 10, DAY 11, DAY 12.",
+      "Jason’s clothing changes subtly across the days.",
+      "The painting becomes significantly more developed."
+    ],
+    "dialogue": []
+  },
+
+  "narrative": {
+    "summary": "A montage spanning Days 6 through 12 shows Jason steadily progressing on the line-work and illustration details. The time-lapse emphasizes the long, meticulous nature of this stage in the process.",
+    "beatPurpose": "Show the passage of time and progress toward the deadline; convey the labor-intensive nature of the commission; transition efficiently through mid-process days.",
+    "conflict": "Mostly internal — endurance, focus, and staying consistent across many slow work sessions.",
+    "stakes": "Jason must maintain pace to finish before the two-week deadline; the pressure increases as the days advance.",
+    "outcome": "Significant progress is made; the painting nears late-stage development.",
+    "themes": [
+      "Time pressure",
+      "Artistic endurance",
+      "Commitment to craft",
+      "Documentary realism"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne"],
+    "newIntroductions": [],
+    "revealedBackstory": [],
+    "emotionalShifts": {
+      "Jason Towne": "Focused → tired → determined → increasingly absorbed in the work"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s art studio interior"],
+    "props": [
+      "Painting in progress",
+      "Dropper bottles",
+      "Brushes and tools",
+      "Studio lighting",
+      "Work tables"
+    ],
+    "technology": ["Camera time-lapse setup"],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "Represents the bulk of the mid-stage illustration work Jason predicted earlier in SC-007.",
+      "Leads toward the final days of the two-week deadline."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [
+      "Extended time-lapse sequence spanning multiple days",
+      "Title card overlays: DAY 6, DAY 7, DAY 8, DAY 9, DAY 10, DAY 11, DAY 12"
+    ],
+    "SFX": [
+      "Soft ambient music",
+      "Studio ambience blended under time-lapse"
+    ],
+    "music": [
+      "Montage cue with steady rhythm or evolving progression to match creative build-up"
+    ],
+    "cameraIdeas": [
+      "Static overhead time-lapse shot",
+      "Cut-ins of macro details developing over days",
+      "Cross dissolves between each day title card"
+    ],
+    "setRequirements": [
+      "Consistent studio environment across days",
+      "Multiple wardrobe changes",
+      "Lighting continuity or intentional variations"
+    ]
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "scene_id": "SC-024",
+  "title": "Next Day at the Art Studio — Planning the Heist",
+  "logline": "Jason and Kenny sit down to plan how they’ll steal Jason’s own painting back from the guarded art show.",
+  "setting": {
+    "location": "Jason’s Art Studio — Lounge Area",
+    "environment": "Daytime; natural light through large double doors; casual, cluttered studio atmosphere.",
+    "time_of_day": "Day"
+  },
+  "characters": {
+    "JASON_TOWNE": {
+      "role": "Protagonist",
+      "mood": "Determined, anxious but focused",
+      "objective": "Formulate a workable plan to steal his painting back."
+    },
+    "KENNY": {
+      "role": "Friend and co-conspirator",
+      "mood": "Energetic, confident, slightly chaotic",
+      "objective": "Help Jason pull off the heist."
+    },
+    "STACEY": {
+      "role": "Documentarian",
+      "mood": "Quiet observer",
+      "objective": "Document events without influencing them."
+    }
+  },
+  "story_beats": [
+    {
+      "beat_id": "B1",
+      "description": "Jason and Kenny sit in the studio lounge planning next steps."
+    },
+    {
+      "beat_id": "B2",
+      "description": "Kenny asks if Jason has a plan."
+    },
+    {
+      "beat_id": "B3",
+      "description": "Jason reveals the plan is minimal — Kenny will physically grab the painting."
+    },
+    {
+      "beat_id": "B4",
+      "description": "Kenny reacts with disbelief but begins accepting the idea."
+    },
+    {
+      "beat_id": "B5",
+      "description": "Jason details the moment-by-moment heist strategy."
+    },
+    {
+      "beat_id": "B6",
+      "description": "Kenny psychs himself up and agrees."
+    },
+    {
+      "beat_id": "B7",
+      "description": "Jason, Kenny, and Stacey head to the truck to execute."
+    }
+  ],
+  "dialogue": [
+    {
+      "character": "KENNY",
+      "line": "Do you have a plan to grab the painting?"
+    },
+    {
+      "character": "JASON",
+      "line": "I do… It’s a loose plan. Not sure it’ll work."
+    },
+    {
+      "character": "KENNY",
+      "line": "We’ll make it work."
+    },
+    {
+      "character": "JASON",
+      "line": "My plan is, you’re going to take it."
+    },
+    {
+      "character": "KENNY",
+      "line": "..That’s your plan? I’m going to take it? Kamikaze style?"
+    },
+    {
+      "character": "JASON",
+      "line": "Yes. You’re going to be so fast— a blur, the guard won’t be able to catch you."
+    },
+    {
+      "character": "KENNY",
+      "line": "I am fast— but you’re blowing smoke."
+    },
+    {
+      "character": "JASON",
+      "line": "Think about it: You walk in, grab the painting, I’ll hold the door. You toss the painting into the back of my truck. By the time you get in, I’ll be ready as the getaway driver."
+    },
+    {
+      "character": "KENNY",
+      "line": "I can do that… Yep! I can do that."
+    },
+    {
+      "character": "JASON",
+      "line": "Great, let’s go!"
+    }
+  ],
+  "props": [
+    "Studio lounge chairs",
+    "Coffee table with paint supplies",
+    "Large double studio doors",
+    "Jason’s truck parked outside",
+    "Stacey’s camera gear"
+  ],
+  "themes": [
+    "Desperation leads to bold action",
+    "Friendship under pressure",
+    "Artists reclaiming their autonomy",
+    "Chaos as a form of justice"
+  ],
+  "continuity": {
+    "previous_scene": "SC-023",
+    "next_scene": "SC-025",
+    "setup_payoffs": {
+      "Jason’s distrust and panic": "Pushes him to initiate the heist.",
+      "Kenny’s impulsiveness": "Makes him the perfect candidate for the grab.",
+      "Stacey documenting everything": "Continues observing without intervening."
+    }
+  }
+}

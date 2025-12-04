@@ -1,0 +1,135 @@
+{
+  "scene_id": "SC-025",
+  "title": "Trusting Stacey & Leaving for the Heist",
+  "logline": "Jason challenges Stacey’s loyalty, only to learn she’s also been paid in fake money—cementing her commitment to documenting the scam as the trio heads out for the heist.",
+  "setting": {
+    "location": "Outside Jason’s Art Studio — Parking Area",
+    "environment": "Daylight; warm outdoor light; Jason’s truck parked near the large double doors.",
+    "time_of_day": "Day"
+  },
+  "characters": {
+    "JASON_TOWNE": {
+      "role": "Protagonist",
+      "mood": "Guarded, frustrated, conflicted",
+      "objective": "Determine whether Stacey can be trusted before the heist."
+    },
+    "KENNY": {
+      "role": "Co-conspirator",
+      "mood": "Casual, trusting, supportive",
+      "objective": "Keep the plan moving and support Jason’s decisions."
+    },
+    "STACEY": {
+      "role": "Documentarian",
+      "mood": "Honest, calm, committed",
+      "objective": "Prove she isn’t part of Franklin’s scam and continue filming the story."
+    }
+  },
+  "story_beats": [
+    {
+      "beat_id": "B1",
+      "description": "Jason, Kenny, and Stacey walk toward Jason’s truck."
+    },
+    {
+      "beat_id": "B2",
+      "description": "Jason questions whether Stacey should come along."
+    },
+    {
+      "beat_id": "B3",
+      "description": "Stacey reveals she was also paid in prop money and is possibly being scammed."
+    },
+    {
+      "beat_id": "B4",
+      "description": "Jason questions why she’s still documenting the story."
+    },
+    {
+      "beat_id": "B5",
+      "description": "Stacey explains she enjoys filming and now believes she owns the footage."
+    },
+    {
+      "beat_id": "B6",
+      "description": "Kenny backs Stacey up, helping Jason trust her."
+    },
+    {
+      "beat_id": "B7",
+      "description": "Jason agrees to bring Stacey along."
+    },
+    {
+      "beat_id": "B8",
+      "description": "Jason struggles again with his barely functional truck key fob."
+    },
+    {
+      "beat_id": "B9",
+      "description": "The group prepares to leave for the heist."
+    }
+  ],
+  "dialogue": [
+    {
+      "character": "JASON",
+      "line": "Hey Stacey, no offense, but I don’t think you should come with us. You work for Franklin, so I don’t know if I can trust you."
+    },
+    {
+      "character": "JASON",
+      "line": "I like you, but I have trust issues with this deal. Also, this doesn’t need to be on camera."
+    },
+    {
+      "character": "STACEY",
+      "line": "I’ve stayed quiet about this until now… This is my first time working for Franklin, and he paid me with the same prop money. That means he’s most likely scamming me too."
+    },
+    {
+      "character": "JASON",
+      "line": "If that’s true, why are you still here shooting this doc?"
+    },
+    {
+      "character": "STACEY",
+      "line": "I’m having fun shooting this. It’s what I do."
+    },
+    {
+      "character": "JASON",
+      "line": "You’re here just for the fun of it now?"
+    },
+    {
+      "character": "STACEY",
+      "line": "Well… sure. It’s been fun. But I also have all the footage. And as far as I’m concerned, this doc footage belongs to me."
+    },
+    {
+      "character": "KENNY",
+      "line": "..I believe her."
+    },
+    {
+      "character": "JASON",
+      "line": "Okay, you do make a good point."
+    },
+    {
+      "character": "STACEY",
+      "line": "Let me finish capturing this story."
+    },
+    {
+      "character": "JASON",
+      "line": "Let’s go then. Come with us."
+    },
+    {
+      "character": "JASON",
+      "line": "Dammit! I keep forgetting to get a new battery. Whatever, let’s go."
+    }
+  ],
+  "props": [
+    "Jason’s malfunctioning key fob",
+    "Jason’s truck",
+    "Stacey’s camera gear"
+  ],
+  "themes": [
+    "Trust under pressure",
+    "Collaboration in crisis",
+    "Blurred lines between truth and performance",
+    "Loyalty formed through shared vulnerability"
+  ],
+  "continuity": {
+    "previous_scene": "SC-024",
+    "next_scene": "SC-026",
+    "setup_payoffs": {
+      "Stacey’s strange position in the scam": "Now clarified—she’s a victim too.",
+      "Jason’s distrust of Franklin": "Escalates as the heist moves forward.",
+      "Key fob malfunction": "Continuing gag and slight tension builder before the heist."
+    }
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "sceneId": "SC-002",
+  "sequence": 2,
+  "title": "The Commission Meeting",
+  "pageEst": 5.5,
+
+  "screenplay": {
+    "rawText": "INT. JASON'S ART STUDIO - DAY\nJason, Stacey, and Catherine discuss the commission contract with unusual requirements: cash-only, NDA, three marketing events, and a high payment that raises suspicion.",
+    "slugline": {
+      "location": "Jason's Art Studio",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+    "actions": [
+      "Jason waits in his art studio surrounded by his paintings.",
+      "Stacey Morrison prepares interview equipment and mics Jason.",
+      "Catherine Thompson arrives dressed professionally.",
+      "Jason shows Catherine the painting 'Burst of Life.'",
+      "They sit to discuss the contract.",
+      "Catherine reveals an unusual commission deal involving cash, NDA, documentary filming, and marketing events.",
+      "Catherine stacks cash on the table in neat piles.",
+      "Jason signs the contract."
+    ],
+    "dialogue": [
+      {
+        "character": "STACEY",
+        "lines": ["I just need to clip this mic to your shirt.", "Okay.. Give me a mic check.", "..More. Say something else.", "Okay, stop. That's good."]
+      },
+      {
+        "character": "JASON",
+        "lines": ["Sounds good.", "Testing. Testing..", "Fuzzy Wuzzy was a bear—", "Yes, come in!", "I call this one Burst of Life.", "Thank you.", "Requirements? What are they?", "Cash? Cash is good.", "It says here painting price blank? Documentary price blank?", "Three marketing events?", "I'm fine with that.", "So she’s going to be following me through the whole process?", "I can make that work.", "Ten what!? Ten grand?", "I don’t know if I should be happy, or offended.", "Fine. I'm okay with that.", "Why is there a blank space here for a bonus payout?", "Yes, I'll do it.", "Yes, of course we have a deal."]
+      },
+      {
+        "character": "CATHERINE",
+        "lines": [
+          "Pleased to finally meet you face-to-face.",
+          "Thank you.",
+          "I bet you’re wondering why we set this all up just to discuss a potential painting commission?",
+          "Franklin B. Stevenson loves your Illustrated Abstractions and wants to buy the next piece.",
+          "Mr. Stevenson wants your vision.",
+          "Yes, but only pictures online.",
+          "Shall we continue our conversation?",
+          "Franklin pays in cash. Will that be okay?",
+          "All of Mr. Stevenson's requests are in this contract.",
+          "Continue reading.",
+          "Yes, Franklin wants to see the painting out in the world before he takes possession.",
+          "We’re offering ten thousand for the painting.",
+          "Five thousand for the documentary.",
+          "Another five thousand if you finish in two weeks.",
+          "This will all be yours if you can stick to the contract.",
+          "Sign the contract and we’ll get started.",
+          "This is only the bonus portion of the deal.",
+          "You cannot spend any of this cash until the contract is fulfilled.",
+          "We have our reasons."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": ["Hi Catherine, nice to see you too!", "Bye Catherine!", "It is— It's very exciting!"]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason meets with art dealer Catherine Thompson to discuss a mysterious commission. The buyer offers unusually high payment, insists on cash-only, three marketing events, an NDA, and full documentary coverage. Jason is excited but uneasy.",
+    "beatPurpose": "Explain how Jason got involved in a dangerous and suspicious commission; contrast with the opening chase scene.",
+    "conflict": "Increasingly strange contract conditions create tension and suspicion.",
+    "stakes": "Jason’s career, personal safety, financial entanglement, legal risk via strict NDA.",
+    "outcome": "Jason signs the contract, setting the plot in motion.",
+    "themes": [
+      "Temptation",
+      "Artistic integrity vs commercial pressure",
+      "Hidden agendas",
+      "Power imbalance"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Stacey Morrison", "Catherine Thompson"],
+    "newIntroductions": ["Stacey Morrison", "Catherine Thompson"],
+    "revealedBackstory": [
+      "Jason has a signature painting series: Illustrated Abstractions.",
+      "Franklin B. Stevenson is an influential buyer."
+    ],
+    "emotionalShifts": {
+      "Jason Towne": "Curious → cautious → excited → conflicted → committed",
+      "Catherine Thompson": "Professional, confident, withholding full truth",
+      "Stacey Morrison": "Neutral observer, mildly amused"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s Art Studio"],
+    "props": [
+      "Camera equipment",
+      "Clip-on microphones",
+      "Contract",
+      "Stacks of cash",
+      "Painting: Burst of Life"
+    ],
+    "technology": ["Documentary gear", "Studio lighting"],
+    "factionsReferenced": ["Franklin B. Stevenson (offscreen)"],
+    "continuityLinks": [
+      "This explains why Jason is later running with the painting in Scene 1.",
+      "Establishes the NDA and dangerous contract terms."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [],
+    "SFX": ["Studio ambience", "Paper handling", "Cash stacking"],
+    "music": ["Light investigative tone → rising tension"],
+    "cameraIdeas": [
+      "Over-the-shoulder contract close-ups",
+      "Slow zoom on cash stacks",
+      "Shot-reverse-shot for negotiation tension"
+    ],
+    "setRequirements": ["Art studio interior", "Paintings", "Camera tripod setup", "Cash bundles", "Contract paperwork"]
+  }
+}

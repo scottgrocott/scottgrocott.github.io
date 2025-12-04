@@ -35,11 +35,6 @@
             "protagonist: TBD",
             "protagonist: friend group (from the campground) TBD",
             "primary antagonist: Joey Tortellini (Ferrari Family Leader)"
-        ],
-        "primary_player_abilities": [
-            "Walk, sprint, crouch, slide",
-            "Interact: shoot, open doors, pick up detonators",
-            "Environmental stealth: shadows, noise"
         ]
     },
     "worldAssets": {
@@ -224,7 +219,7 @@
     },
 	"autopia":{
 		"description":"A large island nation in the middle of the ocean. Autopia is a socially stratified and car culture dominates daily life. A port city, an inland desert, a mountain filled northern region (The location of Mountain City), a large deep canyon region in the desert. Very mysterious",
-		"url":"https://scottgrocott.github.io/json/buggywhip/mountain-city/autopia.json"
+		"buggywhip_url":"https://scottgrocott.github.io/json/buggywhip/mountain-city/autopia.json"
 	}
     "factions": {
         "dealershipFamilies": {

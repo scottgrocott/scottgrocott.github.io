@@ -1,0 +1,107 @@
+{
+  "sceneId": "SC-011",
+  "sequence": 11,
+  "title": "Completion of the Painting (Day 12)",
+  "pageEst": 1.4,
+
+  "screenplay": {
+    "rawText": "INT. JASON’S ART STUDIO – DAY\nJason makes the final brush stroke on the commission. He hangs the painting for proper viewing, adjusts lighting, evaluates it, and decides it is finished except for clear coating, which he will do the next day.",
+    "slugline": {
+      "location": "Jason’s Art Studio (interior)",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+    "actions": [
+      "Jason applies the final brush stroke.",
+      "He steps back to assess the work.",
+      "Jason lifts the finished painting from the table.",
+      "He hangs it on the wall for full view.",
+      "He adjusts the studio lighting meticulously.",
+      "Jason studies the painting from a distance.",
+      "He removes the painting from the wall and places it back on the table.",
+      "Jason notes that clear coating will happen tomorrow."
+    ],
+    "dialogue": [
+      {
+        "character": "JASON",
+        "lines": [
+          "That’s it, I think it’s done..",
+          "Well, let’s take a proper look at it..",
+          "I like it.. ..Now it needs to be clear coated.",
+          "I’ll clear coat it tomorrow after it’s had time to dry."
+        ]
+      },
+      {
+        "character": "STACEY",
+        "lines": [
+          "Nice! What now?"
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason completes the final brush stroke of his commission. He evaluates the painting under ideal lighting, expresses satisfaction, and schedules the clear coating for the next day.",
+    "beatPurpose": "Mark the official completion of the primary artwork before the final finishing stage; highlight Jason's perfectionism and methodical process.",
+    "conflict": "Internal tension — uncertain until the last moment whether the painting 'feels' complete.",
+    "stakes": "This represents the successful near-end of the two-week challenge; he must now only clear-coat and participate in the marketing events.",
+    "outcome": "Jason finishes the painting and prepares for the clear coating on Day 13.",
+    "themes": [
+      "Completion and evaluation",
+      "Artistic confidence",
+      "Process discipline",
+      "Transition from creation to finishing"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Stacey Morrison"],
+    "newIntroductions": [],
+    "revealedBackstory": [],
+    "emotionalShifts": {
+      "Jason Towne": "Focused → relieved → satisfied",
+      "Stacey Morrison": "Supportive → curious → appreciative"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": ["Jason’s art studio interior"],
+    "props": [
+      "Plastic table",
+      "Finished painting",
+      "Lighting setup",
+      "Brushes and tools"
+    ],
+    "technology": ["Documentary filming equipment"],
+    "factionsReferenced": [],
+    "continuityLinks": [
+      "End of the painting phase begun in SC-003.",
+      "Prepares for clear-coat step and upcoming marketing events required by the contract.",
+      "Occurs at the end of the Day 6–12 time-lapse sequence (SC-010)."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [],
+    "SFX": [
+      "Brush sound for final stroke",
+      "Studio ambience",
+      "Fasteners or hooks as painting is hung"
+    ],
+    "music": [
+      "Light cue of accomplishment or resolution"
+    ],
+    "cameraIdeas": [
+      "Close-up on the final brush stroke.",
+      "Pull-back shot revealing Jason stepping away.",
+      "Over-the-shoulder as he adjusts lighting.",
+      "Hero shot of the finished piece on the wall."
+    ],
+    "setRequirements": [
+      "Studio wall for final viewing",
+      "Adjustable lighting rig",
+      "Plastic work table",
+      "Camera setup for documentary coverage"
+    ]
+  }
+}

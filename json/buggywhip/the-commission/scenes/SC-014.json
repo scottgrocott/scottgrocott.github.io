@@ -1,0 +1,148 @@
+{
+  "sceneId": "SC-014",
+  "sequence": 14,
+  "title": "The Drunken Art Critic Podcast",
+  "pageEst": 4.0,
+
+  "screenplay": {
+    "rawText": "INT. DRUNKEN ART CRITIC PODCAST STUDIO – DAY\nJason appears as a guest on Martin Jenkins' podcast. A large segment of dialogue unfolds as Martin drinks progressively more wine, critiques Jason’s work harshly at first, then reveals a reluctant appreciation. The commissioned painting hangs behind them.",
+    "slugline": {
+      "location": "Drunken Art Critic Podcast Studio",
+      "interiorExterior": "INT",
+      "timeOfDay": "DAY"
+    },
+
+    "actions": [
+      "Jason sits beside MARTIN JENKINS, aka The Drunken Art Critic.",
+      "Jason’s newly completed commissioned painting hangs between them on the set wall.",
+      "Martin checks with his producer off-camera, still prepping despite claiming he isn’t ready.",
+      "Martin pours wine for Jason, then for himself.",
+      "They clink glasses.",
+      "Martin launches into the interview, already half-snarky and half-buzzed.",
+      "Martin critiques the painting as 'jejune' before acknowledging he often says that when drunk.",
+      "Jason explains his Illustrated Abstractions style.",
+      "Martin grows steadily more intoxicated, philosophizing about the death of tactile art forms.",
+      "The conversation ends with Martin surprisingly complimenting both Jason and the painting."
+    ],
+
+    "dialogue": [
+      {
+        "character": "MARTIN",
+        "lines": [
+          "Are we ready?... I’m not quite ready.",
+          "Cheers.",
+          "Lovely, that’ll do for now.",
+          "We’re rolling?",
+          "Today I’m sitting with Jason Towne. Welcome to the show Jason.",
+          "Yes, yes of course. We’re going to have a few drinks together, and discuss some art—your art.",
+          "Fantastic! Let’s talk about some art and life.",
+          "I have to say it’s a bit jejune.",
+          "You know, naive. Simple. Superficial.",
+          "Well, it’s only paint and canvas. What else could it be?",
+          "Indeed...",
+          "Yes, well, I say jejune when I’m drunk. So pardon me for that.",
+          "In your opinion, is painting a dying art form?",
+          "I’m referring to the death of everything tactile. We live in a world of screens now.",
+          "Take this wine as an example: You cannot enjoy this through a screen.",
+          "Of course I hope you’re right about that.",
+          "One more thing—I usually become more discontented with my guests as the show unfolds. However, you are not as egregious as most.",
+          "Yes, in other words, you’re not remarkably bad.",
+          "I’ve quite enjoyed our little chat.",
+          "This has been fun for me, this wine is fantastic.",
+          "That is all for now... The bar is closed... for you anyway. Ha!",
+          "Yes. And don’t forget to read my next article, it publishes soon in Art Knowing Magazine. Bye bye for now."
+        ]
+      },
+      {
+        "character": "JASON",
+        "lines": [
+          "Cheers.",
+          "Hi Martin, thanks for having me.",
+          "Love it, that’s why I’m here.",
+          "Sounds great, I’m familiar with your show. Seems to be working well for ya.",
+          "Come again?",
+          "Sure, in that context it is simple. It is paint on canvas.",
+          "It seems appropriate to call these illustrated abstractions...",
+          "I stack line-work onto expressive brush strokes that are layered onto a colorfield base.",
+          "I hope not. Haven’t people been saying that for the past 100 years?",
+          "You’re right, I think people will always make their way back to the tactile world.",
+          "Egregious? Thank you... I guess.",
+          "I’ll take that as a compliment.",
+          "Well, thanks for having me."
+        ]
+      }
+    ]
+  },
+
+  "narrative": {
+    "summary": "Jason participates in the Drunken Art Critic podcast, where Martin Jenkins delivers a mixture of drunken insults, philosophical musings, and surprising compliments. The interaction showcases both Jason’s calm grounded nature and the bizarre, chaotic world of art media Franklin has pushed him into.",
+    "beatPurpose": "Marketing Event #1; deep character contrast between Jason’s sincerity and the chaotic, performative art-world commentator.",
+    "conflict": "Comic verbal conflict—Martin challenges Jason’s work aggressively before softening.",
+    "stakes": "Jason’s reputation is being publicly shaped. This podcast will influence the art show and his standing with the mysterious buyer.",
+    "outcome": "Jason handles the interview with grace. Martin ends up supporting him, promising a future article.",
+    "tone": [
+      "Comedic",
+      "Satirical",
+      "Philosophical",
+      "Awkward"
+    ],
+    "themes": [
+      "The absurdity of the art world",
+      "Authenticity vs performance",
+      "The evolution (or death) of tactile creativity",
+      "Alcohol-fueled truth-telling"
+    ]
+  },
+
+  "characters": {
+    "present": ["Jason Towne", "Martin Jenkins (The Drunken Art Critic)"],
+    "newIntroductions": ["Martin Jenkins"],
+    "revealedBackstory": [],
+    "emotionalShifts": {
+      "Jason Towne": "Relaxed → Defending his work → Mildly amused → Confident",
+      "Martin Jenkins": "Pretending professionalism → Increasingly drunk → Critical → Philosophical → Warm"
+    }
+  },
+
+  "worldbuilding": {
+    "locations": [
+      "Drunken Art Critic podcast studio set",
+      "Backdrop featuring Jason’s displayed painting"
+    ],
+    "props": [
+      "Jason’s commissioned painting",
+      "Wine bottles",
+      "Wine glasses",
+      "Podcast microphones",
+      "Camera setup"
+    ],
+    "continuityLinks": [
+      "This is Marketing Event #1 in Jason’s contract.",
+      "Leads directly into upcoming Marketing Event #2 (dangerous neighborhood photoshoot with Kenny)."
+    ]
+  },
+
+  "productionNotes": {
+    "VFX": [],
+    "SFX": [
+      "Wine bottle uncorking",
+      "Clinking glasses",
+      "Camera rolling / light hum"
+    ],
+    "music": [
+      "Loose jazz or comedic, off-kilter background cue to underscore Martin’s drunkenness"
+    ],
+    "cameraIdeas": [
+      "Two-shot with painting framed between them",
+      "Close-ups on Martin drinking",
+      "Slow zoom on Jason as Martin insults the painting",
+      "Cutaway to painting during critiques"
+    ],
+    "setRequirements": [
+      "Podcast desk with mics",
+      "Wine bottle(s) and glasses",
+      "Mounted painting behind guests",
+      "Soft-lit studio environment"
+    ]
+  }
+}
