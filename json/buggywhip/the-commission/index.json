@@ -9,7 +9,15 @@
       "dark-comedy"
     ],
     "logline": "An underrecognized painter accepts a lucrative commission from a mysterious buyer, only to be pulled into an escalating series of bizarre staged events that threaten his sanity, reputation, and career — until he discovers the truth behind the art-world puppet master controlling his fate.",
-    "story_overview": "Jason Towne, a struggling but talented painter, takes a high-paying commission that becomes stranger every day. As documentary cameras follow his process, an eccentric buyer orchestrates dramatic confrontations, a staged robbery, a fake bounty, and a chaotic art-show heist — all to shock Jason out of obscurity. The final twist reveals the buyer as a filmmaker creating a series of ‘scam-based art documentaries,’ with Jason as the first subject."
+    "story_overview": "Jason Towne, a struggling but talented painter, takes a high-paying commission that becomes stranger every day. As documentary cameras follow his process, an eccentric buyer orchestrates dramatic confrontations, a staged robbery, a fake bounty, and a chaotic art-show heist — all to shock Jason out of obscurity. The final twist reveals the buyer as a filmmaker creating a series of ‘scam-based art documentaries,’ with Jason as the first subject.",
+    "project_goals": ["To create a feature length AI pre-visualation of the script including video,SFX,dialog and music.",
+                      "To position the project for potential production funding or partnerships with indie film studios.",
+                      "To establish a pilot for a potential web series exploring similar art-world scams and schemes each featuring different artists."],
+    "target_audience": "Art enthusiasts, independent film lovers, and audiences who appreciate dark humor",
+    "executives": ["Jason Towne - Writer/Director/Producer/Lead Protagonist",
+                     "Michael Souza - Co-Producer/Lead Antagonist/Cinematographer/Editor/Sound Designer/Musical Score",
+                     "Scott Grocott - Co-Producer/AI Visual Effects Supervisor/AI Prompt Engineer/Character Actor"]
+  
   },
   "themes": [
     "art vs commerce",
