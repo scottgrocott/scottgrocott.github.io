@@ -219,6 +219,10 @@
     },
 	"autopia":{
 		"description":"A large island nation in the middle of the ocean. Autopia is a socially stratified and car culture dominates daily life. A port city, an inland desert, a mountain filled northern region (The location of Mountain City), a large deep canyon region in the desert. Very mysterious",
+		"town_dessert_flat":["Desert Flats.Desert Flats-sounds like this vast, sun-baked expanse just past Mountain City's edges, where the land stretches out flat and endless, dotted with wind-worn rocks and forgotten trails. It's got that lonely, timeless feel, right? The kind of place where old ranches cling to life, dust devils dance in the heat, and maybe a lone inventor tinkers in a shed full of half-finished machines. ",
+"the racing scene fits perfectly, turning those endless flats into a high-stakes playground for speed junkies and daredevils. Imagine souped-up mini hot rods barreling across the salt, kicking up dust clouds that shimmer in the heat, crowds gathered under patched-up awnings, betting on who'll make it to the end without their engine seizing from the dust."],
+		"city_bay_city":["Bay City-coastal counterpart to Mountain City's inland vibes. A miniature port town. Bay's the living room, where inland and coast share space on one tiny peninsula. Mountains frame it, but the water's what makes it breathe.",
+		"Bay City-miniature coastal racing town. Drift culture rules here, with cars screeching around tight bends, drifting sideways past neon lights and harbor cranes, salt air mixing with tire smoke."],
 		"buggywhip_url":"https://scottgrocott.github.io/json/buggywhip/mountain-city/autopia.json"
 	}
     "factions": {
