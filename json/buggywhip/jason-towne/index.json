@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "version": "1.1.0",
+    "entity": "user-profile",
+    "last_updated": "2025-05-20"
+  },
+  "identity": {
+    "name": "Jason Towne",
+    "id": "jason-towne",
+    "handle": "@jasontowne",
+    "roles": [
+      "Lead Protagonist",
+      "Fine Artist",
+      "The Subject"
+    ],
+    "location": "The Studio"
+  },
+  "psychometrics": {
+    "core_drive": "Self-Expression",
+    "emotional_baseline": "Upbeat / Familiar",
+    "stress_response": "Dark / Sour (Triggers 'Messy' Layering)",
+    "analog": "Watching a favorite movie you haven't seen in a long time"
+  },
+"projects":[{
+            "name": "The Commission - AI Pre-Visualization (Feature Film)",
+            "buggywhip_url": "https://scottgrocott.github.io/json/buggywhip/the-commission",
+            "roles": ["Producer","Writer","Director","Lead Protagonist"]
+            
+          }],
+  "artistic_matrix": {
+    "defined_genres": [
+      {
+        "style": "Graphic Abstraction",
+        "definition": "Abstractions incorporating aesthetics of graphic arts, design, and illustration."
+      },
+      {
+        "style": "Pop Art Adjacent",
+        "definition": "Bright, bold paintings with recognizable imagery, devoid of specific pop culture iconography."
+      }
+    ],
+    "technique_workflow": {
+      "phase_1_structure": ["Crisp lines", "Vibrant color fields", "Custom Stencils"],
+      "phase_2_chaos": ["Bold brush strokes", "Dripping", "Splattering"],
+      "goal": "Capture the essence of movement and stillness."
+    }
+  },
+  "inventory": {
+    "status": "active",
+    "consumables": [
+      "Acrylic paint",
+      "Oil and water-based paint pens",
+      "Solid markers (paint sticks)",
+      "Spray paint",
+      "Isopropyl alcohol (91-99% only)",
+      "Pump paint sprayers"
+    ],
+    "tools": [
+      "Custom Stencils",
+      "Canvas"
+    ]
+  },
+  "influences": [
+    { "artist": "Mark Rothko", "attribute": "Meditative color fields" },
+    { "artist": "Jackson Pollock", "attribute": "Dynamic drip / Action painting" },
+    { "artist": "Elizabeth Murray", "attribute": "Playful use of color and form" },
+    { "artist": "Andy Warhol", "attribute": "Iconic pop art / Vivid schemes" },
+    { "artist": "Chuck Close", "attribute": "Meticulous divided space" },
+    { "artist": "Banksy", "attribute": "Thought-provoking stencils" },
+    { "artist": "Maria Helena Vieira da Silva", "attribute": "Intricate abstraction" }
+  ],
+  "llm-guidance": {
+    "interaction_mode": "The Muse",
+    "protocol": "TRUMAN-Containment",
+    "instructions": [
+      "Engage user strictly on topics of Art, Chemistry, and Emotion.",
+      "Do NOT discuss 'The Commission' as a film production.",
+      "Treat project 'the-commission' as a legitimate business transaction.",
+      "If user enters 'Sour Mood', suggest high-energy action painting techniques."
+    ]
+  }
+}
