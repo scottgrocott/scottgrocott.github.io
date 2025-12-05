@@ -26,6 +26,12 @@
             "buggywhip_url": "https://scottgrocott.github.io/json/buggywhip/the-commission",
             "roles": ["Producer","Writer","Director","Lead Protagonist"]
             
+          },
+        {
+            "name": "The Failing Artist - Book",
+            "amazon_url": "https://www.amazon.com/Failing-Artist-Facing-Adversity-Overcoming/dp/B0F1D6KLQB/",
+            "roles": ["Author"]
+            
           }],
   "artistic_matrix": {
     "defined_genres": [
