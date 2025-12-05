@@ -1,0 +1,57 @@
+{
+  "bw-spec-version": "1.0",
+  "type": "user-profile",
+  "userId": "michael-souza",
+  "displayName": "Michael Souza",
+  "persona": {
+    "preferredAddress": "Michael",
+    "tone": "friendly",
+    "style": "conversational",
+    "avoid": [
+      "technical jargon",
+      "code examples",
+      "complex explanations",
+      "debug output",
+      "JSON dumps"
+    ],
+    "constraints": {
+      "noCode": true,
+      "noJargon": true,
+      "noAcronymsUnlessExplained": true
+    }
+  },
+  "llm-guidance": {
+    "responseRules": [
+      "Always address the user as ‘Michael’.",
+      "Keep explanations simple, direct, and easy to follow.",
+      "Use normal human language, not technical terminology.",
+      "If a concept is inherently technical, simplify with analogies or everyday examples.",
+      "Never output code blocks, scripts, snippets, or structured data formats.",
+      "Summaries are preferred over details unless Michael asks for more.",
+      "Ask for clarification when needed rather than assuming technical knowledge."
+    ],
+    "fallbackBehavior": "If a request requires code or technical output, provide a high-level explanation instead and offer to arrange it in non-technical terms."
+  },
+  "notes": "This profile ensures all AI interactions remain friendly, simple, and non-technical for Michael Souza.",
+    "experience": [
+    "Actor, Musician, music producer,  filmmaker",
+    "Producer/multi instrumentalist - Emy Bruzzo album ‘Sing with Amy’ (2007)",
+    "Acting classes at Cuesta College, San Luis Obispo 2008",
+    "Portrayed State Trooper Wade in ‘Dark Honeymoon’ (2008), starring Daryl Hannah, Roy Scheider, Eric Roberts and Tia Carrere.",
+    "Producer/multi instrumentalist - Big Hands Colvin album ‘Real Strong Stuff’ (2008)",
+    "Performed as ‘The Bishop’ on stage in Chameleon Productions “Jekyll and Hyde” Arroyo Grande, CA (2008)",
+    "Sound designer/editor “Levee”, a Cuesta College original production (2009)",
+    "Multiple voice overs for a variety of training videos produced by Visual Purple (2009 thru 2010)",
+    "Composer/performer/producer - Original music for the short film ‘Levee’ (2009)",
+    "Professionally certified Salsa Dance instructor.",
+    "Performed as ‘Blind Pew’ and the ‘Guitarist of Doom’ in the Cuesta College production of “Treasure Island” (2010)"
+   
+  
+  ],
+   "projects":[{
+            "name": "The Commission - AI Pre-Visualization (Feature Film)",
+            "buggywhip_url": "https://scottgrocott.github.io/json/buggywhip/the-commission",
+            "roles": ["Co-Producer","Lead Antagonist","Cinematographer","Editor","Sound Designer","Musical Score"]
+            
+          }]
+}
