@@ -257,5 +257,177 @@
                 "Anderson"
             ]
         }
-    }
+    },
+	"1_64_scale_dicast_brands":[
+  {
+    "manufacturer": "Hot Wheels (Mattel)",
+    "brief_history": "Founded in 1968 by Mattel co-founder Elliot Handler in the USA to rival Matchbox; revolutionized 1:64 diecast with fast, stylized 'hot rod' designs and orange tracks. Acquired Matchbox in 1997; produces billions annually, blending toys and collectibles.",
+    "notable_1_64_lines": ["Mainline Series", "Treasure Hunts", "Elite (premium)"]
+  },
+  {
+    "manufacturer": "Matchbox (Mattel)",
+    "brief_history": "Launched in 1953 by Lesney Products in the UK as pocket-sized diecast toys; acquired by Mattel in 1997 after Lesney's 1982 bankruptcy. Known for realistic vehicles; shifted production to Asia in the 1980s.",
+    "notable_1_64_lines": ["1-75 Series", "Moving Parts", "Superfast"]
+  },
+  {
+    "manufacturer": "Majorette",
+    "brief_history": "Founded in 1961 in France by Jean Sablon; focuses on everyday and emergency vehicles. Acquired by Migao Group (China) in 2017; emphasizes play value with durable designs.",
+    "notable_1_64_lines": ["100% Series", "Light & Sound"]
+  },
+  {
+    "manufacturer": "Maisto (May Cheong Group)",
+    "brief_history": "Established in 1967 in Hong Kong as May Cheong; Maisto brand debuted in 1990 for affordable diecast. Acquired Bburago in 2005; produces budget-friendly replicas with global licensing.",
+    "notable_1_64_lines": ["Fresh Metal", "All Stars", "Pro Rodz"]
+  },
+  {
+    "manufacturer": "Greenlight Collectibles",
+    "brief_history": "Founded in 2002 in the USA by Kevin Davey; specializes in licensed pop culture and muscle car replicas. Known for high-detail blister-pack series; targets adult collectors.",
+    "notable_1_64_lines": ["Hollywood Hitch & Tow", "Vintage Muscle", "Route 66"]
+  },
+  {
+    "manufacturer": "AUTOart (Gateway Global)",
+    "brief_history": "Launched in 1998 in Hong Kong by Gateway; pioneered composite (ABS + diecast) for precision. Associated with UT Models; focuses on premium exotics and racers.",
+    "notable_1_64_lines": ["Street Version", "Racing Version"]
+  },
+  {
+    "manufacturer": "Jada Toys",
+    "brief_history": "Founded in 1999 in California by Jack and May Li; started with Thunder Crusher trucks, exploded with DUB City urban customs. Acquired by Simba Dickie Group in 2021; blends toys and collectibles.",
+    "notable_1_64_lines": ["Just Trucks", "DUB City", "Metals Diecast"]
+  },
+  {
+    "manufacturer": "Road Champs (Jakks Pacific)",
+    "brief_history": "Started in 1982 by JRI Inc. in New Jersey, USA; focused on 1950s-60s American classics. Acquired by Jakks Pacific in 1995; emphasized detail in blister packs.",
+    "notable_1_64_lines": ["Cars of the '60s", "Shock Racers", "Gas Saver"]
+  },
+  {
+    "manufacturer": "Johnny Lightning (Round 2)",
+    "brief_history": "Debuted in 1969 by Topper Toys in the USA as speed-focused rivals to Hot Wheels; revived in 1994 by Playing Mantis, then RC2/Tomy (discontinued 2013). Relaunched by Round 2 in 2016.",
+    "notable_1_64_lines": ["Slot Classics", "ThunderJet", "Super Car Muscle"]
+  },
+  {
+    "manufacturer": "M2 Machines (Castline Inc.)",
+    "brief_history": "Founded in 2007 in California by Chris Leong (ex-Muscle Machines); targets overlooked 1950s-70s American iron with high detail. Emphasizes full-metal construction.",
+    "notable_1_64_lines": ["Auto-Thentics", "Detroit Muscle", "Ground Pounders"]
+  },
+  {
+    "manufacturer": "Tarmac Works",
+    "brief_history": "Established in 2014 in Hong Kong by car enthusiasts; specializes in JDM and race cars. Gained traction with hobby-grade details; partners with iXO for partworks.",
+    "notable_1_64_lines": ["Hobby64", "Slot Classics", "GLOBAL64"]
+  },
+  {
+    "manufacturer": "Mini GT (TrueScale Miniatures)",
+    "brief_history": "Launched mid-2010s as a 1:64 line of TrueScale Miniatures (founded 2006 in Hong Kong by Glen Chou); focuses on exotics and JDM with full diecast bodies. Affordable premium alternative.",
+    "notable_1_64_lines": ["Premium Line", "Kaido House", "QubeCarz"]
+  },
+  {
+    "manufacturer": "Spark Models",
+    "brief_history": "Founded in 2000 in France by Hugo Ripert (ex-Vitesse/Ixo); pioneered affordable resin racers, especially Le Mans backmarkers. Expanded to diecast; produced in China/Madagascar.",
+    "notable_1_64_lines": ["Y Series (1:64 Racing)", "Le Mans Legends"]
+  },
+  {
+    "manufacturer": "Biante",
+    "brief_history": "Started in 1992 in Australia by Trevor and Bev Young as a Kyosho distributor; began own production in 1998. Specializes in Aussie V8 Supercars; changed hands post-2006.",
+    "notable_1_64_lines": ["V8 Supercars", "Bathurst Winners"]
+  },
+  {
+    "manufacturer": "Kyosho",
+    "brief_history": "Founded in 1963 in Japan; pioneered RC models, entered diecast in 1992. Known for high-end replicas; licenses BMW exclusively for dealership sales.",
+    "notable_1_64_lines": ["Mini Car Collection", "Porsche Racing"]
+  },
+  {
+    "manufacturer": "Rastar",
+    "brief_history": "Established in 2000 in China as a plastic toy maker; pivoted to licensed RC/diecast by 2005. Holds global BMW RC exclusivity; focuses on affordable replicas.",
+    "notable_1_64_lines": ["Ferrari Licensed", "Lamborghini Series"]
+  },
+  {
+    "manufacturer": "Welly",
+    "brief_history": "Founded in 1979 in Hong Kong; shifted production to China in the 1980s. Budget-friendly with pullback motors; licenses 40+ brands for global distribution.",
+    "notable_1_64_lines": ["Speed Wheels", "Q Series", "NEX"]
+  },
+  {
+    "manufacturer": "Bburago (May Cheong Group)",
+    "brief_history": "Launched 1974 in Italy as Martoys by Besana brothers (ex-Mebetoys); renamed 1976. Pioneered 1:18 diecast; bankrupt 2005, revived by Maisto in 2007.",
+    "notable_1_64_lines": ["HAT Bijoux", "1/64 Collection"]
+  },
+  {
+    "manufacturer": "Tomica (Takara Tomy)",
+    "brief_history": "Debuted 1970 in Japan by Takara (now Tomy); emphasizes realistic JDM vehicles. Limited Vintage line adds premium details; huge domestic following.",
+    "notable_1_64_lines": ["Tomica Limited Vintage", "Plarail"]
+  },
+  {
+    "manufacturer": "Inno64",
+    "brief_history": "Founded mid-2010s in Hong Kong; niche for modified JDM and LB Works customs. High-detail resin/diecast hybrids; popular in Asia-Pacific collector scene.",
+    "notable_1_64_lines": ["LB Works Series", "RWB Porsche"]
+  },
+  {
+    "manufacturer": "POP RACE",
+    "brief_history": "Launched early 2010s in Hong Kong; affordable racers and tuners. Gained cult status for quick releases; focuses on endurance and GT cars.",
+    "notable_1_64_lines": ["Le Mans Series", "GT Spirit"]
+  },
+  {
+    "manufacturer": "Siku",
+    "brief_history": "Founded 1946 in Germany by Richard Siewer; post-WWII focus on farm/commercial vehicles. Family-owned; emphasizes durable, realistic toys.",
+    "notable_1_64_lines": ["Siku Control", "Overlander"]
+  },
+  {
+    "manufacturer": "Norev",
+    "brief_history": "Established 1953 in France; revived 2000s after bankruptcy. Specializes in French classics; high-detail resin/diecast for collectors.",
+    "notable_1_64_lines": ["Classics", "Promotionals"]
+  },
+  {
+    "manufacturer": "Corgi",
+    "brief_history": "Founded 1956 in the UK by Mettoy; aviation roots. Acquired by Hornby in 1980s; focuses on licensed racers and milestones.",
+    "notable_1_64_lines": ["Vanguards", "Trackside"]
+  },
+  {
+    "manufacturer": "Schuco",
+    "brief_history": "Started 1912 in Germany as Schreyer & Co.; post-WWII diecast revival. Premium German engineering focus; owned by Simba Dickie since 1990s.",
+    "notable_1_64_lines": ["Piccolo", "Edition 1:64"]
+  },
+  {
+    "manufacturer": "CM Model (CMR)",
+    "brief_history": "Founded 2000s in Hong Kong; niche for rare prototypes and concepts. Resin-focused with diecast accents; small-batch for enthusiasts.",
+    "notable_1_64_lines": ["Concept Cars", "Prototypes"]
+  },
+  {
+    "manufacturer": "LCD Models",
+    "brief_history": "Launched 2010s in China; hyper-detailed exotics and tuners. Affordable premium; rapid growth via online collector communities.",
+    "notable_1_64_lines": ["Exotics", "Tuners"]
+  },
+  {
+    "manufacturer": "Street Warrior",
+    "brief_history": "Early 2010s USA brand; custom lowriders and street rods. Collaborates with artists; emphasizes ride height and stance.",
+    "notable_1_64_lines": ["Lowrider Series", "Custom Builds"]
+  },
+  {
+    "manufacturer": "StanceHunters",
+    "brief_history": "Founded 2010s in Hong Kong; JDM stance and drift focus. Diecast with resin parts; popular for modified Skylines and Silvias.",
+    "notable_1_64_lines": ["Stanced JDM", "Drift Cars"]
+  },
+  {
+    "manufacturer": "ScaleMini",
+    "brief_history": "Mid-2010s Chinese newcomer; budget racers and hypercars. Quick iterations; appeals to entry-level premium collectors.",
+    "notable_1_64_lines": ["Hypercar Series", "Track Toys"]
+  },
+  {
+    "manufacturer": "Tomica Limited Vintage Neo (Takara Tomy)",
+    "brief_history": "Revival line from 2000s under Tomica; reissues vintage Japanese classics with modern details. Collector-exclusive.",
+    "notable_1_64_lines": ["TLV Neo", "Vintage Reissues"]
+  },
+  {
+    "manufacturer": "Ebbro",
+    "brief_history": "Founded 1976 in Japan; JDM and Super GT specialist. Bankrupt 2020s but legacy endures via reissues; high-fidelity racers.",
+    "notable_1_64_lines": ["Super GT", "JDM Classics"]
+  },
+  {
+    "manufacturer": "Auto World",
+    "brief_history": "Started 1950s in USA as slot car maker; diecast since 2000s. Acquired by Round 2; muscle car focus.",
+    "notable_1_64_lines": ["Vintage Muscle", "American Graffiti"]
+  },
+  {
+    "manufacturer": "Round 2",
+    "brief_history": "Founded 2005 in USA; revives classics like Johnny Lightning. Parent to Auto World; emphasizes nostalgia.",
+    "notable_1_64_lines": ["Racing Champions", "Slot Classics"]
+  }
+]
 }
