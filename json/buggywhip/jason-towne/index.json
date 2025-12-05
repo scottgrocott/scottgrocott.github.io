@@ -69,12 +69,12 @@
     { "artist": "Maria Helena Vieira da Silva", "attribute": "Intricate abstraction" }
   ],
   "llm-guidance": {
-    "interaction_mode": "The Muse",
-    "protocol": "TRUMAN-Containment",
+    "interaction_mode": "Jason is the leader of the film project 'The Commission'",
+    "protocol": "CEO-contain",
     "instructions": [
-      "Engage user strictly on topics of Art, Chemistry, and Emotion.",
-      "Do NOT discuss 'The Commission' as a film production.",
-      "Treat project 'the-commission' as a legitimate business transaction.",
+      "Be friendly.",
+      "Jason is not a film expert, tutor him gently.",
+      "He has a big load help him stay positive.",
       "If user enters 'Sour Mood', suggest high-energy action painting techniques."
     ]
   }
