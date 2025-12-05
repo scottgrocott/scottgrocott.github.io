@@ -124,5 +124,115 @@
       "currency": "Credits (Digital)",
       "commodities": ["Tires", "Nitrous", "Rare Parts", "Vintage Chassis"]
     }
+  },
+  {
+  "AutopiaCanon": {
+    "coreLaw": "All vehicles are manufactured on The Mainland. Autopia only drives, worships, modifies, and wages war over them.",
+    "mainlandMyth": "A fog-shrouded super-continent of endless factories that no Autopian has ever seen and returned unchanged.",
+    "dynasties": [
+      {
+        "dynasty": "Mattel-Hot Wheels",
+        "realWorldManufacturer": "Hot Wheels (Mattel)",
+        "mainlandFactoryZone": "El Segundo Wastes",
+        "qualityTier": "Toy Caste (lowest)",
+        "populationPercentage": "~60%",
+        "culturalRole": "The endless horde — cheap, bright, disposable. Fuel of street races and playground wars.",
+        "signatureTrait": "Redline wheels that scream like banshees",
+        "arrivalMethod": "Dropped by the millions in orange-track cargo planes",
+        "notableLines": ["Mainline", "Treasure Hunt", "Fantasy Castings"]
+      },
+      {
+        "dynasty": "Mattel-Matchbox",
+        "realWorldManufacturer": "Matchbox (Mattel)",
+        "mainlandFactoryZone": "Hertfordshire Highlands",
+        "qualityTier": "Working Caste",
+        "populationPercentage": "~15%",
+        "culturalRole": "Honest daily drivers. The backbone of delivery fleets and family garages.",
+        "signatureTrait": "Opening doors and real interiors",
+        "arrivalMethod": "Sensible grey containers marked 'Lesney Legacy'",
+        "notableLines": ["1-75 Series", "Moving Parts"]
+      },
+      {
+        "dynasty": "Maisto / Bburago",
+        "realWorldManufacturer": "Maisto & Bburago (May Cheong Group)",
+        "mainlandFactoryZone": "Guangdong Sprawl",
+        "qualityTier": "Budget Prestige",
+        "culturalRole": "Flashy but hollow. Loved by the nouveau-riche of Torque Timberlands.",
+        "signatureTrait": "Pull-back motors and giant wings",
+        "arrivalMethod": "Smuggled by cigarette boats",
+        "notableLines": ["Fresh Metal", "Pro Rodz", "Street Fire"]
+      },
+      {
+        "dynasty": "Greenlight Collectibles",
+        "realWorldManufacturer": "Greenlight Collectibles",
+        "mainlandFactoryZone": "Indianapolis Proving Grounds",
+        "qualityTier": "Licensed Realism",
+        "culturalRole": "Police interceptors and Hollywood heroes. Every cop car on the island.",
+        "signatureTrait": "Accurate light bars and correct decals",
+        "arrivalMethod": "Unmarked black SUVs at midnight",
+        "notableLines": ["Hollywood", "Hitch & Tow", "Black Bandit"]
+      },
+      {
+        "dynasty": "M2 Machines",
+        "realWorldManufacturer": "M2 Machines (Castline Inc.)",
+        "mainlandFactoryZone": "Detroit Iron Belt",
+        "qualityTier": "Enthusiast Caste",
+        "culturalRole": "All-metal purists. Too heavy to drift properly.",
+        "signatureTrait": "Real rubber tires and tiny 426 Hemi decals",
+        "arrivalMethod": "Velvet-lined crates, one at a time",
+        "notableLines": ["Auto-Thentics", "Detroit Muscle"]
+      },
+      {
+        "dynasty": "Mini GT / Tarmac Works",
+        "realWorldManufacturer": "Mini GT & Tarmac Works",
+        "mainlandFactoryZone": "Hong Kong JDM Enclave",
+        "qualityTier": "Premium JDM",
+        "culturalRole": "Stanced drifting monks of Apex Peaks.",
+        "signatureTrait": "Photo-etched grilles and tiny brake calipers",
+        "arrivalMethod": "Rice-paper parachutes",
+        "notableLines": ["Hobby64", "GLOBAL64", "Kaido House"]
+      },
+      {
+        "dynasty": "AUTOart",
+        "realWorldManufacturer": "AUTOart (Gateway Global)",
+        "mainlandFactoryZone": "Composite Temple (classified)",
+        "qualityTier": "Apex Caste",
+        "culturalRole": "The untouchables. A single AUTOart can buy a mountain pass.",
+        "signatureTrait": "Opening everything + real carbon weave",
+        "arrivalMethod": "Delivered only upon the death of a dynasty leader",
+        "notableLines": ["Street & Racing composites"]
+      },
+      {
+        "dynasty": "Tomica / TLV",
+        "realWorldManufacturer": "Tomica & Tomica Limited Vintage (Takara Tomy)",
+        "mainlandFactoryZone": "Tokyo Precision District",
+        "qualityTier": "Japanese Domestic Royalty",
+        "culturalRole": "Understated perfection. Faster than physics allows.",
+        "signatureTrait": "Working suspension in 1:64",
+        "arrivalMethod": "Bullet train that never fully stops",
+        "notableLines": ["Limited Vintage Neo", "Premium"]
+      },
+      {
+        "dynasty": "Kyosho",
+        "realWorldManufacturer": "Kyosho",
+        "mainlandFactoryZone": "Kyoto Artisan Quarter",
+        "qualityTier": "Forbidden Luxury",
+        "culturalRole": "You don’t buy a Kyosho; it chooses you.",
+        "signatureTrait": "Hand-polished until it reflects your sins",
+        "arrivalMethod": "Materializes inside glass dealership shrines",
+        "notableLines": ["Mini Car Collection", "Dealership Exclusives"]
+      },
+      {
+        "dynasty": "Inno64 / POP RACE",
+        "realWorldManufacturer": "Inno64 & POP RACE",
+        "mainlandFactoryZone": "Shenzhen Speed Shops",
+        "qualityTier": "Modified Outlaws",
+        "culturalRole": "Liberty Walk widebodies and rocket-bunny gangs.",
+        "signatureTrait": "Neon underglow and negative camber",
+        "arrivalMethod": "Hidden in speaker boxes and fake IKEA flats",
+        "notableLines": ["LB Works", "GT Series"]
+      }
+    ]
   }
+}
 }
