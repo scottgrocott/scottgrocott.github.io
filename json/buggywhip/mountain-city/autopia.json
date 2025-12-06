@@ -115,10 +115,23 @@
   },
   "culture": {
     "socialHierarchy": [
-      "The Fabricators (Top tier - those who build)",
-      "The Tuners (Middle tier - those who improve)",
-      "The Drivers (Working class - those who operate)",
-      "The Commuters (Lowest class - those who drive purely for transport)"
+	      "The Dynasty Class":[
+	  "Dynasties treat fabbers like secret weapons. The families – Tortellini with their Ferraris, Boss and Lambos, Nakamura with Toyotas – court them hard, offering rare parts, prime workshop space, and protection in exchange for exclusivity. A single fabber can tip a turf war or championship by unveiling a beast no one else can match. In return, dynasties shield them from rivals, sometimes even from the law, because losing a top fabber could mean losing everything.",
+	  "The dynasties don't just operate law enforcement; they own it. Cops are basically private security on steroids, funded and directed by the families. In Port Injection, you've got Lamborghini Huracans for highways and Dodge Chargers for busting boring haulers. Up in the Apex Peaks, off-road Raptors hunt down anyone messing with the touge runs. These cops aren't about public safety – they're enforcers for the dynasties' territories. They pull over unmodified cars, protect race routes, and break up rival family operations. The law in Autopia is just another tool for the dynasties to maintain their power and crush any threats to their automotive empires."
+	  ],
+      "The Fabricators (Top tier - those who build)":[
+	  "Fabbers are the absolute elite, the genius builders who don't just mod, but actually create rides from the ground up. They're the ones who turn scrap and smarts into legendary cars that rule the dynasties. Fabbers are scarce, worshipped almost like prophets in Autopia. They design the next generation of speed beasts, the ones that win championships and power plays. Owning a Fabber's creation? That's the ultimate flex on the island."
+	  ],
+      "The Tuners (Middle tier - those who improve)":[
+	  "Tuners are the middle class magicians, taking stock cars and turning them into fire-breathing monsters. They're the ones who know every nut, bolt, and line of nitrous that flows through the veins of a dynastic ride. Their job is to customize, upgrade, and optimize vehicles for peak performance or show. In Autopia, a tuner's reputation is everything; one bad build can cost a dynasty a race or a war."
+	  ],
+      "The Drivers (Working class - those who operate)":[
+	  "The drivers are the muscle of Autopia, the ones who actually race and show off. They're employees of the dynasties, trading their skills behind the wheel for protection and status. You see them piloting modified beasts in street races, dynastic showcases, or as getaway drivers in turf wars. Their job's to dominate the road, win races for their family, or sometimes just intimidate rivals with sheer speed and presence."
+	  ],
+      "The Commuters (Lowest class - those who drive purely for transport)":[
+	  "The low-tier commuters get shoved to the fringes of each zone. In Port Injection, it's the squat sprawl of garages on the outskirts, where neon fades to grime. Gasket Gulch's dustbowls have their ramshackle trailer parks, far from Rust Valhalla's action. Up in Apex Peaks, they're stuck in the lower switchbacks, watching the touge kings from below. Torque Timberlands' mud bogs have basic cabins for them, and Velocity Flats' salt edges hold prefab sheds. Always on the outskirts, near the action but never in the spotlight.",
+	  "They handle the grunt work – tow-truck drivers, tire scrappers, body shop sweeps, oil changers, or just parking-lot attendants. Sometimes they run errands for the dynasties, hauling parts or cleaning up after races. It's all the dirty jobs the tuners and fabbers won't touch"
+	  ]
     ],
     "economy": {
       "currency": "Credits (Digital)",
