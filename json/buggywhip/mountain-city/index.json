@@ -85,14 +85,15 @@
     ],
     "protagonist_perspective": "every shift he sees the life he wants on the other side of the fence—while he's stuck mowing the grass and selling energy drinks to the people living it"
   },
-           "protagonist_friend_group": {
+           "protagonist_friend_group":{
   "setting": "A.O.K. Kampground and Mountain City",
   "vibe": "Stranger Things tech misfits meet Goonies-style gearhead rebels",
   "members": [
     {
       "name": "Rusty",
       "role": "Gadget Wizard",
-      "backstory": "Prodigy tinkerer from Bay City. His family’s Peugeot garage was fire-bombed by Tortellini enforcers over unpaid “protection.” He escaped with only a duffel of tools and a lifelong hatred of the dynasties. Now he turns scrap into weapons, traps, and impossible mods while quietly tracking every family shipment that rolls past the kampground.",
+      "backstory": "Prodigy tinkerer from Bay City. His family’s Peugeot garage was fire-bombed by Tortellini enforcers over unpaid 'protection.' He escaped with only a duffel of tools and a lifelong hatred of the dynasties. Now he turns scrap into weapons, traps, and impossible mods while quietly tracking every family shipment that rolls past the kampground.",
+      "how_they_met": "Met the protagonist during a late-night meltdown of the protagonist’s barely-running Frankenstein car. Rusty watched him stubbornly try to repair it alone, saw the same desperation he grew up with, and stepped in. The 'fix' was dangerous, brilliant, and held together with three bolts and hope—marking the start of their partnership.",
       "traits": [
         "Inventive tinkerer",
         "Combines scrap tech with car parts",
@@ -104,6 +105,7 @@
       "name": "Echo",
       "role": "Quiet Observer",
       "backstory": "Former mainland corporate data analyst who discovered the dynasties were rigging fuel prices island-wide. When she tried to leak it, they put a bounty on her. She fled to the kampground, rewired the old CB tower into a surveillance net, and now watches everything without ever being seen.",
+      "how_they_met": "The protagonist discovered Echo long before he actually met her—through anonymous warnings scribbled on receipts, marked maps tucked under his trailer door, and mysterious static bursts on the CB radio. Eventually he caught her calibrating a homemade antenna behind the general store. She said only one sentence: 'You're standing in a blind spot,' and from then on she quietly watched over him.",
       "traits": [
         "Introverted",
         "Master of scavenged surveillance and hacked police scanners",
@@ -115,6 +117,7 @@
       "name": "Nova",
       "role": "Fearless Strategist (male)",
       "backstory": "Grew up in the Port Injection slums running bets for the Kim family’s underground fight club. Kicked out (and nearly killed) for refusing to throw a match. He’s been plotting revenge ever since, turning every race into a chess move against the dynasties.",
+      "how_they_met": "Nova first noticed the protagonist during an impromptu illegal time-trial near the edge of Mountain City. The protagonist wasn’t racing—he was quietly watching from behind a fence. Nova clocked his hunger instantly. Later that night, after a small scuffle with some dynasty punks, Nova saw the protagonist stand his ground despite being scared out of his mind. Nova decided he’d found a wildcard worth backing.",
       "traits": [
         "Charismatic schemer",
         "Ice-cold under pressure",
@@ -126,6 +129,7 @@
       "name": "Axel",
       "role": "Gearhead Adventurer",
       "backstory": "Former off-road champion blacklisted by the Boss family after he refused to fix a Velocity Flats record run. They slashed his tires and left him in the desert. He walked out three days later towing his wrecked truck with a winch he built from junk. Now he maps every hidden trail on Autopia and lives for the next impossible stunt.",
+      "how_they_met": "Axel met the protagonist when he caught him trying—and failing spectacularly—to navigate a forbidden back trail on a junky scooter. Instead of laughing, Axel admired the guts it took. He tossed the kid the keys to his beat-up runner truck and said, 'If you’re gonna crash something, crash something worth the story.' It was the protagonist’s first time driving a real machine.",
       "traits": [
         "Fearless driver and mechanic",
         "Thrill addict",
@@ -137,6 +141,7 @@
       "name": "Maggie",
       "role": "Resourceful Dreamer",
       "backstory": "Daughter of a legendary independent fabricator who died when a faulty engine she helped design exploded during a test. The dynasties covered it up and blamed her family. She carries the guilt, but also every blueprint her father ever drew, and she’s determined to build something that will make the families remember her name.",
+      "how_they_met": "They met when the protagonist found Maggie rummaging through the scrappers’ pile behind the kampground workshop, hunting for a very specific bolt pattern from a discontinued engine. They bonded instantly over mutual underdog dreams and shared grief—hers for her father, his for a life he’s never been allowed to touch. She became the first to tell him he wasn’t dreaming too big.",
       "traits": [
         "Optimistic visionary",
         "Scavenges impossible parts",
@@ -146,7 +151,8 @@
     }
   ],
   "group_dynamic": "Five kampground outcasts who turned a dusty trailer park into a rebel workshop and war room. They fight with brains, scrap, and pure nerve, rallying around the protagonist’s quiet dream of one day driving for real—knowing that if he ever gets the keys, they all rise together."
-},
+}
+,
             "primary antagonist: Joey Tortellini (Ferrari Family Leader)"
         ]
     },
