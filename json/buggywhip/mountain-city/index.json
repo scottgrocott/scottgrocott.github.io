@@ -32,44 +32,41 @@
         "Act 3 Adds the final twist in that the city is taken over by a new more powerful boss.'Chad Boss' to be exact. Chad moves in with his Lamborghini operation (up until this point in the series Lamborghini has not be seen or spoken of because Chad had not been called in yet) and begins to battle the powers that be to get the city under his control in a high-stakes showdown that reshapes Mountain City."
     ],
         "characters": [
-            "protagonist": {
-    "name": null,
-    "age": null,
-    "car": {
-      "description": "Frankenstein custom 1:64 Pixar Cars character",
-      "base_character": "rusty, Mater-inspired but original",
-      "condition": "pieced together from salvage parts, runs barely, constantly mocked",
-      "nickname": null,
-      "emotional_significance": "his only ride, a joke to everyone else but everything to him"
-    },
-    "jobs": [
-      {
-        "title": "Groundskeeper",
-        "location": "A.O.K. Kampground",
-        "duties": "mows lawns, fixes facilities, keeps the whole place running"
-      },
-      {
-        "title": "General Store Cashier",
-        "location": "A.O.K. Kampground general store",
-        "duties": "sells snacks, camping supplies, small auto parts to campers"
-      }
-    ],
-    "living_situation": {
-      "type": "beat-up travel trailer",
-      "location": "permanently parked at A.O.K. Kampground",
-      "condition": "rough, patched together, but home"
-    },
-    "core_desire": "to be handed the keys to a real family racing fleet car just once and prove he can drive with the best of them",
-    "current_motivation": "not revenge, not respect (yet)—just one legitimate shot to show what he can do",
-    "emotional_core": {
-      "primary_struggle": "crippling lack of confidence",
-      "root_cause": "untested, never given a real chance",
-      "daily_pain": "watching everyone else live his dream while he cleans up after them and sells them sodas",
-      "inner_belief": "deep down he believes he COULD be fast—if someone would only let him prove it, even to himself"
-    },
-    "version": "1.1",
-    "last_updated": "2025-12-05"
+           "protagonist": {
+  "name": "Edward Van Heflen",
+  "nickname": "Eddie",
+  "age": 19,
+  "car": {
+    "description": "Frankenstein 1:64 custom",
+    "base": "rusty, Mater-inspired original character pieced together from junkyard scraps",
+    "condition": "barely runs, backfires constantly, laughed at by everyone",
+    "emotional_value": "the only thing he truly owns; every mod is a promise to himself and his missing brother"
   },
+  "jobs": [
+    "Groundskeeper at A.O.K. Kampground",
+    "Cashier at the kampground general store"
+  ],
+  "living_situation": "Permanently parked, beat-to-hell travel trailer behind the store",
+  "family_backstory": {
+    "father": "Low-tier commuter-class driver, died in a suspicious high-speed crash when Eddie was 9 – officially ruled 'driver error', but Eddie never believed it",
+    "mother": "Worked double shifts at a Tortellini-owned parts warehouse until her health broke; now lives off-island",
+    "older_brother": {
+      "name": "Alex Van Heflen",
+      "age_when_disappeared": 21,
+      "last_seen": "Three years ago, after bragging he’d been offered a secret test drive for one of the big families",
+      "clues_left_behind": "A half-finished turbo blueprint and an old leather toolkit Eddie still keeps under his bed"
+    }
+  },
+  "core_desire": "To be handed the keys to a real dynasty race car just once – not for fame, but to prove to himself (and to whatever’s left of Lucas) that he’s fast enough",
+  "emotional_core": {
+    "primary_wound": "Feels he’s the reason Lucas vanished – thinks his brother took a dangerous gig to get Eddie a shot that never came",
+    "daily_pain": "Sweeping cigarette butts off the same tracks where legends are made their name, selling energy drinks to the kids who already have what he wants",
+    "hidden_fear": "That he isn’t actually fast – that all the daydreams are just delusion and Lucas died for nothing"
+  },
+  "current_state": "Quiet, watchful, polite to a fault. Speaks softly, listens hard, and can strip an alternator in four minutes flat. Zero confidence behind the wheel of anything faster than a golf cart, but his hands don’t shake when he’s holding a wrench.",
+  "version": "2.0",
+  "last_updated": "2025-12-05"
+},
   "primary_location": {
     "name": "A.O.K. Kampground",
     "full_name": "Autopia Outdoor Kampground",
