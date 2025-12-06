@@ -331,6 +331,102 @@
                 "carManufacturer": "Dodge",
                 "restaurantName": "Anderson's Burger Barn"
             }
+			{
+  "id": 23,
+  "dealershipName": "Willys Motors",
+  "familyName": "Willys",
+  "ethnicity": "American",
+  "carManufacturer": "Jeep",
+  "restaurantName": "Willys Off-Road Cafe"
+},{
+  "id": 24,
+  "dealershipName": "Mercury Motors",
+  "familyName": "Mercury",
+  "ethnicity": "American",
+  "carManufacturer": "Mercury",
+  "restaurantName": "Mercury Drive-In Diner"
+},{
+  "id": 25,
+  "dealershipName": "Benz Motors",
+  "familyName": "Benz",
+  "ethnicity": "German",
+  "carManufacturer": "Mercedes-Benz",
+  "restaurantName": "Benz Bavarian Steakhouse"
+},{
+  "id": 26,
+  "dealershipName": "Jaguar Motors",
+  "familyName": "Jaguar",
+  "ethnicity": "British",
+  "carManufacturer": "Jaguar",
+  "restaurantName": "Jaguar's English Tea & Grill"
+},{
+  "id": 27,
+  "dealershipName": "Studebaker Motors",
+  "familyName": "Studebaker",
+  "ethnicity": "American",
+  "carManufacturer": "Studebaker",
+  "restaurantName": "Studebaker's Classic Diner"
+},{
+  "id": 28,
+  "dealershipName": "Mazda Motors",
+  "familyName": "Mazda",
+  "ethnicity": "Japanese",
+  "carManufacturer": "Mazda",
+  "restaurantName": "Mazda Noodle House"
+},{
+  "id": 29,
+  "dealershipName": "Porsche Autohaus",
+  "familyName": "Porsche",
+  "ethnicity": "German",
+  "carManufacturer": "Porsche",
+  "restaurantName": "Porsche Schnitzel Haus"
+},{
+  "id": 30,
+  "dealershipName": "Plymouth Motors",
+  "familyName": "Plymouth",
+  "ethnicity": "American",
+  "carManufacturer": "Plymouth",
+  "restaurantName": "Plymouth Family Diner"
+},{
+  "id": 31,
+  "dealershipName": "Ram Trucks",
+  "familyName": "Ram",
+  "ethnicity": "American",
+  "carManufacturer": "Ram",
+  "restaurantName": "Ram's Steakhouse & Grill"
+},
+{
+  "id": 32,
+  "dealershipName": "Oldsmobile Motors",
+  "familyName": "Oldsmobile",
+  "ethnicity": "American",
+  "carManufacturer": "Oldsmobile",
+  "restaurantName": "Oldsmobile Family Roadhouse"
+},
+{
+  "id": 33,
+  "dealershipName": "Cadillac Motors",
+  "familyName": "Cadillac",
+  "ethnicity": "American",
+  "carManufacturer": "Cadillac",
+  "restaurantName": "Cadillac Luxury Grill"
+},
+{
+  "id": 34,
+  "dealershipName": "Audi Motors",
+  "familyName": "Audi",
+  "ethnicity": "German",
+  "carManufacturer": "Audi",
+  "restaurantName": "Audi Biergarten"
+},
+{
+  "id": 35,
+  "dealershipName": "Holden Motors",
+  "familyName": "Holden",
+  "ethnicity": "Australian",
+  "carManufacturer": "Holden",
+  "restaurantName": "Holden's Outback Grill"
+}
         ]
     },
 	"autopia":{
