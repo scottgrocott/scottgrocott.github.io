@@ -85,7 +85,63 @@
     ],
     "protagonist_perspective": "every shift he sees the life he wants on the other side of the fence—while he's stuck mowing the grass and selling energy drinks to the people living it"
   },
-            "protagonist: friend group (from the campground) TBD",
+            "protagonist_friend_group": {
+    "setting": "A.O.K. Kampground and Mountain City",
+    "vibe": "Motley crew blending Stranger Things tech-savvy misfits with Goonies-style adventurous gearheads",
+    "members": [
+      {
+        "name": "Rusty",
+        "role": "Gadget Wizard",
+        "traits": [
+          "Inventive tinkerer",
+          "Combines scrap tech with car parts",
+          "Comic relief with unexpected brilliance"
+        ],
+        "interaction_with_protagonist": "Helps mod the protagonist’s Frankenstein car, often pushing risky ideas that spark both breakthroughs and chaos."
+      },
+      {
+        "name": "Echo",
+        "role": "Quiet Observer",
+        "traits": [
+          "Introverted",
+          "Surveillance expert using walkie-talkies and old feeds",
+          "Sees patterns others miss"
+        ],
+        "interaction_with_protagonist": "Keeps tabs on the protagonist’s movements, offering cryptic insights that guide him through Mountain City’s hidden dangers."
+      },
+      {
+        "name": "Nova",
+        "role": "Fearless Strategist",
+        "traits": [
+          "Charismatic schemer",
+          "Always plotting against Mountain City’s racing dynasties",
+          "Confident, persuasive leader"
+        ],
+        "interaction_with_protagonist": "Draws the protagonist into bigger conflicts, framing him as the heart of their scrappy rebellion."
+      },
+      {
+        "name": "Axel",
+        "role": "Gearhead Adventurer",
+        "traits": [
+          "Hands-on mechanic",
+          "Thrill-seeker with a love for risky stunts",
+          "Loyal, impulsive, and fiercely protective"
+        ],
+        "interaction_with_protagonist": "Becomes the protagonist’s right-hand in the garage, pushing him to test limits and chase glory."
+      },
+      {
+        "name": "Maggie",
+        "role": "Resourceful Dreamer",
+        "traits": [
+          "Optimistic and imaginative",
+          "Good at scavenging supplies and improvising solutions",
+          "Keeps morale high with humor and heart"
+        ],
+        "interaction_with_protagonist": "Grounds the group emotionally, reminding the protagonist why he’s fighting for more than just racing."
+      }
+    ],
+    "group_dynamic": "Together they form a scrappy, entertaining crew—two adventurous gearheads and three tech-savvy misfits—who transform the campground into both a workshop and a war room, rallying around the protagonist’s dream of breaking into Mountain City’s racing elite."
+  },
             "primary antagonist: Joey Tortellini (Ferrari Family Leader)"
         ]
     },
