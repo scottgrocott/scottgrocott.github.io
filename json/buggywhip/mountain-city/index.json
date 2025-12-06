@@ -85,63 +85,68 @@
     ],
     "protagonist_perspective": "every shift he sees the life he wants on the other side of the fence—while he's stuck mowing the grass and selling energy drinks to the people living it"
   },
-            "protagonist_friend_group": {
-    "setting": "A.O.K. Kampground and Mountain City",
-    "vibe": "Motley crew blending Stranger Things tech-savvy misfits with Goonies-style adventurous gearheads",
-    "members": [
-      {
-        "name": "Rusty",
-        "role": "Gadget Wizard",
-        "traits": [
-          "Inventive tinkerer",
-          "Combines scrap tech with car parts",
-          "Comic relief with unexpected brilliance"
-        ],
-        "interaction_with_protagonist": "Helps mod the protagonist’s Frankenstein car, often pushing risky ideas that spark both breakthroughs and chaos."
-      },
-      {
-        "name": "Echo",
-        "role": "Quiet Observer",
-        "traits": [
-          "Introverted",
-          "Surveillance expert using walkie-talkies and old feeds",
-          "Sees patterns others miss"
-        ],
-        "interaction_with_protagonist": "Keeps tabs on the protagonist’s movements, offering cryptic insights that guide him through Mountain City’s hidden dangers."
-      },
-      {
-        "name": "Nova",
-        "role": "Fearless Strategist",
-        "traits": [
-          "Charismatic schemer",
-          "Always plotting against Mountain City’s racing dynasties",
-          "Confident, persuasive leader"
-        ],
-        "interaction_with_protagonist": "Draws the protagonist into bigger conflicts, framing him as the heart of their scrappy rebellion."
-      },
-      {
-        "name": "Axel",
-        "role": "Gearhead Adventurer",
-        "traits": [
-          "Hands-on mechanic",
-          "Thrill-seeker with a love for risky stunts",
-          "Loyal, impulsive, and fiercely protective"
-        ],
-        "interaction_with_protagonist": "Becomes the protagonist’s right-hand in the garage, pushing him to test limits and chase glory."
-      },
-      {
-        "name": "Maggie",
-        "role": "Resourceful Dreamer",
-        "traits": [
-          "Optimistic and imaginative",
-          "Good at scavenging supplies and improvising solutions",
-          "Keeps morale high with humor and heart"
-        ],
-        "interaction_with_protagonist": "Grounds the group emotionally, reminding the protagonist why he’s fighting for more than just racing."
-      }
-    ],
-    "group_dynamic": "Together they form a scrappy, entertaining crew—two adventurous gearheads and three tech-savvy misfits—who transform the campground into both a workshop and a war room, rallying around the protagonist’s dream of breaking into Mountain City’s racing elite."
-  },
+           "protagonist_friend_group": {
+  "setting": "A.O.K. Kampground and Mountain City",
+  "vibe": "Stranger Things tech misfits meet Goonies-style gearhead rebels",
+  "members": [
+    {
+      "name": "Rusty",
+      "role": "Gadget Wizard",
+      "backstory": "Prodigy tinkerer from Bay City. His family’s Peugeot garage was fire-bombed by Tortellini enforcers over unpaid “protection.” He escaped with only a duffel of tools and a lifelong hatred of the dynasties. Now he turns scrap into weapons, traps, and impossible mods while quietly tracking every family shipment that rolls past the kampground.",
+      "traits": [
+        "Inventive tinkerer",
+        "Combines scrap tech with car parts",
+        "Dark, sarcastic comic relief with sudden strokes of genius"
+      ],
+      "interaction_with_protagonist": "Constantly upgrades the protagonist’s Frankenstein car, pushing wild ideas that either win races or nearly kill them—usually both."
+    },
+    {
+      "name": "Echo",
+      "role": "Quiet Observer",
+      "backstory": "Former mainland corporate data analyst who discovered the dynasties were rigging fuel prices island-wide. When she tried to leak it, they put a bounty on her. She fled to the kampground, rewired the old CB tower into a surveillance net, and now watches everything without ever being seen.",
+      "traits": [
+        "Introverted",
+        "Master of scavenged surveillance and hacked police scanners",
+        "Sees patterns no one else notices"
+      ],
+      "interaction_with_protagonist": "Feeds the protagonist cryptic warnings and shortcuts, speaking in half-sentences that somehow always save his skin."
+    },
+    {
+      "name": "Nova",
+      "role": "Fearless Strategist (male)",
+      "backstory": "Grew up in the Port Injection slums running bets for the Kim family’s underground fight club. Kicked out (and nearly killed) for refusing to throw a match. He’s been plotting revenge ever since, turning every race into a chess move against the dynasties.",
+      "traits": [
+        "Charismatic schemer",
+        "Ice-cold under pressure",
+        "Natural leader who drags everyone into glorious trouble"
+      ],
+      "interaction_with_protagonist": "Sees the protagonist as the perfect wildcard and constantly maneuvers him into bigger, riskier plays against the families."
+    },
+    {
+      "name": "Axel",
+      "role": "Gearhead Adventurer",
+      "backstory": "Former off-road champion blacklisted by the Boss family after he refused to fix a Velocity Flats record run. They slashed his tires and left him in the desert. He walked out three days later towing his wrecked truck with a winch he built from junk. Now he maps every hidden trail on Autopia and lives for the next impossible stunt.",
+      "traits": [
+        "Fearless driver and mechanic",
+        "Thrill addict",
+        "Loyal to a fault"
+      ],
+      "interaction_with_protagonist": "The first person to ever let the protagonist drive a real race car; pushes him harder than anyone, believing the kid’s got champion blood."
+    },
+    {
+      "name": "Maggie",
+      "role": "Resourceful Dreamer",
+      "backstory": "Daughter of a legendary independent fabricator who died when a faulty engine she helped design exploded during a test. The dynasties covered it up and blamed her family. She carries the guilt, but also every blueprint her father ever drew, and she’s determined to build something that will make the families remember her name.",
+      "traits": [
+        "Optimistic visionary",
+        "Scavenges impossible parts",
+        "Keeps the crew’s spirits alive"
+      ],
+      "interaction_with_protagonist": "The emotional anchor; constantly reminds him his dream is worth chasing and quietly sketches mods for the day he finally gets his shot."
+    }
+  ],
+  "group_dynamic": "Five kampground outcasts who turned a dusty trailer park into a rebel workshop and war room. They fight with brains, scrap, and pure nerve, rallying around the protagonist’s quiet dream of one day driving for real—knowing that if he ever gets the keys, they all rise together."
+},
             "primary antagonist: Joey Tortellini (Ferrari Family Leader)"
         ]
     },
