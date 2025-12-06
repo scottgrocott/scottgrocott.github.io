@@ -336,5 +336,85 @@
 	"autopia":{
 		"description":"A large island nation in the middle of the ocean. Autopia is a socially stratified and car culture dominates daily life. A port city, an inland desert, a mountain filled northern region (The location of Mountain City), a large deep canyon region in the desert. Very mysterious",
 				"buggywhip_url":"https://scottgrocott.github.io/json/buggywhip/mountain-city/autopia.json"
-	}
+	},
+	"season_1_outline":{
+  "series": "Mountain City",
+  "season": 1,
+  "title": "The Forest Tracks",
+  "total_episodes": 24,
+  "format": "web-series (24 × 12–18 min episodes)",
+  "season_arc": "Eddie Van Heflen goes from unknown A.O.K. groundskeeper to hot prospect courted by multiple dynasties while hunting the truth about his missing brother Alex. Ends with the crew committing to infiltrate Mountain City and confront Joey Tortellini.",
+  "cliffhanger": "Anonymous call from J.T. (Joey Tortellini) lures Eddie to Mountain City: 'Your brother asked too many questions.'",
+  "key_families": [
+    { "name": "Nakamura Toyota", "approach": "professional, respectful" },
+    { "name": "Johnson Ford", "approach": "aggressive, blue-collar" },
+    { "name": "Kim Hyundai", "approach": "generous but demand absolute loyalty" },
+    { "name": "Schneider BMW", "approach": "elitist, dismissive" },
+    { "name": "Tortellini Ferrari", "approach": "shadow puppet-master, never directly offers until finale" }
+  ],
+  "mini_arcs": [
+    {
+      "arc": 1,
+      "title": "Welcome to A.O.K.",
+      "episodes": "1–6",
+      "theme": "World building, crew assembly, dream defined",
+      "episodes": [
+        { "episode": 1, "title": "First Shift", "logline": "On his first day back after winter break, Eddie works his double shift while watching family teams practice—dreaming of a life he’s never allowed to touch." },
+        { "episode": 2, "title": "The Crew", "logline": "Eddie’s Frankenstein car breaks down; Rusty fixes it and introduces him to the ragtag crew of dynasty-burned outcasts." },
+        { "episode": 3, "title": "Unlicensed", "logline": "Eddie watches Schneider BMW enforcers humiliate a working-class driver, confronting the brutal class system." },
+        { "episode": 4, "title": "Velocity Flats Run", "logline": "Axel takes Eddie shotgun on an illegal midnight race—proving raw talent can beat money." },
+        { "episode": 5, "title": "The Families", "logline": "A convoy of all 22 families rolls through A.O.K.; Eddie learns the full scope of their power." },
+        { "episode": 6, "title": "Late Night at the Store", "logline": "Eddie opens up to Maggie about missing brother Alex and his fear he’ll never be fast enough." }
+      ]
+    },
+    {
+      "arc": 2,
+      "title": "Clues in the Dust",
+      "episodes": "7–12",
+      "theme": "Alex mystery surfaces, Eddie proves he can drive",
+      "episodes": [
+        { "episode": 7, "title": "The Blueprint", "logline": "Hidden turbo schematic in Alex’s old tools reveals first clue: 'Test run—Sector 7'." },
+        { "episode": 8, "title": "Sector 7", "logline": "Eddie and Rusty break into abandoned Sector 7; discover covered-up crashes and barely escape security." },
+        { "episode": 9, "title": "Nova’s Plan", "logline": "Nova enters Eddie in an underground race to build rep and gather intel." },
+        { "episode": 10, "title": "First Race", "logline": "Eddie’s Frankenstein nearly explodes but he guts out a podium against independents." },
+        { "episode": 11, "title": "Word Spreads", "logline": "Three families (Nakamura, Johnson, Kim) send scouts hunting 'the kid with the rust bucket'." },
+        { "episode": 12, "title": "Three Offers", "logline": "Eddie receives formal recruitment pitches; Echo warns every contract is a cage." }
+      ]
+    },
+    {
+      "arc": 3,
+      "title": "Deeper In",
+      "episodes": "13–18",
+      "theme": "Investigation escalates, families become threats",
+      "episodes": [
+        { "episode": 13, "title": "Echo’s Network", "logline": "Echo’s intercepts reveal multiple families run secret 'test driver incidents'—Alex’s name appears in three." },
+        { "episode": 14, "title": "The Warehouse", "logline": "Eddie and Maggie find redacted logs listing Alex as a contract tester." },
+        { "episode": 15, "title": "Sal", "logline": "Paranoid ex-mechanic Sal reveals the families bury failed test drivers in paperwork, not hospitals." },
+        { "episode": 16, "title": "Pressure", "logline": "Recruiting families turn hostile—threats, permit revocations, intimidation." },
+        { "episode": 17, "title": "Maggie’s Gambit", "logline": "Crew builds a real race car from scrap to prove independence." },
+        { "episode": 18, "title": "The Proving Run", "logline": "Eddie smashes the independent lap record at Echo Gorge—attracting Tortellini attention." }
+      ]
+    },
+    {
+      "arc": 4,
+      "title": "The Decision",
+      "episodes": "19–24",
+      "theme": "Choosing a path forward",
+      "episodes": [
+        { "episode": 19, "title": "Summit Invitation", "logline": "Eddie is invited to the exclusive multi-family showcase at Summit Resorts." },
+        { "episode": 20, "title": "Preparations", "logline": "Crew turns A.O.K. into a war room—tech, defenses, strategy." },
+        { "episode": 21, "title": "The Showcase", "logline": "Brutal multi-heat race where prospects wreck each other for contracts." },
+        { "episode": 22, "title": "Crash", "logline": "Johnson Ford driver intentionally wrecks Eddie—reveals hidden Tortellini body cam." },
+        { "episode": 23, "title": "Questions", "logline": "Crew realizes Tortellini is secretly funding and manipulating other families’ test programs." },
+        { "episode": 24, "title": "The Call (Season Finale)", "logline": "J.T. calls: 'Your brother asked too many questions. Come to Mountain City.' Eddie and crew decide to go in." }
+      ]
+    }
+  ],
+  "season_summary_by_blocks": {
+    "1-6": "World building, crew assembly, dreams defined",
+    "7-12": "Alex mystery surfaces, Eddie proves himself, families recruit",
+    "13-18": "Conspiracy grows, independence forged",
+    "19-24": "Summit betrayal, Tortellini revealed, crew heads to Mountain City"
+  }
+}
 }
