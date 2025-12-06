@@ -227,8 +227,7 @@
 		"town_canyon-crossing":["Canyon Crossing-that's the wild frontier carved into Autopia's craggy spine. Imagine endless red rock canyons, wide enough to swallow whole RV convoys and dotted with switchback trails where 4x4s claw their way up sheer cliffs, tires spitting gravel and dust. It's a haven for off-road junkies, those rugged souls who live for the roar of a big-block diesel echoing off canyon walls, the thrill of jumping ravines in tricked-out rigs. Picture massive campfires under star-drenched skies, RVs parked in half-moon clusters like tiny pioneer settlements, and dust trails marking the paths of the latest canyon daredevils. This is where sanity takes a backseat to the pull of the wild"],
 		"town_everglades-jungle":["Everglades Jungle-the humid, pulse-quickening heart of Autopia's night scene, a twisted mashup of tangled mangroves, glowing neon, and full-moon key to key style small connected island races."]
 		"buggywhip_url":"https://scottgrocott.github.io/json/buggywhip/mountain-city/autopia.json"
-	}
- ```json
+	},
 "factions": {
   "dealershipFamilies": {
     "description": "Each ethnic family owns a dealership + restaurant tied to national cuisine and car manufacturer. Economic and political dynasties shape Mountain City culture. Families control both racing fleets (performance-focused basics) and showroom collections (premium status symbols).",
