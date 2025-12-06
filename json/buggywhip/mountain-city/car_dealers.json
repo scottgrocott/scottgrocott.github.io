@@ -1,0 +1,214 @@
+{
+  "carDealerships": [
+    {
+      "id": 1,
+      "family_id": 1,
+      "ethnicity": "Japanese",
+      "carManufacturer": "Toyota"
+    },
+    {
+      "id": 2,
+      "family_id": 2,
+      "ethnicity": "Japanese",
+      "carManufacturer": "Honda"
+    },
+    {
+      "id": 3,
+      "family_id": 3,
+      "ethnicity": "Japanese",
+      "carManufacturer": "Nissan"
+    },
+    {
+      "id": 4,
+      "family_id": 4,
+      "ethnicity": "Japanese",
+      "carManufacturer": "Suzuki"
+    },
+    {
+      "id": 5,
+      "family_id": 5,
+      "ethnicity": "Japanese",
+      "carManufacturer": "Mitsubishi"
+    },
+    {
+      "id": 6,
+      "family_id": 6,
+      "ethnicity": "Korean",
+      "carManufacturer": "Hyundai"
+    },
+    {
+      "id": 7,
+      "family_id": 7,
+      "ethnicity": "Korean",
+      "carManufacturer": "Kia"
+    },
+    {
+      "id": 8,
+      "family_id": 8,
+      "ethnicity": "French",
+      "carManufacturer": "Peugeot"
+    },
+    {
+      "id": 9,
+      "family_id": 9,
+      "ethnicity": "French",
+      "carManufacturer": "Renault"
+    },
+    {
+      "id": 10,
+      "family_id": 10,
+      "ethnicity": "Italian",
+      "carManufacturer": "Ferrari"
+    },
+    {
+      "id": 11,
+      "family_id": 11,
+      "ethnicity": "Italian",
+      "carManufacturer": "Lamborghini"
+    },
+    {
+      "id": 12,
+      "family_id": 12,
+      "ethnicity": "British",
+      "carManufacturer": "Aston Martin"
+    },
+    {
+      "id": 13,
+      "family_id": 13,
+      "ethnicity": "British",
+      "carManufacturer": "Land Rover"
+    },
+    {
+      "id": 14,
+      "family_id": 14,
+      "ethnicity": "German",
+      "carManufacturer": "BMW"
+    },
+    {
+      "id": 15,
+      "family_id": 15,
+      "ethnicity": "German",
+      "carManufacturer": "Volkswagen"
+    },
+    {
+      "id": 16,
+      "family_id": 16,
+      "ethnicity": "Swedish",
+      "carManufacturer": "Volvo"
+    },
+    {
+      "id": 17,
+      "family_id": 17,
+      "ethnicity": "Swedish",
+      "carManufacturer": "Saab"
+    },
+    {
+      "id": 18,
+      "family_id": 18,
+      "ethnicity": "American",
+      "carManufacturer": "Ford"
+    },
+    {
+      "id": 19,
+      "family_id": 19,
+      "ethnicity": "American",
+      "carManufacturer": "Chevrolet"
+    },
+    {
+      "id": 20,
+      "family_id": 20,
+      "ethnicity": "American",
+      "carManufacturer": "Chrysler"
+    },
+    {
+      "id": 21,
+      "family_id": 21,
+      "ethnicity": "American",
+      "carManufacturer": "GMC"
+    },
+    {
+      "id": 22,
+      "family_id": 22,
+      "ethnicity": "American",
+      "carManufacturer": "Dodge"
+    },
+    {
+      "id": 23,
+      "family_id": 23,
+      "ethnicity": "American",
+      "carManufacturer": "Jeep"
+    },
+    {
+      "id": 24,
+      "family_id": 24,
+      "ethnicity": "American",
+      "carManufacturer": "Mercury"
+    },
+    {
+      "id": 25,
+      "family_id": 25,
+      "ethnicity": "German",
+      "carManufacturer": "Mercedes-Benz"
+    },
+    {
+      "id": 26,
+      "family_id": 26,
+      "ethnicity": "British",
+      "carManufacturer": "Jaguar"
+    },
+    {
+      "id": 27,
+      "family_id": 27,
+      "ethnicity": "American",
+      "carManufacturer": "Studebaker"
+    },
+    {
+      "id": 28,
+      "family_id": 28,
+      "ethnicity": "Japanese",
+      "carManufacturer": "Mazda"
+    },
+    {
+      "id": 29,
+      "family_id": 29,
+      "ethnicity": "German",
+      "carManufacturer": "Porsche"
+    },
+    {
+      "id": 30,
+      "family_id": 30,
+      "ethnicity": "American",
+      "carManufacturer": "Plymouth"
+    },
+    {
+      "id": 31,
+      "family_id": 31,
+      "ethnicity": "American",
+      "carManufacturer": "Ram"
+    },
+    {
+      "id": 32,
+      "family_id": 32,
+      "ethnicity": "American",
+      "carManufacturer": "Oldsmobile"
+    },
+    {
+      "id": 33,
+      "family_id": 33,
+      "ethnicity": "American",
+      "carManufacturer": "Cadillac"
+    },
+    {
+      "id": 34,
+      "family_id": 34,
+      "ethnicity": "German",
+      "carManufacturer": "Audi"
+    },
+    {
+      "id": 35,
+      "family_id": 35,
+      "ethnicity": "Australian",
+      "carManufacturer": "Holden"
+    }
+  ]
+}

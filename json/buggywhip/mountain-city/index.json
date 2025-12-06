@@ -32,7 +32,7 @@
         "Act 3 Adds the final twist in that the city is taken over by a new more powerful boss.'Chad Boss' to be exact. Chad moves in with his Lamborghini operation (up until this point in the series Lamborghini has not be seen or spoken of because Chad had not been called in yet) and begins to battle the powers that be to get the city under his control in a high-stakes showdown that reshapes Mountain City."
     ],
         "characters": [
-           "protagonist": {
+           "protagonist",":", {
   "name": "Edward Van Heflen",
   "nickname": "Eddie",
   "age": 19,
@@ -67,7 +67,7 @@
   "version": "2.0",
   "last_updated": "2025-12-05"
 },
-  "primary_location": {
+  "primary_location",":", {
     "name": "A.O.K. Kampground",
     "full_name": "Autopia Outdoor Kampground",
     "type": "public, working-class campground",
@@ -82,7 +82,7 @@
     ],
     "protagonist_perspective": "every shift he sees the life he wants on the other side of the fence—while he's stuck mowing the grass and selling energy drinks to the people living it"
   },
-           "protagonist_friend_group":{
+           "protagonist_friend_group",":",{
   "setting": "A.O.K. Kampground and Mountain City",
   "vibe": "Stranger Things tech misfits meet Goonies-style gearhead rebels",
   "members": [
@@ -154,281 +154,8 @@
         ]
     },
     "worldAssets": {
-        "carDealerships": [
-            {
-                "id": 1,
-                "dealershipName": "Nakamura Motors",
-                "familyName": "Nakamura",
-                "ethnicity": "Japanese",
-                "carManufacturer": "Toyota",
-                "restaurantName": "Nakamura Sushi House"
-            },
-            {
-                "id": 2,
-                "dealershipName": "Miyazaki Autos",
-                "familyName": "Miyazaki",
-                "ethnicity": "Japanese",
-                "carManufacturer": "Honda",
-                "restaurantName": "Miyazaki Ramen House"
-            },
-            {
-                "id": 3,
-                "dealershipName": "Kawasaki Automotive",
-                "familyName": "Kawasaki",
-                "ethnicity": "Japanese",
-                "carManufacturer": "Nissan",
-                "restaurantName": "Kawasaki Teppanyaki Grill"
-            },
-            {
-                "id": 4,
-                "dealershipName": "Suzuki Motors",
-                "familyName": "Suzuki",
-                "ethnicity": "Japanese",
-                "carManufacturer": "Suzuki",
-                "restaurantName": "Suzuki Tempura and Soba"
-            },
-            {
-                "id": 5,
-                "dealershipName": "Mitsubishi Motors",
-                "familyName": "Mitsubishi",
-                "ethnicity": "Japanese",
-                "carManufacturer": "Mitsubishi",
-                "restaurantName": "Mitsubishi Izakaya"
-            },
-            {
-                "id": 6,
-                "dealershipName": "Kim Motors",
-                "familyName": "Kim",
-                "ethnicity": "Korean",
-                "carManufacturer": "Hyundai",
-                "restaurantName": "Kim's Bulgogi Palace"
-            },
-            {
-                "id": 7,
-                "dealershipName": "Choi Autohaus",
-                "familyName": "Choi",
-                "ethnicity": "Korean",
-                "carManufacturer": "Kia",
-                "restaurantName": "Choi's Kimchi Bistro"
-            },
-            {
-                "id": 8,
-                "dealershipName": "Dupont Automobiles",
-                "familyName": "Dupont",
-                "ethnicity": "French",
-                "carManufacturer": "Peugeot",
-                "restaurantName": "Le Bistro Dupont"
-            },
-            {
-                "id": 9,
-                "dealershipName": "Renault Motors",
-                "familyName": "Renault",
-                "ethnicity": "French",
-                "carManufacturer": "Renault",
-                "restaurantName": "Renault Café de Paris"
-            },
-            {
-                "id": 10,
-                "dealershipName": "Tortellini Motors",
-                "familyName": "Tortellini",
-                "ethnicity": "Italian",
-                "carManufacturer": "Ferrari",
-                "restaurantName": "Ristorante Tortellini"
-            },
-            {
-                "id": 11,
-                "dealershipName": "Boss Autos",
-                "familyName": "Boss",
-                "ethnicity": "Italian",
-                "carManufacturer": "Lamborghini",
-                "restaurantName": "Boss Trattoria"
-            },
-            {
-                "id": 12,
-                "dealershipName": "Winston Motors",
-                "familyName": "Winston",
-                "ethnicity": "British",
-                "carManufacturer": "Aston Martin",
-                "restaurantName": "Winston's British Pub"
-            },
-            {
-                "id": 13,
-                "dealershipName": "Rover Autos",
-                "familyName": "Rover",
-                "ethnicity": "British",
-                "carManufacturer": "Land Rover",
-                "restaurantName": "The Rover Roast House"
-            },
-            {
-                "id": 14,
-                "dealershipName": "Schneider Motors",
-                "familyName": "Schneider",
-                "ethnicity": "German",
-                "carManufacturer": "BMW",
-                "restaurantName": "Schneider's Bratwurst Haus"
-            },
-            {
-                "id": 15,
-                "dealershipName": "Volkswagen Autowerks",
-                "familyName": "Volkswagen",
-                "ethnicity": "German",
-                "carManufacturer": "Volkswagen",
-                "restaurantName": "Volkswagen Wurst und Bier"
-            },
-            {
-                "id": 16,
-                "dealershipName": "Eriksson Autos",
-                "familyName": "Eriksson",
-                "ethnicity": "Swedish",
-                "carManufacturer": "Volvo",
-                "restaurantName": "Eriksson Smorgasbord Café"
-            },
-            {
-                "id": 17,
-                "dealershipName": "Svensson Motors",
-                "familyName": "Svensson",
-                "ethnicity": "Swedish",
-                "carManufacturer": "Saab",
-                "restaurantName": "Svensson Herring Haven"
-            },
-            {
-                "id": 18,
-                "dealershipName": "Johnson Motors",
-                "familyName": "Johnson",
-                "ethnicity": "American",
-                "carManufacturer": "Ford",
-                "restaurantName": "Johnson's All-American Diner"
-            },
-            {
-                "id": 19,
-                "dealershipName": "Smith Automotive",
-                "familyName": "Smith",
-                "ethnicity": "American",
-                "carManufacturer": "Chevrolet",
-                "restaurantName": "Smith's Classic BBQ Pit"
-            },
-            {
-                "id": 20,
-                "dealershipName": "Miller Motors",
-                "familyName": "Miller",
-                "ethnicity": "American",
-                "carManufacturer": "Chrysler",
-                "restaurantName": "Miller's Roadside Grill"
-            },
-            {
-                "id": 21,
-                "dealershipName": "Brown Autos",
-                "familyName": "Brown",
-                "ethnicity": "American",
-                "carManufacturer": "GMC",
-                "restaurantName": "Brown's Southern Comfort Kitchen"
-            },
-            {
-                "id": 22,
-                "dealershipName": "Anderson Motors",
-                "familyName": "Anderson",
-                "ethnicity": "American",
-                "carManufacturer": "Dodge",
-                "restaurantName": "Anderson's Burger Barn"
-            }
-			{
-  "id": 23,
-  "dealershipName": "Willys Motors",
-  "familyName": "Willys",
-  "ethnicity": "American",
-  "carManufacturer": "Jeep",
-  "restaurantName": "Willys Off-Road Cafe"
-},{
-  "id": 24,
-  "dealershipName": "Mercury Motors",
-  "familyName": "Mercury",
-  "ethnicity": "American",
-  "carManufacturer": "Mercury",
-  "restaurantName": "Mercury Drive-In Diner"
-},{
-  "id": 25,
-  "dealershipName": "Benz Motors",
-  "familyName": "Benz",
-  "ethnicity": "German",
-  "carManufacturer": "Mercedes-Benz",
-  "restaurantName": "Benz Bavarian Steakhouse"
-},{
-  "id": 26,
-  "dealershipName": "Jaguar Motors",
-  "familyName": "Jaguar",
-  "ethnicity": "British",
-  "carManufacturer": "Jaguar",
-  "restaurantName": "Jaguar's English Tea & Grill"
-},{
-  "id": 27,
-  "dealershipName": "Studebaker Motors",
-  "familyName": "Studebaker",
-  "ethnicity": "American",
-  "carManufacturer": "Studebaker",
-  "restaurantName": "Studebaker's Classic Diner"
-},{
-  "id": 28,
-  "dealershipName": "Mazda Motors",
-  "familyName": "Mazda",
-  "ethnicity": "Japanese",
-  "carManufacturer": "Mazda",
-  "restaurantName": "Mazda Noodle House"
-},{
-  "id": 29,
-  "dealershipName": "Porsche Autohaus",
-  "familyName": "Porsche",
-  "ethnicity": "German",
-  "carManufacturer": "Porsche",
-  "restaurantName": "Porsche Schnitzel Haus"
-},{
-  "id": 30,
-  "dealershipName": "Plymouth Motors",
-  "familyName": "Plymouth",
-  "ethnicity": "American",
-  "carManufacturer": "Plymouth",
-  "restaurantName": "Plymouth Family Diner"
-},{
-  "id": 31,
-  "dealershipName": "Ram Trucks",
-  "familyName": "Ram",
-  "ethnicity": "American",
-  "carManufacturer": "Ram",
-  "restaurantName": "Ram's Steakhouse & Grill"
-},
-{
-  "id": 32,
-  "dealershipName": "Oldsmobile Motors",
-  "familyName": "Oldsmobile",
-  "ethnicity": "American",
-  "carManufacturer": "Oldsmobile",
-  "restaurantName": "Oldsmobile Family Roadhouse"
-},
-{
-  "id": 33,
-  "dealershipName": "Cadillac Motors",
-  "familyName": "Cadillac",
-  "ethnicity": "American",
-  "carManufacturer": "Cadillac",
-  "restaurantName": "Cadillac Luxury Grill"
-},
-{
-  "id": 34,
-  "dealershipName": "Audi Motors",
-  "familyName": "Audi",
-  "ethnicity": "German",
-  "carManufacturer": "Audi",
-  "restaurantName": "Audi Biergarten"
-},
-{
-  "id": 35,
-  "dealershipName": "Holden Motors",
-  "familyName": "Holden",
-  "ethnicity": "Australian",
-  "carManufacturer": "Holden",
-  "restaurantName": "Holden's Outback Grill"
-}
-        ]
-    },
+       "carDealers":"https://scottgrocott.github.io/json/buggywhip/mountain-city/car_dealers.json"
+	},
 	"autopia":{
 		"description":"A large island nation in the middle of the ocean. Autopia is a socially stratified and car culture dominates daily life. A port city, an inland desert, a mountain filled northern region (The location of Mountain City), a large deep canyon region in the desert. Very mysterious",
 				"buggywhip_url":"https://scottgrocott.github.io/json/buggywhip/mountain-city/autopia.json"
