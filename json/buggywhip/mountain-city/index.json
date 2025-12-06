@@ -228,36 +228,356 @@
 		"town_everglades-jungle":["Everglades Jungle-the humid, pulse-quickening heart of Autopia's night scene, a twisted mashup of tangled mangroves, glowing neon, and full-moon key to key style small connected island races."]
 		"buggywhip_url":"https://scottgrocott.github.io/json/buggywhip/mountain-city/autopia.json"
 	}
-    "factions": {
-        "dealershipFamilies": {
-            "description": "Each ethnic family owns dealership + restaurant tied to national cuisine and car manufacturer. Economic and political dynasties shape town culture.",
-            "coreRule": "Family last names correspond to national cuisine; manufacturer matches origin country.",
-            "families": [
-                "Nakamura",
-                "Miyazaki",
-                "Kawasaki",
-                "Suzuki",
-                "Mitsubishi",
-                "Kim",
-                "Choi",
-                "Dupont",
-                "Renault",
-                "Tortellini",
-                "Boss",
-                "Winston",
-                "Rover",
-                "Schneider",
-                "Volkswagen",
-                "Eriksson",
-                "Svensson",
-                "Johnson",
-                "Smith",
-                "Miller",
-                "Brown",
-                "Anderson"
-            ]
+ ```json
+"factions": {
+  "dealershipFamilies": {
+    "description": "Each ethnic family owns a dealership + restaurant tied to national cuisine and car manufacturer. Economic and political dynasties shape Mountain City culture. Families control both racing fleets (performance-focused basics) and showroom collections (premium status symbols).",
+    "coreRule": "Family last names correspond to national cuisine; manufacturer matches origin country. Each family monopolizes their brand across all quality tiers.",
+    "families": [
+      {
+        "familyName": "Nakamura",
+        "ethnicity": "Japanese",
+        "manufacturer": "Toyota",
+        "dealership": "Nakamura Motors",
+        "restaurant": "Nakamura Sushi House",
+        "racingFleet": {
+          "description": "Performance-tuned Toyotas for street racing and competition",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Tomica", "Maisto"]
+        },
+        "showroomFleet": {
+          "description": "Pristine collector Toyotas for prestige and social events",
+          "primaryDiecastBrands": ["Mini GT", "Tarmac Works", "Kyosho", "Inno64"]
         }
-    },
+      },
+      {
+        "familyName": "Miyazaki",
+        "ethnicity": "Japanese",
+        "manufacturer": "Honda",
+        "dealership": "Miyazaki Autos",
+        "restaurant": "Miyazaki Ramen House",
+        "racingFleet": {
+          "description": "High-performance Hondas dominating drift and circuit racing",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Tomica", "Maisto"]
+        },
+        "showroomFleet": {
+          "description": "Legendary Honda collectibles and NSX heritage cars",
+          "primaryDiecastBrands": ["Mini GT", "Tarmac Works", "Inno64", "POP RACE"]
+        }
+      },
+      {
+        "familyName": "Kawasaki",
+        "ethnicity": "Japanese",
+        "manufacturer": "Nissan",
+        "dealership": "Kawasaki Automotive",
+        "restaurant": "Kawasaki Teppanyaki Grill",
+        "racingFleet": {
+          "description": "GT-R tuned monsters and Z-car street legends",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Tomica", "Maisto"]
+        },
+        "showroomFleet": {
+          "description": "Skyline heritage collection and premium GT-Rs",
+          "primaryDiecastBrands": ["Mini GT", "Tarmac Works", "Inno64", "Kyosho"]
+        }
+      },
+      {
+        "familyName": "Suzuki",
+        "ethnicity": "Japanese",
+        "manufacturer": "Suzuki",
+        "dealership": "Suzuki Motors",
+        "restaurant": "Suzuki Tempura and Soba",
+        "racingFleet": {
+          "description": "Lightweight Suzuki kei cars and Swift sport models",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Tomica", "Maisto"]
+        },
+        "showroomFleet": {
+          "description": "Rare Suzuki classics and limited editions",
+          "primaryDiecastBrands": ["Tomica Limited Vintage", "Mini GT", "Kyosho"]
+        }
+      },
+      {
+        "familyName": "Mitsubishi",
+        "ethnicity": "Japanese",
+        "manufacturer": "Mitsubishi",
+        "dealership": "Mitsubishi Motors",
+        "restaurant": "Mitsubishi Izakaya",
+        "racingFleet": {
+          "description": "Evo rally beasts and Eclipse tuner cars",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Tomica", "Maisto"]
+        },
+        "showroomFleet": {
+          "description": "3000GT VR-4s and Evo heritage collection",
+          "primaryDiecastBrands": ["Mini GT", "Tarmac Works", "Inno64", "Kyosho"]
+        }
+      },
+      {
+        "familyName": "Kim",
+        "ethnicity": "Korean",
+        "manufacturer": "Hyundai",
+        "dealership": "Kim Motors",
+        "restaurant": "Kim's Bulgogi Palace",
+        "racingFleet": {
+          "description": "N-Performance hot hatches and Genesis sport sedans",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Welly"]
+        },
+        "showroomFleet": {
+          "description": "Luxury Genesis lineup and concept vehicles",
+          "primaryDiecastBrands": ["Mini GT", "LCD Models", "Tarmac Works"]
+        }
+      },
+      {
+        "familyName": "Choi",
+        "ethnicity": "Korean",
+        "manufacturer": "Kia",
+        "dealership": "Choi Autohaus",
+        "restaurant": "Choi's Kimchi Bistro",
+        "racingFleet": {
+          "description": "Stinger GT track weapons and modified Fortes",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Welly"]
+        },
+        "showroomFleet": {
+          "description": "EV6 GT and premium Kia innovations",
+          "primaryDiecastBrands": ["Mini GT", "LCD Models"]
+        }
+      },
+      {
+        "familyName": "Dupont",
+        "ethnicity": "French",
+        "manufacturer": "Peugeot",
+        "dealership": "Dupont Automobiles",
+        "restaurant": "Le Bistro Dupont",
+        "racingFleet": {
+          "description": "Rally-bred 205 GTIs and modern hot hatches",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Majorette", "Norev"]
+        },
+        "showroomFleet": {
+          "description": "Classic Peugeot heritage and Le Mans racers",
+          "primaryDiecastBrands": ["Norev", "Spark Models", "Majorette Premium"]
+        }
+      },
+      {
+        "familyName": "Renault",
+        "ethnicity": "French",
+        "manufacturer": "Renault",
+        "dealership": "Renault Motors",
+        "restaurant": "Renault Café de Paris",
+        "racingFleet": {
+          "description": "Clio RS hot hatches and Megane R.S. track toys",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Majorette", "Norev"]
+        },
+        "showroomFleet": {
+          "description": "Alpine A110 heritage and F1 team cars",
+          "primaryDiecastBrands": ["Norev", "Spark Models", "Solido"]
+        }
+      },
+      {
+        "familyName": "Tortellini",
+        "ethnicity": "Italian",
+        "manufacturer": "Ferrari",
+        "dealership": "Tortellini Motors",
+        "restaurant": "Ristorante Tortellini",
+        "leadership": "Joey Tortellini (Primary Antagonist - Act 2)",
+        "racingFleet": {
+          "description": "Stripped-down Ferrari racing machines - fast and dangerous",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Bburago", "Maisto"]
+        },
+        "showroomFleet": {
+          "description": "Museum-quality Ferrari collection - pristine status symbols",
+          "primaryDiecastBrands": ["Mini GT", "LCD Models", "BBR Models", "Looksmart"]
+        }
+      },
+      {
+        "familyName": "Boss",
+        "ethnicity": "Italian",
+        "manufacturer": "Lamborghini",
+        "dealership": "Boss Autos",
+        "restaurant": "Boss Trattoria",
+        "leadership": "Chad Boss (Final Antagonist - Act 3)",
+        "introduction": "Not seen until Act 3 - arrives to dominate both racing and social scenes",
+        "racingFleet": {
+          "description": "Terrifyingly fast Lamborghini race builds - Chad's secret weapon",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Bburago", "Maisto"]
+        },
+        "showroomFleet": {
+          "description": "Stunning Lamborghini collection - ultimate prestige statement",
+          "primaryDiecastBrands": ["Mini GT", "LCD Models", "Kyosho", "AUTOart"]
+        }
+      },
+      {
+        "familyName": "Winston",
+        "ethnicity": "British",
+        "manufacturer": "Aston Martin",
+        "dealership": "Winston Motors",
+        "restaurant": "Winston's British Pub",
+        "racingFleet": {
+          "description": "Gentleman racer Aston Martins with hidden speed",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Corgi", "Maisto"]
+        },
+        "showroomFleet": {
+          "description": "Bond-era classics and DB lineage perfection",
+          "primaryDiecastBrands": ["Mini GT", "AUTOart", "Spark Models"]
+        }
+      },
+      {
+        "familyName": "Rover",
+        "ethnicity": "British",
+        "manufacturer": "Land Rover",
+        "dealership": "Rover Autos",
+        "restaurant": "The Rover Roast House",
+        "racingFleet": {
+          "description": "Off-road Defenders and Range Rover Sport builds for Canyon Crossing",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Welly"]
+        },
+        "showroomFleet": {
+          "description": "Luxury Range Rovers and heritage Defender collection",
+          "primaryDiecastBrands": ["Mini GT", "LCD Models", "AUTOart"]
+        }
+      },
+      {
+        "familyName": "Schneider",
+        "ethnicity": "German",
+        "manufacturer": "BMW",
+        "dealership": "Schneider Motors",
+        "restaurant": "Schneider's Bratwurst Haus",
+        "racingFleet": {
+          "description": "M-Power track weapons and E30 drift legends",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Rastar"]
+        },
+        "showroomFleet": {
+          "description": "Ultimate driving machines and M heritage cars",
+          "primaryDiecastBrands": ["Mini GT", "Kyosho", "Tarmac Works", "AUTOart"]
+        }
+      },
+      {
+        "familyName": "Volkswagen",
+        "ethnicity": "German",
+        "manufacturer": "Volkswagen",
+        "dealership": "Volkswagen Autowerks",
+        "restaurant": "Volkswagen Wurst und Bier",
+        "racingFleet": {
+          "description": "GTI hot hatches and tuned Golf Rs dominating street circuits",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Welly"]
+        },
+        "showroomFleet": {
+          "description": "Classic Beetles, Bus heritage, and modern Golf perfection",
+          "primaryDiecastBrands": ["Mini GT", "Schuco", "Norev", "Greenlight"]
+        }
+      },
+      {
+        "familyName": "Eriksson",
+        "ethnicity": "Swedish",
+        "manufacturer": "Volvo",
+        "dealership": "Eriksson Autos",
+        "restaurant": "Eriksson Smorgasbord Café",
+        "racingFleet": {
+          "description": "Turbocharged wagons and sleeper sedans - underestimated speed",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Welly"]
+        },
+        "showroomFleet": {
+          "description": "Classic P1800s and modern Polestar innovations",
+          "primaryDiecastBrands": ["Mini GT", "Norev", "DNA Collectibles"]
+        }
+      },
+      {
+        "familyName": "Svensson",
+        "ethnicity": "Swedish",
+        "manufacturer": "Saab",
+        "dealership": "Svensson Motors",
+        "restaurant": "Svensson Herring Haven",
+        "racingFleet": {
+          "description": "Quirky turbocharged Saabs with cult following",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto"]
+        },
+        "showroomFleet": {
+          "description": "Rare Saab heritage models and extinct brand nostalgia",
+          "primaryDiecastBrands": ["DNA Collectibles", "Neo Scale Models"]
+        }
+      },
+      {
+        "familyName": "Johnson",
+        "ethnicity": "American",
+        "manufacturer": "Ford",
+        "dealership": "Johnson Motors",
+        "restaurant": "Johnson's All-American Diner",
+        "racingFleet": {
+          "description": "Mustang GT street brawlers and F-150 Raptor off-road beasts",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Jada Toys"]
+        },
+        "showroomFleet": {
+          "description": "Classic Mustangs, GT heritage, and American muscle royalty",
+          "primaryDiecastBrands": ["Mini GT", "Greenlight", "M2 Machines", "Auto World"]
+        }
+      },
+      {
+        "familyName": "Smith",
+        "ethnicity": "American",
+        "manufacturer": "Chevrolet",
+        "dealership": "Smith Automotive",
+        "restaurant": "Smith's Classic BBQ Pit",
+        "racingFleet": {
+          "description": "Camaro ZL1s and Corvette track monsters",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Jada Toys"]
+        },
+        "showroomFleet": {
+          "description": "Big-block muscle and Corvette heritage collection",
+          "primaryDiecastBrands": ["Mini GT", "Greenlight", "M2 Machines", "Auto World"]
+        }
+      },
+      {
+        "familyName": "Miller",
+        "ethnicity": "American",
+        "manufacturer": "Chrysler",
+        "dealership": "Miller Motors",
+        "restaurant": "Miller's Roadside Grill",
+        "racingFleet": {
+          "description": "Hellcat drag monsters and 300C street cruisers",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Jada Toys"]
+        },
+        "showroomFleet": {
+          "description": "HEMI heritage and modern supercharged beasts",
+          "primaryDiecastBrands": ["Mini GT", "Greenlight", "M2 Machines"]
+        }
+      },
+      {
+        "familyName": "Brown",
+        "ethnicity": "American",
+        "manufacturer": "GMC",
+        "dealership": "Brown Autos",
+        "restaurant": "Brown's Southern Comfort Kitchen",
+        "racingFleet": {
+          "description": "Sierra off-road trucks and performance SUVs",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Greenlight"]
+        },
+        "showroomFleet": {
+          "description": "Luxury Denali lineup and classic GMC trucks",
+          "primaryDiecastBrands": ["Mini GT", "Greenlight", "M2 Machines"]
+        }
+      },
+      {
+        "familyName": "Anderson",
+        "ethnicity": "American",
+        "manufacturer": "Dodge",
+        "dealership": "Anderson Motors",
+        "restaurant": "Anderson's Burger Barn",
+        "racingFleet": {
+          "description": "Viper track weapons and Challenger drag racers",
+          "primaryDiecastBrands": ["Hot Wheels", "Matchbox", "Maisto", "Jada Toys"]
+        },
+        "showroomFleet": {
+          "description": "Viper heritage and modern Hellcat collection",
+          "primaryDiecastBrands": ["Mini GT", "Greenlight", "M2 Machines", "Auto World"]
+        }
+      }
+    ]
+  },
+  "workingClass": {
+    "description": "Regular citizens of Autopia who drive unlicensed fantasy cars not affiliated with any dealership family. These are the true independents - the working class, the nobodies, the underdogs.",
+    "vehicleTypes": "Hot Wheels originals (Bone Shaker, Twin Mill, Deora II), Matchbox generics (unlicensed trucks, vans, service vehicles), Maisto fantasy models",
+    "socialStatus": "Lowest tier - no family protection, no brand loyalty, must earn all respect",
+    "locations": "A.O.K. Kampground (accepts all makes/models), independent shops, alleys, back streets",
+    "narrativeRole": "Ultimate underdogs - when an unlicensed car wins a race, it's a major upset that threatens the family power structure"
+  }
+}
+```},
 	"1_64_scale_dicast_brands":[
   {
     "manufacturer": "Hot Wheels (Mattel)",
