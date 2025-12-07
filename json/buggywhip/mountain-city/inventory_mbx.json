@@ -1,0 +1,754 @@
+{
+  "inventory": [
+    {
+      "id": "MB-001",
+      "manufacturer": "Matchbox",
+      "model_name": "Jeep FC",
+      "model_year": null,
+      "series": "None",
+      "color": "Metallic Green",
+      "condition": "Mint",
+      "real_world_car": "Jeep FC",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Racing and Service",
+        "family_id": 23,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "Dumping bed with moving parts",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["jeep", "moving-parts", "service-fleet"]
+    },
+    {
+      "id": "MB-002",
+      "manufacturer": "Matchbox",
+      "model_name": "Porsche Targa",
+      "model_year": null,
+      "series": "None",
+      "color": "Red with black accents",
+      "condition": "Good",
+      "real_world_car": "Porsche Targa",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Family Street Car Class",
+        "family_id": 29,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["porsche", "standard-class", "street-car", "sports-car", "targa"]
+    },
+    {
+      "id": "MB-003",
+      "manufacturer": "Matchbox",
+      "model_name": "Porsche Panamera",
+      "model_year": 2010,
+      "series": "None",
+      "color": "Red",
+      "condition": "Good",
+      "real_world_car": "Porsche Panamera",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Family Street Car Class",
+        "family_id": 29,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["porsche", "standard-class", "street-car", "luxury", "sedan"]
+    },
+    {
+      "id": "MB-004",
+      "manufacturer": "Matchbox",
+      "model_name": "2016 Chevy Camaro Convertible",
+      "model_year": 2016,
+      "series": "None",
+      "color": "Orange",
+      "condition": "Good",
+      "real_world_car": "2016 Chevrolet Camaro Convertible",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Sports Car Class",
+        "family_id": 19,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["chevrolet", "standard-class", "sports-car", "camaro", "convertible"]
+    },
+    {
+      "id": "MB-005",
+      "manufacturer": "Matchbox",
+      "model_name": "Mercedes-Benz SLR McLaren",
+      "model_year": null,
+      "series": "None",
+      "color": "Satin silver with black wheels",
+      "condition": "Good",
+      "real_world_car": "Mercedes-Benz SLR McLaren",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Luxury Sports Car Class",
+        "family_id": 25,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["mercedes-benz", "luxury", "sports-car", "supercar", "mclaren"]
+    },
+    {
+      "id": "MB-006",
+      "manufacturer": "Matchbox",
+      "model_name": "1970 Plymouth Barracuda",
+      "model_year": 1970,
+      "series": "None",
+      "color": "Metal flake blue",
+      "condition": "Good",
+      "real_world_car": "1970 Plymouth Barracuda",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Muscle Car Class",
+        "family_id": 30,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["plymouth", "standard-class", "muscle-car", "cuda", "classic", "american-muscle"]
+    },
+    {
+      "id": "MB-007",
+      "manufacturer": "Matchbox",
+      "model_name": "1984 Toyota MR2",
+      "model_year": 1984,
+      "series": "None",
+      "color": "Deep dark metal flake blue-green, almost black",
+      "condition": "Good",
+      "real_world_car": "1984 Toyota MR2",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Sports Car Class",
+        "family_id": 1,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["toyota", "standard-class", "sports-car", "mr2", "jdm"]
+    },
+    {
+      "id": "MB-008",
+      "manufacturer": "Matchbox",
+      "model_name": "1991 GMC Cyclone",
+      "model_year": 1991,
+      "series": "None",
+      "color": "Red with white trim",
+      "condition": "Good",
+      "real_world_car": "1991 GMC Cyclone",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Truck Class",
+        "family_id": 21,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["gmc", "standard-class", "truck", "cyclone", "performance"]
+    },
+    {
+      "id": "MB-009",
+      "manufacturer": "Matchbox",
+      "model_name": "2016 Ram Flatbed Truck",
+      "model_year": 2016,
+      "series": "None",
+      "color": "Silver",
+      "condition": "Good",
+      "real_world_car": "2016 Ram Flatbed Truck",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Work Truck Class",
+        "family_id": 31,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": false,
+        "modifications": ["Remove existing tampos and replace with Mountain City appropriate graphics"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ram", "standard-class", "work-truck", "flatbed", "commercial"]
+    },
+    {
+      "id": "MB-010",
+      "manufacturer": "Matchbox",
+      "model_name": "2020 Jeep Gladiator Rubicon",
+      "model_year": 2020,
+      "series": "None",
+      "color": "Black",
+      "condition": "Good",
+      "real_world_car": "2020 Jeep Gladiator Rubicon",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Off-Road Truck Class",
+        "family_id": 23,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Doorless, topless configuration - ready for outdoor action"],
+        "special_features": "Open cab with no doors or top",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["jeep", "standard-class", "off-road", "truck", "gladiator", "rubicon", "open-cab"]
+    },
+    {
+      "id": "MB-011",
+      "manufacturer": "Matchbox",
+      "model_name": "2020 Jeep Gladiator Rubicon",
+      "model_year": 2020,
+      "series": "None",
+      "color": "Metal flake blue with black fenders",
+      "condition": "Good",
+      "real_world_car": "2020 Jeep Gladiator Rubicon",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Off-Road Truck Class",
+        "family_id": 23,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Doorless, topless configuration - ready for outdoor action"],
+        "special_features": "Open cab with no doors or top",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["jeep", "standard-class", "off-road", "truck", "gladiator", "rubicon", "open-cab"]
+    },
+    {
+      "id": "MB-012",
+      "manufacturer": "Matchbox",
+      "model_name": "1971 Oldsmobile Vista Cruiser",
+      "model_year": 1971,
+      "series": "None",
+      "color": "Blue with wood paneling",
+      "condition": "Good",
+      "real_world_car": "1971 Oldsmobile Vista Cruiser",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Station Wagon Class",
+        "family_id": 32,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["oldsmobile", "standard-class", "station-wagon", "classic", "woody"]
+    },
+    {
+      "id": "MB-013",
+      "manufacturer": "Matchbox",
+      "model_name": "2010 Cadillac CTS Wagon",
+      "model_year": 2010,
+      "series": "None",
+      "color": "Burgundy",
+      "condition": "Good",
+      "real_world_car": "2010 Cadillac CTS Wagon",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Station Wagon Class",
+        "family_id": 33,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["cadillac", "standard-class", "station-wagon", "luxury", "sport-wagon"]
+    },
+    {
+      "id": "MB-014",
+      "manufacturer": "Matchbox",
+      "model_name": "1964 Ford Fairlane Wagon",
+      "model_year": 1964,
+      "series": "None",
+      "color": "Champagne",
+      "condition": "Good",
+      "real_world_car": "1964 Ford Fairlane Wagon",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Station Wagon Class",
+        "family_id": 18,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ford", "standard-class", "station-wagon", "fairlane", "classic"]
+    },
+    {
+      "id": "MB-015",
+      "manufacturer": "Matchbox",
+      "model_name": "1966 Chevy Wagon",
+      "model_year": 1966,
+      "series": "None",
+      "color": "Metal flake purple",
+      "condition": "Good",
+      "real_world_car": "1966 Chevrolet Wagon",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Station Wagon Class",
+        "family_id": 19,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "Removable top with cargo, 'Wild West Tours' graphics - consider using in Mountain City story",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["chevrolet", "standard-class", "station-wagon", "classic", "removable-top"]
+    },
+    {
+      "id": "MB-016",
+      "manufacturer": "Matchbox",
+      "model_name": "2004 Audi RS6 Avant",
+      "model_year": 2004,
+      "series": "None",
+      "color": "Matte silver",
+      "condition": "Good",
+      "real_world_car": "2004 Audi RS6 Avant",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Performance Station Wagon Class",
+        "family_id": 34,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["audi", "performance", "station-wagon", "rs6", "sport-wagon"]
+    },
+    {
+      "id": "MB-017",
+      "manufacturer": "Matchbox",
+      "model_name": "2010 Holden Ute SSV",
+      "model_year": 2010,
+      "series": "None",
+      "color": "Purple",
+      "condition": "Good",
+      "real_world_car": "2010 Holden Ute SSV",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Work/Toy Transport Class",
+        "family_id": 35,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "El Camino-type utility vehicle",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["holden", "standard-class", "ute", "work-vehicle", "el-camino-style"]
+    },
+    {
+      "id": "MB-018",
+      "manufacturer": "Matchbox",
+      "model_name": "2008 Chevy Corvette ZL1",
+      "model_year": 2008,
+      "series": "None",
+      "color": "White",
+      "condition": "Good",
+      "real_world_car": "2008 Chevrolet Corvette ZL1",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Luxury Performance Sports Car Class",
+        "family_id": 19,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["chevrolet", "luxury", "performance", "sports-car", "corvette", "supercar"]
+    },
+    {
+      "id": "MB-019",
+      "manufacturer": "Matchbox",
+      "model_name": "Mazda RX-3",
+      "model_year": null,
+      "series": "None",
+      "color": "Beige with #57 and Toyo Tires livery",
+      "condition": "Good",
+      "real_world_car": "Mazda RX-3",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Family Race Car Class",
+        "family_id": 28,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Modified for racing"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["mazda", "standard-class", "race-car", "rx3", "jdm", "racing-livery"]
+    },
+    {
+      "id": "MB-020",
+      "manufacturer": "Matchbox",
+      "model_name": "Ford Mustang GTD",
+      "model_year": null,
+      "series": "None",
+      "color": "Dark metal flake blue with gold wheels",
+      "condition": "Good",
+      "real_world_car": "Ford Mustang GTD",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Performance Street/Race Class",
+        "family_id": 18,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Souped up race configuration"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ford", "standard-class", "performance", "race-car", "mustang", "street-legal"]
+    },
+    {
+      "id": "MB-021",
+      "manufacturer": "Matchbox",
+      "model_name": "1961 Jaguar E-Type Coupe",
+      "model_year": 1961,
+      "series": "None",
+      "color": "Powder blue",
+      "condition": "Good",
+      "real_world_car": "1961 Jaguar E-Type Coupe",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Classic Sports Car Class",
+        "family_id": 26,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["jaguar", "standard-class", "classic", "sports-car", "e-type", "british"]
+    },
+    {
+      "id": "MB-022",
+      "manufacturer": "Matchbox",
+      "model_name": "2024 Dodge Charger R/T",
+      "model_year": 2024,
+      "series": "None",
+      "color": "Red",
+      "condition": "Good",
+      "real_world_car": "2024 Dodge Charger R/T",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Electric Muscle Car Class",
+        "family_id": 22,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "Opening doors, electric powertrain",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["dodge", "electric", "muscle-car", "charger", "opening-doors", "modern"]
+    },
+    {
+      "id": "MB-023",
+      "manufacturer": "Matchbox",
+      "model_name": "1985 BMW 318i",
+      "model_year": 1985,
+      "series": "None",
+      "color": "Red",
+      "condition": "Good",
+      "real_world_car": "1985 BMW 318i",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Performance Sedan Class",
+        "family_id": 14,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["bmw", "performance", "sedan", "classic", "e30"]
+    },
+    {
+      "id": "MB-024",
+      "manufacturer": "Matchbox",
+      "model_name": "Porsche 718 Spyder RS",
+      "model_year": null,
+      "series": "None",
+      "color": "Deep metallic blue",
+      "condition": "Good",
+      "real_world_car": "Porsche 718 Spyder RS",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Performance Sports Car Class",
+        "family_id": 29,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "Opening doors, convertible",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["porsche", "performance", "sports-car", "718", "spyder", "convertible", "opening-doors"]
+    },
+    {
+      "id": "MB-025",
+      "manufacturer": "Matchbox",
+      "model_name": "2020 Jeep Gladiator",
+      "model_year": 2020,
+      "series": "None",
+      "color": "Dark red with black fenders",
+      "condition": "Good",
+      "real_world_car": "2020 Jeep Gladiator",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Off-Road Vehicle Class",
+        "family_id": 23,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "Opening hood",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["jeep", "off-road", "truck", "gladiator", "opening-hood"]
+    },
+    {
+      "id": "MB-026",
+      "manufacturer": "Matchbox",
+      "model_name": "2020 Jeep Gladiator Rubicon",
+      "model_year": 2020,
+      "series": "None",
+      "color": "Metal flake green with black fenders",
+      "condition": "Good",
+      "real_world_car": "2020 Jeep Gladiator Rubicon",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Off-Road Truck Class",
+        "family_id": 23,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Doorless, topless configuration - ready for outdoor action"],
+        "special_features": "Open cab with no doors or top",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["jeep", "standard-class", "off-road", "truck", "gladiator", "rubicon", "open-cab"]
+    },
+    {
+      "id": "MB-027",
+      "manufacturer": "Matchbox",
+      "model_name": "1991 Mitsubishi Pajero",
+      "model_year": 1991,
+      "series": "None",
+      "color": "Bluish gun metal gray with off-white trim package",
+      "condition": "Good",
+      "real_world_car": "1991 Mitsubishi Pajero",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Off-Road Vehicle Class",
+        "family_id": 5,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "Opening doors",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["mitsubishi", "standard-class", "off-road", "suv", "pajero", "opening-doors"]
+    },
+    {
+      "id": "MB-028",
+      "manufacturer": "Matchbox",
+      "model_name": "Field Car",
+      "model_year": null,
+      "series": "None",
+      "color": "Orange with black markings and #180 on doors",
+      "condition": "Good",
+      "real_world_car": null,
+      "fantasy_casting": true,
+      "autopia_classification": {
+        "tier": "Off-Road Vehicle Class",
+        "family_id": null,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["fantasy-casting", "independent", "off-road", "field-car", "matchbox-original"]
+    },
+    {
+      "id": "MB-029",
+      "manufacturer": "Matchbox",
+      "model_name": "1978 Ford Bronco",
+      "model_year": 1978,
+      "series": "None",
+      "color": "Metal flake copper with white trim package and white camper shell",
+      "condition": "Good",
+      "real_world_car": "1978 Ford Bronco",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Off-Road Vehicle Class",
+        "family_id": 18,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "Opening hood, camper shell",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ford", "standard-class", "off-road", "bronco", "classic", "camper-shell", "opening-hood"]
+    },
+    {
+      "id": "MB-030",
+      "manufacturer": "Matchbox",
+      "model_name": "1995 Chevy C-1500",
+      "model_year": 1995,
+      "series": "None",
+      "color": "Deep metal flake red",
+      "condition": "Good",
+      "real_world_car": "1995 Chevrolet C-1500",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Commuter Pickup Class",
+        "family_id": 19,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "Opening tailgate and opening hood",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["chevrolet", "standard-class", "commuter", "pickup-truck", "opening-hood", "opening-tailgate"]
+    }
+  ]
+}

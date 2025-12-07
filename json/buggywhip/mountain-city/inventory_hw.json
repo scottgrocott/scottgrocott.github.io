@@ -1,0 +1,927 @@
+{
+  "inventory": [
+    {
+      "id": "HW-002",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Datsun 240Z",
+      "model_year": null,
+      "series": "Art Cars",
+      "color": "Pearlescent pink with cherry blossom graphics",
+      "condition": "Mint",
+      "real_world_car": "Datsun 240Z",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Racing Fleet",
+        "family_id": 3,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["nissan", "racing-fleet", "jdm", "art-cars"]
+    },
+    {
+      "id": "HW-003",
+      "manufacturer": "Hot Wheels",
+      "model_name": "2021 Ford Bronco",
+      "model_year": 2021,
+      "series": "None",
+      "color": "Blue gray with number 1 racing graphic and mud splatter",
+      "condition": "Good",
+      "real_world_car": "2021 Ford Bronco",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Racing Fleet",
+        "family_id": 18,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ford", "racing-fleet", "bronco", "off-road"]
+    },
+    {
+      "id": "HW-004",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Toyota Tundra",
+      "model_year": 2010,
+      "series": "None",
+      "color": "Maroon with Tokyo 2020 Olympic graphics",
+      "condition": "Good",
+      "real_world_car": "Toyota Tundra",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Racing Fleet",
+        "family_id": 1,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["4x4 off-road build"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["toyota", "racing-fleet", "tundra", "off-road", "4x4", "olympics"]
+    },
+    {
+      "id": "HW-005",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Cyclone",
+      "model_year": 1991,
+      "series": "None",
+      "color": "Blue gray two-tone with brand graphics",
+      "condition": "Good",
+      "real_world_car": "GMC Cyclone",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Racing Fleet",
+        "family_id": 21,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["gmc", "racing-fleet", "cyclone", "pickup-truck"]
+    },
+    {
+      "id": "HW-006",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Land Rover Defender 90",
+      "model_year": null,
+      "series": "None",
+      "color": "Dark blue with mud splatter and #90 racing graphic",
+      "condition": "Good",
+      "real_world_car": "Land Rover Defender 90",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Racing Fleet",
+        "family_id": 13,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Mud tires"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["land-rover", "racing-fleet", "defender", "off-road", "mud-tires"]
+    },
+    {
+      "id": "HW-007",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Mercedes-Benz Unimog U1300",
+      "model_year": null,
+      "series": "None",
+      "color": "Red with search and rescue graphics",
+      "condition": "Mint",
+      "real_world_car": "Mercedes-Benz Unimog U1300",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Municipal Service Fleet",
+        "family_id": 25,
+        "character_assignment": null,
+        "story_role": "Municipal Service"
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["mercedes-benz", "municipal-service", "unimog", "search-rescue", "emergency"]
+    },
+    {
+      "id": "HW-008",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Mercedes-Benz Unimog U1300",
+      "model_year": null,
+      "series": "None",
+      "color": "White with search and rescue graphics",
+      "condition": "Mint",
+      "real_world_car": "Mercedes-Benz Unimog U1300",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Municipal Service Fleet",
+        "family_id": 25,
+        "character_assignment": null,
+        "story_role": "Municipal Service"
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["mercedes-benz", "municipal-service", "unimog", "search-rescue", "emergency"]
+    },
+    {
+      "id": "HW-009",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Jaguar XJC V12 Coupe",
+      "model_year": null,
+      "series": "None",
+      "color": "White with red, white, and blue Jaguar branding and racing #76",
+      "condition": "Good",
+      "real_world_car": "Jaguar XJC V12 Coupe",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Racing Fleet",
+        "family_id": 26,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["jaguar", "racing-fleet", "xjc", "british", "luxury-sports"]
+    },
+    {
+      "id": "HW-010",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Ford Transit Connect",
+      "model_year": null,
+      "series": "None",
+      "color": "Blue",
+      "condition": "Mint",
+      "real_world_car": "Ford Transit Connect",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Service Fleet",
+        "family_id": 18,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": false,
+        "modifications": ["Graphics need to be stripped and replaced with Mountain City appropriate branding"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ford", "service-fleet", "transit", "van", "work-vehicle"]
+    },
+    {
+      "id": "HW-011",
+      "manufacturer": "Hot Wheels",
+      "model_name": "1963 Studebaker Champ Pickup",
+      "model_year": 1963,
+      "series": "None",
+      "color": "Maroon with tan trim highlight",
+      "condition": "Mint",
+      "real_world_car": "1963 Studebaker Champ Pickup",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Family Class Car",
+        "family_id": 27,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["studebaker", "standard-class", "pickup-truck", "classic", "vintage"]
+    },
+    {
+      "id": "HW-012",
+      "manufacturer": "Hot Wheels",
+      "model_name": "1963 Studebaker Champ Pickup",
+      "model_year": 1963,
+      "series": "None",
+      "color": "Black with racing #63 and black and white checkered stripe down the middle",
+      "condition": "Mint",
+      "real_world_car": "1963 Studebaker Champ Pickup",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Family Class Car",
+        "family_id": 27,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["studebaker", "standard-class", "pickup-truck", "classic", "vintage", "racing-livery"]
+    },
+    {
+      "id": "HW-013",
+      "manufacturer": "Hot Wheels",
+      "model_name": "1995 Mazda RX-7",
+      "model_year": 1995,
+      "series": "None",
+      "color": "Red with racing livery #95",
+      "condition": "Mint",
+      "real_world_car": "1995 Mazda RX-7",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Racing Fleet",
+        "family_id": 28,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["mazda", "racing-fleet", "rx7", "drift", "jdm", "sports-car"]
+    },
+    {
+      "id": "HW-014",
+      "manufacturer": "Hot Wheels",
+      "model_name": "1949 Ford F1 Pickup",
+      "model_year": 1949,
+      "series": "None",
+      "color": "Metallic purple with pinstriping",
+      "condition": "Good",
+      "real_world_car": "1949 Ford F1 Pickup",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Family Lowrider Class",
+        "family_id": 18,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Lowrider build", "White wall tires"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ford", "lowrider", "standard-class", "pickup-truck", "classic", "custom", "white-walls"]
+    },
+    {
+      "id": "HW-015",
+      "manufacturer": "Hot Wheels",
+      "model_name": "BMW 2002",
+      "model_year": null,
+      "series": "None",
+      "color": "Blue metal flake with BMW color stripes",
+      "condition": "Good",
+      "real_world_car": "BMW 2002",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Family Street Car Class",
+        "family_id": 14,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["bmw", "standard-class", "street-car", "classic", "sports-car"]
+    },
+    {
+      "id": "HW-016",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Mercedes-Benz 500E",
+      "model_year": null,
+      "series": "None",
+      "color": "Silver",
+      "condition": "Good",
+      "real_world_car": "Mercedes-Benz 500E",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Family Street Car Class",
+        "family_id": 25,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["mercedes-benz", "standard-class", "street-car", "luxury", "sedan"]
+    },
+    {
+      "id": "HW-017",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Range Rover Velar",
+      "model_year": null,
+      "series": "None",
+      "color": "Burgundy",
+      "condition": "Good",
+      "real_world_car": "Range Rover Velar",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Luxury Off-Road Vehicle Class",
+        "family_id": 13,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["land-rover", "standard-class", "luxury", "off-road", "suv"]
+    },
+    {
+      "id": "HW-018",
+      "manufacturer": "Hot Wheels",
+      "model_name": "2021 Ford Bronco",
+      "model_year": 2021,
+      "series": "None",
+      "color": "Blue",
+      "condition": "Good",
+      "real_world_car": "2021 Ford Bronco",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard 4x4 Off-Road Class",
+        "family_id": 18,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ford", "standard-class", "4x4", "off-road", "bronco", "suv"]
+    },
+    {
+      "id": "HW-019",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Fantasy Rally Truck",
+      "model_year": null,
+      "series": "None",
+      "color": "Red with #55, Hot Wheels graphics, and Holley graphics",
+      "condition": "Good",
+      "real_world_car": null,
+      "fantasy_casting": true,
+      "autopia_classification": {
+        "tier": "Independent Racing Class",
+        "family_id": null,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Mud tires"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["fantasy-casting", "independent", "rally", "off-road", "mud-tires", "racing"]
+    },
+    {
+      "id": "HW-020",
+      "manufacturer": "Hot Wheels",
+      "model_name": "2019 Chevy Silverado Trail Boss LT",
+      "model_year": 2019,
+      "series": "None",
+      "color": "Green camouflage with racing #19",
+      "condition": "Good",
+      "real_world_car": "2019 Chevrolet Silverado Trail Boss LT",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard 4x4 Off-Road Truck Class",
+        "family_id": 19,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["4x4 build"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["chevrolet", "standard-class", "4x4", "off-road", "silverado", "pickup-truck", "camo"]
+    },
+    {
+      "id": "HW-021",
+      "manufacturer": "Hot Wheels",
+      "model_name": "1987 Chevy C10",
+      "model_year": 1987,
+      "series": "None",
+      "color": "Black with ghost flames",
+      "condition": "Good",
+      "real_world_car": "1987 Chevrolet C10",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Lowrider Class",
+        "family_id": 19,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Lowrider build"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["chevrolet", "lowrider", "standard-class", "pickup-truck", "custom", "c10"]
+    },
+    {
+      "id": "HW-022",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Custom '62 Chevy Pickup",
+      "model_year": 1962,
+      "series": "None",
+      "color": "Metallic turquoise with light green and white flames",
+      "condition": "Good",
+      "real_world_car": "1962 Chevrolet Pickup",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Lowrider Truck Class",
+        "family_id": 19,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Lowrider build"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["chevrolet", "lowrider", "standard-class", "pickup-truck", "custom", "classic"]
+    },
+    {
+      "id": "HW-023",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Ford Mustang GTD",
+      "model_year": null,
+      "series": "None",
+      "color": "Dark metal flake blue with gold wheels",
+      "condition": "Good",
+      "real_world_car": "Ford Mustang GTD",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Performance Street/Race Class",
+        "family_id": 18,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Souped up race configuration"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ford", "standard-class", "performance", "race-car", "mustang", "street-legal"]
+    },
+    {
+      "id": "HW-024",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Porsche 911 Turbo Cabriolet",
+      "model_year": null,
+      "series": "None",
+      "color": "Burgundy with pink interior",
+      "condition": "Good",
+      "real_world_car": "Porsche 911 Turbo Cabriolet",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Standard Family Sports Car Class",
+        "family_id": 29,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": "Convertible",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["porsche", "standard-class", "sports-car", "911", "convertible", "cabriolet"]
+    },
+    {
+      "id": "HW-025",
+      "manufacturer": "Hot Wheels",
+      "model_name": "BMW 635CSi",
+      "model_year": null,
+      "series": "None",
+      "color": "Orange with John Player Special style markings",
+      "condition": "Good",
+      "real_world_car": "BMW 635CSi",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Race Car Class",
+        "family_id": 14,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Modified for racing", "Wide body kit"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["bmw", "race-car", "racing-fleet", "wide-body", "modified", "jps-livery"]
+    },
+    {
+      "id": "HW-026",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Gas Monkey '88 Corvette",
+      "model_year": 1988,
+      "series": "Gas Monkey Garage",
+      "color": "Medium green metal flake",
+      "condition": "Good",
+      "real_world_car": "1988 Chevrolet Corvette",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Performance Modified Car Class",
+        "family_id": 19,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Big block engine with blower sticking out the front", "Large wheels", "Hot Rod style build"],
+        "special_features": "Supercharger protruding through hood",
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["chevrolet", "performance", "modified", "corvette", "hot-rod", "gas-monkey", "supercharged"]
+    },
+    {
+      "id": "HW-027",
+      "manufacturer": "Hot Wheels",
+      "model_name": "1996 Dodge Viper GTS",
+      "model_year": 1996,
+      "series": "None",
+      "color": "Yellow with two black racing stripes",
+      "condition": "Good",
+      "real_world_car": "1996 Dodge Viper GTS",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "High-End Performance Street Car Class",
+        "family_id": 22,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["dodge", "high-end", "performance", "street-car", "viper", "supercar"]
+    },
+    {
+      "id": "HW-028",
+      "manufacturer": "Hot Wheels",
+      "model_name": "1989 Mercedes-Benz 560 SEC AMG",
+      "model_year": 1989,
+      "series": "None",
+      "color": "Dark metallic blue",
+      "condition": "Good",
+      "real_world_car": "1989 Mercedes-Benz 560 SEC AMG",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Luxury Coupe Class",
+        "family_id": 25,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["mercedes-benz", "luxury", "coupe", "amg", "classic"]
+    },
+    {
+      "id": "HW-029",
+      "manufacturer": "Hot Wheels",
+      "model_name": "Chevy Camaro IROC-Z",
+      "model_year": null,
+      "series": "None",
+      "color": "Metal flake purple with black and white striping",
+      "condition": "Good",
+      "real_world_car": "Chevrolet Camaro IROC-Z",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Muscle Car Class",
+        "family_id": 19,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["chevrolet", "muscle-car", "camaro", "iroc-z", "performance"]
+    },
+    {
+      "id": "HW-030",
+      "manufacturer": "Hot Wheels",
+      "model_name": "1967 Ford Mustang 428",
+      "model_year": 1967,
+      "series": "None",
+      "color": "Black with gold and white stripes and racing #67",
+      "condition": "Good",
+      "real_world_car": "1967 Ford Mustang 428",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Classic Muscle Car Class",
+        "family_id": 18,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["ford", "classic", "muscle-car", "mustang", "racing-livery"]
+    },
+    {
+      "id": "HW-031",
+      "manufacturer": "Hot Wheels",
+      "model_name": "2023 Drift-N-Brake",
+      "model_year": 2023,
+      "series": "None",
+      "color": "Gun metal gray with orange markings",
+      "condition": "Good",
+      "real_world_car": null,
+      "fantasy_casting": true,
+      "autopia_classification": {
+        "tier": "Modified Muscle Station Wagon Drift Class",
+        "family_id": null,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": ["Modified for drifting"],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": 2023
+      },
+      "tags": ["fantasy-casting", "independent", "drift", "modified", "station-wagon", "muscle-car"]
+    },
+    {
+      "id": "HW-032",
+      "manufacturer": "Hot Wheels",
+      "model_name": "1984 Audi Sport Quattro",
+      "model_year": 1984,
+      "series": "None",
+      "color": "Silver with orange and black Quattro Audi graphics and racing #2",
+      "condition": "Good",
+      "real_world_car": "1984 Audi Sport Quattro",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Race Car Class",
+        "family_id": 34,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["audi", "race-car", "racing-fleet", "quattro", "rally", "classic"]
+    },
+    {
+      "id": "HW-033",
+      "manufacturer": "Hot Wheels",
+      "model_name": "BMW M3 Wagon",
+      "model_year": null,
+      "series": "None",
+      "color": "Green with Michelin Tire racing livery and #91",
+      "condition": "Good",
+      "real_world_car": "BMW M3 Wagon",
+      "fantasy_casting": false,
+      "autopia_classification": {
+        "tier": "Family Race Car Class",
+        "family_id": 14,
+        "character_assignment": null,
+        "story_role": null
+      },
+      "production_notes": {
+        "camera_ready": true,
+        "modifications": [],
+        "special_features": null,
+        "replacement_needed": false,
+        "diecast_release_year": null
+      },
+      "tags": ["bmw", "race-car", "racing-fleet", "m3", "wagon", "racing-livery"]
+    },
+    {
+      "id": "HW-034",
+      "manufacturer": "Hot Wheels","model_name": "1971 Porsche 911",
+  "model_year": 1971,
+  "series": "None",
+  "color": "Metallic sky blue with #71 racing livery",
+  "condition": "Good",
+  "real_world_car": "1971 Porsche 911",
+  "fantasy_casting": false,
+  "autopia_classification": {
+    "tier": "Performance Sports Car Class",
+    "family_id": 29,
+    "character_assignment": null,
+    "story_role": null
+  },
+  "production_notes": {
+    "camera_ready": true,
+    "modifications": [],
+    "special_features": null,
+    "replacement_needed": false,
+    "diecast_release_year": null
+  },
+  "tags": ["porsche", "performance", "sports-car", "911", "classic", "racing-livery"]
+},
+{
+  "id": "HW-035",
+  "manufacturer": "Hot Wheels",
+  "model_name": "Porsche 911 Carrera Cabriolet",
+  "model_year": null,
+  "series": "None",
+  "color": "Metallic silver with silver wheels",
+  "condition": "Good",
+  "real_world_car": "Porsche 911 Carrera Cabriolet",
+  "fantasy_casting": false,
+  "autopia_classification": {
+    "tier": "Luxury Sports Car Class",
+    "family_id": 29,
+    "character_assignment": null,
+    "story_role": null
+  },
+  "production_notes": {
+    "camera_ready": true,
+    "modifications": [],
+    "special_features": null,
+    "replacement_needed": false,
+    "diecast_release_year": null
+  },
+  "tags": ["porsche", "luxury", "sports-car", "911", "carrera", "cabriolet", "convertible"]
+},
+{
+  "id": "HW-036",
+  "manufacturer": "Hot Wheels",
+  "model_name": "2018 Honda Civic Type R",
+  "model_year": 2018,
+  "series": "None",
+  "color": "Blue with Honda #3 racing livery and black wheels",
+  "condition": "Good",
+  "real_world_car": "2018 Honda Civic Type R",
+  "fantasy_casting": false,
+  "autopia_classification": {
+    "tier": "Performance Sports Car Class",
+    "family_id": 2,
+    "character_assignment": null,
+    "story_role": null
+  },
+  "production_notes": {
+    "camera_ready": true,
+    "modifications": [],
+    "special_features": null,
+    "replacement_needed": false,
+    "diecast_release_year": null
+  },
+  "tags": ["honda", "performance", "sports-car", "civic", "type-r", "racing-livery"]
+},
+{
+  "id": "HW-037",
+  "manufacturer": "Hot Wheels",
+  "model_name": "1971 Nissan Skyline HT 2000 GT-R",
+  "model_year": 1971,
+  "series": "None",
+  "color": "Off-white with #24 on doors, branding, and black side stripes",
+  "condition": "Good",
+  "real_world_car": "1971 Nissan Skyline HT 2000 GT-R",
+  "fantasy_casting": false,
+  "autopia_classification": {
+    "tier": "Classic JDM Sports Car Class",
+    "family_id": 3,
+    "character_assignment": null,
+    "story_role": null
+  },
+  "production_notes": {
+    "camera_ready": true,
+    "modifications": [],
+    "special_features": null,
+    "replacement_needed": false,
+    "diecast_release_year": null
+  },
+  "tags": ["nissan", "classic", "jdm", "sports-car", "skyline", "gtr", "racing-livery"]
+},
+{
+  "id": "HW-038",
+  "manufacturer": "Hot Wheels",
+  "model_name": "2023 Toyota GR Supra",
+  "model_year": 2023,
+  "series": "None",
+  "color": "Yellow with black wheels",
+  "condition": "Good",
+  "real_world_car": "2023 Toyota GR Supra",
+  "fantasy_casting": false,
+  "autopia_classification": {
+    "tier": "JDM Performance Car Class",
+    "family_id": 1,
+    "character_assignment": null,
+    "story_role": null
+  },
+  "production_notes": {
+    "camera_ready": true,
+    "modifications": [],
+    "special_features": null,
+    "replacement_needed": false,
+    "diecast_release_year": null
+  },
+  "tags": ["toyota", "jdm", "performance", "sports-car", "supra", "gr-supra"]
+}
+  ]
