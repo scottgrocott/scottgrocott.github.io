@@ -1,0 +1,279 @@
+{
+  "meta": {
+    "project": "Mountain City",
+    "version": "1.0.0",
+    "generated_by": "BuggyWhip",
+    "last_updated": "2025-12-05",
+    "description": "Consolidated master database of story bible, world assets, and vehicle inventory."
+  },
+  "story_bible": {
+    "series_outline": {
+      "title": "Mountain City: The Forest Tracks",
+      "season": 1,
+      "total_episodes": 24,
+      "format": "Web Series (12–18 min episodes)",
+      "logline": "Eddie Van Heflen goes from unknown A.O.K. groundskeeper to hot prospect courted by multiple dynasties while hunting the truth about his missing brother Alex.",
+      "season_arc": {
+        "summary": "The season follows Eddie's rise from a mechanic to a sought-after driver, the formation of his crew, and the uncovering of the 'Test Driver Conspiracy' involving the dynasties.",
+        "blocks": {
+          "1-6": "World building, crew assembly, dreams defined.",
+          "7-12": "Alex mystery surfaces, Eddie proves himself, families recruit.",
+          "13-18": "Conspiracy grows, independence forged.",
+          "19-24": "Summit betrayal, Tortellini revealed, crew heads to Mountain City."
+        }
+      }
+    },
+    "characters": {
+      "protagonist": {
+        "name": "Edward 'Eddie' Van Heflen",
+        "age": 19,
+        "role": "Groundskeeper / Reluctant Racer",
+        "vehicle": "Frankenstein 1:64 Custom (Rusty, Mater-inspired junkyard build)",
+        "motivation": "To find out what happened to his brother Alex by becoming fast enough to enter the Dynasty world.",
+        "backstory": "Father died in a 'driver error' crash. Mother lives off-island. Brother Alex vanished 3 years ago after a secret test drive."
+      },
+      "antagonists": [
+        {
+          "name": "Joey Tortellini",
+          "role": "Ferrari Family Leader / Primary Antagonist (Act 2)",
+          "goal": "Monopolize the city's automotive industry through shadow funding."
+        },
+        {
+          "name": "Chad Boss",
+          "role": "Lamborghini Family Leader / Final Antagonist (Act 3)",
+          "goal": "Dominate the city with brute force and money."
+        }
+      ],
+      "crew": [
+        {
+          "name": "Rusty",
+          "role": "Gadget Wizard",
+          "trait": "Hates dynasties; creates weapons from scrap.",
+          "backstory": "Family garage firebombed by Tortellini enforcers."
+        },
+        {
+          "name": "Echo",
+          "role": "Surveillance / Intel",
+          "trait": "Paranoid observer; uses hacked scanners.",
+          "backstory": "Former corporate analyst hiding from a bounty."
+        },
+        {
+          "name": "Nova",
+          "role": "Strategist",
+          "trait": "Charismatic schemer; high-risk gambler.",
+          "backstory": "Ex-Kim family bet runner."
+        },
+        {
+          "name": "Axel",
+          "role": "Driver / Mentor",
+          "trait": "Thrill addict; former off-road champ.",
+          "backstory": "Blacklisted by the Boss family."
+        },
+        {
+          "name": "Maggie",
+          "role": "Fabricator",
+          "trait": "Visionary builder; emotional anchor.",
+          "backstory": "Daughter of a disgraced engine builder."
+        }
+      ]
+    },
+    "locations": {
+      "primary_hub": "A.O.K. Kampground (Autopia Outdoor Kampground)",
+      "description": "The only affordable place for independents. Sits on the edge of the luxury Autopia National Motor Recreation Area."
+    }
+  },
+  "world_setting": {
+    "geography": {
+      "regions": [
+        {
+          "id": "mountain_city",
+          "name": "Mountain City",
+          "biome": "Alpine / Urban",
+          "description": "A socially stratified city known for towering skyscrapers and neon-lit streets. The heart of the Dynasty power."
+        },
+        {
+          "id": "bay_city",
+          "name": "Bay City",
+          "biome": "Coastal / Urban",
+          "description": "Miniature port town where drift culture rules. The living room of the island."
+        },
+        {
+          "id": "port_injection",
+          "name": "Port Injection",
+          "biome": "Metropolis",
+          "description": "The capital city. Neon-drenched, high-speed intercepts, and the Turbo Terminal shipping docks."
+        },
+        {
+          "id": "gasket_gulch",
+          "name": "Gasket Gulch",
+          "biome": "Desert Wasteland",
+          "description": "Lawless interior. Home to trophy trucks and rat rods. Fuel is currency here."
+        },
+        {
+          "id": "canyon_crossing",
+          "name": "Canyon Crossing",
+          "biome": "Red Rock Canyon",
+          "description": "The wild frontier for off-road junkies. Switchback trails and sheer cliffs."
+        },
+        {
+          "id": "torque_timberlands",
+          "name": "Torque Timberlands",
+          "biome": "Rainforest / Mud",
+          "description": "Dense wet forest where winches are mandatory. Home to mudders and crawlers."
+        },
+        {
+          "id": "velocity_flats",
+          "name": "Velocity Flats",
+          "biome": "Salt Flats",
+          "description": "A massive white expanse for top-speed runs. No lanes, no limits."
+        }
+      ]
+    },
+    "culture": {
+      "social_hierarchy": [
+        "The Dynasty Class (Owners/Rulers)",
+        "The Fabricators (Elite Builders/Prophets)",
+        "The Tuners (Middle Class Mechanics)",
+        "The Drivers (Soldiers/Racers)",
+        "The Commuters (Invisible Working Class)"
+      ],
+      "law_enforcement": "Privatized security owned by Dynasties. They pull you over for driving a boring car, not for speeding.",
+      "economy": {
+        "currency": "Digital Credits",
+        "commodities": ["Tires", "Nitrous", "Rare Parts", "Vintage Chassis"]
+      }
+    },
+    "lore": {
+      "core_law": "All vehicles are manufactured on 'The Mainland'. Autopia only drives and modifies them.",
+      "mainland_myth": "A fog-shrouded continent of endless factories no one has ever seen.",
+      "diecast_brands_canon": [
+        { "brand": "Hot Wheels", "role": "The endless horde (60% pop). Cheap, fast, disposable." },
+        { "brand": "Matchbox", "role": "The working caste (15% pop). Honest daily drivers and service fleets." },
+        { "brand": "Greenlight", "role": "Law enforcement and government vehicles." },
+        { "brand": "Mini GT / Tarmac", "role": "The elite / JDM Royalty." },
+        { "brand": "AUTOart", "role": "The untouchables (God Tier)." }
+      ]
+    }
+  },
+  "factions": {
+    "families": [
+      { "id": 1, "name": "Nakamura", "make": "Toyota", "ethnicity": "Japanese", "tier": "Dynasty" },
+      { "id": 2, "name": "Miyazaki", "make": "Honda", "ethnicity": "Japanese", "tier": "Dynasty" },
+      { "id": 3, "name": "Kawasaki", "make": "Nissan", "ethnicity": "Japanese", "tier": "Dynasty" },
+      { "id": 4, "name": "Suzuki", "make": "Suzuki", "ethnicity": "Japanese", "tier": "Dynasty" },
+      { "id": 5, "name": "Mitsubishi", "make": "Mitsubishi", "ethnicity": "Japanese", "tier": "Dynasty" },
+      { "id": 6, "name": "Kim", "make": "Hyundai", "ethnicity": "Korean", "tier": "Dynasty" },
+      { "id": 7, "name": "Choi", "make": "Kia", "ethnicity": "Korean", "tier": "Dynasty" },
+      { "id": 8, "name": "Dupont", "make": "Peugeot", "ethnicity": "French", "tier": "Dynasty" },
+      { "id": 9, "name": "Renault", "make": "Renault", "ethnicity": "French", "tier": "Dynasty" },
+      { "id": 10, "name": "Tortellini", "make": "Ferrari", "ethnicity": "Italian", "tier": "Dynasty (Antagonist)" },
+      { "id": 11, "name": "Boss", "make": "Lamborghini", "ethnicity": "Italian", "tier": "Dynasty (Late Antagonist)" },
+      { "id": 12, "name": "Winston", "make": "Aston Martin", "ethnicity": "British", "tier": "Dynasty" },
+      { "id": 13, "name": "Rover", "make": "Land Rover", "ethnicity": "British", "tier": "Dynasty" },
+      { "id": 14, "name": "Schneider", "make": "BMW", "ethnicity": "German", "tier": "Dynasty" },
+      { "id": 15, "name": "Volkswagen", "make": "Volkswagen", "ethnicity": "German", "tier": "Dynasty" },
+      { "id": 16, "name": "Eriksson", "make": "Volvo", "ethnicity": "Swedish", "tier": "Dynasty" },
+      { "id": 17, "name": "Svensson", "make": "Saab", "ethnicity": "Swedish", "tier": "Dynasty" },
+      { "id": 18, "name": "Johnson", "make": "Ford", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 19, "name": "Smith", "make": "Chevrolet", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 20, "name": "Miller", "make": "Chrysler", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 21, "name": "Brown", "make": "GMC", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 22, "name": "Anderson", "make": "Dodge", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 23, "name": "Willys", "make": "Jeep", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 24, "name": "Mercury", "make": "Mercury", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 25, "name": "Benz", "make": "Mercedes-Benz", "ethnicity": "German", "tier": "Dynasty" },
+      { "id": 26, "name": "Jaguar", "make": "Jaguar", "ethnicity": "British", "tier": "Dynasty" },
+      { "id": 27, "name": "Studebaker", "make": "Studebaker", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 28, "name": "Mazda", "make": "Mazda", "ethnicity": "Japanese", "tier": "Dynasty" },
+      { "id": 29, "name": "Porsche", "make": "Porsche", "ethnicity": "German", "tier": "Dynasty" },
+      { "id": 30, "name": "Plymouth", "make": "Plymouth", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 31, "name": "Ram", "make": "Ram", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 32, "name": "Oldsmobile", "make": "Oldsmobile", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 33, "name": "Cadillac", "make": "Cadillac", "ethnicity": "American", "tier": "Dynasty" },
+      { "id": 34, "name": "Audi", "make": "Audi", "ethnicity": "German", "tier": "Dynasty" },
+      { "id": 35, "name": "Holden", "make": "Holden", "ethnicity": "Australian", "tier": "Dynasty" }
+    ],
+    "dealerships": [
+      { "id": 1, "family_id": 1, "name": "Nakamura Imports", "brand": "Toyota" },
+      { "id": 2, "family_id": 2, "name": "Miyazaki Autos", "brand": "Honda" },
+      { "id": 18, "family_id": 18, "name": "Johnson Ford & Utility", "brand": "Ford" },
+      { "id": 19, "family_id": 19, "name": "Smith Custom Shop", "brand": "Chevrolet" },
+      { "id": 25, "family_id": 25, "name": "Benz Executive Plaza", "brand": "Mercedes-Benz" }
+    ]
+  },
+  "assets": {
+    "inventory": {
+      "matchbox": [
+        { "id": "MB-001", "make": "Jeep", "model": "FC", "year": "1957", "role": "Family Racing/Service", "family_id": 23 },
+        { "id": "MB-002", "make": "Porsche", "model": "911 Targa", "year": "1982", "role": "Standard Street Car", "family_id": 29 },
+        { "id": "MB-003", "make": "Porsche", "model": "Panamera", "year": "2010", "role": "Standard Street Car", "family_id": 29 },
+        { "id": "MB-004", "make": "Chevy", "model": "Camaro Convertible", "year": "2016", "role": "Standard Sports Car", "family_id": 19 },
+        { "id": "MB-005", "make": "Mercedes-Benz", "model": "SLR McLaren", "year": null, "role": "Luxury Sports Car", "family_id": 25 },
+        { "id": "MB-006", "make": "Plymouth", "model": "Barracuda", "year": "1970", "role": "Standard Muscle Car", "family_id": 30 },
+        { "id": "MB-007", "make": "Toyota", "model": "MR2", "year": "1984", "role": "Standard Sports Car", "family_id": 1 },
+        { "id": "MB-008", "make": "GMC", "model": "Cyclone", "year": "1991", "role": "Standard Truck", "family_id": 21 },
+        { "id": "MB-009", "make": "Ram", "model": "Flatbed Truck", "year": "2016", "role": "Standard Work Truck", "family_id": 31 },
+        { "id": "MB-010", "make": "Jeep", "model": "Gladiator Rubicon (Black)", "year": "2020", "role": "Standard Off-Road Truck", "family_id": 23 },
+        { "id": "MB-011", "make": "Jeep", "model": "Gladiator Rubicon (Blue)", "year": "2020", "role": "Standard Off-Road Truck", "family_id": 23 },
+        { "id": "MB-012", "make": "Oldsmobile", "model": "Vista Cruiser", "year": "1971", "role": "Standard Station Wagon", "family_id": 32 },
+        { "id": "MB-013", "make": "Cadillac", "model": "CTS Wagon", "year": "2010", "role": "Standard Station Wagon", "family_id": 33 },
+        { "id": "MB-014", "make": "Ford", "model": "Fairlane Wagon", "year": "1964", "role": "Standard Station Wagon", "family_id": 18 },
+        { "id": "MB-015", "make": "Chevy", "model": "Chevelle Wagon", "year": "1966", "role": "Standard Station Wagon", "family_id": 19 },
+        { "id": "MB-016", "make": "Audi", "model": "RS6 Avant", "year": "2004", "role": "Performance Station Wagon", "family_id": 34 },
+        { "id": "MB-017", "make": "Holden", "model": "Ute SSV", "year": "2010", "role": "Standard Work/Toy Transport", "family_id": 35 },
+        { "id": "MB-018", "make": "Chevy", "model": "Corvette ZL1", "year": "2008", "role": "Luxury Performance Sports Car", "family_id": 19 },
+        { "id": "MB-019", "make": "Mazda", "model": "RX-3", "year": "1974", "role": "Standard Family Race Car", "family_id": 28 },
+        { "id": "MB-020", "make": "Ford", "model": "Mustang GTD", "year": "2024", "role": "Standard Performance Street/Race", "family_id": 18 },
+        { "id": "MB-021", "make": "Jaguar", "model": "E-Type Coupe", "year": "1961", "role": "Standard Classic Sports Car", "family_id": 26 },
+        { "id": "MB-022", "make": "Dodge", "model": "Charger R/T", "year": "2024", "role": "Electric Muscle Car", "family_id": 22 },
+        { "id": "MB-023", "make": "BMW", "model": "318i", "year": "1985", "role": "Performance Sedan", "family_id": 14 },
+        { "id": "MB-024", "make": "Porsche", "model": "718 Spyder RS", "year": "2023", "role": "Performance Sports Car", "family_id": 29 },
+        { "id": "MB-025", "make": "Jeep", "model": "Gladiator (Red)", "year": "2020", "role": "Off-Road Vehicle", "family_id": 23 },
+        { "id": "MB-026", "make": "Jeep", "model": "Gladiator Rubicon (Green)", "year": "2020", "role": "Standard Off-Road Truck", "family_id": 23 },
+        { "id": "MB-027", "make": "Mitsubishi", "model": "Pajero", "year": "1991", "role": "Standard Off-Road Vehicle", "family_id": 5 },
+        { "id": "MB-028", "make": "Matchbox", "model": "Field Car (Fantasy)", "year": null, "role": "Independent Off-Road", "family_id": null },
+        { "id": "MB-029", "make": "Ford", "model": "Bronco", "year": "1978", "role": "Standard Off-Road Vehicle", "family_id": 18 },
+        { "id": "MB-030", "make": "Chevy", "model": "C-1500", "year": "1995", "role": "Standard Commuter Pickup", "family_id": 19 }
+      ],
+      "hot_wheels": [
+        { "id": "HW-002", "make": "Datsun", "model": "240Z", "year": "1971", "role": "Family Racing Fleet", "family_id": 3 },
+        { "id": "HW-003", "make": "Ford", "model": "Bronco", "year": "2021", "role": "Family Racing Fleet", "family_id": 18 },
+        { "id": "HW-004", "make": "Toyota", "model": "Tundra", "year": "2010", "role": "Family Racing Fleet", "family_id": 1 },
+        { "id": "HW-005", "make": "GMC", "model": "Cyclone", "year": "1991", "role": "Family Racing Fleet", "family_id": 21 },
+        { "id": "HW-006", "make": "Land Rover", "model": "Defender 90", "year": null, "role": "Family Racing Fleet", "family_id": 13 },
+        { "id": "HW-007", "make": "Mercedes-Benz", "model": "Unimog U1300 (Red)", "year": null, "role": "Municipal Service Fleet", "family_id": 25 },
+        { "id": "HW-008", "make": "Mercedes-Benz", "model": "Unimog U1300 (White)", "year": null, "role": "Municipal Service Fleet", "family_id": 25 },
+        { "id": "HW-009", "make": "Jaguar", "model": "XJC V12 Coupe", "year": "1976", "role": "Family Racing Fleet", "family_id": 26 },
+        { "id": "HW-010", "make": "Ford", "model": "Transit Connect", "year": "2010", "role": "Family Service Fleet", "family_id": 18 },
+        { "id": "HW-011", "make": "Studebaker", "model": "Champ Pickup (Maroon)", "year": "1963", "role": "Standard Family Class", "family_id": 27 },
+        { "id": "HW-012", "make": "Studebaker", "model": "Champ Pickup (Racing)", "year": "1963", "role": "Standard Family Class", "family_id": 27 },
+        { "id": "HW-013", "make": "Mazda", "model": "RX-7", "year": "1995", "role": "Family Racing Fleet", "family_id": 28 },
+        { "id": "HW-014", "make": "Ford", "model": "F1 Pickup (Lowrider)", "year": "1949", "role": "Standard Lowrider Class", "family_id": 18 },
+        { "id": "HW-015", "make": "BMW", "model": "2002", "year": "1974", "role": "Standard Family Street Car", "family_id": 14 },
+        { "id": "HW-016", "make": "Mercedes-Benz", "model": "500E", "year": "1991", "role": "Standard Family Street Car", "family_id": 25 },
+        { "id": "HW-017", "make": "Range Rover", "model": "Velar", "year": "2018", "role": "Standard Luxury Off-Road", "family_id": 13 },
+        { "id": "HW-018", "make": "Ford", "model": "Bronco", "year": "2021", "role": "Standard 4x4 Off-Road", "family_id": 18 },
+        { "id": "HW-019", "make": "Hot Wheels", "model": "Fantasy Rally Truck", "year": null, "role": "Independent Racing Class", "family_id": null },
+        { "id": "HW-020", "make": "Chevy", "model": "Silverado Trail Boss LT", "year": "2019", "role": "Standard 4x4 Off-Road Truck", "family_id": 19 },
+        { "id": "HW-021", "make": "Chevy", "model": "C10", "year": "1987", "role": "Standard Lowrider Class", "family_id": 19 },
+        { "id": "HW-022", "make": "Chevy", "model": "Custom '62 Pickup", "year": "1962", "role": "Standard Lowrider Truck", "family_id": 19 },
+        { "id": "HW-023", "make": "Ford", "model": "Mustang GTD", "year": "2024", "role": "Standard Performance Street/Race", "family_id": 18 },
+        { "id": "HW-024", "make": "Porsche", "model": "911 Turbo Cabriolet", "year": "2020", "role": "Standard Family Sports Car", "family_id": 29 },
+        { "id": "HW-025", "make": "BMW", "model": "635CSi", "year": "1985", "role": "Family Race Car Class", "family_id": 14 },
+        { "id": "HW-026", "make": "Chevy", "model": "Gas Monkey Corvette", "year": "1988", "role": "Performance Modified Car", "family_id": 19 },
+        { "id": "HW-027", "make": "Dodge", "model": "Viper GTS", "year": "1996", "role": "High-End Performance Street Car", "family_id": 22 },
+        { "id": "HW-028", "make": "Mercedes-Benz", "model": "560 SEC AMG", "year": "1989", "role": "Luxury Coupe Class", "family_id": 25 },
+        { "id": "HW-029", "make": "Chevy", "model": "Camaro IROC-Z", "year": "1985", "role": "Muscle Car Class", "family_id": 19 },
+        { "id": "HW-030", "make": "Ford", "model": "Mustang 428", "year": "1967", "role": "Classic Muscle Car Class", "family_id": 18 },
+        { "id": "HW-031", "make": "Hot Wheels", "model": "Drift-N-Brake", "year": "2023", "role": "Modified Muscle Drift Class", "family_id": null },
+        { "id": "HW-032", "make": "Audi", "model": "Sport Quattro", "year": "1984", "role": "Family Race Car Class", "family_id": 34 },
+        { "id": "HW-033", "make": "BMW", "model": "M3 Wagon", "year": "2022", "role": "Family Race Car Class", "family_id": 14 },
+        { "id": "HW-034", "make": "Porsche", "model": "911", "year": "1971", "role": "Performance Sports Car", "family_id": 29 },
+        { "id": "HW-035", "make": "Porsche", "model": "911 Carrera Cabriolet", "year": "2020", "role": "Luxury Sports Car", "family_id": 29 },
+        { "id": "HW-036", "make": "Honda", "model": "Civic Type R", "year": "2018", "role": "Performance Sports Car", "family_id": 2 },
+        { "id": "HW-037", "make": "Nissan", "model": "Skyline HT 2000 GT-R", "year": "1971", "role": "Classic JDM Sports Car", "family_id": 3 },
+        { "id": "HW-038", "make": "Toyota", "model": "GR Supra", "year": "2023", "role": "JDM Performance Car", "family_id": 1 }
+      ]
+    }
+  }
+}
