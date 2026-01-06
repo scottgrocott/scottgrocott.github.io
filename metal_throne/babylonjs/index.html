@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Babylon.js Greybox Scene</title>
+  <style>
+    body { 
+      margin: 0; 
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+    #renderCanvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+    #loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      z-index: 1000;
+      text-align: center;
+      background: rgba(0,0,0,0.7);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="renderCanvas"></canvas>
+  <div id="loading">Loading assets...</div>
+  <div id="info">WASD to move | Mouse to look | Space to jump | Click to start</div>
+  
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  
+  <script>
+    const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets.json';
+    
+    const canvas = document.getElementById('renderCanvas');
+    const engine = new BABYLON.Engine(canvas, true);
+    let scene, camera;
+    
+    const createScene = async () => {
+      scene = new BABYLON.Scene(engine);
+      scene.clearColor = new BABYLON.Color3(0.529, 0.808, 0.922); // Sky blue
+      scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+      scene.fogColor = new BABYLON.Color3(0.529, 0.808, 0.922);
+      scene.fogStart = 100;
+      scene.fogEnd = 750;
+      
+      // Camera with collision
+      camera = new BABYLON.UniversalCamera('camera', new BABYLON.Vector3(0, 1.6, 0), scene);
+      camera.attachControl(canvas, true);
+      camera.speed = 0.5;
+      camera.angularSensibility = 2000;
+      
+      // Enable collision
+      camera.checkCollisions = true;
+      camera.applyGravity = true;
+      camera.ellipsoid = new BABYLON.Vector3(1, 0.9, 1);
+      scene.gravity = new BABYLON.Vector3(0, -0.15, 0);
+      
+      // WASD keys
+      camera.keysUp.push(87); // W
+      camera.keysDown.push(83); // S
+      camera.keysLeft.push(65); // A
+      camera.keysRight.push(68); // D
+      
+      // Lighting
+      const ambientLight = new BABYLON.HemisphericLight('ambientLight', new BABYLON.Vector3(0, 1, 0), scene);
+      ambientLight.intensity = 0.7;
+      
+      const directionalLight = new BABYLON.DirectionalLight('dirLight', new BABYLON.Vector3(-1, -2, -1), scene);
+      directionalLight.position = new BABYLON.Vector3(20, 40, 20);
+      directionalLight.intensity = 0.5;
+      
+      // Shadows
+      const shadowGenerator = new BABYLON.ShadowGenerator(1024, directionalLight);
+      shadowGenerator.useBlurExponentialShadowMap = true;
+      shadowGenerator.blurKernel = 32;
+      
+      // Ground
+      const ground = BABYLON.MeshBuilder.CreateGround('ground', { width: 1000, height: 1000 }, scene);
+      ground.material = new BABYLON.StandardMaterial('groundMat', scene);
+      ground.material.diffuseColor = new BABYLON.Color3(0.482, 0.784, 0.643); // Green
+      ground.receiveShadows = true;
+      ground.checkCollisions = true;
+      
+      // Load scene data
+      await loadSceneData(shadowGenerator);
+      
+      return scene;
+    };
+    
+    const loadSceneData = async (shadowGenerator) => {
+      try {
+        const response = await fetch(JSON_URL);
+        const data = await response.json();
+        
+        let loadedCount = 0;
+        const totalAssets = data.buildings.length;
+        
+        // Load buildings
+        const loadPromises = data.buildings.map((building) => {
+          return new Promise((resolve) => {
+            const modelId = building.model.replace('#', '').replace('glb', '');
+            const asset = data.assets.find(a => a.id === modelId + 'glb');
+            
+            if (asset) {
+              BABYLON.SceneLoader.ImportMesh(
+                '',
+                '',
+                asset.src,
+                scene,
+                (meshes) => {
+                  const pos = building.position.split(' ').map(Number);
+                  
+                  meshes.forEach((mesh) => {
+                    if (mesh) {
+                      mesh.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
+                      mesh.checkCollisions = true;
+                      
+                      // Enable shadows
+                      if (mesh.material) {
+                        shadowGenerator.addShadowCaster(mesh);
+                        mesh.receiveShadows = true;
+                      }
+                    }
+                  });
+                  
+                  loadedCount++;
+                  updateLoadingProgress(loadedCount, totalAssets);
+                  resolve();
+                },
+                null,
+                (scene, message, exception) => {
+                  console.error(`Error loading ${building.id}:`, message, exception);
+                  loadedCount++;
+                  updateLoadingProgress(loadedCount, totalAssets);
+                  resolve();
+                }
+              );
+            } else {
+              resolve();
+            }
+          });
+        });
+        
+        // Create tanks
+        data.tanks.forEach((tank, index) => {
+          const pos = tank.position.split(' ').map(Number);
+          const scale = tank.scale.split(' ').map(Number);
+          
+          const cylinder = BABYLON.MeshBuilder.CreateCylinder(
+            `tank-${index}`,
+            { height: 1, diameter: 2 },
+            scene
+          );
+          
+          cylinder.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
+          cylinder.scaling = new BABYLON.Vector3(scale[0], scale[1], scale[2]);
+          
+          const material = new BABYLON.StandardMaterial(`tankMat-${index}`, scene);
+          material.diffuseColor = new BABYLON.Color3(0.75, 0.75, 0.75); // Silver
+          material.specularColor = new BABYLON.Color3(0.9, 0.9, 0.9);
+          cylinder.material = material;
+          
+          cylinder.checkCollisions = true;
+          cylinder.receiveShadows = true;
+          shadowGenerator.addShadowCaster(cylinder);
+        });
+        
+        await Promise.all(loadPromises);
+        
+      } catch (error) {
+        console.error('Error loading scene:', error);
+        document.querySelector('#loading').textContent = 'Error loading scene';
+      }
+    };
+    
+    const updateLoadingProgress = (loaded, total) => {
+      const loadingEl = document.querySelector('#loading');
+      loadingEl.textContent = `Loading assets... ${loaded}/${total}`;
+      
+      if (loaded >= total) {
+        setTimeout(() => {
+          loadingEl.style.display = 'none';
+        }, 500);
+      }
+    };
+    
+    // Initialize scene
+    createScene().then(() => {
+      engine.runRenderLoop(() => {
+        scene.render();
+      });
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      engine.resize();
+    });
+    
+    // Click to enable pointer lock
+    canvas.addEventListener('click', () => {
+      canvas.requestPointerLock = canvas.requestPointerLock || 
+                                   canvas.mozRequestPointerLock || 
+                                   canvas.webkitRequestPointerLock;
+      if (canvas.requestPointerLock) {
+        canvas.requestPointerLock();
+      }
+    });
+  </script>
+</body>
+</html>
