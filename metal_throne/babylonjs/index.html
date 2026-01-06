@@ -100,7 +100,9 @@
       ground.material.diffuseColor = new BABYLON.Color3(0.482, 0.784, 0.643); // Green
       ground.receiveShadows = true;
       ground.checkCollisions = true;
-      
+      //debug
+      scene.debugLayer.show();
+
       // Load scene data
       await loadSceneData(shadowGenerator);
       
