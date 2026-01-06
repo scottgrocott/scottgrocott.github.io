@@ -1,0 +1,68 @@
+{
+  "assets": [
+    { "id": "fire_deptglb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/fire_dept/00.glb" },
+    { "id": "fire_dept_01glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/fire_dept_01/00.glb" },
+    { "id": "fire_dept_01aglb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/fire_dept_01a/00.glb" },
+    { "id": "7207glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7207/00.glb" },
+    { "id": "7207aglb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7207a/00.glb" },
+    { "id": "7215glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7215/00.glb" },
+    { "id": "7215aglb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7215a/00.glb" },
+    { "id": "7000glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7000/00.glb" },
+    { "id": "7010glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7010/00.glb" },
+    { "id": "7020glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7020/00.glb" },
+    { "id": "7030glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7030/00.glb" },
+    { "id": "7200glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7200/00.glb" },
+    { "id": "7230glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7230/00.glb" },
+    { "id": "7208glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7208/00.glb" },
+    { "id": "7290glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7290/00.glb" },
+    { "id": "7291glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7291/00.glb" },
+    { "id": "7330glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7330/00.glb" },
+    { "id": "7331glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7331/00.glb" },
+    { "id": "7332glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7332/00.glb" }
+],
+  "buildings": [
+    { "id": "fire_dept", "model": "#fire_deptglb", "position": "-154.538 0 239.218", "class": "collidable" },
+    { "id": "fire_dept_01", "model": "#fire_dept_01glb", "position": "-12.7498 0.51117 250.43003", "class": "collidable" },
+    { "id": "fire_dept_01a", "model": "#fire_dept_01aglb", "position": "-49.049 0.36778 201.448", "class": "collidable" },
+    { "id": "7207", "model": "#7207glb", "position": "-24.534 0 107.882", "class": "collidable" },
+    { "id": "7207a", "model": "#7207aglb", "position": "-24.47012 0.32057 99.61409", "class": "collidable" },
+    { "id": "7215", "model": "#7215glb", "position": "-73.51048 0.62904 184.79075", "class": "collidable" },
+    { "id": "7215a", "model": "#7215aglb", "position": "-181.7037 0 147.4006", "class": "collidable" },
+    { "id": "7000", "model": "#7000glb", "position": "73.49579 0.52302 213.82621", "class": "collidable" },
+    { "id": "7010", "model": "#7010glb", "position": "92.37906 0.5355 264.29158", "class": "collidable" },
+    { "id": "7020", "model": "#7020glb", "position": "38.77596 0.63361 230.59007", "class": "collidable" },
+    { "id": "7030", "model": "#7030glb", "position": "38.79218 0.52435 214.56726", "class": "collidable" },
+    { "id": "7200", "model": "#7200glb", "position": "30.28748 0.50423 157.27944", "class": "collidable" },
+    { "id": "7230", "model": "#7230glb", "position": "30.20997 0.62251 138.21147", "class": "collidable" },
+    { "id": "7208", "model": "#7208glb", "position": "76.69358 0.64688 145.22456", "class": "collidable" },
+    { "id": "7290", "model": "#7290glb", "position": "25.26337 0.4706 104.39384", "class": "collidable" },
+    { "id": "7291", "model": "#7291glb", "position": "56.07697 0.53924 85.03245", "class": "collidable" },
+    { "id": "7330", "model": "#7330glb", "position": "77.03785 0.67524 -82.36381", "class": "collidable" },
+    { "id": "7331", "model": "#7331glb", "position": "51.82531 0.43752 -40.52044", "class": "collidable" },
+    { "id": "7332", "model": "#7332glb", "position": "52.886 0.52139 -86.1239", "class": "collidable" }
+  ],
+  
+  "tanks": [
+    {
+      "geometry": "primitive: cylinder",
+      "material": "shader: flat; color: silver",
+      "scale": "13.10886 22.52704 13.10886",
+      "position": "137.43613 10.59534 -6.735",
+      "class": "collidable"
+    },
+    {
+      "geometry": "primitive: cylinder",
+      "material": "shader: flat; color: silver",
+      "scale": "13.10886 22.52704 13.10886",
+      "position": "137.43613 10.59534 -55.06571",
+      "class": "collidable"
+    },
+    {
+      "geometry": "primitive: cylinder",
+      "material": "shader: flat; color: silver",
+      "scale": "13.10886 22.52704 13.10886",
+      "position": "137.43613 10.59534 -102.81642",
+      "class": "collidable"
+    }
+  ]
+}
