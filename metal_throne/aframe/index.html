@@ -72,14 +72,16 @@
         
         // Create building entities
         data.buildings.forEach(building => {
-  /*  */      
+       
  if (building.id == 'green') {
   console.log('Adding green:', building.position);
+/*  
   building.setAttribute('position', {
     x: building.position.x,
     y: 194.240,
     z: building.position.z
   });
+*/ 
 }
   
           const entity = document.createElement('a-entity');
