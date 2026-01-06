@@ -41,7 +41,7 @@
     { "id": "7330", "model": "#7330glb", "position": "77.03785 0.67524 -82.36381", "class": "collidable" },
     { "id": "7331", "model": "#7331glb", "position": "51.82531 0.43752 -40.52044", "class": "collidable" },
     { "id": "7332", "model": "#7332glb", "position": "52.886 0.52139 -86.1239", "class": "collidable" },
-    { "id": "green", "model": "#greenglb", "position": "45.67154 .02 94.92152", "scale": "1.2 1.2 1.2", "class": "collidable" }
+    { "id": "green", "model": "#greenglb", "position": "45.67154 .01 94.92152", "scale": "1.2 1.2 1.2", "class": "collidable" }
   ],
   
   "tanks": [
