@@ -18,7 +18,8 @@
     { "id": "7291glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7291/00.glb" },
     { "id": "7330glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7330/00.glb" },
     { "id": "7331glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7331/00.glb" },
-    { "id": "7332glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7332/00.glb" }
+    { "id": "7332glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7332/00.glb" },
+    { "id": "greenglb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/green.glb" }
 ],
   "buildings": [
     { "id": "fire_dept", "model": "#fire_deptglb", "position": "-154.538 0 239.218", "class": "collidable" },
@@ -39,7 +40,8 @@
     { "id": "7291", "model": "#7291glb", "position": "56.07697 0.53924 85.03245", "class": "collidable" },
     { "id": "7330", "model": "#7330glb", "position": "77.03785 0.67524 -82.36381", "class": "collidable" },
     { "id": "7331", "model": "#7331glb", "position": "51.82531 0.43752 -40.52044", "class": "collidable" },
-    { "id": "7332", "model": "#7332glb", "position": "52.886 0.52139 -86.1239", "class": "collidable" }
+    { "id": "7332", "model": "#7332glb", "position": "52.886 0.52139 -86.1239", "class": "collidable" },
+    { "id": "green", "model": "#greenglb", "position": "45.67154 233.093 94.92152", "scale": "1.2 1.2 1.2", "class": "collidable" }
   ],
   
   "tanks": [
