@@ -72,21 +72,21 @@
         
         // Create building entities
         data.buildings.forEach(building => {
-       
+  /*      
  if (building.id == 'green') {
   let tempxyz = building.position.split(' ');
   tempxyz[1] = 194.8;
   building.position = tempxyz.join(' ');
   console.log('Adding green:', tempxyz);
-/*  
+ 
   building.setAttribute('position', {
     x: building.position.x,
     y: 194.240,
     z: building.position.z
   });
-*/ 
+ 
 }
-  
+ */ 
           const entity = document.createElement('a-entity');
           entity.setAttribute('id', building.id);
           entity.setAttribute('gltf-model', building.model);

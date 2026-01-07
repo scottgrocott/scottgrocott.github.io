@@ -155,10 +155,12 @@
                 const model = gltf.scene;
                 const pos = building.position.split(' ').map(Number);
                 console.log('Adding building:', building.id, 'at', pos);
+                /*
                  if (building.id == 'green') {
                   pos[1] = 195.240;
                   console.log('Adjusted green position to:', pos);
                 }
+                */
                 model.position.set(pos[0], pos[1], pos[2]);
                 model.traverse((child) => {
                   if (child.isMesh) {

@@ -125,41 +125,43 @@
             const asset = data.assets.find(a => a.id === modelId + 'glb');
             
             if (asset) {
-              BABYLON.SceneLoader.ImportMesh(
-                '',
-                '',
-                asset.src,
-                scene,
-                (meshes) => {
-                  const pos = building.position.split(' ').map(Number);
-                  
-                  meshes.forEach((mesh) => {
-                    if (mesh) {
-                      //mesh.position = new BABYLON.Vector3(pos[2], pos[1], pos[0]);
-                      mesh.position = new BABYLON.Vector3(pos[0], pos[1], -pos[2]);
-                      //mesh.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
-                      mesh.checkCollisions = true;
-                      
-                      // Enable shadows
-                      if (mesh.material) {
-                        shadowGenerator.addShadowCaster(mesh);
-                        mesh.receiveShadows = true;
-                      }
-                    }
-                  });
-                  
-                  loadedCount++;
-                  updateLoadingProgress(loadedCount, totalAssets);
-                  resolve();
-                },
-                null,
-                (scene, message, exception) => {
-                  console.error(`Error loading ${building.id}:`, message, exception);
-                  loadedCount++;
-                  updateLoadingProgress(loadedCount, totalAssets);
-                  resolve();
-                }
-              );
+BABYLON.SceneLoader.ImportMesh(
+  '',
+  '',
+  asset.src,
+  scene,
+  (meshes) => {
+    const pos = building.position.split(' ').map(Number);
+
+    // 1. Move ONLY the root node (the first element in the array)
+    const root = meshes[0];
+    if (root) {
+      // Use the same coordinate mapping that worked for your Three.js sync
+      root.position = new BABYLON.Vector3(-pos[0], pos[1], -pos[2]);
+    }
+
+    // 2. Loop through ALL meshes for properties like Shadows and Collisions
+    meshes.forEach((mesh) => {
+      if (mesh) {
+        // DO NOT set mesh.position here anymore
+        
+        mesh.checkCollisions = true;
+
+        // Only add meshes with actual geometry to the shadow generator
+        if (mesh.getClassName() === "Mesh" || mesh.getClassName() === "InstancedMesh") {
+          if (mesh.material) {
+            shadowGenerator.addShadowCaster(mesh);
+            mesh.receiveShadows = true;
+          }
+        }
+      }
+    });
+
+    loadedCount++;
+    updateLoadingProgress(loadedCount, totalAssets);
+    resolve();
+  }
+);
             } else {
               resolve();
             }
