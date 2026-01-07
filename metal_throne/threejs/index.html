@@ -182,6 +182,7 @@
         });
         
         // Create tanks
+        /*
         data.tanks.forEach((tank, index) => {
           const geometry = new THREE.CylinderGeometry(1, 1, 1, 32);
           const material = new THREE.MeshLambertMaterial({ color: 0xC0C0C0 });
@@ -197,7 +198,7 @@
           
           scene.add(cylinder);
         });
-        
+        */
       } catch (error) {
         console.error('Error loading scene:', error);
         document.querySelector('#loading').textContent = 'Error loading scene';

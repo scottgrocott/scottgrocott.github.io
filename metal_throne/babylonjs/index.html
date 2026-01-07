@@ -71,7 +71,7 @@
       camera.angularSensibility = 2000;
       
       // Enable collision
-      camera.checkCollisions = true;
+      camera.checkCollisions = false;
       camera.applyGravity = false;
       camera.ellipsoid = new BABYLON.Vector3(1, 0.9, 1);
       scene.gravity = new BABYLON.Vector3(0, -0.15, 0);
@@ -102,7 +102,7 @@
       ground.receiveShadows = true;
       ground.checkCollisions = true;
       //debug
-      scene.debugLayer.show();
+      //scene.debugLayer.show();
 
       // Load scene data
       await loadSceneData(shadowGenerator);
@@ -136,7 +136,7 @@
                   meshes.forEach((mesh) => {
                     if (mesh) {
                       //mesh.position = new BABYLON.Vector3(pos[2], pos[1], pos[0]);
-                      mesh.position = new BABYLON.Vector3(-pos[0], pos[1], -pos[2]);
+                      mesh.position = new BABYLON.Vector3(pos[0], pos[1], -pos[2]);
                       //mesh.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
                       mesh.checkCollisions = true;
                       
@@ -167,6 +167,7 @@
         });
         
         // Create tanks
+        /*
         data.tanks.forEach((tank, index) => {
           const pos = tank.position.split(' ').map(Number);
           const scale = tank.scale.split(' ').map(Number);
@@ -189,7 +190,7 @@
           cylinder.receiveShadows = true;
           shadowGenerator.addShadowCaster(cylinder);
         });
-        
+        */
         await Promise.all(loadPromises);
         
       } catch (error) {
