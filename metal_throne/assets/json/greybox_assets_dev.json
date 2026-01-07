@@ -20,9 +20,9 @@
     { "id": "7331glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7331/00.glb" },
     { "id": "7332glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/7332/00.glb" },
     { "id": "greenglb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/green.glb" },
-    { "id": "tank01glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/tank-0.glb" },
-    { "id": "tank02glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/tank-0.glb" },
-    { "id": "tank03glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/tank-0.glb" }
+    { "id": "tank01glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/tank-01.glb" },
+    { "id": "tank02glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/tank-01.glb" },
+    { "id": "tank03glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/tank-01.glb" }
 ],
   "buildings": [
     { "id": "fire_dept", "model": "#fire_deptglb", "position": "0 0 0", "class": "collidable" },
