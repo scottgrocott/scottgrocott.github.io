@@ -75,6 +75,8 @@
        
  if (building.id == 'green') {
   let tempxyz = building.position.split(' ');
+  tempxyz[1] = 194.240;
+  building.position = tempxyz.join(' ');
   console.log('Adding green:', tempxyz);
 /*  
   building.setAttribute('position', {
