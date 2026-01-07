@@ -41,8 +41,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script>
-    const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets.json';
-    
+    //const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets.json';
+    const JSON_URL = 'http://localhost:81/metal_throne/assets/json/greybox_assets_dev.json';
+
     let scene, camera, renderer, loader;
     let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
     let velocity = new THREE.Vector3();
@@ -155,7 +156,7 @@
                 const pos = building.position.split(' ').map(Number);
                 console.log('Adding building:', building.id, 'at', pos);
                  if (building.id == 'green') {
-                  pos[1] = 194.240;
+                  pos[1] = 195.240;
                   console.log('Adjusted green position to:', pos);
                 }
                 model.position.set(pos[0], pos[1], pos[2]);
@@ -226,9 +227,9 @@
       const time = performance.now();
       const delta = (time - prevTime) / 1000;
       
-      velocity.x -= velocity.x * 10.0 * delta;
-      velocity.z -= velocity.z * 10.0 * delta;
-      velocity.y -= 9.8 * delta; // gravity
+      velocity.x -= velocity.x * 4.0 * delta;
+      velocity.z -= velocity.z * 4.0 * delta;
+      velocity.y -= .8 * delta; // gravity
       
       direction.z = Number(moveForward) - Number(moveBackward);
       direction.x = Number(moveRight) - Number(moveLeft);

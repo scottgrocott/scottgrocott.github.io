@@ -49,7 +49,8 @@
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
   
   <script>
-    const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets.json';
+    //const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets.json';
+    const JSON_URL = 'http://localhost:81/metal_throne/assets/json/greybox_assets_dev.json';
     
     const canvas = document.getElementById('renderCanvas');
     const engine = new BABYLON.Engine(canvas, true);
@@ -60,8 +61,8 @@
       scene.clearColor = new BABYLON.Color3(0.529, 0.808, 0.922); // Sky blue
       scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
       scene.fogColor = new BABYLON.Color3(0.529, 0.808, 0.922);
-      scene.fogStart = 100;
-      scene.fogEnd = 750;
+      scene.fogStart = 10000;
+      scene.fogEnd = 75000;
       
       // Camera with collision
       camera = new BABYLON.UniversalCamera('camera', new BABYLON.Vector3(0, 1.6, 0), scene);
@@ -71,7 +72,7 @@
       
       // Enable collision
       camera.checkCollisions = true;
-      camera.applyGravity = true;
+      camera.applyGravity = false;
       camera.ellipsoid = new BABYLON.Vector3(1, 0.9, 1);
       scene.gravity = new BABYLON.Vector3(0, -0.15, 0);
       
@@ -95,7 +96,7 @@
       shadowGenerator.blurKernel = 32;
       
       // Ground
-      const ground = BABYLON.MeshBuilder.CreateGround('ground', { width: 1000, height: 1000 }, scene);
+      const ground = BABYLON.MeshBuilder.CreateGround('ground', { width: 10000, height: 10000 }, scene);
       ground.material = new BABYLON.StandardMaterial('groundMat', scene);
       ground.material.diffuseColor = new BABYLON.Color3(0.482, 0.784, 0.643); // Green
       ground.receiveShadows = true;
@@ -134,7 +135,9 @@
                   
                   meshes.forEach((mesh) => {
                     if (mesh) {
-                      mesh.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
+                      //mesh.position = new BABYLON.Vector3(pos[2], pos[1], pos[0]);
+                      mesh.position = new BABYLON.Vector3(-pos[0], pos[1], -pos[2]);
+                      //mesh.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
                       mesh.checkCollisions = true;
                       
                       // Enable shadows
@@ -174,7 +177,7 @@
             scene
           );
           
-          cylinder.position = new BABYLON.Vector3(pos[0], pos[1], pos[2]);
+          cylinder.position = new BABYLON.Vector3(-pos[0], pos[1], -pos[2]);
           cylinder.scaling = new BABYLON.Vector3(scale[0], scale[1], scale[2]);
           
           const material = new BABYLON.StandardMaterial(`tankMat-${index}`, scene);

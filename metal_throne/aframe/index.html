@@ -24,14 +24,14 @@
   
   <a-scene>
     <!-- Sky -->
-    <a-sky color="#87CEEB"></a-sky>
+    <a-sky color="#87CEEB" radius="10000"></a-sky>
     
     <!-- Lighting -->
     <a-light type="ambient" color="#BBB"></a-light>
     <a-light type="directional" color="#FFF" intensity="0.6" position="1 1 0"></a-light>
     
     <!-- Ground plane -->
-    <a-plane position="0 0 0" rotation="-90 0 0" width="1000" height="1000" color="#7BC8A4" shadow></a-plane>
+    <a-plane position="0 0 0" rotation="-90 0 0" width="10000" height="10000" color="tan" shadow></a-plane>
     
     <!-- Assets will be dynamically loaded here -->
     <a-assets id="asset-container" timeout="30000">
@@ -42,13 +42,13 @@
     
     <!-- Camera with WASD controls -->
     <a-entity id="rig" position="0 1.6 0">
-      <a-entity camera look-controls wasd-controls="acceleration: 40" position="0 0 0"></a-entity>
+      <a-entity camera="far: 20000" look-controls wasd-controls="acceleration: 100;fly: true" position="0 0 0"></a-entity>
     </a-entity>
   </a-scene>
 
   <script>
-    const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets.json';
-    
+    //const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets.json';
+    const JSON_URL = 'http://localhost:81/metal_throne/assets/json/greybox_assets_dev.json';
     async function loadScene() {
       try {
         const response = await fetch(JSON_URL);
@@ -75,7 +75,7 @@
        
  if (building.id == 'green') {
   let tempxyz = building.position.split(' ');
-  tempxyz[1] = 194.240;
+  tempxyz[1] = 194.8;
   building.position = tempxyz.join(' ');
   console.log('Adding green:', tempxyz);
 /*  
