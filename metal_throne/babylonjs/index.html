@@ -67,7 +67,7 @@
       // Camera with collision
       camera = new BABYLON.UniversalCamera('camera', new BABYLON.Vector3(0, 1.6, 0), scene);
       camera.attachControl(canvas, true);
-      camera.speed = 0.5;
+      camera.speed = 1;
       camera.angularSensibility = 2000;
       
       // Enable collision
@@ -137,7 +137,7 @@ BABYLON.SceneLoader.ImportMesh(
     const root = meshes[0];
     if (root) {
       // Use the same coordinate mapping that worked for your Three.js sync
-      root.position = new BABYLON.Vector3(-pos[0], pos[1], -pos[2]);
+      root.position = new BABYLON.Vector3(-pos[0], pos[1], pos[2]);
     }
 
     // 2. Loop through ALL meshes for properties like Shadows and Collisions
