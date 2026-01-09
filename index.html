@@ -1,6 +1,16 @@
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EBGF4V165P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EBGF4V165P');
+</script>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
@@ -13,193 +23,177 @@
         <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
         <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="css/styles.css" rel="stylesheet" />
+        <link href="https://scottgrocott.github.io/css/styles.css" rel="stylesheet" />
+                <!-- Custom CSS -->
+        <link href="https://scottgrocott.github.io/css/custom.css" rel="stylesheet" />
     </head>
-    <body id="page-top">
-        <!-- Navigation-->
-        <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
-            <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="#page-top">Scott Grocott</a>
-                <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                    Menu
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#signup">Contact</a></li>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="bi bi-tools me-2"></i>Scott Grocott - Creative Technologist</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="https://scottgrocott.github.io/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link " href="https://scottgrocott.github.io/blog/">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link " href="https://scottgrocott.github.io/metal_throne/">Metal Throne</a></li>
+                    <li class="nav-item" id="cray_nav"><a class="nav-link " href="https://scottgrocott.github.io/164cray/">1:64 Cray!</a></li>
+                    <li class="nav-item" id="music_nav"><a class="nav-link " href="https://scottgrocott.github.io/music/">Music</a></li>
+                
+                </ul>
+            </div>
+        </div>
+    </nav>
+<main class="container mb-5">
+    <div class="row g-4">
+        
+        <!-- Sidebar / Intro -->
+        <div class="col-lg-4">
+            <div class="card p-4 h-100 bg-white">
+                <div class="text-center mb-4">
+                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center text-white mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-cpu fs-1"></i>
+                    </div>
+                    <h1 class="h3 fw-bold mb-0">Scott Grocott</h1>
+                    <p class="text-muted">Principal Engineer</p>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-4">
+                    <h6 class="fw-bold text-uppercase small text-primary mb-3">Core Expertise</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark border">Local-First AI</span>
+                        <span class="badge bg-light text-dark border">Ollama</span>
+                        <span class="badge bg-light text-dark border">WebGL (Three.js,Babylon.js)</span>
+                        <span class="badge bg-light text-dark border">Node.js</span>
+                        <span class="badge bg-light text-dark border">Full-Stack Architecture</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h6 class="fw-bold text-uppercase small text-primary mb-3">Personal Ops</h6>
+                    <p class="small text-muted mb-0">Running <strong>BuggyWhip v0.1.2</strong> — private AI-driven systems management.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Experience Timeline -->
+        <div class="col-lg-8" id="experience">
+            
+            <!-- Grocott Labs -->
+            <div class="card mb-4 border-start border-primary border-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h4 class="fw-bold mb-0 text-primary">Grocott Labs</h4>
+                            <span class="text-muted fw-semibold">Principal Engineer / Indie Developer</span>
+                        </div>
+                        <span class="badge bg-primary">2024 - Current</span>
+                    </div>
+                    <p class="text-secondary small mb-4">Focus: Privacy-focused AI agents and WebGL immersive experiences.</p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded shadow-sm border h-100">
+                                <h6 class="fw-bold small mb-2"><i class="bi bi-robot me-2"></i>BuggyWhip</h6>
+                                <p class="x-small text-muted mb-0">A JSON based, LLM-agnostic AI prompt injection framework for Model Context Protocol management.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded shadow-sm border h-100">
+                                <h6 class="fw-bold small mb-2"><i class="bi bi-controller me-2"></i><a href="https://scottgrocott.github.io/metal_throne/">Metal Throne</a></h6>
+                                <p class="x-small text-muted mb-0">Browser-based Dystopian FPS using WebGL. Integrated LLM APIs for dynamic in-game debugging.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 164Cray! -->
+            <div class="card mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h4 class="fw-bold mb-0"><a href="https://www.youtube.com/@164cray">164Cray! - Tiny Adventures</a></h4>
+                        <span class="text-muted small">2021 - Current</span>
+                    </div>
+                    <h6 class="text-primary mb-3">Technical Producer / Creative Technologist</h6>
+                    <ul class="small text-secondary ps-3 mb-0">
+                        <li>Engineered magnetic mechanical animation systems for motion control.</li>
+                        <li>Full-cycle production using DaVinci Resolve and Reason DAW.</li>
+                        <li>Real-time vehicle animation systems for 1:64 scale miniatures.</li>
                     </ul>
                 </div>
             </div>
-        </nav>
-        <!-- Masthead-->
-        <header class="masthead">
-            <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
-                <div class="d-flex justify-content-center">
-                    <div class="text-center">
-                        <h1 class="mx-auto my-0 text-uppercase">Scott Grocott</h1>
-                        <h2 class="text-white-50 mx-auto mt-2 mb-5">Creative Technologist</h2>
-                        <a class="btn btn-primary" href="/metal_throne/">Metal Throne</a>
+
+            <!-- Club DV8 -->
+            <div class="card bg-dark text-white mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h4 class="fw-bold mb-0"><a href="https://www.clubdv805.com/">Club DV8</a></h4>
+                        <span class="text-info small">2019 - Current</span>
                     </div>
+                    <h6 class="text-info">Technical Lead / Synthesizer-Guitarist</h6>
+                    <p class="small opacity-75">Developed browser-based MIDI preset and setlist management systems for live performance integration.</p>
                 </div>
             </div>
-        </header>
-        <!-- About-->
-        <section class="about-section text-center" id="about">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-lg-8">
-                        <h2 class="text-white mb-4">Built with Bootstrap 5</h2>
-                        <p class="text-white-50">
-                            Grayscale is a free Bootstrap theme created by Start Bootstrap. It can be yours right now, simply download the template on
-                            <a href="https://startbootstrap.com/theme/grayscale/">the preview page.</a>
-                            The theme is open source, and you can use it for any purpose, personal or commercial.
-                        </p>
-                    </div>
-                </div>
-                <img class="img-fluid" src="assets/img/ipad.png" alt="..." />
-            </div>
-        </section>
-        <!-- Projects-->
-        <section class="projects-section bg-light" id="projects">
-            <div class="container px-4 px-lg-5">
-                <!-- Featured Project Row-->
-                <div class="row gx-0 mb-4 mb-lg-5 align-items-center">
-                    <div class="col-xl-8 col-lg-7"><img class="img-fluid mb-3 mb-lg-0" src="assets/img/bg-masthead.jpg" alt="..." /></div>
-                    <div class="col-xl-4 col-lg-5">
-                        <div class="featured-text text-center text-lg-left">
-                            <h4>Shoreline</h4>
-                            <p class="text-black-50 mb-0">Grayscale is open source and MIT licensed. This means you can use it for any project - even commercial projects! Download it, customize it, and publish your website!</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Project One Row-->
-                <div class="row gx-0 mb-5 mb-lg-0 justify-content-center">
-                    <div class="col-lg-6"><img class="img-fluid" src="assets/img/demo-image-01.jpg" alt="..." /></div>
-                    <div class="col-lg-6">
-                        <div class="bg-black text-center h-100 project">
-                            <div class="d-flex h-100">
-                                <div class="project-text w-100 my-auto text-center text-lg-left">
-                                    <h4 class="text-white">Misty</h4>
-                                    <p class="mb-0 text-white-50">An example of where you can put an image of a project, or anything else, along with a description.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Project Two Row-->
-                <div class="row gx-0 justify-content-center">
-                    <div class="col-lg-6"><img class="img-fluid" src="assets/img/demo-image-02.jpg" alt="..." /></div>
-                    <div class="col-lg-6 order-lg-first">
-                        <div class="bg-black text-center h-100 project">
-                            <div class="d-flex h-100">
-                                <div class="project-text w-100 my-auto text-center text-lg-right">
-                                    <h4 class="text-white">Mountains</h4>
-                                    <p class="mb-0 text-white-50">Another example of a project with its respective description. These sections work well responsively as well!</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+            <!-- Historical Work Table -->
+            <div class="mt-5">
+                <h5 class="fw-bold mb-3"><i class="bi bi-history me-2"></i>Consulting & Career Highlights</h5>
+                <div class="table-responsive bg-white rounded shadow-sm">
+                    <table class="table table-sm table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr class="small text-uppercase">
+                                <th class="ps-3 py-3">Organization</th>
+                                <th>Focus</th>
+                                <th class="text-end pe-3">Period</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            <tr>
+                                <td class="ps-3 fw-bold">Arclight Media</td>
+                                <td class="text-muted">High-traffic Drupal/CodeIgniter systems</td>
+                                <td class="text-end pe-3">2012-2018</td>
+                            </tr>
+                            <tr>
+                                <td class="ps-3 fw-bold">Remtrol Inc.</td>
+                                <td class="text-muted">Perl, Apache::ASP, MySQL development</td>
+                                <td class="text-end pe-3">2002-2008</td>
+                            </tr>
+                            <tr>
+                                <td class="ps-3 fw-bold">Cellular One</td>
+                                <td class="text-muted">Software Engineer (ASP.NET/SQL)</td>
+                                <td class="text-end pe-3">2001-2002</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </section>
-        <!-- Signup-->
-        <section class="signup-section" id="signup">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5">
-                    <div class="col-md-10 col-lg-8 mx-auto text-center">
-                        <i class="far fa-paper-plane fa-2x mb-2 text-white"></i>
-                        <h2 class="text-white mb-5">Subscribe to receive updates!</h2>
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- * * SB Forms Contact Form * *-->
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- This form is pre-integrated with SB Forms.-->
-                        <!-- To make this form functional, sign up at-->
-                        <!-- https://startbootstrap.com/solution/contact-forms-->
-                        <!-- to get an API token!-->
-                        <form class="form-signup" id="contactForm" data-sb-form-api-token="API_TOKEN">
-                            <!-- Email address input-->
-                            <div class="row input-group-newsletter">
-                                <div class="col"><input class="form-control" id="emailAddress" type="email" placeholder="Enter email address..." aria-label="Enter email address..." data-sb-validations="required,email" /></div>
-                                <div class="col-auto"><button class="btn btn-primary disabled" id="submitButton" type="submit">Notify Me!</button></div>
-                            </div>
-                            <div class="invalid-feedback mt-2" data-sb-feedback="emailAddress:required">An email is required.</div>
-                            <div class="invalid-feedback mt-2" data-sb-feedback="emailAddress:email">Email is not valid.</div>
-                            <!-- Submit success message-->
-                            <!---->
-                            <!-- This is what your users will see when the form-->
-                            <!-- has successfully submitted-->
-                            <div class="d-none" id="submitSuccessMessage">
-                                <div class="text-center mb-3 mt-2 text-white">
-                                    <div class="fw-bolder">Form submission successful!</div>
-                                    To activate this form, sign up at
-                                    <br />
-                                    <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
-                                </div>
-                            </div>
-                            <!-- Submit error message-->
-                            <!---->
-                            <!-- This is what your users will see when there is-->
-                            <!-- an error submitting the form-->
-                            <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3 mt-2">Error sending message!</div></div>
-                        </form>
-                    </div>
-                </div>
+
+        </div>
+    </div>
+</main>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark mt-5">
+        <div class="container text-center">
+            <p class="m-0 text-white">Copyright &copy; 2026 Scott Grocott </p>
+            <div class="mt-2">
+                <span style="color: #ffffff;">Contact:</span><br>
+                <span><img src="https://scottgrocott.github.io/assets/img/email.png" alt="Contact Scott Grocott" width="387" height="53"></span>
+<!--
+                <a href="#" class="text-white-50 me-3 text-decoration-none small">Privacy Policy</a>
+                <a href="#" class="text-white-50 text-decoration-none small">Terms of Service</a>
+            -->
             </div>
-        </section>
-        <!-- Contact-->
-        <section class="contact-section bg-black">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5">
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card py-4 h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-map-marked-alt text-primary mb-2"></i>
-                                <h4 class="text-uppercase m-0">Address</h4>
-                                <hr class="my-4 mx-auto" />
-                                <div class="small text-black-50">4923 Market Street, Orlando FL</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card py-4 h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-envelope text-primary mb-2"></i>
-                                <h4 class="text-uppercase m-0">Email</h4>
-                                <hr class="my-4 mx-auto" />
-                                <div class="small text-black-50"><a href="#!">hello@yourdomain.com</a></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card py-4 h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-mobile-alt text-primary mb-2"></i>
-                                <h4 class="text-uppercase m-0">Phone</h4>
-                                <hr class="my-4 mx-auto" />
-                                <div class="small text-black-50">+1 (555) 902-8832</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="social d-flex justify-content-center">
-                    <a class="mx-2" href="#!"><i class="fab fa-twitter"></i></a>
-                    <a class="mx-2" href="#!"><i class="fab fa-facebook-f"></i></a>
-                    <a class="mx-2" href="#!"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
-        </section>
-        <!-- Footer-->
-        <footer class="footer bg-black small text-center text-white-50"><div class="container px-4 px-lg-5">Copyright &copy; Your Website 2023</div></footer>
-        <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Core theme JS-->
-        <script src="js/scripts.js"></script>
-        <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-        <!-- * *                               SB Forms JS                               * *-->
-        <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
-        <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-        <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
-    </body>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5.3 JS Bundle CDN -->
+    <script src="https://scottgrocott.github.io/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
