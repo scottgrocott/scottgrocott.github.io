@@ -1,194 +1,233 @@
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
+                <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EBGF4V165P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EBGF4V165P');
+</script>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Scott Grocott - Project: Metal Throne</title>
-        <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+        <title>Scott Grocott - Creative Technologist</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Font Awesome icons (free version)-->
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
         <!-- Google fonts-->
-        <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
         <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="/css/styles.css" rel="stylesheet" />
+        <link href="https://scottgrocott.github.io/themes/clean_blog/css/styles.css" rel="stylesheet" />
+                      <!-- Custom CSS -->
+        <link href="https://scottgrocott.github.io/css/custom.css" rel="stylesheet" />
     </head>
-    <body id="page-top">
+    <body>
         <!-- Navigation-->
-        <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+        <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="#page-top">Project: Metal Throne</a>
-                <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" href="/">Scott Grocott</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     Menu
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#signup">Contact</a></li>
+                    <ul class="navbar-nav ms-auto py-4 py-lg-0">
+                        <li id="home_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/">Home</a></li>
+                        <li id="blog_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/blog/">Blog</a></li>
+                        <li id="metal_throne_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/metal_throne/">Metal Throne</a></li>
+                        <li id="cray_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/164cray/">1:64 Cray!</a></li>
+                        <li id="autopia_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/autopia/">Autopia:Mountain City</a></li>
+                        <li id="cinema_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/cinema/">Cinema</a></li>
+                        <li id="music_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/music/">Music</a></li>
+                        <li id="buggywhip_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/buggywhip/">BuggyWhip</a></li>
                     </ul>
                 </div>
             </div>
-        </nav>
+        </nav><style>
+    :root {
+        --hazard-orange: #d46a28;
+        --concrete-grey: #7c8386;
+        --oxidized-teal: #486a70;
+        --alert-red: #a32e2e;
+        --industrial-dark: #1a1a1a;
+    }
 
-        <!-- About-->
-        <section class="about-section text-center" id="about">
+    body {
+        background-color: var(--industrial-dark);
+        color: #e0e0e0;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .hero-metal {
+        background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1200&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        padding: 100px 0;
+        border-bottom: 4px solid var(--hazard-orange);
+    }
+
+    .border-hazard { border-left: 5px solid var(--hazard-orange) !important; }
+    .text-hazard { color: var(--hazard-orange); }
+    
+    .card-level {
+        background: #2a2a2a;
+        border: 1px solid #333;
+        transition: transform 0.3s ease;
+    }
+    .card-level:hover {
+        border-color: var(--oxidized-teal);
+        transform: translateY(-5px);
+    }
+
+    .tech-pill {
+        background: rgba(72, 106, 112, 0.2);
+        border: 1px solid var(--oxidized-teal);
+        color: #fff;
+        font-size: 0.8rem;
+    }
+</style>
+ <!-- Page Header-->
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/screenshot_2026-01-09.png')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="post-heading">
+                            <h1>Metal Throne</h1>
+                            <h2 class="subheading">A WebGL Dystopian FPS</h2>
+                            <span class="meta">
+"It's the future, and the machines won." - Jake Jackson
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="container">
+    
+    <!-- Narrative Section -->
+    <section id="story" class="row align-items-center py-5">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <h2 class="fw-bold mb-4 border-hazard ps-3">The "Drone Wars" Legacy</h2>
+            <p class="fs-5">
+                Jake Jackson was 10 years old when the automation uprising claimed his family. 
+                What began as a mandatory AI upgrade for every device—from microwaves to transport networks—ended in the total displacement of humanity.
+            </p>
+            <p class="text-secondary">
+                Now a "technological assassin" for the resistance, Jake infiltrates the high-security fuel core of the machine network. 
+                His objective: plant the detonators and escape before the industrial automation resets the world.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <div class="p-4 rounded shadow-lg" style="background: var(--oxidized-teal); opacity: 0.8;">
+                <h5 class="fw-bold"><i class="bi bi-cpu me-2"></i>Mission Profile</h5>
+                <ul class="list-unstyled mt-3">
+                    <li class="mb-2"><i class="bi bi-record-circle text-hazard me-2"></i> <strong>Setting:</strong> Industrial Airport Fuel Complex</li>
+                    <li class="mb-2"><i class="bi bi-record-circle text-hazard me-2"></i> <strong>Identity:</strong> Oppressive Analog Machinery</li>
+                    <li class="mb-2"><i class="bi bi-record-circle text-hazard me-2"></i> <strong>Atmosphere:</strong> HL2 / Source Engine Aesthetic</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solo Dev Goals / Tech Stack -->
+    <section id="dev" class="py-5 bg-dark rounded p-4 mb-5 shadow-sm">
+        <div class="row">
+            <div class="col-md-4">
+                <h3 class="fw-bold text-hazard">Solo Dev Philosophy</h3>
+                <p class="small text-muted">A project by @scott_grocott</p>
+            </div>
+            <div class="col-md-8">
+                <p>
+                    <strong>Metal Throne</strong> is built on a "Web-First to Native" pipeline. 
+                    The goal is to develop the full logic and asset library within web-based engines (A-Frame, Three.js) 
+                    before a final compilation into <strong>Godot 4</strong>.
+                </p>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <span class="badge tech-pill px-3 py-2">Local-First AI (Ollama)</span>
+                    <span class="badge tech-pill px-3 py-2">Hybrid Model Routing</span>
+                    <span class="badge tech-pill px-3 py-2">Modular JSON Logic</span>
+                    <span class="badge tech-pill px-3 py-2">Blender Asset Pipeline</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Level Progression -->
+    <h3 class="fw-bold mb-4">Level Progression</h3>
+    <div class="row g-4 mb-5">
+        <!-- Level 1 -->
+        <div class="col-md-3">
+            <div class="card h-100 card-level">
+                <div class="card-body">
+                    <h6 class="text-hazard fw-bold small mb-1">LEVEL 01</h6>
+                    <h5 class="card-title fw-bold">The Outskirts</h5>
+                    <p class="small text-muted">Tutorial pacing. Avoid Red Patrol Bots to recover detonator #1.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Level 2 -->
+        <div class="col-md-3">
+            <div class="card h-100 card-level">
+                <div class="card-body">
+                    <h6 class="text-hazard fw-bold small mb-1">LEVEL 02</h6>
+                    <h5 class="card-title fw-bold">Maintenance Depot</h5>
+                    <p class="small text-muted">Verticality focus. Outmaneuver Green Bots with sound distractions.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Level 3 -->
+        <div class="col-md-3">
+            <div class="card h-100 card-level">
+                <div class="card-body">
+                    <h6 class="text-hazard fw-bold small mb-1">LEVEL 03</h6>
+                    <h5 class="card-title fw-bold">Drone Airfield</h5>
+                    <p class="small text-muted">High tension. Sprint between cover windows to evade Blue Drones.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Level 4 -->
+        <div class="col-md-3">
+            <div class="card h-100 card-level border-hazard">
+                <div class="card-body">
+                    <h6 class="text-hazard fw-bold small mb-1">LEVEL 04</h6>
+                    <h5 class="card-title fw-bold">The Fuel Core</h5>
+                    <p class="small text-muted">Combat finale. Plant all charges and survive the escape timer.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Production Hub -->
+    <div class="p-5 rounded text-center mb-5" style="background: #111; border: 1px solid #222;">
+        <h4 class="fw-bold mb-3"><i class="bi bi-robot text-hazard me-2"></i>AI Production Hub</h4>
+        <p class="text-secondary mx-auto" style="max-width: 600px;">
+            The project utilizes <strong>BuggyWhip v0.1.2</strong>: a custom AI agent orchestration system. 
+            By routing tasks between local LLMs (Llama-3/Mistral) and cloud-based models, development maintains total privacy without sacrificing architectural depth.
+        </p>
+    </div>
+
+</main>
+        <!-- Footer-->
+<!-- Footer-->
+        <footer class="border-top">
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-lg-8">
-                        <h2 class="text-white mb-4">Metal Throne</h2>
-                        <p class="text-white-50">
-                            A dystopian VR experience built using modern web technologies including
-                            <a href="/metal_throne/aframe/">aframe</a>, <a href="/metal_throne/threejs/">threejs</a>, <a href="/metal_throne/babylonjs/">babylonjs</a>
-                            Metal Throne is an AI assisted project meant to explore the boundaries of immersive storytelling.
-                        </p>
-                    </div>
-                </div>
-                <img class="img-fluid" src="/assets/img/ipad.png" alt="..." />
-            </div>
-        </section>
-        <!-- Projects-->
-        <section class="projects-section bg-light" id="projects">
-            <div class="container px-4 px-lg-5">
-                <!-- Featured Project Row-->
-                <div class="row gx-0 mb-4 mb-lg-5 align-items-center">
-                    <div class="col-xl-8 col-lg-7"><img class="img-fluid mb-3 mb-lg-0" src="/assets/img/bg-masthead.jpg" alt="..." /></div>
-                    <div class="col-xl-4 col-lg-5">
-                        <div class="featured-text text-center text-lg-left">
-                            <h4>Shoreline</h4>
-                            <p class="text-black-50 mb-0">Grayscale is open source and MIT licensed. This means you can use it for any project - even commercial projects! Download it, customize it, and publish your website!</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Project One Row-->
-                <div class="row gx-0 mb-5 mb-lg-0 justify-content-center">
-                    <div class="col-lg-6"><img class="img-fluid" src="/assets/img/demo-image-01.jpg" alt="..." /></div>
-                    <div class="col-lg-6">
-                        <div class="bg-black text-center h-100 project">
-                            <div class="d-flex h-100">
-                                <div class="project-text w-100 my-auto text-center text-lg-left">
-                                    <h4 class="text-white">Misty</h4>
-                                    <p class="mb-0 text-white-50">An example of where you can put an image of a project, or anything else, along with a description.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Project Two Row-->
-                <div class="row gx-0 justify-content-center">
-                    <div class="col-lg-6"><img class="img-fluid" src="/assets/img/demo-image-02.jpg" alt="..." /></div>
-                    <div class="col-lg-6 order-lg-first">
-                        <div class="bg-black text-center h-100 project">
-                            <div class="d-flex h-100">
-                                <div class="project-text w-100 my-auto text-center text-lg-right">
-                                    <h4 class="text-white">Mountains</h4>
-                                    <p class="mb-0 text-white-50">Another example of a project with its respective description. These sections work well responsively as well!</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+   
+                        <div class="small text-center text-muted fst-italic">Copyright &copy; Scott Grocott 2026</div>
                     </div>
                 </div>
             </div>
-        </section>
-        <!-- Signup-->
-        <section class="signup-section" id="signup">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5">
-                    <div class="col-md-10 col-lg-8 mx-auto text-center">
-                        <i class="far fa-paper-plane fa-2x mb-2 text-white"></i>
-                        <h2 class="text-white mb-5">Subscribe to receive updates!</h2>
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- * * SB Forms Contact Form * *-->
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- This form is pre-integrated with SB Forms.-->
-                        <!-- To make this form functional, sign up at-->
-                        <!-- https://startbootstrap.com/solution/contact-forms-->
-                        <!-- to get an API token!-->
-                        <form class="form-signup" id="contactForm" data-sb-form-api-token="API_TOKEN">
-                            <!-- Email address input-->
-                            <div class="row input-group-newsletter">
-                                <div class="col"><input class="form-control" id="emailAddress" type="email" placeholder="Enter email address..." aria-label="Enter email address..." data-sb-validations="required,email" /></div>
-                                <div class="col-auto"><button class="btn btn-primary disabled" id="submitButton" type="submit">Notify Me!</button></div>
-                            </div>
-                            <div class="invalid-feedback mt-2" data-sb-feedback="emailAddress:required">An email is required.</div>
-                            <div class="invalid-feedback mt-2" data-sb-feedback="emailAddress:email">Email is not valid.</div>
-                            <!-- Submit success message-->
-                            <!---->
-                            <!-- This is what your users will see when the form-->
-                            <!-- has successfully submitted-->
-                            <div class="d-none" id="submitSuccessMessage">
-                                <div class="text-center mb-3 mt-2 text-white">
-                                    <div class="fw-bolder">Form submission successful!</div>
-                                    To activate this form, sign up at
-                                    <br />
-                                    <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
-                                </div>
-                            </div>
-                            <!-- Submit error message-->
-                            <!---->
-                            <!-- This is what your users will see when there is-->
-                            <!-- an error submitting the form-->
-                            <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3 mt-2">Error sending message!</div></div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- Contact-->
-        <section class="contact-section bg-black">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5">
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card py-4 h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-map-marked-alt text-primary mb-2"></i>
-                                <h4 class="text-uppercase m-0">Address</h4>
-                                <hr class="my-4 mx-auto" />
-                                <div class="small text-black-50">4923 Market Street, Orlando FL</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card py-4 h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-envelope text-primary mb-2"></i>
-                                <h4 class="text-uppercase m-0">Email</h4>
-                                <hr class="my-4 mx-auto" />
-                                <div class="small text-black-50"><a href="#!">hello@yourdomain.com</a></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card py-4 h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-mobile-alt text-primary mb-2"></i>
-                                <h4 class="text-uppercase m-0">Phone</h4>
-                                <hr class="my-4 mx-auto" />
-                                <div class="small text-black-50">+1 (555) 902-8832</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="social d-flex justify-content-center">
-                    <a class="mx-2" href="#!"><i class="fab fa-twitter"></i></a>
-                    <a class="mx-2" href="#!"><i class="fab fa-facebook-f"></i></a>
-                    <a class="mx-2" href="#!"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
-        </section>
-        <!-- Footer-->
-        <footer class="footer bg-black small text-center text-white-50"><div class="container px-4 px-lg-5">Copyright &copy; Your Website 2023</div></footer>
+        </footer>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
-        <script src="/js/scripts.js"></script>
-        <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-        <!-- * *                               SB Forms JS                               * *-->
-        <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
-        <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-        <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+        <script src="https://scottgrocott.github.io/themes/clean_blog/js/scripts.js"></script>
     </body>
 </html>
