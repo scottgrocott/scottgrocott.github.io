@@ -11,3 +11,7 @@
     --bs-bg-opacity: 1;
     background-color: rgba(72,22,88,1) !important;
 }
+.text-primary {
+    --bs-text-opacity: 1;
+    background-color: rgba(72,22,88,1) !important;
+}
