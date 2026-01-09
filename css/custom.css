@@ -13,5 +13,5 @@
 }
 .text-primary {
     --bs-text-opacity: 1;
-    background-color: rgba(72,22,88,1) !important;
+    color: rgba(72,22,88,1) !important;
 }
