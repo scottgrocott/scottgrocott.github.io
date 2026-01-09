@@ -1,6 +1,6 @@
-.nav-item #164_nav {
-    display:none;
+#164_nav {
+    display:none !important;
 }
-.nav-item #music_nav {
+#music_nav {
     display:none;
 }
