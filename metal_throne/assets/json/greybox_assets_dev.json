@@ -44,7 +44,7 @@
     { "id": "7330", "model": "#7330glb", "position": "215.33606 0 -56.042", "scale": "0 0 0","rotation": "0 0 0", "class": "collidable" },
     { "id": "7331", "model": "#7331glb", "position": "193.45134 0 0",  "scale": "0 0 0","rotation": "0 0 0","class": "collidable" },
     { "id": "7332", "model": "#7332glb", "position": "193.51246 0 -37.65817",  "scale": "0 0 0","rotation": "0 0 0","class": "collidable" },
-    { "id": "green", "model": "#greenglb", "position": "0 0 0", "scale": "0 0 0","rotation": "0 0 0", "class": "collidable" },
+    { "id": "green", "model": "#greenglb", "position": "0 -1.5 0", "scale": "0 0 0","rotation": "0 0 0", "class": "collidable" },
     { "id": "tank01", "model": "#tank01glb", "position": "280.49769 0 -.735",  "scale": "0 0 0","rotation": "0 0 0","class": "collidable" },
     { "id": "tank02", "model": "#tank02glb", "position": "280.49769 0 -49.06571",  "scale": "0 0 0","rotation": "0 0 0","class": "collidable" },
     { "id": "tank03", "model": "#tank03glb", "position": "280.49769 0 -96.81642",  "scale": "0 0 0","rotation": "0 0 0","class": "collidable" }
