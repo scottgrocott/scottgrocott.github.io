@@ -25,7 +25,7 @@
     { "id": "tank03glb", "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/tank-01.glb" }
 ],
   "buildings": [
-    { "id": "fire_dept", "model": "#fire_deptglb", "position": "-41.16646 0 187.78599", "class": "collidable" },
+    { "id": "fire_dept", "model": "#fire_deptglb", "position": "22.13071 0 231.52948", "class": "collidable" },
     { "id": "fire_dept_01", "model": "#fire_dept_01glb", "position": "142.03516 0 227.23321", "class": "collidable" },
     { "id": "fire_dept_01a", "model": "#fire_dept_01aglb", "position": "108.09597 0 184.70434", "class": "collidable" },
     { "id": "7207", "model": "#7207glb", "position": "120.4915 0 91.197", "scale": "0 0 0","rotation": "0 0 0", "class": "collidable" },
