@@ -2,9 +2,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+                  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EBGF4V165P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EBGF4V165P');
+</script>
   <meta charset="utf-8">
-  <title>A-Frame Greybox Scene</title>
+  <title>A-Frame Greybox Scene Build Date:2026-01-11 06:14:44</title>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
   <style>
     body { margin: 0; overflow: hidden; }
     #loading {
@@ -21,9 +31,56 @@
   </style>
 </head>
 <body>
-  <div id="loading">Loading assets...</div>
+  <style>
+    /* Mobile Overlay Containers */
+    #mobile-controls {
+        position: fixed;
+        bottom: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; /* Let touches pass through to joystick */
+        z-index: 999;
+        display: none; /* Show only on mobile via JS */
+    }
+
+    /* Left Joystick Area */
+    #joystick-zone {
+        position: absolute;
+        bottom: 40px; left: 40px;
+        width: 150px; height: 150px;
+        background: rgba(124, 131, 134, 0.2);
+        border: 2px solid var(--concrete-grey);
+        border-radius: 50%;
+        pointer-events: auto;
+    }
+
+    /* Action Buttons (Right Side) */
+    .action-btn {
+        position: absolute;
+        width: 70px; height: 70px;
+        background: rgba(212, 106, 40, 0.4);
+        border: 2px solid #d46a28;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: auto;
+        font-weight: bold;
+    }
+    #btn-shoot { bottom: 120px; right: 40px; background: rgba(163, 46, 46, 0.6); border-color: #a32e2e; }
+    #btn-crouch { bottom: 40px; right: 130px; }
+    #btn-interact { bottom: 40px; right: 40px; }
+
+    @media (max-width: 991px) { #mobile-controls { display: block; } }
+</style>
+
+<div id="mobile-controls">
+    <div id="joystick-zone"></div>
+    <div id="btn-shoot" class="action-btn"><i class="bi bi-crosshair"></i></div>
+    <div id="btn-interact" class="action-btn"><i class="bi bi-hand-index-thumb"></i></div>
+    <div id="btn-crouch" class="action-btn">SLIDE</div>
+</div>  <div id="loading">Loading assets...</div>
   
-  <a-scene>
+  <a-scene movement-controls="controls: joystick; speed: 0.3>
     <!-- Sky -->
     <a-sky color="#87CEEB" radius="10000"></a-sky>
     
@@ -43,13 +100,13 @@
     
     <!-- Camera with WASD controls -->
     <a-entity id="rig" position="0 1.6 0">
-      <a-entity camera="far: 20000" look-controls wasd-controls="acceleration: 100;fly: true" position="0 0 0"></a-entity>
+      <a-entity camera="far: 20000" look-controls="pointerLockEnabled: true" wasd-controls="acceleration: 100;fly: true" position="0 0 0"></a-entity>
     </a-entity>
   </a-scene>
 
   <script>
-    const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets_dev.json';
-    //const JSON_URL = 'http://localhost:81/json/greybox_assets_dev.json';
+    //const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets_dev.json';
+    const JSON_URL = 'http://localhost:81/json/greybox_assets_dev.json';
     async function loadScene() {
       try {
         const response = await fetch(JSON_URL);
@@ -73,25 +130,28 @@
         
         // Create building entities
         data.buildings.forEach(building => {
-  /*      
- if (building.id == 'green') {
-  let tempxyz = building.position.split(' ');
-  tempxyz[1] = 194.8;
-  building.position = tempxyz.join(' ');
-  console.log('Adding green:', tempxyz);
- 
-  building.setAttribute('position', {
-    x: building.position.x,
-    y: 194.240,
-    z: building.position.z
-  });
- 
-}
- */ 
+
           const entity = document.createElement('a-entity');
           entity.setAttribute('id', building.id);
           entity.setAttribute('gltf-model', building.model);
+          // 1. Handle Position (Required)
           entity.setAttribute('position', building.position);
+
+          // 2. Handle Scale (With Safety Default)
+          // If scale is missing or is "0 0 0", default it to "1 1 1" 
+          // so the object is actually visible.
+          if (building.scale && building.scale !== "0 0 0") {
+            entity.setAttribute('scale', building.scale);
+          } else {
+            entity.setAttribute('scale', '1 1 1'); 
+          }
+
+          // 3. Handle Rotation (With Safety Default)
+          if (building.rotation) {
+            entity.setAttribute('rotation', building.rotation);
+          } else {
+            entity.setAttribute('rotation', '0 0 0');
+          }
           entity.setAttribute('class', building.class);
           sceneContainer.appendChild(entity);
         });
