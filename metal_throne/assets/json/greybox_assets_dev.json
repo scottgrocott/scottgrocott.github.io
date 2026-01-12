@@ -29,7 +29,7 @@
       "id": "fire_dept", 
       "model": "#fire_deptglb", 
       "position": "25.96929 0 233.26781", 
-      "rotation": "0 21.181103770396273 0",
+      "rotation": "0 0 0",
       "class": "collidable",
       "animations": [{ "clip": "hazard_flicker", "loop": "repeat", "timeScale": 1.0, "crossFade": 0.5 }]
     },
