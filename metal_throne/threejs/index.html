@@ -2,8 +2,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+                  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EBGF4V165P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EBGF4V165P');
+</script>
   <meta charset="utf-8">
-  <title>Three.js Greybox Scene</title>
+  <title>Three.js Greybox Scene Build Date:2026-01-12 01:25:48</title>
   <style>
     body { 
       margin: 0; 
@@ -36,14 +45,77 @@
   </style>
 </head>
 <body>
-  <div id="loading">Loading assets...</div>
+  <style>
+    /* Mobile Overlay Containers */
+    #mobile-controls {
+        position: fixed;
+        bottom: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; /* Let touches pass through to joystick */
+        z-index: 999;
+        display: none; /* Show only on mobile via JS */
+    }
+
+     #joystick-container {
+        position: fixed;
+        bottom: 40px;
+        left: 40px;
+        width: 150px;
+        height: 150px;
+        z-index: 1001;
+        /* Important: Ensure this doesn't block touch-to-look on the rest of the screen */
+        touch-action: none;
+    }
+    .mobile-btn {
+        position: fixed;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: rgba(212, 106, 40, 0.4);
+        border: 2px solid #d46a28;
+        color: white;
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #btn-shoot { bottom: 120px; right: 40px; border-color: #a32e2e; background: rgba(163, 46, 46, 0.5); }
+    #btn-interact { bottom: 40px; right: 40px; }
+
+    /* Hide on desktop */
+    @media (min-width: 992px) {
+        #joystick-container, .mobile-btn { display: none; }
+    }
+
+    @media (max-width: 991px) { #mobile-controls { display: block; } }
+</style>
+
+<div id="mobile-controls">
+    <div id="joystick-container"></div>
+ <button id="btn-shoot" class="mobile-btn"><i class="bi bi-crosshair"></i></button>
+<button id="btn-interact" class="mobile-btn"><i class="bi bi-hand-index-thumb"></i></button>
+</div>  <div id="loading">Loading assets...</div>
   <div id="info">WASD to move | Mouse to look | Space to jump</div>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://scottgrocott.github.io/metal_throne/assets/js/nipplejs.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script>
-    const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets_dev.json';
-    //const JSON_URL = 'http://localhost:81/json/greybox_assets_dev.json';
+
+        const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets_dev.json';
+    //gloabal controller state for mobile
+let moveJoystick = null;
+const mobileState = {
+    forward: 0,
+    side: 0,
+    lookX: 0,
+    lookY: 0,
+    isMoving: false
+};
+
+// Movement Sensitivity
+const moveSpeed = 0.15;
+const lookSensitivity = 0.005;
+
 
     let scene, camera, renderer, loader;
     let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
@@ -56,14 +128,57 @@
     const PI_2 = Math.PI / 2;
     
     function init() {
+//nipplejs joystick setup
+  // 1. SAFE JOYSTICK INITIALIZATION
+    const initJoystick = () => {
+        const zone = document.getElementById('joystick-container');
+        
+        // Safety check: Is the library loaded and the div present?
+        if (typeof nipplejs === 'undefined') {
+            console.warn("NippleJS not found, retrying...");
+            setTimeout(initJoystick, 100);
+            return;
+        }
+
+        if (!zone) {
+            console.error("Joystick container not found in DOM");
+            return;
+        }
+
+        moveJoystick = nipplejs.create({
+            zone: zone,
+            mode: 'static',
+            position: { left: '75px', top: '75px' },
+            color: '#d46a28'
+        });
+
+        moveJoystick.on('move', (evt, data) => {
+            mobileState.isMoving = true;
+            mobileState.forward = data.vector.y;
+            mobileState.side = data.vector.x;
+        });
+
+        moveJoystick.on('end', () => {
+            mobileState.isMoving = false;
+            mobileState.forward = 0;
+            mobileState.side = 0;
+        });
+    };
+    
+    initJoystick();
+
+
       // Scene
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x87CEEB);
       scene.fog = new THREE.Fog(0x87CEEB, 0, 750);
       
-      // Camera
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 1.6, 0);
+    // Camera
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1.6, 0);
+    
+    // IMPORTANT: Three.js cameras need a rotation order for Euler manipulation
+    camera.rotation.order = 'YXZ'; 
       
       // Renderer
       renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -154,15 +269,34 @@
               asset.src,
               (gltf) => {
                 const model = gltf.scene;
-                const pos = building.position.split(' ').map(Number);
-                console.log('Adding building:', building.id, 'at', pos);
-                /*
-                 if (building.id == 'green') {
-                  pos[1] = 195.240;
-                  console.log('Adjusted green position to:', pos);
-                }
-                */
-                model.position.set(pos[0], pos[1], pos[2]);
+// 1. Parse Position (Default to 0 0 0)
+const posArr = building.position ? building.position.split(' ').map(Number) : [0, 0, 0];
+
+// 2. Parse Scale (Defensive: if missing or "0 0 0", force to "1 1 1")
+let scaleArr = [1, 1, 1]; // Default
+if (building.scale && building.scale !== "0 0 0") {
+    scaleArr = building.scale.split(' ').map(Number);
+}
+
+// 3. Parse Rotation (Default to 0 0 0)
+const rotArr = building.rotation ? building.rotation.split(' ').map(Number) : [0, 0, 0];
+
+//console.log(`Processing building: ${building.id} | Scale: ${scaleArr.join(' ')}`);
+
+// Apply to Three.js Model
+model.position.set(posArr[0], posArr[1], posArr[2]);
+
+model.scale.set(scaleArr[0], scaleArr[1], scaleArr[2]);
+
+// Convert Degrees from JSON/A-Frame logic to Radians for Three.js
+model.rotation.set(
+    THREE.MathUtils.degToRad(rotArr[0]),
+    THREE.MathUtils.degToRad(rotArr[1]),
+    THREE.MathUtils.degToRad(rotArr[2])
+);
+
+// Optional: Ensure the matrix updates for raycasting/physics
+model.updateMatrixWorld();
                 model.traverse((child) => {
                   if (child.isMesh) {
                     child.castShadow = true;
@@ -227,7 +361,7 @@
     
     function animate() {
       requestAnimationFrame(animate);
-      
+       updateMobileMovement(); 
       const time = performance.now();
       const delta = (time - prevTime) / 1000;
       
@@ -267,8 +401,109 @@
       renderer.render(scene, camera);
     }
     
+let lastTouchX = 0;
+let lastTouchY = 0;
+
+window.addEventListener('touchstart', (e) => {
+    const touch = e.touches[0];
+    lastTouchX = touch.pageX;
+    lastTouchY = touch.pageY;
+}, { passive: false });
+
+window.addEventListener('touchmove', (e) => {
+    // Only process look-around if the touch is NOT on the joystick zone
+    if (e.target.id === 'joystick-zone' || e.target.closest('#joystick-zone')) return;
+
+    const touch = e.touches[0];
+    const movementX = touch.pageX - lastTouchX;
+    const movementY = touch.pageY - lastTouchY;
+
+    // Update camera rotation
+    // Note: We rotate the camera's Y based on horizontal movement
+    // and the camera's X based on vertical movement
+    camera.rotation.y -= movementX * lookSensitivity;
+    
+    // Clamp vertical look to prevent flipping 180 degrees
+    const newRotationX = camera.rotation.x - movementY * lookSensitivity;
+    camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, newRotationX));
+
+    lastTouchX = touch.pageX;
+    lastTouchY = touch.pageY;
+}, { passive: false });
+
+
+ // This ensures nipple.js and all PHP-included HTML are ready
+window.onload = () => {
     init();
     animate();
+};
+
+// 3. DEFENSIVE ACTION BUTTONS
+// Wrap these in DOMContentLoaded to ensure the mobile_nav buttons exist
+document.addEventListener('DOMContentLoaded', () => {
+    const shootBtn = document.getElementById('btn-shoot');
+    const interactBtn = document.getElementById('btn-interact');
+
+    if (shootBtn) {
+        shootBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            console.log("Mobile Shoot");
+            // performShoot(); // Ensure this function is defined
+        });
+    }
+
+    if (interactBtn) {
+        interactBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            console.log("Mobile Interact");
+            // checkInteraction(); // Ensure this function is defined
+        });
+    }
+});
+
+
+function updateMobileMovement() {
+    if (!mobileState.isMoving) return;
+
+    // 1. Get the camera's forward direction
+    const direction = new THREE.Vector3();
+    camera.getWorldDirection(direction);
+    
+    // 2. Flatten the direction (so we don't fly if looking up)
+    direction.y = 0;
+    direction.normalize();
+
+    // 3. Calculate the "Right" vector for strafing
+    const sideVector = new THREE.Vector3();
+    sideVector.crossVectors(camera.up, direction);
+
+    // 4. Apply forward/backward movement
+    camera.position.addScaledVector(direction, mobileState.forward * moveSpeed);
+    
+    // 5. Apply strafe movement
+    camera.position.addScaledVector(sideVector, -mobileState.side * moveSpeed);
+}
+
+    // Mobile Joystick Setup
+    /*
+    var options = {
+        zone: document.getElementById('joystick-zone'),
+    };
+    var manager = nipplejs.create(options);
+*/
+
+document.getElementById('btn-shoot').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    // Trigger your raycasting/shooting logic here
+    console.log("Weapon Discharged");
+    performShoot(); 
+});
+
+document.getElementById('btn-interact').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    // Trigger detonator pickup / door logic
+    checkInteraction(); 
+});
   </script>
 </body>
 </html>

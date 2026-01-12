@@ -2,19 +2,37 @@
 <!DOCTYPE html>
 <html>
 <head>
+                  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EBGF4V165P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EBGF4V165P');
+</script>
   <meta charset="utf-8">
-  <title>Babylon.js Greybox Scene</title>
+  <title>Babylon.js Greybox Scene Build Date:2026-01-12 01:26:35</title>
   <style>
-    body { 
-      margin: 0; 
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-    }
-    #renderCanvas {
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-    }
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000;
+}
+
+#renderCanvas {
+    position: fixed; /* Takes the canvas out of the flow */
+    top: 0;
+    left: 0;
+    width: 100vw;   /* Viewport Width */
+    height: 100vh;  /* Viewport Height */
+    display: block;
+    touch-action: none;
+    outline: none;
+}
     #loading {
       position: absolute;
       top: 50%;
@@ -42,7 +60,55 @@
   </style>
 </head>
 <body>
-  <canvas id="renderCanvas"></canvas>
+  <style>
+    /* Mobile Overlay Containers */
+    #mobile-controls {
+        position: fixed;
+        bottom: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; /* Let touches pass through to joystick */
+        z-index: 999;
+        display: none; /* Show only on mobile via JS */
+    }
+
+     #joystick-container {
+        position: fixed;
+        bottom: 40px;
+        left: 40px;
+        width: 150px;
+        height: 150px;
+        z-index: 1001;
+        /* Important: Ensure this doesn't block touch-to-look on the rest of the screen */
+        touch-action: none;
+    }
+    .mobile-btn {
+        position: fixed;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: rgba(212, 106, 40, 0.4);
+        border: 2px solid #d46a28;
+        color: white;
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #btn-shoot { bottom: 120px; right: 40px; border-color: #a32e2e; background: rgba(163, 46, 46, 0.5); }
+    #btn-interact { bottom: 40px; right: 40px; }
+
+    /* Hide on desktop */
+    @media (min-width: 992px) {
+        #joystick-container, .mobile-btn { display: none; }
+    }
+
+    @media (max-width: 991px) { #mobile-controls { display: block; } }
+</style>
+
+<div id="mobile-controls">
+    <div id="joystick-container"></div>
+ <button id="btn-shoot" class="mobile-btn"><i class="bi bi-crosshair"></i></button>
+<button id="btn-interact" class="mobile-btn"><i class="bi bi-hand-index-thumb"></i></button>
+</div>  <canvas id="renderCanvas"></canvas>
   <div id="loading">Loading assets...</div>
   <div id="info">WASD to move | Mouse to look | Space to jump | Click to start</div>
   
@@ -50,21 +116,51 @@
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
   
   <script>
-    const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets_dev.json';
-    //const JSON_URL = 'http://localhost:81/json/greybox_assets_dev.json';
-    
+          const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets_dev.json';
+         
     const canvas = document.getElementById('renderCanvas');
-    const engine = new BABYLON.Engine(canvas, true);
+    const engine = new BABYLON.Engine(canvas, true,{ 
+    adaptToDeviceRatio: true, 
+    antialias: true 
+});
+engine.onResizeObservable.add(() => {
+    // This ensures that when the simulation toggles, 
+    // Babylon re-renders at the correct resolution
+    scene.getEngine().resize();
+});
     let scene, camera;
     
     const createScene = async () => {
       scene = new BABYLON.Scene(engine);
+      scene.useRightHandedSystem = true;
       scene.clearColor = new BABYLON.Color3(0.529, 0.808, 0.922); // Sky blue
       scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
       scene.fogColor = new BABYLON.Color3(0.529, 0.808, 0.922);
       scene.fogStart = 10000;
       scene.fogEnd = 75000;
       
+/*
+// Setup Virtual Joysticks
+const leftJoystick = new BABYLON.VirtualJoystick(true); // Left side
+leftJoystick.setJoystickSensibility(0.02);
+
+scene.onBeforeRenderObservable.add(() => {
+    if (leftJoystick.pressed) {
+        const moveVec = leftJoystick.deltaPosition;
+        // Apply movement to your camera/player
+        camera.cameraDirection.x += moveVec.x * speed;
+        camera.cameraDirection.z += moveVec.y * speed;
+    }
+});
+
+// Use the FreeCamera/UniversalCamera - it has touch-rotate built in!
+const camera = new BABYLON.UniversalCamera("MobileCam", new BABYLON.Vector3(0, 1.6, 0), scene);
+camera.attachControl(canvas, true);
+*/
+
+
+
+
       // Camera with collision
       camera = new BABYLON.UniversalCamera('camera', new BABYLON.Vector3(0, 1.6, 0), scene);
       camera.attachControl(canvas, true);
@@ -132,14 +228,33 @@ BABYLON.SceneLoader.ImportMesh(
   asset.src,
   scene,
   (meshes) => {
-    const pos = building.position.split(' ').map(Number);
+const posArr = building.position ? building.position.split(' ').map(Number) : [0, 0, 0];
+const rotArr = building.rotation ? building.rotation.split(' ').map(Number) : [0, 0, 0];
 
-    // 1. Move ONLY the root node (the first element in the array)
-    const root = meshes[0];
-    if (root) {
-      // Use the same coordinate mapping that worked for your Three.js sync
-      root.position = new BABYLON.Vector3(-pos[0], pos[1], pos[2]);
-    }
+const root = meshes[0]; 
+if (root) {
+    // 1. Position now matches exactly (No - sign needed!)
+    root.position = new BABYLON.Vector3(posArr[0], posArr[1], posArr[2]);
+
+    // 2. Scale
+    root.scaling = new BABYLON.Vector3(1, 1, 1); 
+
+    // 3. Rotation: Nullify the glTF quaternion so .rotation works
+    root.rotationQuaternion = null; 
+
+    // 4. Set Euler Order to match Three.js (XYZ)
+    // Babylon defaults to YXZ. We force XYZ to match your other engines.
+    root.rotation = new BABYLON.Vector3(
+        BABYLON.Tools.ToRadians(rotArr[0]),
+        BABYLON.Tools.ToRadians(rotArr[1]),
+        BABYLON.Tools.ToRadians(rotArr[2])
+    );
+
+
+    // Metadata for your Stealth Logic
+    root.id = building.id;
+    root.metadata = { class: building.class };
+}
 
     // 2. Loop through ALL meshes for properties like Shadows and Collisions
     meshes.forEach((mesh) => {
@@ -220,10 +335,30 @@ BABYLON.SceneLoader.ImportMesh(
       });
     });
     
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      engine.resize();
-    });
+ // 1. Create a ResizeObserver to watch the canvas specifically
+const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+        if (entry.target === canvas) {
+            // Force Babylon to recalculate viewport
+            engine.resize();
+            console.log("Canvas Resized:", canvas.width, "x", canvas.height);
+        }
+    }
+});
+
+// 2. Start observing
+resizeObserver.observe(canvas);
+
+// 3. Keep the old listener as a fallback for older browsers
+window.addEventListener('resize', () => {
+    engine.resize();
+});
+
+// 4. Handle Orientation Change (Specific to mobile devices)
+window.addEventListener("orientationchange", () => {
+    // Small delay to allow the browser to finalize the rotation
+    setTimeout(() => { engine.resize(); }, 200);
+});
     
     // Click to enable pointer lock
     canvas.addEventListener('click', () => {

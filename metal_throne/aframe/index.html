@@ -12,8 +12,10 @@
   gtag('config', 'G-EBGF4V165P');
 </script>
   <meta charset="utf-8">
-  <title>A-Frame Greybox Scene Build Date:2026-01-11 06:14:44</title>
+  <title>A-Frame Greybox Scene Build Date:2026-01-12 01:25:06</title>
+  <!---->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
   <style>
     body { margin: 0; overflow: hidden; }
@@ -41,43 +43,44 @@
         display: none; /* Show only on mobile via JS */
     }
 
-    /* Left Joystick Area */
-    #joystick-zone {
-        position: absolute;
-        bottom: 40px; left: 40px;
-        width: 150px; height: 150px;
-        background: rgba(124, 131, 134, 0.2);
-        border: 2px solid var(--concrete-grey);
-        border-radius: 50%;
-        pointer-events: auto;
+     #joystick-container {
+        position: fixed;
+        bottom: 40px;
+        left: 40px;
+        width: 150px;
+        height: 150px;
+        z-index: 1001;
+        /* Important: Ensure this doesn't block touch-to-look on the rest of the screen */
+        touch-action: none;
     }
-
-    /* Action Buttons (Right Side) */
-    .action-btn {
-        position: absolute;
-        width: 70px; height: 70px;
+    .mobile-btn {
+        position: fixed;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
         background: rgba(212, 106, 40, 0.4);
         border: 2px solid #d46a28;
-        border-radius: 50%;
         color: white;
+        z-index: 1001;
         display: flex;
         align-items: center;
         justify-content: center;
-        pointer-events: auto;
-        font-weight: bold;
     }
-    #btn-shoot { bottom: 120px; right: 40px; background: rgba(163, 46, 46, 0.6); border-color: #a32e2e; }
-    #btn-crouch { bottom: 40px; right: 130px; }
+    #btn-shoot { bottom: 120px; right: 40px; border-color: #a32e2e; background: rgba(163, 46, 46, 0.5); }
     #btn-interact { bottom: 40px; right: 40px; }
+
+    /* Hide on desktop */
+    @media (min-width: 992px) {
+        #joystick-container, .mobile-btn { display: none; }
+    }
 
     @media (max-width: 991px) { #mobile-controls { display: block; } }
 </style>
 
 <div id="mobile-controls">
-    <div id="joystick-zone"></div>
-    <div id="btn-shoot" class="action-btn"><i class="bi bi-crosshair"></i></div>
-    <div id="btn-interact" class="action-btn"><i class="bi bi-hand-index-thumb"></i></div>
-    <div id="btn-crouch" class="action-btn">SLIDE</div>
+    <div id="joystick-container"></div>
+ <button id="btn-shoot" class="mobile-btn"><i class="bi bi-crosshair"></i></button>
+<button id="btn-interact" class="mobile-btn"><i class="bi bi-hand-index-thumb"></i></button>
 </div>  <div id="loading">Loading assets...</div>
   
   <a-scene movement-controls="controls: joystick; speed: 0.3>
@@ -105,8 +108,8 @@
   </a-scene>
 
   <script>
-    //const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets_dev.json';
-    const JSON_URL = 'http://localhost:81/json/greybox_assets_dev.json';
+        const JSON_URL = 'https://scottgrocott.github.io/metal_throne/assets/json/greybox_assets_dev.json';
+         
     async function loadScene() {
       try {
         const response = await fetch(JSON_URL);
