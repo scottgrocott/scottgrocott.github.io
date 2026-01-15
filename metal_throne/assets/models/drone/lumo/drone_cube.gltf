@@ -1,0 +1,136 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Lumo"
+  },
+
+  "scene": 0,
+  "scenes": [{ "nodes": [0] }],
+
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "DroneCube",
+      "translation": [0, 0, 0],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1]
+    }
+  ],
+
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ],
+      "name": "CubeMesh"
+    }
+  ],
+
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [1.0, 0.84, 0.0, 1.0],   // gold hue
+        "metallicFactor": 1.0,                     // fully metallic
+        "roughnessFactor": 0.15                    // shiny (low roughness)
+      },
+      "name": "GoldMaterial"
+    }
+  ],
+
+  /* ---------- BUFFER DEFINITIONS ---------- */
+  "buffers": [
+    {
+      "uri": "drone_cube.bin",
+      "byteLength": 1152
+    }
+  ],
+
+  "bufferViews": [
+    { "buffer": 0, "byteOffset": 0,   "byteLength": 288, "target": 34962 }, // POSITION
+    { "buffer": 0, "byteOffset": 288, "byteLength": 288, "target": 34962 }, // NORMAL
+    { "buffer": 0, "byteOffset": 576, "byteLength": 192, "target": 34962 }, // TEXCOORD_0
+    { "buffer": 0, "byteOffset": 768, "byteLength": 72,  "target": 34963 }, // INDICES
+    { "buffer": 0, "byteOffset": 840, "byteLength": 96,  "target": 34962 }, // ANIM_ROTATION (flight)
+    { "buffer": 0, "byteOffset": 936, "byteLength": 96,  "target": 34962 }, // ANIM_TRANSLATION (flight)
+    { "buffer": 0, "byteOffset": 1032,"byteLength": 48,  "target": 34962 }  // ANIM_ROTATION (hover)
+  ],
+
+  "accessors": [
+    /* Geometry */
+    { "bufferView": 0, "componentType": 5126, "count": 24, "type": "VEC3", "max": [0.5,0.5,0.5], "min": [-0.5,-0.5,-0.5] }, // POSITION
+    { "bufferView": 1, "componentType": 5126, "count": 24, "type": "VEC3" },                         // NORMAL
+    { "bufferView": 2, "componentType": 5126, "count": 24, "type": "VEC2" },                         // TEXCOORD_0
+    { "bufferView": 3, "componentType": 5123, "count": 36, "type": "SCALAR" },                     // INDICES
+
+    /* Animation data */
+    { "bufferView": 4, "componentType": 5126, "count": 2, "type": "VEC4", "normalized": false }, // ROTATION (flight)
+    { "bufferView": 5, "componentType": 5126, "count": 2, "type": "VEC3", "normalized": false }, // TRANSLATION (flight)
+    { "bufferView": 6, "componentType": 5126, "count": 2, "type": "VEC4", "normalized": false }  // ROTATION (hover)
+  ],
+
+  /* ---------- ANIMATION DEFINITIONS ---------- */
+  "animations": [
+    {
+      "name": "flight",
+      "samplers": [
+        {
+          "input": 7,               // time stamps (see below)
+          "output": 4,              // rotation quaternion array
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 7,
+          "output": 5,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": { "node": 0, "path": "rotation" }
+        },
+        {
+          "sampler": 1,
+          "target": { "node": 0, "path": "translation" }
+        }
+      ]
+    },
+    {
+      "name": "hover",
+      "samplers": [
+        {
+          "input": 8,               // time stamps (see below)
+          "output": 6,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": { "node": 0, "path": "rotation" }
+        }
+      ]
+    }
+  ],
+
+  /* Time accessor definitions (outside the main accessor array) */
+  "extras": {
+    "timeAccessors": {
+      "7": { "bufferView": 7, "componentType": 5126, "count": 2, "type": "SCALAR", "min": [0], "max": [5] },   // flight duration = 5 s
+      "8": { "bufferView": 8, "componentType": 5126, "count": 2, "type": "SCALAR", "min": [0], "max": [3] }    // hover duration = 3 s
+    }
+  },
+
+  "bufferViewsExtra": [
+    { "buffer": 0, "byteOffset": 1080, "byteLength": 8,  "target": 0 }, // TIME (flight) – two floats: 0,5
+    { "buffer": 0, "byteOffset": 1088, "byteLength": 8,  "target": 0 }  // TIME (hover) – two floats: 0,3
+  ]
+}
