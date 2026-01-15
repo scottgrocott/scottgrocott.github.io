@@ -15,7 +15,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Scott Grocott - Creative Technologist</title>
+        <title>From Satellite to Sandbox Using AI and Vector Tracing to define the Metal Throne’s geography. Posted by Scott Grocott on January 17, 2026</title>
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Font Awesome icons (free version)-->
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -49,72 +49,65 @@
                     </ul>
                 </div>
             </div>
-        </nav> <!-- Page Header-->
-        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/assets/img/mb.jpg')">
+        </nav>
+    <!-- Page Header-->
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/fuel_yard_simple.png')">
             <div class="container position-relative px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
-                        <div class="site-heading">
-                            <h1>Scott's Blog</h1>
-                            <span class="subheading">A Blog about what Scott does.</span>
+                        <div class="post-heading">
+                            <h1>From Satellite to Sandbox</h1>
+                            <h2 class="subheading">Using AI and Vector Tracing to define the Metal Throne’s geography.</h2>
+                            <span class="meta">
+                                Posted by
+                                <a href="#!">Scott Grocott</a>
+                                on January 17, 2026                            </span>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
-        <!-- Main Content-->
-        <div class="container px-4 px-lg-5">
-            <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="col-md-10 col-lg-8 col-xl-7">
-								                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="https://scottgrocott.github.io/blog/2026-01-17.html">
-                            <h2 class="post-title">From Satellite to Sandbox</h2>
-                            <h3 class="post-subtitle">Using AI and Vector Tracing to define the Metal Throne’s geography.</h3>
-                        </a>
+        <!-- Post Content-->
+        <article class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>In world-building, scale is everything. To make <em>Metal Throne</em> feel grounded, I’ve developed a workflow that turns real-world satellite imagery into functional 3D navigation data. By isolating open spaces and grassy zones, I can establish exactly where the "Machine Hub" allows for movement and where the industrial architecture creates its iron walls.</p>
 
-                        <p class="post-meta">
-                            Posted by
+                        <h2 class="section-heading">The Workflow: AI-Driven Simplification</h2>
+                        <p>The process began with a high-resolution satellite JPG from Google Maps.
+ <a href="#!"><img class="img-fluid" src="https://scottgrocott.github.io/metal_throne/assets/img/fuel_yard.png" alt="Metal Throne Fuel Yard Render" /></a>
+                        <span class="caption text-muted">A look at the 70x70m fuel yard layout—the heart of the game level that was captured from a location on Google Maps.</span>
+						To turn a cluttered photo into 3D geometry, I needed to strip away the noise. I fed the image into <strong>ChatGPT</strong>, instructing it to simplify the map down to its most basic color blocks.</p>
+                         <a href="#!"><img class="img-fluid" src="https://scottgrocott.github.io/metal_throne/assets/img/fuel_yard_simple.png" alt="Metal Throne Fuel Yard Render" /></a>
+                        <span class="caption text-muted">Color Palette simplified by ChatGPT</span>
+                        <p>By flattening the image into distinct colors, I was able to take the result into a vector editor and trace the green "open areas" into clean paths. These paths were then imported into <strong>Blender</strong> and extruded to create 3D placeholders—the negative space where the citizens of the Throne will eventually walk.</p>
+
+                        <h2 class="section-heading">Visualizing the Pathways</h2>
+                        <p>The final step was bringing these placeholders into <strong>A-Frame</strong> as a <code>.glb</code> file. By overlaying these extruded green zones onto the satellite ground plane, I can verify the flow of the world in a 1:1 scale VR environment. This establishes the vital "human" (or machine) pathways between the massive industrial silos and buildings.</p>
+
+  <a href="#!"><img class="img-fluid" src="https://scottgrocott.github.io/metal_throne/assets/img/Screenshot 2026-01-14 185158.png" alt="Metal Throne Fuel Yard Render" /></a>
+                        <span class="caption text-muted">Extruded green areas exported as .glb and imported/placed in A-Frame</span>
+                        <blockquote class="blockquote">"We aren't just placing buildings; we are defining the gaps between them where the story actually happens."</blockquote>
+
+                        <h2 class="section-heading">The Next Step: Raising the Steel</h2>
+                        <p>Now that the open areas and pathways are established, I have a logical blueprint for the structures. These "green blocks" serve as my boundaries—I now know exactly where my buildings must sit to create a claustrophobic, industrial atmosphere without breaking the player's ability to navigate.</p>
+                        
+                        <p>In the coming update, I’ll be replacing these placeholders with high-fidelity industrial models and setting up the collision boxes for our first patrol AI tests.</p>
+                        
+                        <p>The grid is set. The forge is heating up.</p>
+
+                        <p>
+                            Technical breakdown by
                             <a href="https://scottgrocott.github.io/">Scott Grocott</a>
-                            on January 17, 2026
+                            &middot; Tools used:
+                            <a href="#!">ChatGPT, Blender, A-Frame</a>
                         </p>
                     </div>
-                    <!-- Divider-->
-                    <hr class="my-4" /
-				                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="https://scottgrocott.github.io/blog/2026-01-16.html">
-                            <h2 class="post-title">From Satellite to Sandbox</h2>
-                            <h3 class="post-subtitle">Mapping the Fuel Yard with Blender-OSM.</h3>
-                        </a>
-
-                        <p class="post-meta">
-                            Posted by
-                            <a href="https://scottgrocott.github.io/">Scott Grocott</a>
-                            on January 16, 2026
-                        </p>
-                    </div>
-                    <!-- Divider-->
-                    <hr class="my-4" />
-                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="https://scottgrocott.github.io/blog/2026-01-15.html">
-                            <h2 class="post-title">Welcome to Metal Throne</h2>
-                            <h3 class="post-subtitle">The Journey Begins.</h3>
-                        </a>
-
-                        <p class="post-meta">
-                            Posted by
-                            <a href="https://scottgrocott.github.io/">Scott Grocott</a>
-                            on January 15, 2026
-                        </p>
-                    </div>
-                    <!-- Divider-->
-                    <hr class="my-4" />
-                   
                 </div>
             </div>
-        </div>
+        </article>
+
 <!-- Footer-->
         <footer class="border-top">
             <div class="container px-4 px-lg-5">
