@@ -1,18 +1,67 @@
-<?php include '../header.php'; ?>
 
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+                <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EBGF4V165P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EBGF4V165P');
+</script>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>From Satellite to Sandbox Mapping the Fuel Yard with Blender-OSM. Posted by Scott Grocott on January 15, 2026</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="https://scottgrocott.github.io/themes/clean_blog/css/styles.css" rel="stylesheet" />
+                      <!-- Custom CSS -->
+        <link href="https://scottgrocott.github.io/css/custom.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="https://scottgrocott.github.io/">Scott Grocott</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ms-auto py-4 py-lg-0">
+                        <li id="home_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/">Home</a></li>
+                        <li id="blog_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/blog/">Blog</a></li>
+                        <li id="metal_throne_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/metal_throne/">Metal Throne</a></li>
+                        <li id="cray_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/164cray/">1:64 Cray!</a></li>
+                        <li id="autopia_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/autopia/">Autopia:Mountain City</a></li>
+                        <li id="cinema_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/cinema/">Cinema</a></li>
+                        <li id="music_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/music/">Music</a></li>
+                        <li id="buggywhip_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/buggywhip/">BuggyWhip</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
     <!-- Page Header-->
-        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/assets/img/blog02.png')">
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/Screenshot 2026-01-14 175111.png')">
             <div class="container position-relative px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <div class="post-heading">
                             <h1>From Satellite to Sandbox</h1>
-                            <h2 class="subheading">Mapping 7290 Delta Rd with Blender-OSM.</h2>
+                            <h2 class="subheading">Mapping the Fuel Yard with Blender-OSM.</h2>
                             <span class="meta">
                                 Posted by
                                 <a href="#!">Scott Grocott</a>
-                                on <?php echo date("F j, Y"); ?>
-                            </span>
+                                on January 15, 2026                            </span>
                         </div>
                     </div>
                 </div>
@@ -23,20 +72,19 @@
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
-                        <p>In world-building, scale is everything. To make <em>Metal Throne</em> feel grounded in reality, I decided to bypass manual "guessing" of building dimensions. Instead, I went straight to the source: real-world geospatial data. By using the coordinate <strong>7290 Delta Rd</strong>, I’ve established a 70x70m play area that perfectly mirrors its real-world counterpart.</p>
+                        <p>In world-building, scale is everything. To make <em>Metal Throne</em> feel grounded in reality, I decided to bypass manual "guessing" of building dimensions. Instead, I went straight to the source: real-world geospatial data. By using the coordinate of a real world location, I’ve established a 70x70m play area that perfectly mirrors its real-world counterpart.</p>
 
                         <h2 class="section-heading">The Workflow: Blender-OSM</h2>
                         <p>The bridge between Google Maps and A-Frame was built using the <a href="https://prochitecture.gumroad.com/l/blender-osm" target="_blank text-primary">Blender-OSM addon</a>. This tool allowed me to pull OpenStreetMap data directly into Blender as 3D geometry. Within minutes, the flat satellite imagery was populated with accurate volumetric graybox buildings.</p>
                         
-                        <p>Once the geometry was generated, I exported the entire layout as a single <code>.obj</code> file. The challenge was ensuring that when this object landed in the A-Frame scene, it remained perfectly aligned with the top-down satellite ground plane. By locking the origin points in Blender before export, the digital "Machine Hub" now sits exactly where the real buildings exist on the map.</p>
+                        <p>Once the geometry was generated, I exported the entire layout as a single <code>.glb</code> file. The challenge was ensuring that when this object landed in the A-Frame scene, it remained perfectly aligned with the top-down satellite ground plane. By locking the origin points in Blender before export, the digital "Machine Hub" now sits exactly where the real buildings exist on the map.</p>
 
                         <h2 class="section-heading">Visualizing the Layout</h2>
                         <p>To test the accuracy, I've put together a flythrough showing the progression from raw map data to 3D geometry. Seeing the silhouettes of the fuel tanks rise out of the flat satellite textures is the first step in making this world feel "lived in"—even if the only things living there now are the machines.</p>
 
                         <!-- Video Embed Section -->
                         <div class="ratio ratio-16x9 my-4 shadow rounded">
-                            <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID_HERE" title="Metal Throne Flythrough" allowfullscreen></iframe>
-                        </div>
+                          <iframe width="560" height="315" src="https://www.youtube.com/embed/wBEZVnQS3OQ?si=ZGpn83UxImyIKeqg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>   </div>
                         <span class="caption text-muted text-center d-block">A progression flythrough: Satellite map, building geometry, and the combined overlay.</span>
 
                         <blockquote class="blockquote">"The map is not the territory, but in game dev, the map is the foundation upon which the machine's logic is built."</blockquote>
@@ -44,13 +92,13 @@
                         <h2 class="section-heading">The Next Step: Individualization</h2>
                         <p>While having the entire hub as one single object is great for visual alignment, it’s not practical for gameplay. Each building needs its own identity—and its own collision box. My next task involves isolating each building model within the scene. </p>
                         
-                        <p>In the coming update, I’ll be breaking this massive OBJ into individual components and importing them into A-Frame with unique coordinates that correspond to the map. This will allow for granular interaction, specific AI patrol paths around certain structures, and eventually, the ability to plant detonators on individual silos.</p>
+                        <p>In the coming update, I’ll be breaking this massive GLB into individual components and importing them into A-Frame with unique coordinates that correspond to the map. This will allow for granular interaction, specific AI patrol paths around certain structures, and eventually, the ability to plant detonators on individual silos.</p>
                         
                         <p>The graybox is alive. The grid is set. Now, we begin to build the detail.</p>
 
                         <p>
                             Technical breakdown by
-                            <a href="#!">Scott Grocott</a>
+                            <a href="https://scottgrocott.github.io/">Scott Grocott</a>
                             &middot; Tools used:
                             <a href="#!">Blender, OSM, A-Frame</a>
                         </p>
@@ -59,4 +107,20 @@
             </div>
         </article>
 
-<?php include '../footer.php'; ?>
+<!-- Footer-->
+        <footer class="border-top">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+   
+                        <div class="small text-center text-muted fst-italic">Copyright &copy; Scott Grocott 2026</div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="https://scottgrocott.github.io/themes/clean_blog/js/scripts.js"></script>
+    </body>
+</html>
