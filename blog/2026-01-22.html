@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+                <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EBGF4V165P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EBGF4V165P');
+</script>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Babylon.js: The Heavyweight Engine Bringing Professional Pipeline Tools to Metal Throne.</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="https://scottgrocott.github.io/themes/clean_blog/css/styles.css" rel="stylesheet" />
+                      <!-- Custom CSS -->
+        <link href="https://scottgrocott.github.io/css/custom.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="https://scottgrocott.github.io/">Scott Grocott</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ms-auto py-4 py-lg-0">
+                        <li id="home_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/">Home</a></li>
+                        <li id="blog_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/blog/">Blog</a></li>
+                        <li id="metal_throne_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/metal_throne/">Metal Throne</a></li>
+                        <li id="cray_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/164cray/">1:64 Cray!</a></li>
+                        <li id="autopia_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/autopia/">Autopia:Mountain City</a></li>
+                        <li id="cinema_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/cinema/">Cinema</a></li>
+                        <li id="music_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/music/">Music</a></li>
+                        <li id="buggywhip_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/buggywhip/">BuggyWhip</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    <!-- Page Header-->
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/Screenshot 2026-01-14 175111.png')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="post-heading">
+                            <h1>Babylon.js: The Heavyweight Engine</h1>
+                            <h2 class="subheading">Bringing Professional Pipeline Tools to Metal Throne.</h2>
+                            <span class="meta">
+                                Posted by
+                                <a href="#!">Scott Grocott</a>
+                                on January 16, 2026                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Post Content-->
+        <article class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>We’ve seen the rapid prototyping of A-Frame and the precision of Three.js. Now, we arrive at <strong>Babylon.js</strong>. While the previous contenders feel like specialized tools, Babylon.js feels like a complete workshop. It is a "batteries-included" game engine that provides a robust ecosystem for complex projects like <em>Metal Throne</em>.</p>
+
+                        <h2 class="section-heading">A True Game Engine Experience</h2>
+                        <p>What immediately separates Babylon.js from the pack is its feature set. Out of the box, it offers advanced PBR (Physically Based Rendering), built-in physics engines, sound management, and an incredibly powerful debugging inspector. For a game focused on industrial textures and machinery, Babylon’s handling of metallic materials and complex lighting is second to none.</p>
+
+                        <h2 class="section-heading">The Data Integration</h2>
+                        <p>Even though Babylon.js is a "thicker" engine, it handled my <code>manifest.json</code> workflow with surprising elegance. The <code>SceneLoader</code> class is highly optimized, allowing me to import the modular hub pieces while maintaining the performance needed for a web environment.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Babylon.js: Constructing the Hub from JSON
+BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (loader) {
+    if (loader.name === "gltf") { /* loader settings */ }
+});
+
+fetch('assets/manifest.json')
+  .then(res => res.json())
+  .then(data => {
+    data.hub_elements.forEach(item => {
+      BABYLON.SceneLoader.ImportMesh("", "assets/", item.src, scene, function (meshes) {
+        const root = meshes[0];
+        root.position = new BABYLON.Vector3(item.pos.x, item.pos.y, item.pos.z);
+        root.rotation = new BABYLON.Vector3(item.rot.x, item.rot.y, item.rot.z);
+      });
+    });
+  });</code></pre>
+
+                        <h2 class="section-heading">Visual Comparison & Performance</h2>
+                        <p>The visual difference is striking. Babylon’s default lighting pipeline creates a "weight" to the geometry that fits the <em>Metal Throne</em> aesthetic perfectly. The fuel tanks look colder, the steel looks heavier, and the shadows feel more grounded in the world.</p>
+                        
+                        <p>In the comparison screenshots below, you can see how Babylon handles the ambient occlusion and reflections across the hub. It provides a level of "polish" that usually requires dozens of custom shaders in other libraries.</p>
+
+                        <!-- Babylon.js Screenshots 
+                        <div class="my-4">
+                            <img class="img-fluid shadow rounded" src="https://scottgrocott.github.io/metal_throne/assets/img/babylon_render.jpg" alt="Babylon.js Render Comparison">
+                            <span class="caption text-muted text-center d-block">Babylon.js Render: Advanced PBR and lighting materials in action.</span>
+                        </div>
+-->
+                        <h2 class="section-heading">The Final Web Shootout Flythrough</h2>
+                        <p>Below is the final flythrough video of this experiment. It shows the Babylon.js version of the dynamically constructed hub. Pay close attention to the way light interacts with the silos as the camera passes—this is the result of Babylon's high-end rendering pipeline.</p>
+
+                        <!-- Video Embed Section -->
+                        <div class="ratio ratio-16x9 my-4 shadow rounded">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/jF-Ep6Xr8zM?si=mm3vq-fpM3VgXgbp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>  
+					   </div>
+
+                        <blockquote class="blockquote">"Babylon.js doesn't just display the world; it simulates the physics and the atmosphere of the Throne."</blockquote>
+
+                        <h2 class="section-heading">The Conclusion of the Shootout</h2>
+                        <p>Comparing A-Frame, Three.js, and Babylon.js has been an invaluable experiment. Each engine has its throne: A-Frame for speed, Three.js for precision, and Babylon.js for sheer engine-power. </p>
+                        
+                        <p>We are just getting started. "Metal Throne - Fuel Yard" will give each engine a run for it's money.</p>
+
+                        <p>
+                            Technical breakdown by
+                            <a href="https://scottgrocott.github.io/">Scott Grocott</a>
+                            &middot; Engine:
+                            <a href="#!">Babylon.js</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+<!-- Footer-->
+        <footer class="border-top">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+   
+                        <div class="small text-center text-muted fst-italic">Copyright &copy; Scott Grocott 2026</div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="https://scottgrocott.github.io/themes/clean_blog/js/scripts.js"></script>
+    </body>
+</html>
