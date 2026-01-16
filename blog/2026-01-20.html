@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+                <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EBGF4V165P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EBGF4V165P');
+</script>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>A-Frame: The Visual Architect Building the Fuel Yard with JSON and the Visual Inspector.</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="https://scottgrocott.github.io/themes/clean_blog/css/styles.css" rel="stylesheet" />
+                      <!-- Custom CSS -->
+        <link href="https://scottgrocott.github.io/css/custom.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="https://scottgrocott.github.io/">Scott Grocott</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ms-auto py-4 py-lg-0">
+                        <li id="home_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/">Home</a></li>
+                        <li id="blog_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/blog/">Blog</a></li>
+                        <li id="metal_throne_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/metal_throne/">Metal Throne</a></li>
+                        <li id="cray_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/164cray/">1:64 Cray!</a></li>
+                        <li id="autopia_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/autopia/">Autopia:Mountain City</a></li>
+                        <li id="cinema_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/cinema/">Cinema</a></li>
+                        <li id="music_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/music/">Music</a></li>
+                        <li id="buggywhip_nav" class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://scottgrocott.github.io/buggywhip/">BuggyWhip</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    <!-- Page Header-->
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/aframe_json.png')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="post-heading">
+                            <h1>A-Frame: The Visual Architect</h1>
+                            <h2 class="subheading">Building the Fuel Yard with JSON and the Visual Inspector.</h2>
+                            <span class="meta">
+                                Posted by
+                                <a href="#!">Scott Grocott</a>
+                                on January 20, 2026                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Post Content-->
+        <article class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>As the "Great Engine Shootout" continues, <strong>A-Frame</strong> has emerged as a frontrunner for rapid iteration. While Three.js offers raw power and Babylon.js brings industrial-grade features, A-Frame offers something neither can match as easily: a built-in, real-time visual 3D inspector that works right in the browser.</p>
+
+                        <h2 class="section-heading">Dynamic JSON Instantiation</h2>
+                        <p>In the <em>Metal Throne</em> ecosystem, the scene doesn't live in the HTML. It lives in the <code>manifest.json</code>. I wrote a custom A-Frame component that acts as our "Scene Builder." It fetches our coordinates and injects <code>&lt;a-entity&gt;</code> tags into the DOM on the fly.</p>
+
+<pre class="bg-dark text-light p-3 rounded"><code>// Scene Loader Component
+AFRAME.registerComponent('json-model-loader', {
+  init: function () {
+    fetch('assets/manifest.json')
+      .then(res => res.json())
+      .then(data => {
+        data.hub_elements.forEach(item => {
+          let el = document.createElement('a-entity');
+          el.setAttribute('gltf-model', item.src);
+          el.setAttribute('position', item.pos);
+          el.setAttribute('rotation', item.rot);
+          this.el.appendChild(el);
+        });
+      });
+  }
+});</code></pre>
+
+                        <h2 class="section-heading">The Secret Weapon: The Inspector</h2>
+                        <p>One of the most powerful features of A-Frame is the Visual Inspector. By hitting <code><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd></code> on the keyboard, I can freeze the live scene and jump into a 3D editor mode. </p>
+                        
+                        <p>This is where the "0,0,0 workflow" really pays off. I can grab a fuel silo, nudge it five centimeters to the left, or rotate a pathway to better align with the terrain texture, all without touching a line of code. Once it's perfect, I can simply copy the new coordinates and update the JSON file.</p>
+
+                        <!-- Inspector Screenshot Placeholder -->
+                        <div class="my-4">
+                            <img class="img-fluid shadow rounded" src="https://scottgrocott.github.io/metal_throne/assets/img/aframe_inspector.png" alt="A-Frame Inspector Screenshot">
+                            <span class="caption text-muted text-center d-block">The A-Frame Inspector: Fine-tuning asset placement in real-time.</span>
+                        </div>
+
+                        <h2 class="section-heading">Walking the Fuel Yard</h2>
+                        <p>To see how this all comes together, I’ve put together a flythrough of the dynamically constructed scene. Every building you see was loaded via the JSON manifest, allowing for a lightweight, modular environment that feels massive but remains easy to manage.</p>
+
+                        <!-- Video Embed Section -->
+                        <div class="ratio ratio-16x9 my-4 shadow rounded">
+                     <iframe width="560" height="315" src="https://www.youtube.com/embed/kOgRniKWjSk?si=TJbs5bMN7xIs-nNA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+						</div>
+
+                        <blockquote class="blockquote">"A-Frame turns the web browser into a level editor. The 'flicker' in the rendering is just because the material hasn't been adjusted yet.</blockquote>
+
+                        <h2 class="section-heading">The Verdict on A-Frame</h2>
+                        <p>The speed of development here is hard to beat. The ability to toggle between the user's perspective and the "God-view" inspector allows for a level of spatial debugging that significantly speeds up the world-building process. </p>
+                        
+                        <p>Next up in the shootout: We take the exact same JSON data and see how <strong>Three.js</strong> handles the same industrial complexity without the help of a declarative wrapper.</p>
+
+                        <p>
+                            Technical breakdown by
+                            <a href="https://scottgrocott.github.io/">Scott Grocott</a>
+                            &middot; Tools used:
+                            <a href="#!">A-Frame, Visual Inspector, JSON</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+<!-- Footer-->
+        <footer class="border-top">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+   
+                        <div class="small text-center text-muted fst-italic">Copyright &copy; Scott Grocott 2026</div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="https://scottgrocott.github.io/themes/clean_blog/js/scripts.js"></script>
+    </body>
+</html>
