@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Solo‑Dev A‑Frame Demo – 5 GLTF Models</title>
+
+  <!-- A‑Frame core library -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+  <!-- Optional: Orbit controls for easy camera navigation while testing -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe-orbit-controls-component@0.3.2/dist/aframe-orbit-controls-component.min.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; }
+  </style>
+</head>
+
+<body>
+  <a-scene background="color: #222">
+
+    <!-- Simple ground plane -->
+    <a-plane rotation="-90 0 0" width="30" height="30" color="#555"></a-plane>
+
+    <!-- Ambient light + directional light for basic shading -->
+    <a-entity light="type: ambient; intensity: 0.5"></a-entity>
+    <a-entity light="type: directional; intensity: 0.8"
+              position="5 10 5"></a-entity>
+
+    <!-- Camera with orbit controls (handy for quick testing) -->
+    <a-entity id="cameraRig"
+              camera="fov: 80"
+              position="0 1.6 5"
+              orbit-controls="target: 0 1 0; enableDamping:true; dampingFactor:0.25">
+    </a-entity>
+
+    <!-- ==== GLTF MODELS ==== -->
+    <!-- Replace each src attribute with the real URL of your model -->
+
+    <!-- Model 1 -->
+    <a-entity gltf-model="src: https://example.com/models/model1.glb"
+              position="-4 0 -2"
+              scale="1 1 1"></a-entity>
+
+    <!-- Model 2 -->
+    <a-entity gltf-model="src: https://example.com/models/model2.glb"
+              position="-2 0 -2"
+              scale="1 1 1"></a-entity>
+
+    <!-- Model 3 -->
+    <a-entity gltf-model="src: https://example.com/models/model3.glb"
+              position="0 0 -2"
+              scale="1 1 1"></a-entity>
+
+    <!-- Model 4 -->
+    <a-entity gltf-model="src: https://example.com/models/model4.glb"
+              position="2 0 -2"
+              scale="1 1 1"></a-entity>
+
+    <!-- Model 5 -->
+    <a-entity gltf-model="src: https://example.com/models/model5.glb"
+              position="4 0 -2"
+              scale="1 1 1"></a-entity>
+
+  </a-scene>
+</body>
+</html>
