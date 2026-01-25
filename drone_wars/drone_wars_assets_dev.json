@@ -1,0 +1,43 @@
+{
+  "assets": [
+    { "id": "object_0_glb", "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_0.glb" },
+    { "id": "object_1_glb", "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_1.glb" },
+    { "id": "object_2_glb", "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_2.glb" },
+    { "id": "object_3_glb", "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_3.glb" },
+    { "id": "droneglb", "src": "https://scottgrocott.github.io/drone_wars/temp/red_cube_animated.gltf" }
+  ],
+  "buildings": [
+    { 
+      "id": "object_0", 
+      "model": "#object_0_glb", 
+      "position": "0 1.099 9.42035", 
+      "rotation": "0 0 0",
+      "scale": "10 10 10", 
+      "class": "collidable"
+    },
+    { 
+      "id": "object_1", 
+      "model": "#object_1_glb", 
+       "position": "-7.17603 1.099 0", 
+      "rotation": "0 0 0",
+      "scale": "10 10 10",
+      "class": "collidable"
+    },
+    { 
+      "id": "object_2", 
+      "model": "#object_2_glb", 
+       "position": "12.03286 1.099 0", 
+      "rotation": "0 0 0",
+      "scale": "10 10 10",
+      "class": "collidable"
+    },
+    { 
+      "id": "object_3", 
+      "model": "#object_3_glb", 
+      "position": "0 1.099 -9.54585", 
+      "rotation": "0 0 0",
+      "scale": "10 10 10",
+      "class": "collidable"
+    }
+  ]
+}
