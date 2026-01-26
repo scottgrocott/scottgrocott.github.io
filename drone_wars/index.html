@@ -29,6 +29,7 @@
 <script src="/drone_wars/aframe/components/weapon-placeholder.js"></script>
 <script src="/drone_wars/aframe/components/physics-player.js"></script>
 <script src="/drone_wars/aframe/components/physics-static.js"></script>
+<script src="/drone_wars/aframe/components/ladder.js"></script>
 <script src="/drone_wars/aframe/components/scene.js"></script>
 
 
@@ -124,7 +125,7 @@
     height: 1.6; 
     radius: 0.4; 
     mass: 80; 
-    jumpForce: 3000; 
+    jumpForce: 1000; 
     moveSpeed: 5000; 
     maxVelocity: 5
   ">
@@ -142,6 +143,18 @@
   </a-entity>
 </a-entity>
  
+<a-entity ladder="height: 8; width: 1; climbSpeed: 7;texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" position="5 0 10" rotation="0 0 0"></a-entity>
+
+<a-entity ladder="height: 10; width: 1; climbSpeed: 7;texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" 
+          position="0 -0.60296 -9.54734" 
+          rotation="0 0 0">
+</a-entity>
+<
+<!-- Example ladder with custom texture and height 
+<a-entity ladder="height: 8; texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" 
+          position="-5 0 15">
+</a-entity>
+-->
   </a-scene>
 
   <script>
