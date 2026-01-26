@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,6 +31,8 @@
 <script src="/drone_wars/aframe/components/physics-player.js"></script>
 <script src="/drone_wars/aframe/components/physics-static.js"></script>
 <script src="/drone_wars/aframe/components/ladder.js"></script>
+<script src="/drone_wars/aframe/components/navmesh-builder.js"></script>
+<script src="/drone_wars/aframe/components/physics-drone.js"></script>
 <script src="/drone_wars/aframe/components/scene.js"></script>
 
 
@@ -93,7 +96,7 @@
     <button id="btn-interact" class="mobile-btn"><i class="bi bi-hand-index-thumb"></i></button>
   </div>
   
-  <a-scene movement-controls="controls: joystick; speed:100" renderer="toneMapping: acesFilmic; exposure: 1.2; colorManagement: true" reflection>
+  <a-scene navmesh-builder movement-controls="controls: joystick; speed:100" renderer="toneMapping: acesFilmic; exposure: 1.2; colorManagement: true" reflection>
     <a-sky color="#87CEEB" radius="10000"></a-sky>
     <a-light type="ambient" color="#BBB"></a-light>
     <a-light type="directional" color="#FFF" intensity="0.6" position="1 1 0"></a-light>
@@ -142,19 +145,20 @@
     ">
   </a-entity>
 </a-entity>
- 
-<a-entity ladder="height: 8; width: 1; climbSpeed: 7;texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" position="5 0 10" rotation="0 0 0"></a-entity>
 
-<a-entity ladder="height: 10; width: 1; climbSpeed: 7;texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" 
+<a-entity id="ladder1" ladder="height: 8; width: 1; climbSpeed: 7;texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" position="5 0 10" rotation="0 0 0"></a-entity>
+
+
+<a-entity id="ladder2" ladder="height: 10; width: 1; climbSpeed: 7;texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" 
           position="0 -0.60296 -9.54734" 
           rotation="0 0 0">
 </a-entity>
-<
-<!-- Example ladder with custom texture and height 
-<a-entity ladder="height: 8; texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" 
-          position="-5 0 15">
-</a-entity>
--->
+<a-entity id="ladder3" ladder="height: 8; width: 1; climbSpeed: 7; texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" position="-11.44083 0 1.05525" rotation=""><a-box width="1" height="8" depth="0.1" material="src: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png; side: double" position="0 4 0" geometry=""></a-box></a-entity>
+<a-entity id="ladder4" ladder="height: 10; width: 1; climbSpeed: 7; texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" position="-0.83595 0 38.20815" rotation="">
+<a-box width="1" height="10" depth="0.1" material="src: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png; side: double" position="0 5 0" geometry=""></a-box></a-entity>
+<a-entity id="ladder5" ladder="height: 8; width: 1; climbSpeed: 7;texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" position="5 0 10" rotation="0 0 0"></a-entity>
+<a-entity id="ladder6" ladder="height: 8; width: 1; climbSpeed: 7;texture: https://scottgrocott.github.io/metal_throne/assets/img/ladder.png" position="5 0 10" rotation="0 0 0"></a-entity>
+
   </a-scene>
 
   <script>

@@ -10,7 +10,7 @@
     { 
       "id": "object_0", 
       "model": "#object_0_glb", 
-      "position": "15.71956 4.524 28.10528", 
+      "position": "15.71956 4.124 28.10528", 
       "rotation": "0 0 0",
       "scale": "40 40 40", 
       "class": "collidable"

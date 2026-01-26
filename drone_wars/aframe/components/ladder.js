@@ -2,7 +2,7 @@ AFRAME.registerComponent('ladder', {
   schema: {
     height: { type: 'number', default: 5 },
     width: { type: 'number', default: 0.5 },
-    depth: { type: 'number', default: 0.1 },
+    depth: { type: 'number', default: 0.01 },
     climbSpeed: { type: 'number', default: 3 },
     texture: { type: 'string', default: '' },
     color: { type: 'color', default: '#8B4513' }
