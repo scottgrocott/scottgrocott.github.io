@@ -27,3 +27,22 @@
       
       sceneContainer.appendChild(drone);
     }
+
+
+    // Add key listener once the scene is ready
+window.addEventListener('load', () => {
+  window.addEventListener('keydown', (event) => {
+    // Prevent default browser behavior (e.g., scrolling with arrow keys)
+    // event.preventDefault(); // Uncomment if needed
+
+    // Key '0' (main keyboard 0, not numpad)
+    if (event.key === '0' || event.key === 'Digit0') {
+      buildDrone();
+    }
+
+    // Optional: Also support numpad 0
+    if (event.code === 'Numpad0') {
+      buildDrone();
+    }
+  });
+});
