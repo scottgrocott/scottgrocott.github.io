@@ -10,33 +10,25 @@
     { 
       "id": "object_0", 
       "model": "#object_0_glb", 
-      "position": "8.21366 1.294 16.0007", 
+      "position": "8.21366 2.254 16.0007", 
       "rotation": "0 0 0",
-      "scale": "12 12 12", 
+      "scale": "20 20 20", 
       "class": "collidable"
     },
     { 
       "id": "object_1", 
       "model": "#object_1_glb", 
-       "position": "-7.176 2.07512 0", 
+       "position": "-7.176 2.675 0", 
       "rotation": "0 0 0",
-      "scale": "12 12 12",
-      "class": "collidable"
-    },
-    { 
-      "id": "object_2", 
-      "model": "#object_2_glb", 
-       "position": "25.46845 5.58505 0", 
-      "rotation": "0 0 0",
-      "scale": "12 12 12",
+      "scale": "15 15 15",
       "class": "collidable"
     },
     { 
       "id": "object_3", 
       "model": "#object_3_glb", 
-      "position": "8.21053 1.29914 -15.35791", 
+      "position": "8.21053 2.109 -15.35791", 
       "rotation": "0 0 0",
-      "scale": "12 12 12",
+      "scale": "20 20 20",
       "class": "collidable"
     }
   ]
