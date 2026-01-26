@@ -26,6 +26,9 @@
 <script src="/drone_wars/aframe/components/spatial-sound.js"></script>
 <script src="/drone_wars/aframe/components/yuka-nav.js"></script>
 <script src="/drone_wars/aframe/components/build-drone.js"></script>
+<script src="/drone_wars/aframe/components/weapon-placeholder.js"></script>
+<script src="/drone_wars/aframe/components/physics-player.js"></script>
+<script src="/drone_wars/aframe/components/physics-static.js"></script>
 <script src="/drone_wars/aframe/components/scene.js"></script>
 
 
@@ -104,7 +107,7 @@
   shadow
   physics-ground
   material="
-    src: https://scottgrocott.github.io/metal_throne/assets/img/ground_tile01.jpg;
+    src: https://scottgrocott.github.io/metal_throne/assets/img/gpt_ground.png;
     repeat: 2250 2250;  
     roughness: 0.95;
     metalness: 0.05;
@@ -116,47 +119,35 @@
     <a-entity id="navmesh-container"></a-entity>
     <a-entity id="scene-container"></a-entity>
     
-    <a-entity id="rig" position="0 1.6 0" >
-      <a-entity camera="far: 20000" look-controls="pointerLockEnabled: true" wasd-controls="acceleration: 50;fly: false" position="0 0 0" weapon-placeholder="localX: 0.35; localY: -0.25; localZ: -0.8; radius: 0.09; height: 0.7"></a-entity>
-    </a-entity>
+<a-entity id="rig" position="0 1.6 0" 
+  physics-player="
+    height: 1.6; 
+    radius: 0.4; 
+    mass: 80; 
+    jumpForce: 1000; 
+    moveSpeed: 5000; 
+    maxVelocity: 5
+  ">
+  <a-entity 
+    camera="far: 20000" 
+    look-controls="pointerLockEnabled: true; touchEnabled: false" 
+    position="0 0 0" 
+    weapon-placeholder="
+      localX: 0.35; 
+      localY: -0.25; 
+      localZ: -0.8; 
+      radius: 0.09; 
+      height: 0.7
+    ">
+  </a-entity>
+</a-entity>
+ 
   </a-scene>
 
   <script>
     const JSON_URL = '/drone_wars/aframe/drone_wars_assets_dev.json';
     
   </script>
-  <script>
-AFRAME.registerComponent('weapon-placeholder', {
-  schema: {
-    radius: { type: 'number', default: 0.08 },
-    height: { type: 'number', default: 0.6 },
-    color: { type: 'color', default: '#444444' },
-    opacity: { type: 'number', default: 0.7 },
-    
-    // Local offsets relative to camera (x = right, y = up, z = forward/negative = in front)
-    localX: { type: 'number', default: 0.35 },
-    localY: { type: 'number', default: -0.25 },
-    localZ: { type: 'number', default: -0.8 }  // negative = in front of camera
-  },
-
-  init: function () {
-    const cylinder = document.createElement('a-cylinder');
-    cylinder.setAttribute('radius', this.data.radius);
-    cylinder.setAttribute('height', this.data.height);
-    cylinder.setAttribute('color', this.data.color);
-    cylinder.setAttribute('opacity', this.data.opacity);
-    cylinder.setAttribute('material', 'side: double; metalness: 0.3; roughness: 0.4');
-
-    // Position in LOCAL camera space (stays fixed on screen)
-    cylinder.setAttribute('position', `${this.data.localX} ${this.data.localY} ${this.data.localZ}`);
-    cylinder.setAttribute('rotation', '-52.283 -35.636 39.347');
-    // Optional: Make it always face the camera (good for weapons)
-    // cylinder.setAttribute('look-at', '[camera]');
-
-    this.el.appendChild(cylinder);
-    this.cylinder = cylinder;
-  }
-});
-</script>
+  
 </body>
 </html>
