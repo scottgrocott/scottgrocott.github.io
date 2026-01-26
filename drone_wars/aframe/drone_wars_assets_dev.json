@@ -10,9 +10,9 @@
     { 
       "id": "object_0", 
       "model": "#object_0_glb", 
-      "position": "8.21366 2.254 16.0007", 
+      "position": "15.71956 4.524 28.10528", 
       "rotation": "0 0 0",
-      "scale": "20 20 20", 
+      "scale": "40 40 40", 
       "class": "collidable"
     },
     { 
@@ -26,9 +26,9 @@
     { 
       "id": "object_3", 
       "model": "#object_3_glb", 
-      "position": "8.21053 2.109 -15.35791", 
+      "position": "17.29989 4.279 -27.686", 
       "rotation": "0 0 0",
-      "scale": "20 20 20",
+      "scale": "40 40 40",
       "class": "collidable"
     }
   ]
