@@ -5,7 +5,7 @@
     { "id": "object_2_glb", "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_2.glb" },
     { "id": "object_3_glb", "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_3.glb" },
     { "id": "droneglb", "src": "https://scottgrocott.github.io/drone_wars/temp/red_cube_animated.gltf" },
-    { "id": "navmesh_glb", "src": "https://scottgrocott.github.io/drone_wars/aframe/nav_mesh_create03.glb" }
+    { "id": "navmesh_glb", "src": "https://scottgrocott.github.io/drone_wars/aframe/nav_mesh_create04.glb" }
   ],
   "buildings": [
     { 

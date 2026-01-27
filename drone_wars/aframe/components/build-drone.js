@@ -10,7 +10,7 @@ function buildDrone() {
   drone.setAttribute('modify-gltf-color', `color: ${rgbString}; opacity: 1.0`);
   drone.setAttribute('position', '31.782 21.61002 3.1346');
   drone.setAttribute('scale', '.5 .5 .5');
-  drone.setAttribute('yuka-nav-pathfinding', 'speed: 3; minHeight: 1.5; heightOffset: 4');
+  drone.setAttribute('yuka-nav-pathfinding', 'speed: 3; minHeight: 1.5; heightOffset: 1');
   drone.setAttribute('physics-drone', 'radius: 0.6; mass: 2'); // ADD THIS LINE
   drone.setAttribute('physics-body', 'type: kinematic; mass: 2; restitution: 0.2; friction: 0.8');
   drone.setAttribute('spatial-sound', 'src: https://scottgrocott.github.io/metal_throne/assets/audio/buzz.mp3; volume: 0.7; refDistance: 5; maxDistance: 50');
