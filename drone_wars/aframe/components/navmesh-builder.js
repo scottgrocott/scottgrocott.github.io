@@ -146,7 +146,7 @@ AFRAME.registerComponent('navmesh-builder', {
       }
       
       // Connect nearby regions as neighbors
-      const maxDistance = 5.0; // Max distance to connect regions
+      const maxDistance = 50.0; // Max distance to connect regions (increased for larger scenes)
       
       for (let i = 0; i < regions.length; i++) {
         for (let j = i + 1; j < regions.length; j++) {
@@ -162,6 +162,49 @@ AFRAME.registerComponent('navmesh-builder', {
       navMesh.regions = regions;
       
       console.log(`✅ Nav mesh created with ${regions.length} walkable regions`);
+      
+      // DEBUG: Check region connectivity
+      let connectedCount = 0;
+      let isolatedCount = 0;
+      for (const region of regions) {
+        if (region.neighbors && region.neighbors.length > 0) {
+          connectedCount++;
+        } else {
+          isolatedCount++;
+        }
+      }
+      console.log(`🔗 Connected regions: ${connectedCount}, Isolated: ${isolatedCount}`);
+      
+      // Find largest connected cluster
+      let visited = new Set();
+      let maxClusterSize = 0;
+      for (let i = 0; i < regions.length; i++) {
+        if (visited.has(i)) continue;
+        
+        let clusterSize = 0;
+        let queue = [i];
+        visited.add(i);
+        
+        while (queue.length > 0) {
+          let current = queue.shift();
+          clusterSize++;
+          
+          const region = regions[current];
+          if (region.neighbors) {
+            for (const neighborIdx of region.neighbors) {
+              if (!visited.has(neighborIdx)) {
+                visited.add(neighborIdx);
+                queue.push(neighborIdx);
+              }
+            }
+          }
+        }
+        
+        if (clusterSize > maxClusterSize) {
+          maxClusterSize = clusterSize;
+        }
+      }
+      console.log(`📊 Largest connected cluster: ${maxClusterSize} out of ${regions.length} regions (${(maxClusterSize/regions.length*100).toFixed(1)}%)`);
       
       if (regions.length === 0) {
         console.warn('⚠️ No walkable surfaces found, creating fallback grid');
