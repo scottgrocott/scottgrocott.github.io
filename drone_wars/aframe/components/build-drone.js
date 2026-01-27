@@ -23,7 +23,7 @@ function buildDrone() {
         drone.remove();
       }, 5000);
     }, 5000);
-  }, 5000);
+  }, 50000);
   
   sceneContainer.appendChild(drone);
 }

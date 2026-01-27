@@ -10,105 +10,92 @@ AFRAME.registerComponent('navmesh-builder', {
   init: function() {
     console.log('🗺️ Nav mesh builder initialized');
     
-    // Wait for scene to load before building
+    // Wait for scene to load before loading navmesh
     this.el.sceneEl.addEventListener('loaded', () => {
       setTimeout(() => {
-        this.buildGlobalNavMesh();
+        this.loadNavMeshFromGLB();
       }, 2000); // Wait for all GLBs to load
     });
   },
 
-  buildGlobalNavMesh: function() {
-    console.log('🔨 Building global nav mesh from static objects...');
+  loadNavMeshFromGLB: function() {
+    console.log('🔨 Loading nav mesh from GLB file...');
     
-    // Find all entities with physics-static (these are the walkable surfaces)
-    const staticEntities = document.querySelectorAll('[physics-static]');
+    // Create a loader for the navmesh GLB
+    const loader = new THREE.GLTFLoader();
+    const navmeshURL = 'https://scottgrocott.github.io/drone_wars/aframe/nav_mesh_create.glb';
     
-    if (staticEntities.length === 0) {
-      console.warn('⚠️ No static objects found for nav mesh');
-      return;
-    }
+    loader.load(
+      navmeshURL,
+      (gltf) => {
+        console.log('✅ Nav mesh GLB loaded successfully');
+        this.processNavMeshGeometry(gltf.scene);
+      },
+      (progress) => {
+        console.log(`📥 Loading nav mesh: ${(progress.loaded / progress.total * 100).toFixed(0)}%`);
+      },
+      (error) => {
+        console.error('❌ Failed to load nav mesh GLB:', error);
+        console.log('⚠️ Falling back to simple nav mesh');
+        this.createSimpleNavMesh();
+      }
+    );
+  },
+
+  processNavMeshGeometry: function(scene) {
+    console.log('🔍 Processing nav mesh geometry...');
     
-    console.log(`Found ${staticEntities.length} static objects`);
-    
-    // Collect all walkable geometry
+    // Collect all geometry from the navmesh GLB
     const allVertices = [];
     const allIndices = [];
     let vertexOffset = 0;
     let totalTriangles = 0;
     
-    staticEntities.forEach(entity => {
-      const mesh = entity.getObject3D('mesh');
-      if (!mesh) return;
-      
-      const pos = entity.object3D.position;
-      const rot = entity.object3D.quaternion;
-      const scale = entity.object3D.scale;
-      
-      // Force update matrices
-      entity.object3D.updateMatrixWorld(true);
-      
-      mesh.traverse((node) => {
-        if (node.isMesh && node.geometry) {
-          const geometry = node.geometry;
-          const positions = geometry.attributes.position.array;
-          const indices = geometry.index ? geometry.index.array : null;
-          
-          // Transform vertices to world space
-          const tempVec = new THREE.Vector3();
-          
-          for (let i = 0; i < positions.length; i += 3) {
-            tempVec.set(positions[i], positions[i + 1], positions[i + 2]);
-            
-            // Apply scale
-            tempVec.x *= scale.x;
-            tempVec.y *= scale.y;
-            tempVec.z *= scale.z;
-            
-            // Apply rotation and position
-            tempVec.applyQuaternion(node.quaternion);
-            tempVec.add(node.position);
-            tempVec.applyQuaternion(rot);
-            tempVec.add(pos);
-            
-            allVertices.push(tempVec.x, tempVec.y, tempVec.z);
-          }
-          
-          // Add indices
-          if (indices) {
-            for (let i = 0; i < indices.length; i++) {
-              allIndices.push(indices[i] + vertexOffset);
-            }
-            totalTriangles += indices.length / 3;
-          } else {
-            for (let i = 0; i < positions.length / 3; i++) {
-              allIndices.push(i + vertexOffset);
-            }
-            totalTriangles += positions.length / 9;
-          }
-          
-          vertexOffset += positions.length / 3;
+    scene.traverse((node) => {
+      if (node.isMesh && node.geometry) {
+        const geometry = node.geometry;
+        const positions = geometry.attributes.position.array;
+        const indices = geometry.index ? geometry.index.array : null;
+        
+        // Get world transform
+        node.updateMatrixWorld(true);
+        const worldMatrix = node.matrixWorld;
+        const tempVec = new THREE.Vector3();
+        
+        // Transform vertices to world space
+        for (let i = 0; i < positions.length; i += 3) {
+          tempVec.set(positions[i], positions[i + 1], positions[i + 2]);
+          tempVec.applyMatrix4(worldMatrix);
+          allVertices.push(tempVec.x, tempVec.y, tempVec.z);
         }
-      });
+        
+        // Add indices
+        if (indices) {
+          for (let i = 0; i < indices.length; i++) {
+            allIndices.push(indices[i] + vertexOffset);
+          }
+          totalTriangles += indices.length / 3;
+        } else {
+          for (let i = 0; i < positions.length / 3; i++) {
+            allIndices.push(i + vertexOffset);
+          }
+          totalTriangles += positions.length / 9;
+        }
+        
+        vertexOffset += positions.length / 3;
+      }
     });
     
     if (allVertices.length === 0) {
-      console.error('❌ No geometry found for nav mesh');
+      console.error('❌ No geometry found in nav mesh GLB');
+      this.createSimpleNavMesh();
       return;
     }
     
-    console.log(`📊 Collected ${allVertices.length / 3} vertices, ${totalTriangles} triangles`);
+    console.log(`📊 Collected ${allVertices.length / 3} vertices, ${totalTriangles} triangles from nav mesh`);
     
-    // Create Yuka nav mesh
-    this.createYukaNavMesh(allVertices, allIndices);
-  },
-
-  createYukaNavMesh: function(vertices, indices) {
-    console.log('📝 Creating nav mesh with alternative method...');
-    
-    // Yuka's NavMeshLoader is meant for loading external files
-    // Instead, we'll create a simple but effective nav mesh manually
-    this.createWalkableNavMesh(vertices, indices);
+    // Create Yuka nav mesh from the geometry
+    this.createWalkableNavMesh(allVertices, allIndices);
   },
   
   createWalkableNavMesh: function(vertices, indices) {
