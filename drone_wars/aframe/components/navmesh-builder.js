@@ -146,7 +146,7 @@ AFRAME.registerComponent('navmesh-builder', {
       }
       
       // Connect nearby regions as neighbors
-      const maxDistance = 50.0; // Max distance to connect regions (increased for larger scenes)
+      const maxDistance = 25.0; // Max distance to connect regions (increased for larger scenes)
       
       for (let i = 0; i < regions.length; i++) {
         for (let j = i + 1; j < regions.length; j++) {
