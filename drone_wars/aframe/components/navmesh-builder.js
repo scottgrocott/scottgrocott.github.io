@@ -146,7 +146,7 @@ AFRAME.registerComponent('navmesh-builder', {
       }
       
       // Connect nearby regions as neighbors
-      const maxDistance = 25.0; // Max distance to connect regions (increased for larger scenes)
+      const maxDistance = 55.0; // Max distance to connect regions (increased for larger scenes)
       
       for (let i = 0; i < regions.length; i++) {
         for (let j = i + 1; j < regions.length; j++) {
@@ -205,6 +205,40 @@ AFRAME.registerComponent('navmesh-builder', {
         }
       }
       console.log(`📊 Largest connected cluster: ${maxClusterSize} out of ${regions.length} regions (${(maxClusterSize/regions.length*100).toFixed(1)}%)`);
+      
+      // DEBUG: Show region distribution
+      console.log('📍 Region distribution analysis:');
+      let minX = Infinity, maxX = -Infinity;
+      let minY = Infinity, maxY = -Infinity;
+      let minZ = Infinity, maxZ = -Infinity;
+      let nearOrigin = 0;
+      let farFromOrigin = 0;
+      
+      for (const region of regions) {
+        const x = region.centroid.x;
+        const y = region.centroid.y;
+        const z = region.centroid.z;
+        
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+        minZ = Math.min(minZ, z);
+        maxZ = Math.max(maxZ, z);
+        
+        const distFromOrigin = Math.sqrt(x*x + z*z); // Horizontal distance only
+        if (distFromOrigin < 20) {
+          nearOrigin++;
+        } else {
+          farFromOrigin++;
+        }
+      }
+      
+      console.log(`   X range: ${minX.toFixed(1)} to ${maxX.toFixed(1)} (span: ${(maxX-minX).toFixed(1)})`);
+      console.log(`   Y range: ${minY.toFixed(1)} to ${maxY.toFixed(1)} (span: ${(maxY-minY).toFixed(1)})`);
+      console.log(`   Z range: ${minZ.toFixed(1)} to ${maxZ.toFixed(1)} (span: ${(maxZ-minZ).toFixed(1)})`);
+      console.log(`   Near origin (<20 units): ${nearOrigin} regions (${(nearOrigin/regions.length*100).toFixed(1)}%)`);
+      console.log(`   Far from origin (>20 units): ${farFromOrigin} regions (${(farFromOrigin/regions.length*100).toFixed(1)}%)`);
       
       if (regions.length === 0) {
         console.warn('⚠️ No walkable surfaces found, creating fallback grid');
@@ -390,13 +424,7 @@ AFRAME.registerComponent('yuka-nav-pathfinding', {
   startPatrolling: function() {
     // Find first path
     this.findNewPath();
-    
-    // Set up interval to find new paths
-    this.navigationTimer = setInterval(() => {
-      if (this.navigationActive) {
-        this.findNewPath();
-      }
-    }, this.data.wanderInterval);
+    // Note: New paths will be triggered when destination is reached (see tick function)
   },
   
   findNewPath: function() {
@@ -420,10 +448,28 @@ AFRAME.registerComponent('yuka-nav-pathfinding', {
       }
     }
     
-    // Pick random destination region
-    const toRegion = regions[Math.floor(Math.random() * regions.length)];
+    // Pick DISTANT destination region (prefer exploration over short loops)
+    // Try to find regions far away from current position
+    const minDesiredDistance = 20.0; // Prefer destinations at least this far away
+    let candidateRegions = [];
     
-    console.log(`🎯 Finding path from region to random destination`);
+    for (const region of regions) {
+      const dist = vehiclePos.distanceTo(region.centroid);
+      if (dist > minDesiredDistance) {
+        candidateRegions.push(region);
+      }
+    }
+    
+    // If no far regions found, use all regions
+    if (candidateRegions.length === 0) {
+      candidateRegions = regions;
+    }
+    
+    // Pick random from candidates (now biased toward distant regions)
+    const toRegion = candidateRegions[Math.floor(Math.random() * candidateRegions.length)];
+    
+    const distToTarget = vehiclePos.distanceTo(toRegion.centroid);
+    console.log(`🎯 Finding path to region ${distToTarget.toFixed(1)} units away`);
     
     try {
       // Simple pathfinding: just go to random region centroids
@@ -462,11 +508,11 @@ AFRAME.registerComponent('yuka-nav-pathfinding', {
   },
   
   findWaypoints: function(fromRegion, toRegion, allRegions) {
-    // Simple greedy pathfinding: move towards goal through connected regions
+    // Create a path through multiple regions for more interesting routes
     const waypoints = [];
     const visited = new Set();
     let currentRegion = fromRegion;
-    const maxSteps = 20;
+    const maxSteps = 30; // Increased from 20
     let steps = 0;
     
     visited.add(allRegions.indexOf(currentRegion));
@@ -474,9 +520,10 @@ AFRAME.registerComponent('yuka-nav-pathfinding', {
     while (currentRegion !== toRegion && steps < maxSteps) {
       steps++;
       
-      // Find neighbor closest to goal
+      // Find neighbor that moves toward goal, with some variety
       let bestNeighbor = null;
       let bestDist = Infinity;
+      const candidates = [];
       
       if (currentRegion.neighbors && currentRegion.neighbors.length > 0) {
         for (const neighborIdx of currentRegion.neighbors) {
@@ -485,14 +532,32 @@ AFRAME.registerComponent('yuka-nav-pathfinding', {
           const neighbor = allRegions[neighborIdx];
           const distToGoal = neighbor.centroid.distanceTo(toRegion.centroid);
           
-          if (distToGoal < bestDist) {
-            bestDist = distToGoal;
-            bestNeighbor = neighbor;
+          // Collect neighbors that move us closer
+          if (distToGoal < currentRegion.centroid.distanceTo(toRegion.centroid)) {
+            candidates.push({ neighbor, neighborIdx, distToGoal });
+          }
+        }
+        
+        if (candidates.length > 0) {
+          // Sort by distance to goal
+          candidates.sort((a, b) => a.distToGoal - b.distToGoal);
+          
+          // Pick best one (or occasionally second-best for variety)
+          const pickIdx = Math.random() < 0.8 ? 0 : Math.min(1, candidates.length - 1);
+          bestNeighbor = candidates[pickIdx].neighbor;
+          bestDist = candidates[pickIdx].distToGoal;
+        } else {
+          // No progress toward goal, pick any unvisited neighbor
+          for (const neighborIdx of currentRegion.neighbors) {
+            if (visited.has(neighborIdx)) continue;
+            bestNeighbor = allRegions[neighborIdx];
+            break;
           }
         }
       }
       
       if (bestNeighbor) {
+        // Always add waypoint for more detailed paths
         waypoints.push(bestNeighbor.centroid.clone());
         currentRegion = bestNeighbor;
         visited.add(allRegions.indexOf(currentRegion));
@@ -501,10 +566,13 @@ AFRAME.registerComponent('yuka-nav-pathfinding', {
         break;
       }
       
-      // If we're close enough to goal, stop
-      if (currentRegion === toRegion || currentRegion.centroid.distanceTo(toRegion.centroid) < 5) {
+      // Only stop if we actually reached the goal region
+      if (currentRegion === toRegion) {
         break;
       }
+      
+      // Don't stop early - traverse more regions for longer paths
+      // Removed the "close enough" early exit
     }
     
     return waypoints;
@@ -517,6 +585,21 @@ AFRAME.registerComponent('yuka-nav-pathfinding', {
       
       if (this.vehicle.syncToRenderComponent) {
         this.vehicle.syncToRenderComponent(this.vehicle);
+      }
+      
+      // Check if we've reached the destination and need a new path
+      if (this.followPathBehavior && this.followPathBehavior.active) {
+        const path = this.followPathBehavior.path;
+        if (path && path._waypoints && path._waypoints.length > 0) {
+          const lastWaypoint = path._waypoints[path._waypoints.length - 1];
+          const distToEnd = this.vehicle.position.distanceTo(lastWaypoint);
+          
+          // If we're close to the end (within 2 units), find a new path
+          if (distToEnd < 2.0) {
+            console.log('✅ Reached destination, finding new path...');
+            this.findNewPath();
+          }
+        }
       }
     }
   },
