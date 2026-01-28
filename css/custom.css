@@ -21,3 +21,8 @@
     --bs-bg-opacity: 1;
     background-color: rgba(72,22,88,1) !important;
 }
+
+/* Change the color of the top navigation bar text */
+#email {
+    display:none;
+}
