@@ -1,0 +1,160 @@
+<?php include '../header.php'; ?>
+
+    <!-- Page Header-->
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/flight_zones_green.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="post-heading">
+                            <h1>Flight Zones: Simplicity Wins</h1>
+                            <h2 class="subheading">When Hand-Authoring Beats Automation</h2>
+                            <span class="meta">
+                                Posted by
+                                <a href="#!">Scott Grocott</a>
+                                on <?php echo date("F j, Y"); ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Post Content-->
+        <article class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>After the navmesh complications detailed in the previous post, I made a radical decision: <strong>throw it all away</strong>. No automatic geometry extraction, no surface analysis, no 12,959 regions. Instead, I would hand-author exactly where I wanted drones to fly using simple 3D primitives.</p>
+
+                        <h2 class="section-heading">The Realization</h2>
+                        <p>The breakthrough came from asking a different question. Not "how can I make drones navigate my level?" but "where do I want combat to happen?" The answer was obvious: in clear sight of the player, at interesting heights, around key structures.</p>
+
+                        <p>I didn't need drones navigating the entire Fuel Yard. I needed them patrolling specific areas—an approach lane, a high-altitude corridor, the space between fuel tanks. These could be defined as simple boxes.</p>
+
+                        <h2 class="section-heading">Flight Zones: The Concept</h2>
+                        <p>A flight zone is just a 3D rectangular volume with a center point and dimensions. Drones pick random points within zones and fly between them. That's it. No pathfinding, no region connectivity, no graph search.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Flight Zone Definition
+const zones = [];
+
+// Zone 1: Front approach (where player enters)
+zones.push({
+  center: { x: 0, y: 5, z: -10 },
+  size: { width: 20, height: 8, depth: 15 }
+});
+
+// Zone 2: High altitude patrol
+zones.push({
+  center: { x: 0, y: 12, z: -15 },
+  size: { width: 30, height: 6, depth: 30 }
+});
+
+// Zone 3: Between fuel tanks
+zones.push({
+  center: { x: -15, y: 6, z: -8 },
+  size: { width: 12, height: 10, depth: 20 }
+});</code></pre>
+
+                        <h2 class="section-heading">Visual Debugging</h2>
+                        <p>The beauty of this approach is that zones are <em>visible</em> during development. I can render them as semi-transparent green boxes and immediately see if they intersect buildings or if coverage is adequate.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>buildFlightZones: function() {
+  zones.forEach((zone, index) => {
+    const box = document.createElement('a-box');
+    box.setAttribute('position', `${zone.center.x} ${zone.center.y} ${zone.center.z}`);
+    box.setAttribute('width', zone.size.width);
+    box.setAttribute('height', zone.size.height);
+    box.setAttribute('depth', zone.size.depth);
+    
+    // Debug visual: semi-transparent green
+    box.setAttribute('material', 
+      'color: #00ff00; opacity: 0.2; transparent: true; side: double');
+    
+    this.el.sceneEl.appendChild(box);
+  });
+  
+  window.flightZones = zones;
+  window.flightZonesReady = true;
+}</code></pre>
+
+                        <p>During development, I keep zones visible. For production, I just set opacity to 0. The zones still exist and function—they're just invisible.</p>
+
+                        <h2 class="section-heading">Drone Navigation Behavior</h2>
+                        <p>Instead of A* pathfinding through navmesh regions, drones now use a much simpler approach:</p>
+
+                        <ol>
+                            <li>Pick a random point within current zone</li>
+                            <li>Use Yuka's <code>ArriveBehavior</code> to fly there</li>
+                            <li>When arrived (distance < 2m), pick new point</li>
+                            <li>Repeat every 10 seconds</li>
+                        </ol>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>pickNewTarget: function() {
+  // Pick random flight zone
+  const zone = window.flightZones[Math.floor(Math.random() * window.flightZones.length)];
+  
+  // Pick random point within zone (80% of full size to avoid edges)
+  const targetX = zone.center.x + (Math.random() - 0.5) * zone.size.width * 0.8;
+  const targetY = zone.center.y + (Math.random() - 0.5) * zone.size.height * 0.8;
+  const targetZ = zone.center.z + (Math.random() - 0.5) * zone.size.depth * 0.8;
+  
+  this.targetPoint = new YUKA.Vector3(targetX, targetY, targetZ);
+  
+  // Create arrive behavior
+  const seekBehavior = new YUKA.ArriveBehavior(this.targetPoint, 2, 0.5);
+  this.vehicle.steering.clear();
+  this.vehicle.steering.add(seekBehavior);
+}</code></pre>
+
+                        <h2 class="section-heading">The Immediate Benefits</h2>
+                        
+                        <h3>1. No Collision Issues</h3>
+                        <p>Since I'm hand-placing zones in open air, there are no wall collisions. Drones fly through empty space—exactly as intended.</p>
+
+                        <h3>2. Predictable Performance</h3>
+                        <p>With 4-5 zones instead of 12,959 regions, performance is instant. No complex graph searches, no spatial queries.</p>
+
+                        <h3>3. Design Control</h3>
+                        <p>I can place zones to create specific encounter designs. A narrow corridor zone creates tense close-quarters combat. A high, wide zone creates long-range engagement. This is <em>game design</em>, not just pathfinding.</p>
+
+                        <h3>4. Debuggability</h3>
+                        <p>When a drone behaves strangely, I can visually see which zone it's in and verify that zone makes sense. With navmesh regions, debugging required dumping coordinates to console.</p>
+
+                        <h2 class="section-heading">The Zone Network Concept</h2>
+                        <p>For more complex behavior, zones can be connected like a graph:</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>zones.push({
+  center: { x: 0, y: 5, z: -10 },
+  size: { width: 20, height: 8, depth: 15 },
+  connections: [1, 2]  // Can transition to zones 1 or 2
+});
+
+zones.push({
+  center: { x: -15, y: 5, z: -10 },
+  size: { width: 15, height: 8, depth: 20 },
+  connections: [0, 3]  // Can transition to zones 0 or 3
+});</code></pre>
+
+                        <p>This creates "highways" between zones. Drones don't teleport—they fly through connecting zones to reach their destination. The result is more organic, believable movement.</p>
+
+                        <h2 class="section-heading">The Lesson</h2>
+                        <blockquote class="blockquote">"The most sophisticated solution is not always the best solution. Sometimes hand-crafting beats automation."</blockquote>
+
+                        <p>Automatic navmesh generation is powerful for certain games—large open worlds, procedurally generated levels, dynamic environments. But for a curated combat scenario in a fixed level? Hand-authored flight zones are simpler, more controllable, and more performant.</p>
+
+                        <h2 class="section-heading">What's Next</h2>
+                        <p>With drones now flying reliably, the next challenge is making them <em>threatening</em>. In the next post, I'll detail integrating Rapier physics for player collision, implementing a health system, and the surprisingly complex problem of making drones shootable.</p>
+
+                        <p>
+                            Development log by
+                            <a href="<?php echo $root_url; ?>">Scott Grocott</a>
+                            &middot; Engine:
+                            <a href="https://aframe.io">A-Frame</a>
+                            &middot; Series: Drone Wars (3/5)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+<?php include '../footer.php'; ?>

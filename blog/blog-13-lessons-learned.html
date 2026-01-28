@@ -1,0 +1,192 @@
+<?php include '../header.php'; ?>
+
+    <!-- Page Header-->
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/drone_wars_complete.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="post-heading">
+                            <h1>Drone Wars: Lessons Learned</h1>
+                            <h2 class="subheading">What A-Frame Taught Me About the Road Ahead</h2>
+                            <span class="meta">
+                                Posted by
+                                <a href="#!">Scott Grocott</a>
+                                on <?php echo date("F j, Y"); ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Post Content-->
+        <article class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>Drone Wars is functionally complete. Autonomous drones patrol flight zones, spatial audio tracks their movement, and the integration layer synchronizes three independent libraries into a coherent system. But the real value of this prototype isn't the working code—it's the lessons learned that will shape <em>Go-Cart Wars</em>, <em>Forklift Wars</em>, and ultimately <em>Metal Throne: Fuel Yard</em>.</p>
+
+                        <h2 class="section-heading">What Worked: The Component Architecture</h2>
+                        <p>A-Frame's component-based architecture forced good habits. Each system—navigation, physics, audio—exists as an independent component that can be mixed and matched. This modularity will port beautifully to Three.js and Babylon.js.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// A-Frame component
+AFRAME.registerComponent('spatial-sound', {
+  schema: { src: {type: 'string'}, volume: {type: 'number'} },
+  init: function() { /* setup */ },
+  tick: function() { /* update */ },
+  remove: function() { /* cleanup */ }
+});
+
+// Will translate to Three.js class
+class SpatialSound {
+  constructor(options) { /* setup */ }
+  update(deltaTime) { /* update */ }
+  dispose() { /* cleanup */ }
+}</code></pre>
+
+                        <p>The patterns are identical. A-Frame simply provides the infrastructure.</p>
+
+                        <h2 class="section-heading">What Didn't Work: The Abstraction Tax</h2>
+                        <p>A-Frame's convenience comes with cost. Simple operations require verbose code:</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// A-Frame: Create a colored sphere
+const sphere = document.createElement('a-sphere');
+sphere.setAttribute('color', '#ff0000');
+sphere.setAttribute('radius', '2');
+sphere.setAttribute('material', 'shader: flat');
+droneContainer.appendChild(sphere);
+
+// Three.js equivalent (what I'll use in Go-Cart Wars)
+const geometry = new THREE.SphereGeometry(2);
+const material = new THREE.MeshBasicMaterial({color: 0xff0000});
+const sphere = new THREE.Mesh(geometry, material);
+droneContainer.add(sphere);
+</code></pre>
+
+                        <p>The Three.js version is more direct and gives finer control. For Go-Cart Wars, I'll work at the Three.js level while maintaining the component structure.</p>
+
+                        <h2 class="section-heading">The Big Lesson: Authoring Over Automation</h2>
+                        <p>The failed navmesh experiment taught the most valuable lesson: <strong>automated solutions aren't always better than hand-crafted ones</strong>. This principle will extend beyond navigation:</p>
+
+                        <h3>Combat Encounters</h3>
+                        <p>Instead of procedurally spawning enemies, <em>design</em> encounters. Place spawn points, define patrol patterns, choreograph difficulty curves.</p>
+
+                        <h3>Audio Design</h3>
+                        <p>Instead of ambient sound generators, compose specific soundscapes for specific areas. The player's entrance to the Fuel Yard should sound intentional, not random.</p>
+
+                        <h3>Lighting</h3>
+                        <p>Instead of global illumination, hand-place dramatic lights. Babylon.js will excel here—its light system rewards artistic intent.</p>
+
+                        <h2 class="section-heading">Rapier Physics: The Keeper</h2>
+                        <p>Rapier proved itself. It's fast, reliable, and the WebAssembly implementation means it'll work identically across all three projects. The API is pleasant:</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Same code for A-Frame, Three.js, and Babylon.js
+const rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
+  .setTranslation(x, y, z);
+const rigidBody = physicsWorld.createRigidBody(rigidBodyDesc);
+
+const colliderDesc = RAPIER.ColliderDesc.ball(radius)
+  .setMass(mass);
+const collider = physicsWorld.createCollider(colliderDesc, rigidBody);
+</code></pre>
+
+                        <p>This consistency is invaluable. Go-Cart Wars and Forklift Wars will use the exact same physics code.</p>
+
+                        <h2 class="section-heading">Yuka AI: Room for Growth</h2>
+                        <p>Yuka handled basic navigation well, but it's designed for ground-based agents. For Go-Cart Wars (ground vehicles) it'll be perfect. For Forklift Wars (complex interactions), I may need to extend or replace it.</p>
+
+                        <p>The flight zone concept, though, is universal. Whether it's go-cart race lines or forklift work areas, <em>defining regions of valid movement</em> is cleaner than automatic pathfinding.</p>
+
+                        <h2 class="section-heading">Howler Audio: Spatially Aware</h2>
+                        <p>Howler's spatial audio transformed the experience. Hearing drones approach from behind, tracking them by sound when they leave view—this is essential for immersion. Go-Cart Wars will benefit even more, with engine sounds, tire screeches, and collision impacts all spatially positioned.</p>
+
+                        <h2 class="section-heading">The Technology Triangle</h2>
+                        <p>The three-project approach is vindicated:</p>
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Engine</th>
+                                    <th>Focus</th>
+                                    <th>Tech Validated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Drone Wars</td>
+                                    <td>A-Frame</td>
+                                    <td>AI Navigation</td>
+                                    <td>Yuka, Rapier, Howler integration</td>
+                                </tr>
+                                <tr>
+                                    <td>Go-Cart Wars</td>
+                                    <td>Three.js</td>
+                                    <td>Vehicle Physics</td>
+                                    <td>Rapier vehicles, direct rendering control</td>
+                                </tr>
+                                <tr>
+                                    <td>Forklift Wars</td>
+                                    <td>Babylon.js</td>
+                                    <td>Complex Interactions</td>
+                                    <td>Full engine features, professional pipeline</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p>Each project builds on the previous. By the time Fuel Yard begins, I'll have production-tested all core systems.</p>
+
+                        <h2 class="section-heading">Unexpected Discoveries</h2>
+
+                        <h3>Debugging is Visual</h3>
+                        <p>Being able to see flight zones as green boxes was transformational. Future projects will prioritize visual debugging from day one. Three.js will get debug wireframes, Babylon.js will get the Inspector.</p>
+
+                        <h3>Console Logs are Documentation</h3>
+                        <p>Strategic logging told the story of what was happening:</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>🚁 Creating drone: drone_1769457729833
+✅ Visible marker added with color: #98d1d6
+🗺️ Setting up pathfinding navigation
+✅ Path created with 22 waypoints
+🔴 Collision detected! Pushing back 4.57m
+</code></pre>
+
+                        <p>These emoji-prefixed logs made debugging tractable. They'll become a standard across all three projects.</p>
+
+                        <h3>Performance Budgets Matter</h3>
+                        <p>With 15 drones, the frame rate dropped to 45 FPS. Not because of physics or AI—because of rendering. Each drone had a sphere (geometry), a light (shadow calculations), and text (texture generation). The lesson: visual complexity costs more than system complexity.</p>
+
+                        <h2 class="section-heading">What's Next: Go-Cart Wars</h2>
+                        <p>With Drone Wars complete, development shifts to <strong>Go-Cart Wars</strong>—a Three.js prototype focused on vehicle physics and ground-based combat. The challenges ahead:</p>
+
+                        <ul>
+                            <li><strong>Rapier vehicle constraints</strong>: Wheels, steering, suspension</li>
+                            <li><strong>Terrain interaction</strong>: Bumps, jumps, friction variation</li>
+                            <li><strong>Competitive AI</strong>: Go-carts that race, not just patrol</li>
+                            <li><strong>Direct Three.js rendering</strong>: No A-Frame abstraction</li>
+                        </ul>
+
+                        <p>The flight zone concept will translate to race lines. The component architecture will become ES6 classes. The spatial audio will expand to engine RPM mapping. And Rapier physics will finally tackle the complexity it was designed for: realistic vehicle simulation.</p>
+
+                        <h2 class="section-heading">The Road to the Fuel Yard</h2>
+                        <blockquote class="blockquote">"Three prototypes, three technologies, one throne."</blockquote>
+
+                        <p><em>Metal Throne: Fuel Yard</em> will be the culmination: Babylon.js for professional visuals, Rapier for authentic physics, Yuka for intelligent enemies, Howler for immersive audio. But it won't be built from scratch—it'll be assembled from battle-tested components proven across three smaller games.</p>
+
+                        <p>Drone Wars taught me that the path to a large project is through small, focused experiments. Go-Cart Wars will teach me vehicle dynamics. Forklift Wars will teach me Babylon.js mastery. And when the Fuel Yard finally opens, it will stand on a foundation of three successful prototypes.</p>
+
+                        <p>The first battle is won. Two more await.</p>
+
+                        <p>
+                            Development log by
+                            <a href="<?php echo $root_url; ?>">Scott Grocott</a>
+                            &middot; Engine:
+                            <a href="https://aframe.io">A-Frame</a>
+                            &middot; Series: Drone Wars (5/5)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+<?php include '../footer.php'; ?>

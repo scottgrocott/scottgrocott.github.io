@@ -1,0 +1,229 @@
+<?php include '../header.php'; ?>
+
+    <!-- Page Header-->
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/tech_integration.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="post-heading">
+                            <h1>Three Libraries, One Frame</h1>
+                            <h2 class="subheading">Synchronizing Rapier, Yuka, and Howler in A-Frame</h2>
+                            <span class="meta">
+                                Posted by
+                                <a href="#!">Scott Grocott</a>
+                                on <?php echo date("F j, Y"); ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Post Content-->
+        <article class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>With flight zones solving the navigation problem, I now had drones that flew predictably. But they existed in three separate realities: <strong>Yuka controlled their AI</strong>, <strong>Rapier handled collision</strong>, and <strong>Howler managed their sound</strong>. Getting these three systems to agree on where a drone actually was became the central technical challenge of Drone Wars.</p>
+
+                        <h2 class="section-heading">The Three Kingdoms</h2>
+                        
+                        <h3>Yuka: The Navigator</h3>
+                        <p>Yuka operates on its own coordinate space with its own <code>Vehicle</code> objects. It doesn't know about A-Frame entities or Three.js objects—it just updates vectors representing positions and velocities.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Yuka thinks the drone is here
+this.vehicle.position = new YUKA.Vector3(-5, 8, -12);
+
+// But the visual entity might be somewhere else
+this.el.object3D.position = new THREE.Vector3(-5.5, 8, -12);
+</code></pre>
+
+                        <h3>Rapier: The Enforcer</h3>
+                        <p>Rapier physics runs in WebAssembly, completely separate from JavaScript. It maintains its own <code>RigidBody</code> objects with positions that must be explicitly synced.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Rapier thinks the drone is here (after collision)
+const physicsPos = this.rigidBody.translation();
+// { x: -4.5, y: 8, z: -12 }  // Pushed by collision
+
+// But Yuka wants it here (navigation target)
+const navigationPos = this.vehicle.position;
+// { x: -5, y: 8, z: -12 }  // Where AI says to go
+</code></pre>
+
+                        <h3>Howler: The Listener</h3>
+                        <p>Howler needs to know both the listener (camera) position and the source (drone) position for spatial audio. But it has its own coordinate system and expects explicit updates every frame.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Howler needs to be told both positions explicitly
+Howler.pos(cameraX, cameraY, cameraZ);      // Listener
+this.sound.pos(droneX, droneY, droneZ);     // Source
+</code></pre>
+
+                        <h2 class="section-heading">The Synchronization Problem</h2>
+                        <p>Each system updates at different rates:</p>
+                        <ul>
+                            <li><strong>A-Frame tick:</strong> 60 FPS (16.67ms intervals)</li>
+                            <li><strong>Rapier physics step:</strong> Independent RAF loop, 60 FPS</li>
+                            <li><strong>Yuka EntityManager:</strong> Called in component tick, 60 FPS</li>
+                            <li><strong>Howler audio:</strong> Updated in component tick, 60 FPS</li>
+                        </ul>
+
+                        <p>The problem: if these aren't perfectly synchronized, a drone's position becomes <em>three different values</em> in the same frame. The visual entity might be at (0, 5, -10), physics thinks it's at (0.5, 5, -10), and Yuka wants it at (-0.5, 5, -10).</p>
+
+                        <h2 class="section-heading">Solution 1: The Global Yuka System</h2>
+                        <p>Originally, each drone component called <code>yukaEntityManager.update()</code> in its own tick. With multiple drones, the EntityManager was updating multiple times per frame—causing race conditions.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// BAD: Each drone updates EntityManager independently
+AFRAME.registerComponent('yuka-nav', {
+  tick: function(time, deltaTime) {
+    yukaEntityManager.update(deltaTime / 1000);  // ❌ Called N times
+    this.vehicle.syncToRenderComponent(this.vehicle);
+  }
+});
+</code></pre>
+
+                        <p>The fix: create a single global system that updates EntityManager once per frame:</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// GOOD: Single update per frame
+AFRAME.registerComponent('yuka-system', {
+  tick: function(time, deltaTime) {
+    if (!yukaUpdateLocked) {
+      yukaUpdateLocked = true;
+      
+      const delta = deltaTime / 1000;
+      yukaEntityManager.update(delta);  // ✅ Called once
+      
+      // Sync ALL vehicles after single update
+      for (const entity of yukaEntityManager.entities) {
+        if (entity.syncToRenderComponent) {
+          entity.syncToRenderComponent(entity);
+        }
+      }
+      
+      yukaUpdateLocked = false;
+    }
+  }
+});</code></pre>
+
+                        <p>This ensures Yuka updates exactly once, then all vehicles sync their visual positions in a single batch.</p>
+
+                        <h2 class="section-heading">Solution 2: Kinematic Physics Bodies</h2>
+                        <p>For moving drones, Rapier offers three body types:</p>
+                        <ul>
+                            <li><strong>Dynamic:</strong> Fully physics-simulated (forces, gravity, collisions)</li>
+                            <li><strong>Static:</strong> Never moves (buildings, terrain)</li>
+                            <li><strong>Kinematic:</strong> Moves programmatically, still has collision</li>
+                        </ul>
+
+                        <p>Drones use kinematic bodies—they move according to Yuka navigation, but Rapier still detects when they hit things:</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Create kinematic body
+const rigidBodyDesc = RAPIER.RigidBodyDesc.kinematicPositionBased()
+  .setTranslation(pos.x, pos.y, pos.z);
+
+this.rigidBody = physicsWorld.createRigidBody(rigidBodyDesc);
+
+// Each frame: tell physics where Yuka wants to go
+tick: function() {
+  const yukaPos = this.vehicle.position;
+  
+  this.rigidBody.setNextKinematicTranslation({
+    x: yukaPos.x,
+    y: yukaPos.y,
+    z: yukaPos.z
+  });
+  
+  // Check if collision pushed us away
+  const actualPos = this.rigidBody.translation();
+  const distance = yukaPos.distanceTo(actualPos);
+  
+  if (distance > 0.5) {
+    // Collision detected - update Yuka to match physics
+    this.vehicle.position.copy(actualPos);
+  }
+}</code></pre>
+
+                        <p>This creates a feedback loop: Yuka says "go here," Rapier checks for collisions, and if there's a problem, Yuka is corrected to the physics-safe position.</p>
+
+                        <h2 class="section-heading">Solution 3: Position Caching</h2>
+                        <p>Accessing Rapier physics data during the physics step causes crashes (WASM memory access violations). The solution: cache values between steps:</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Cache positions to avoid accessing physics during step
+startPhysicsCache: function() {
+  setInterval(() => {
+    if (!this.rigidBody) return;
+    
+    try {
+      const vel = this.rigidBody.linvel();
+      this.cachedVelocity = { x: vel.x, y: vel.y, z: vel.z };
+      
+      const pos = this.rigidBody.translation();
+      this.cachedPosition = { x: pos.x, y: pos.y, z: pos.z };
+    } catch (error) {
+      // Skip if locked
+    }
+  }, 16);  // Cache every frame
+}
+
+// Use cached values instead of direct access
+tick: function() {
+  // Safe: uses cached data
+  const speed = Math.sqrt(
+    this.cachedVelocity.x * this.cachedVelocity.x + 
+    this.cachedVelocity.z * this.cachedVelocity.z
+  );
+}</code></pre>
+
+                        <h2 class="section-heading">Solution 4: Spatial Audio Sync</h2>
+                        <p>Howler updates are the simplest—just pull from the entity position (which is already synced from Yuka):</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>tick: function() {
+  // Update listener (camera) position
+  const camPos = this.camera.object3D.position;
+  Howler.pos(camPos.x, camPos.y, camPos.z);
+  
+  // Update source (drone) position  
+  const dronePos = this.el.object3D.position;  // Already synced from Yuka
+  this.sound.pos(dronePos.x, dronePos.y, dronePos.z);
+}</code></pre>
+
+                        <h2 class="section-heading">The Final Pipeline</h2>
+                        <p>With all systems synchronized, the update order becomes:</p>
+
+                        <ol>
+                            <li><strong>Rapier physics step</strong> (independent RAF loop)</li>
+                            <li><strong>A-Frame tick starts</strong></li>
+                            <li><strong>Yuka-system updates</strong> EntityManager once</li>
+                            <li><strong>Each vehicle syncs</strong> to visual entity</li>
+                            <li><strong>Physics-drone checks</strong> for collisions, updates Yuka if needed</li>
+                            <li><strong>Spatial-sound updates</strong> using entity position</li>
+                            <li><strong>A-Frame renders</strong> frame with final positions</li>
+                        </ol>
+
+                        <blockquote class="blockquote">"Three separate libraries, one coherent reality."</blockquote>
+
+                        <h2 class="section-heading">Performance Impact</h2>
+                        <p>With synchronized updates, performance is excellent:</p>
+                        <ul>
+                            <li>5 drones: 60 FPS constant</li>
+                            <li>10 drones: 55-60 FPS</li>
+                            <li>15 drones: 45-50 FPS</li>
+                        </ul>
+
+                        <p>The bottleneck is rendering (each drone has sphere, light, text label) not the integration layer.</p>
+
+                        <h2 class="section-heading">What's Next</h2>
+                        <p>With a solid integration foundation, the next post covers gameplay systems: weapon raycasting, drone health, kill events, and the surprisingly difficult challenge of making a falling drone look good.</p>
+
+                        <p>
+                            Development log by
+                            <a href="<?php echo $root_url; ?>">Scott Grocott</a>
+                            &middot; Engine:
+                            <a href="https://aframe.io">A-Frame</a>
+                            &middot; Series: Drone Wars (4/5)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+<?php include '../footer.php'; ?>

@@ -1,0 +1,126 @@
+<?php include '../header.php'; ?>
+
+    <!-- Page Header-->
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/drone_wars_header.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="post-heading">
+                            <h1>Drone Wars: The First Battle</h1>
+                            <h2 class="subheading">Prototyping AI Combat in A-Frame Before the Main Throne</h2>
+                            <span class="meta">
+                                Posted by
+                                <a href="#!">Scott Grocott</a>
+                                on <?php echo date("F j, Y"); ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Post Content-->
+        <article class="mb-4">
+            <div class="container px-4 px-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>The journey to <strong>Metal Throne: Fuel Yard</strong> begins not with the main project, but with three specialized prototypes. Each one pairs a web technology with a specific combat scenario. <em>Drone Wars</em> is the first—an A-Frame prototype focused entirely on autonomous AI opponents and aerial combat.</p>
+
+                        <h2 class="section-heading">The Trilogy Approach</h2>
+                        <p>Why build three separate games before tackling the main project? Because <em>Metal Throne: Fuel Yard</em> demands expertise across multiple domains: AI pathfinding, physics simulation, spatial audio, and real-time combat. Rather than learn these simultaneously in a monolithic project, I'm breaking them into focused experiments:</p>
+
+                        <ul>
+                            <li><strong>Drone Wars (A-Frame)</strong> - AI navigation and aerial combat</li>
+                            <li><strong>Go-Cart Wars (Three.js)</strong> - Vehicle physics and ground combat</li>
+                            <li><strong>Forklift Wars (Babylon.js)</strong> - Industrial machinery and complex interactions</li>
+                        </ul>
+
+                        <p>Each project introduces key technologies: <strong>Rapier physics</strong>, <strong>Yuka AI</strong>, and <strong>Howler spatial audio</strong>. By the time all three are complete, I'll have a tested, proven tech stack ready for the main Fuel Yard.</p>
+
+                        <h2 class="section-heading">Why A-Frame for Drones?</h2>
+                        <p>A-Frame might seem like an odd choice for a combat game. It's known for VR and quick prototypes, not complex AI systems. But that's precisely why it's perfect for <em>Drone Wars</em>. A-Frame's declarative syntax forces me to think in components—discrete, reusable systems that can later port to Three.js and Babylon.js.</p>
+
+                        <blockquote class="blockquote">"If I can make autonomous AI work in A-Frame's abstraction layer, it will be trivial in lower-level engines."</blockquote>
+
+                        <h2 class="section-heading">The Tech Stack Integration</h2>
+                        <p>The real challenge isn't A-Frame itself—it's integrating three powerful libraries that weren't designed to work together:</p>
+
+                        <h3>Rapier Physics (Rust-based, WASM)</h3>
+                        <pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Initializing Rapier in A-Frame
+import RAPIER from 'rapier3d-compat/rapier.mjs';
+
+async function initPhysics() {
+  await RAPIER.init();
+  const gravity = { x: 0.0, y: -9.81, z: 0.0 };
+  physicsWorld = new RAPIER.World(gravity);
+  
+  // Physics loop - independent of A-Frame's tick
+  function physicsStep() {
+    if (physicsWorld && !physicsStepLocked) {
+      physicsStepLocked = true;
+      physicsWorld.step();
+      physicsStepLocked = false;
+    }
+    requestAnimationFrame(physicsStep);
+  }
+  physicsStep();
+}</code></pre>
+
+                        <h3>Yuka AI (Steering Behaviors)</h3>
+                        <pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// Global entity manager - ONE update per frame
+const yukaEntityManager = new YUKA.EntityManager();
+
+AFRAME.registerComponent('yuka-system', {
+  tick: function(time, deltaTime) {
+    const delta = deltaTime / 1000;
+    yukaEntityManager.update(delta);
+    
+    // Sync all vehicles to their visual entities
+    for (const entity of yukaEntityManager.entities) {
+      if (entity.syncToRenderComponent) {
+        entity.syncToRenderComponent(entity);
+      }
+    }
+  }
+});</code></pre>
+
+                        <h3>Howler Spatial Audio</h3>
+                        <pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>// 3D sound that follows drone position
+this.sound = new Howl({
+  src: ['buzz.mp3'],
+  loop: true,
+  spatial: true,
+  refDistance: 5,
+  maxDistance: 50
+});
+
+// Update listener and source positions every frame
+tick: function() {
+  const camPos = this.camera.object3D.position;
+  Howler.pos(camPos.x, camPos.y, camPos.z);
+  
+  const dronePos = this.el.object3D.position;
+  this.sound.pos(dronePos.x, dronePos.y, dronePos.z);
+}</code></pre>
+
+                        <h2 class="section-heading">The First Prototype Goal</h2>
+                        <p>Before tackling complex behavior, I need to solve one fundamental problem: <strong>Can I make an autonomous drone fly around a 3D environment and remain visible to the player?</strong></p>
+
+                        <p>This seemingly simple question touches on navigation, rendering, performance, and game design. The answer became a deep dive into nav mesh generation, collision detection, and spatial awareness that took the project in unexpected directions.</p>
+
+                        <h2 class="section-heading">What's Next</h2>
+                        <p>In the next post, I'll detail the navigation mesh saga—building a walkable surface map from GLB models, the collision detection nightmare that followed, and the elegant solution that finally made drones fly predictably.</p>
+
+                        <p>
+                            Development log by
+                            <a href="<?php echo $root_url; ?>">Scott Grocott</a>
+                            &middot; Engine:
+                            <a href="https://aframe.io">A-Frame</a>
+                            &middot; Series: Drone Wars (1/5)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+<?php include '../footer.php'; ?>

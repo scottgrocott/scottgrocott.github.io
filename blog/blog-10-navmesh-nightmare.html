@@ -1,0 +1,136 @@
+<?php include '../header.php'; ?>
+
+    <!-- Page Header-->
+        <header class="masthead" style="background-image: url('https://scottgrocott.github.io/metal_throne/assets/img/navmesh_debug.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="post-heading">
+                            <h1>The Nav Mesh Nightmare</h1>
+                            <h2 class="subheading">When 12,959 Regions Became a Problem</h2>
+                            <span class="meta">
+                                Posted by
+                                <a href="#!">Scott Grocott</a>
+                                on <?php echo date("F j, Y"); ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Post Content-->
+        <article class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <p>In the first Drone Wars post, I outlined the ambitious goal of autonomous AI combat. What I didn't mention was the immediate problem: <strong>How do drones know where they can fly?</strong> The answer seemed obvious—build a navigation mesh. The reality? A month-long descent into geometry processing, spatial queries, and the discovery that sometimes the "correct" solution is the wrong one.</p>
+
+                        <h2 class="section-heading">The Navmesh Concept</h2>
+                        <p>A navigation mesh (navmesh) is a data structure representing walkable (or in this case, flyable) surfaces in a 3D world. Instead of path-finding through empty 3D space, AI agents navigate across connected regions—polygons that represent valid movement areas.</p>
+
+                        <p>For ground-based games, this is straightforward: extract floor geometry, triangulate it, connect adjacent triangles, done. For <em>flying</em> drones? The entire 3D volume becomes potential navigation space.</p>
+
+                        <h2 class="section-heading">Building from GLB Models</h2>
+                        <p>My Fuel Yard scene loads modular buildings from a JSON manifest—fuel tanks, silos, industrial structures. Each is a GLB file with complex geometry. The plan: extract all static geometry, identify "walkable" surfaces (anything roughly horizontal), and build a navmesh from those triangles.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>buildGlobalNavMesh: function() {
+  const staticEntities = document.querySelectorAll('[physics-static]');
+  const allVertices = [];
+  const allIndices = [];
+  
+  staticEntities.forEach(entity => {
+    const mesh = entity.getObject3D('mesh');
+    
+    mesh.traverse((node) => {
+      if (node.isMesh && node.geometry) {
+        const positions = node.geometry.attributes.position.array;
+        
+        // Transform to world space
+        for (let i = 0; i < positions.length; i += 3) {
+          tempVec.set(positions[i], positions[i + 1], positions[i + 2]);
+          tempVec.applyMatrix4(node.matrixWorld);
+          allVertices.push(tempVec.x, tempVec.y, tempVec.z);
+        }
+      }
+    });
+  });
+  
+  // Result: 33,346 vertices, 55,025 triangles
+  console.log(`Collected ${allVertices.length / 3} vertices, ${totalTriangles} triangles`);
+}</code></pre>
+
+                        <h2 class="section-heading">The First Success (Sort Of)</h2>
+                        <p>The code worked. It extracted every triangle from every building, transformed them to world space, and identified horizontal surfaces. The result?</p>
+
+                        <blockquote class="blockquote">"✅ Nav mesh created with 12,959 walkable regions"</blockquote>
+
+                        <p>Twelve thousand regions. Each one a valid destination. The drones could now pathfind from any region to any other region using A* search. Problem solved, right?</p>
+
+                        <h2 class="section-heading">The Invisible Drone Problem</h2>
+                        <p>I spawned a drone. The console showed it was created, Yuka navigation was active, pathfinding was working, spatial audio was playing. But the drone was <em>invisible</em>. Not actually invisible—just impossible to find.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>🚁 Drone @(0.0, 4.0, -8.0)    // Spawns in front of player
+🚁 Drone @(10.7, 12.7, 25.0)  // 3 seconds later: behind, above, far away
+</code></pre>
+
+                        <p>With 12,959 regions spanning the entire map, drones would pick a random destination and <em>immediately fly out of view</em>. The player would see a brief flash, hear buzzing in the distance, then nothing. The navmesh was "working"—drones were navigating correctly. They were just navigating to places the player couldn't see.</p>
+
+                        <h2 class="section-heading">Attempt 1: Constrain the Range</h2>
+                        <p>Easy fix—add a maximum range parameter. Drones can only navigate to regions within X meters of their spawn point.</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>findNewPath: function() {
+  const regions = window.globalNavMesh.regions;
+  
+  // Filter to nearby regions only
+  const nearbyRegions = regions.filter(region => {
+    const dx = region.centroid.x - this.centerX;
+    const dz = region.centroid.z - this.centerZ;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    return dist <= this.maxRange;
+  });
+  
+  // Pick random nearby region
+  const toRegion = nearbyRegions[Math.floor(Math.random() * nearbyRegions.length)];
+}</code></pre>
+
+                        <p>This helped, but introduced a new problem: even with range constraints, drones were <em>fast</em>. At 2-3 units per second, they'd reach the edge of the patrol radius in seconds, then pick a new destination on the opposite side. The result? Drones ping-ponging around the perimeter, never staying in the player's view for more than a moment.</p>
+
+                        <h2 class="section-heading">Attempt 2: Slow Everything Down</h2>
+                        <p>Reduce speed to 0.5 units/sec. Reduce range to 5 meters. Increase path-change interval to 20 seconds. The result? Drones were visible... but barely moving. They felt like floating decorations, not threats.</p>
+
+                        <h2 class="section-heading">The Collision Discovery</h2>
+                        <p>Then came the real twist. While debugging, I noticed collision warnings:</p>
+
+<pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;"><code>⚠️ Collision detected! Pushing back 4.57m
+⚠️ Collision detected! Pushing back 4.56m
+⚠️ Collision detected! Pushing back 4.57m
+</code></pre>
+
+                        <p>The drones weren't just flying out of view—they were <em>colliding with buildings</em> and being teleported by physics correction. Every frame, Rapier physics would detect the drone inside a wall and push it away. The navmesh said "this is a valid position" but physics said "you're inside solid geometry."</p>
+
+                        <p>The navmesh was based on <em>surfaces</em>, but drones are <em>volumes</em>. A surface might be valid, but if there's a wall 0.1 meters above it, a drone with a 0.6m collision radius can't fit.</p>
+
+                        <h2 class="section-heading">The Breaking Point</h2>
+                        <p>After weeks of tweaking parameters—adjusting speeds, ranges, heights, collision tolerances—I realized the fundamental approach was flawed. <strong>Building a navmesh from complex building geometry was solving the wrong problem.</strong></p>
+
+                        <p>The navmesh answered "where CAN a drone fly?" But the real question was "where SHOULD a drone fly?" Those are very different questions.</p>
+
+                        <blockquote class="blockquote">"12,959 regions represented everywhere a drone could theoretically navigate. But I only needed about 5 regions representing where I wanted drones to patrol."</blockquote>
+
+                        <h2 class="section-heading">The Pivot</h2>
+                        <p>In the next post, I'll detail the solution that finally worked: abandoning automatic navmesh generation entirely and hand-authoring "flight zones"—simple 3D volumes that define intentional patrol areas. Sometimes the most sophisticated solution is the least useful one.</p>
+
+                        <p>
+                            Development log by
+                            <a href="<?php echo $root_url; ?>">Scott Grocott</a>
+                            &middot; Engine:
+                            <a href="https://aframe.io">A-Frame</a>
+                            &middot; Series: Drone Wars (2/5)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+<?php include '../footer.php'; ?>
