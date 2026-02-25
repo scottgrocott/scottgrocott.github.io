@@ -2,6 +2,10 @@ import { midiNoteToName } from './theory.js';
 import { initTone, synthAttack, synthRelease, synthReleaseAll, synthPanic, isToneReady } from './synth.js';
 import { activeNotes, setStatus, updateDisplay, clearDisplay } from './display.js';
 import { logActivity, setLayerActive } from './panel.js';
+import { audioNoteOn, audioNoteOff, audioAllOff } from './audio.js';
+import { feedNoteOn, feedNoteOff, startAnalysis, onAnalysis } from './analyze.js';
+import { classify } from './classifier.js';
+import { updateStyleDetection } from './panel.js';
 
 let midiSelectEl = null;
 let midiAccess   = null;
@@ -19,6 +23,7 @@ async function onMidiMessage(event) {
 
   if (type === 0xB0 && (data1 === 120 || data1 === 123)) {
     synthPanic();
+    audioAllOff();
     activeNotes.clear();
     for (let i = 0; i < 16; i++) setLayerActive(i, false);
     setStatus('connected', 'Connected');
@@ -38,6 +43,8 @@ async function onMidiMessage(event) {
     if (activeNotes.has(key)) synthRelease(noteName, data1, ch);
     activeNotes.set(key, noteName);
     synthAttack(noteName, data2 / 127, data1, ch);
+    audioNoteOn(ch);
+    feedNoteOn(ch, data1, data2);
     setStatus('playing', 'Playing');
     updateDisplay();
     setLayerActive(ch, true);
@@ -46,6 +53,8 @@ async function onMidiMessage(event) {
     if (!activeNotes.has(key)) return;
     activeNotes.delete(key);
     synthRelease(noteName, data1, ch);
+    audioNoteOff(ch);
+    feedNoteOff(ch, data1);
     if (!activeNotes.size) setStatus('connected', 'Connected');
     const chStillActive = [...activeNotes.keys()].some(k => parseInt(k.split(':')[0]) === ch);
     setLayerActive(ch, chStillActive);
@@ -90,6 +99,7 @@ export async function initMIDI() {
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       synthPanic();
+      audioAllOff();
       activeNotes.clear();
       for (let i = 0; i < 16; i++) setLayerActive(i, false);
       setStatus('connected', 'Connected');
@@ -123,4 +133,11 @@ export async function initMIDI() {
     logActivity('MIDI access denied: ' + err.message, 'err');
     console.error('MIDI error:', err);
   }
+
+  // Start rolling analysis and connect to style detection UI
+  startAnalysis();
+  onAnalysis(features => {
+    const result = classify(features);
+    updateStyleDetection(result);
+  });
 }

@@ -1,40 +1,44 @@
 import { renderer, scene, camera, initScene } from './scene.js';
 import { initTone } from './synth.js';
 import { buildLayers } from './layers.js';
-import { buildPanel } from './panel.js';
+import { buildPanel, initStylePanel } from './panel.js';
 import { initPopup } from './popup.js';
 import { initMIDI } from './midi.js';
+import { initAudio, tickAudio } from './audio.js';
+
+let lastTime = performance.now();
 
 async function boot() {
   try {
-    // 1. WebGPU — async, appends canvas to #canvas-container
     await initScene();
-
-    // 2. TSL shader mesh layers
     buildLayers();
-
-    // 3. Sidebar panel DOM
     buildPanel();
-
-    // 4. Popup button wiring
+    initStylePanel();
     initPopup();
 
-    // 5. Render loop
-    renderer.setAnimationLoop(() => renderer.render(scene, camera));
+    // Render + audio tick loop
+    renderer.setAnimationLoop(() => {
+      const now = performance.now();
+      const dt  = Math.min((now - lastTime) / 1000, 0.1); // seconds, capped
+      lastTime  = now;
 
-    // 6. MIDI — last, so DOM is fully ready
+      tickAudio(dt);
+      renderer.render(scene, camera);
+    });
+
     await initMIDI();
-
   } catch(err) {
     console.error('Boot failed:', err);
   }
 }
 
-document.getElementById('tone-btn').addEventListener('click', () => {
-  initTone();
+document.getElementById('tone-btn').addEventListener('click', async () => {
   const btn = document.getElementById('tone-btn');
-  btn.textContent = '✓ Audio Ready';
+  btn.textContent = '...';
   btn.disabled = true;
+  await initTone();
+  initAudio();         // attach analysers now that voices exist
+  btn.textContent = '✓ Audio Ready';
 });
 
 boot();
