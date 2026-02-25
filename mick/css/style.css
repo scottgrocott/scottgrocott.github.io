@@ -7,7 +7,7 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #000;
+  background: #fff;
   font-family: 'Space Mono', monospace;
 }
 
@@ -23,26 +23,26 @@ body {
 #ui {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 10;
+  z-index: 100;
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 16px 24px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, transparent 100%);
   pointer-events: none;
 }
 #ui > * { pointer-events: all; }
 
 .label {
-  color: #888;
+  color: #aaa;
   font-size: 10px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
 #midi-select {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
   color: #fff;
   font-family: 'Space Mono', monospace;
   font-size: 12px;
@@ -58,7 +58,7 @@ body {
   background-position: right 10px center;
   padding-right: 30px;
 }
-#midi-select:hover { border-color: rgba(255,255,255,0.35); }
+#midi-select:hover { border-color: rgba(255,255,255,0.4); }
 
 #status-dot {
   width: 8px;
@@ -73,7 +73,7 @@ body {
 #status-dot.error     { background: #ff4455; }
 
 #status-text {
-  color: #555;
+  color: #666;
   font-size: 10px;
   letter-spacing: 0.1em;
 }
@@ -84,7 +84,7 @@ body {
   top: 60px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 30;
+  z-index: 110;
   background: #ff6600;
   color: #000;
   font-family: 'Space Mono', monospace;
@@ -100,30 +100,40 @@ body {
 #tone-btn:hover  { background: #ff8833; }
 #tone-btn.hidden { opacity: 0; pointer-events: none; }
 
-/* ─── NOTE / CHORD DISPLAY ──────────────────────────────────── */
-#note-display {
+/* ─── LAYER DISPLAY CONTAINER ───────────────────────────────── */
+/* Fixed fullscreen container — all channel layers live inside here */
+#layer-display {
   position: fixed;
   inset: 0;
   z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   pointer-events: none;
 }
 
-#note-text {
+/* ─── INDIVIDUAL NOTE LAYER ─────────────────────────────────── */
+/* Each channel gets one of these, built by layers.js.
+   Font size, color, opacity, blend mode are set inline by the layer config.
+   Only the structural/transition properties live here. */
+.note-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(80px, 20vw, 280px);
-  color: #111;
   letter-spacing: 0.02em;
-  text-align: center;
   line-height: 1;
-  opacity: 0;
-  transform: scale(0.88);
-  transition: opacity 0.06s ease-out, transform 0.06s ease-out;
+  text-align: center;
   user-select: none;
+  white-space: nowrap;
+
+  /* Start invisible and slightly scaled down */
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity   0.07s ease-out,
+    transform 0.07s ease-out;
 }
-#note-text.visible { opacity: 1; transform: scale(1); }
 
 /* ─── FOOTER ────────────────────────────────────────────────── */
 #footer {
@@ -131,20 +141,23 @@ body {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10;
-  color: #444;
+  z-index: 100;
+  color: #888;
   font-size: 10px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   pointer-events: none;
   white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ─── NO MIDI WARNING ───────────────────────────────────────── */
 #no-midi-warning {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 200;
   flex-direction: column;
   align-items: center;
   justify-content: center;
