@@ -1,25 +1,38 @@
 import * as THREE from 'three';
 
-/* ─── SCENE ─────────────────────────────────────────────────── */
-const scene  = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff);
+export const scene  = new THREE.Scene();
+scene.background    = new THREE.Color(0xffffff);
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 0, 2);
+export const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+camera.position.set(0, 0, 5);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
+// Renderer created but NOT appended to DOM yet — initScene() does that
+export const renderer = new THREE.WebGPURenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-/* ─── RESIZE ────────────────────────────────────────────────── */
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+export async function initScene() {
+  await renderer.init();
+
+  // Now safe to touch DOM
+  const container = document.getElementById('canvas-container');
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  camera.aspect = container.clientWidth / container.clientHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+  container.appendChild(renderer.domElement);
 
-/* ─── ANIMATION LOOP ────────────────────────────────────────── */
-renderer.setAnimationLoop(() => {
-  renderer.render(scene, camera);
-});
+  // Resize observer — reacts to container size changes (panel resize, popup)
+  new ResizeObserver(() => {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    window.dispatchEvent(new Event('resize'));
+  }).observe(container);
+}
+
+export function viewSize(zPos = 0) {
+  const dist = camera.position.z - zPos;
+  const h    = 2 * Math.tan((camera.fov * Math.PI / 180) / 2) * dist;
+  return { w: h * camera.aspect, h };
+}

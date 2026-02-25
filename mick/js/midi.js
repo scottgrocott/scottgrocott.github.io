@@ -1,20 +1,15 @@
 import { midiNoteToName } from './theory.js';
 import { initTone, synthAttack, synthRelease, synthReleaseAll, synthPanic, isToneReady } from './synth.js';
-import { activeNotes, setStatus, updateDisplay } from './display.js';
+import { activeNotes, setStatus, updateDisplay, clearDisplay } from './display.js';
+import { logActivity, setLayerActive } from './panel.js';
 
-/* ─── ELEMENTS ──────────────────────────────────────────────── */
-const midiSelectEl = document.getElementById('midi-select');
+let midiSelectEl = null;
+let midiAccess   = null;
+let activeInput  = null;
 
-/* ─── STATE ─────────────────────────────────────────────────── */
-let midiAccess  = null;
-let activeInput = null;
-
-/* ─── MESSAGE HANDLER ───────────────────────────────────────── */
 async function onMidiMessage(event) {
   const raw    = event.data;
   const status = raw[0];
-
-  // Ignore all system realtime (clock 0xF8, active sense 0xFE, etc.)
   if (status >= 0xF0) return;
 
   const data1 = raw[1] ?? 0;
@@ -22,16 +17,16 @@ async function onMidiMessage(event) {
   const type  = status & 0xF0;
   const ch    = status & 0x0F;
 
-  // Handle CC 120 (All Sound Off) and CC 123 (All Notes Off) — hardware panic
   if (type === 0xB0 && (data1 === 120 || data1 === 123)) {
     synthPanic();
     activeNotes.clear();
+    for (let i = 0; i < 16; i++) setLayerActive(i, false);
     setStatus('connected', 'Connected');
-    updateDisplay();
+    clearDisplay();
+    logActivity('PANIC — all notes off', 'warn');
     return;
   }
 
-  // Only act on note messages — ignore all other CC, pitch bend, aftertouch
   if (type !== 0x90 && type !== 0x80) return;
 
   const noteName = midiNoteToName(data1);
@@ -40,69 +35,69 @@ async function onMidiMessage(event) {
 
   if (isNoteOn) {
     if (!isToneReady()) await initTone();
-
-    // Re-trigger: cleanly release previous voice if same key is already held
     if (activeNotes.has(key)) synthRelease(noteName, data1, ch);
-
     activeNotes.set(key, noteName);
     synthAttack(noteName, data2 / 127, data1, ch);
     setStatus('playing', 'Playing');
     updateDisplay();
-
+    setLayerActive(ch, true);
+    logActivity(`ON  ch${ch+1} ${noteName} vel=${data2}`, 'note-on');
   } else {
-    // Note off — only process notes we actually registered
     if (!activeNotes.has(key)) return;
-
     activeNotes.delete(key);
     synthRelease(noteName, data1, ch);
     if (!activeNotes.size) setStatus('connected', 'Connected');
+    const chStillActive = [...activeNotes.keys()].some(k => parseInt(k.split(':')[0]) === ch);
+    setLayerActive(ch, chStillActive);
     updateDisplay();
+    logActivity(`OFF ch${ch+1} ${noteName}`, 'note-off');
   }
 }
 
-/* ─── CONNECT / DISCONNECT ──────────────────────────────────── */
 function connectInput(inputId) {
   if (activeInput) { activeInput.onmidimessage = null; activeInput = null; }
-
   activeNotes.clear();
   synthReleaseAll();
-  updateDisplay();
-
+  clearDisplay();
   if (!inputId || !midiAccess) { setStatus('', 'No device'); return; }
-
   activeInput = midiAccess.inputs.get(inputId);
   if (activeInput) {
     activeInput.onmidimessage = onMidiMessage;
     setStatus('connected', activeInput.name);
+    logActivity(`Connected: ${activeInput.name}`, 'good');
   }
 }
 
 function populateInputs() {
+  if (!midiSelectEl) return;
   const prev = midiSelectEl.value;
   while (midiSelectEl.options.length > 1) midiSelectEl.remove(1);
   midiAccess.inputs.forEach(inp => {
     const opt = document.createElement('option');
-    opt.value = inp.id; opt.textContent = inp.name;
+    opt.value = inp.id;
+    opt.textContent = inp.name;
     midiSelectEl.appendChild(opt);
   });
   if (prev && midiAccess.inputs.has(prev)) midiSelectEl.value = prev;
 }
 
-midiSelectEl.addEventListener('change', () => connectInput(midiSelectEl.value));
-
-/* ─── KEYBOARD PANIC (Escape) ───────────────────────────────── */
-// Emergency kill-switch: press Escape to immediately silence all voices.
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    synthPanic();
-    activeNotes.clear();
-    setStatus('connected', 'Connected');
-    updateDisplay();
-  }
-});
-
-/* ─── INIT ──────────────────────────────────────────────────── */
 export async function initMIDI() {
+  // Defer all DOM access to here
+  midiSelectEl = document.getElementById('midi-select');
+
+  midiSelectEl.addEventListener('change', () => connectInput(midiSelectEl.value));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      synthPanic();
+      activeNotes.clear();
+      for (let i = 0; i < 16; i++) setLayerActive(i, false);
+      setStatus('connected', 'Connected');
+      clearDisplay();
+      logActivity('ESC — panic', 'warn');
+    }
+  });
+
   if (!('requestMIDIAccess' in navigator)) {
     document.getElementById('no-midi-warning').style.display = 'flex';
     return;
@@ -111,14 +106,13 @@ export async function initMIDI() {
   try {
     midiAccess = await navigator.requestMIDIAccess({ sysex: false });
     populateInputs();
-
     const firstId = midiAccess.inputs.keys().next().value;
     if (firstId) { midiSelectEl.value = firstId; connectInput(firstId); }
-
     midiAccess.onstatechange = e => {
       populateInputs();
+      logActivity(`Device ${e.port.state}: ${e.port.name}`);
       if (e.port.type === 'input' && e.port.state === 'disconnected'
-          && activeInput && activeInput.id === e.port.id) {
+          && activeInput?.id === e.port.id) {
         connectInput('');
         midiSelectEl.value = '';
         setStatus('', 'Disconnected');
@@ -126,6 +120,7 @@ export async function initMIDI() {
     };
   } catch(err) {
     setStatus('error', 'Access denied');
+    logActivity('MIDI access denied: ' + err.message, 'err');
     console.error('MIDI error:', err);
   }
 }

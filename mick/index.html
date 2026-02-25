@@ -3,41 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIDI Canvas</title>
+  <title>MELODY CANVAS — Control</title>
   <link rel="stylesheet" href="/mick/css/style.css">
 </head>
 <body>
 
+  <!-- Canvas lives here until popped out -->
   <div id="canvas-container"></div>
 
-  <div id="ui">
-    <span class="label">Device</span>
-    <select id="midi-select"><option value="">— Select MIDI input —</option></select>
-    <div id="status-dot"></div>
-    <span id="status-text">No device</span>
+  <!-- ═══ CONTROL PANEL ══════════════════════════════════════ -->
+  <div id="control-panel">
+
+    <div class="panel-header">
+      <span class="panel-title">MELODY CANVAS</span>
+      <button id="popup-btn" class="icon-btn" title="Pop canvas out to new window">⧉ Pop Out Canvas</button>
+    </div>
+
+    <!-- MIDI device -->
+    <section class="panel-section">
+      <div class="section-label">MIDI Input</div>
+      <div class="row">
+        <select id="midi-select"><option value="">— Select device —</option></select>
+        <div id="status-dot"></div>
+        <span id="status-text">No device</span>
+      </div>
+    </section>
+
+    <!-- Audio -->
+    <section class="panel-section">
+      <div class="section-label">Audio</div>
+      <button id="tone-btn" class="action-btn">▶ Enable Audio</button>
+    </section>
+
+    <!-- Channel layers -->
+    <section class="panel-section">
+      <div class="section-label">Channel Layers</div>
+      <div id="layer-list">
+        <!-- Populated by panel.js -->
+      </div>
+    </section>
+
+    <!-- Activity log -->
+    <section class="panel-section grow">
+      <div class="section-label">Activity</div>
+      <div id="activity-log"></div>
+    </section>
+
+    <div id="footer-bar">
+      <span id="footer">Play a note or chord</span>
+    </div>
+
   </div>
 
-  <button id="tone-btn">▶ CLICK TO ENABLE AUDIO</button>
-
-  <!-- Per-channel text layers — populated by layers.js buildLayerDOM() -->
-  <div id="layer-display"></div>
-
-  <div id="footer">Play a note or chord</div>
-
+  <!-- No MIDI warning -->
   <div id="no-midi-warning">
     <h2>MIDI Not Supported</h2>
     <p>Your browser doesn't support the Web MIDI API.<br>Please use Chrome or Edge.</p>
   </div>
 
-  <!-- Three.js -->
+  <!-- Three.js WebGPU + TSL -->
   <script type="importmap">
-  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  {
+    "imports": {
+      "three":        "https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.webgpu.js",
+      "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.webgpu.js",
+      "three/tsl":    "https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.tsl.js",
+      "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"
+    }
+  }
   </script>
-
-  <!-- Tone.js (UMD — must load before module scripts) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-
-  <!-- App -->
   <script type="module" src="/mick/js/main.js"></script>
 
 </body>
