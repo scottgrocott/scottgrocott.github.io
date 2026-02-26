@@ -443,7 +443,7 @@ body {
 
 #style-context {
   font-size: 9px;
-  color: #555;
+  color: #958f8f;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   min-height: 12px;
@@ -466,7 +466,7 @@ body {
 
 .style-bar-label {
   font-size: 9px;
-  color: #555;
+  color: #958f8f;
   letter-spacing: 0.04em;
   white-space: nowrap;
   overflow: hidden;
