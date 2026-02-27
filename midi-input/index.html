@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIDI Analyzer SPA - Akai Force Compatible</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; color: #333; }
+        h1 { color: #2c3e50; }
+        select, button, textarea { padding: 8px; margin: 6px 0; font-size: 16px; }
+        button { background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:disabled { background: #95a5a6; }
+        button:hover:not(:disabled) { background: #2980b9; }
+        #status { margin: 12px 0; font-weight: bold; }
+        #jsonOutput { width: 100%; height: 500px; font-family: 'Courier New', monospace; font-size: 13px; padding: 12px; border: 1px solid #ccc; border-radius: 4px; background: #fff; white-space: pre; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>MIDI Song Analyzer (Akai Force → Tone.js JSON)</h1>
+
+    <label for="midiInputSelect">Select MIDI Input (Akai Force):</label><br>
+    <select id="midiInputSelect"></select>
+    <button id="refreshMidiBtn">Refresh MIDI List</button><br><br>
+
+    <button id="startBtn">Start Listening / Record</button>
+    <button id="stopBtn" disabled>Stop & Finalize JSON</button>
+
+    <div id="status">Status: Waiting for MIDI access… (allow permission)</div>
+
+    <textarea id="jsonOutput" readonly>JSON will appear here once recording starts…
+Real-time updates during playback, final on stop/copy to file.</textarea>
+
+    <!-- Tone.js UMD -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.3.5/Tone.js"></script>
+    <!-- Tonal.js browser global (working path from docs) -->
+    <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+
+    <script>
+        // Debug load status
+        setTimeout(() => {
+            console.log('Tone loaded?', !!window.Tone, Tone ? Tone.version : 'N/A');
+            console.log('Tonal loaded?', !!window.Tonal, window.Tonal ? 'Yes - global attached' : 'No');
+        }, 1000);  // Give scripts time to execute
+
+        const TARGET_CHANNELS = [2, 3, 4, 6, 9, 10];
+        const CHANNEL_LABELS = { 2: 'strings', 3: 'bass', 4: 'chords', 6: 'pad', 9: 'percussion', 10: 'drums' };
+
+        let midiAccess = null;
+        let selectedInput = null;
+        let recording = [];
+        let startTime = null;
+        let lastEventTime = 0;
+        let silenceTimeout = null;
+
+        let detectedBPM = 120;
+        let detectedKey = 'C major';
+        let detectedStyle = 'Unknown';
+
+        let jsonObj = {
+            title: "Captured from Akai Force",
+            bpm: 120,
+            key: "C major",
+            style: "Unknown",
+            sections: {},
+            arrangement: []
+        };
+
+        async function initMidi() {
+            try {
+                midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+                updateInputList();
+                midiAccess.onstatechange = updateInputList;
+                document.getElementById('status').textContent = 'MIDI access granted! Select your Force input.';
+            } catch (err) {
+                document.getElementById('status').textContent = 'MIDI access denied: ' + err.message;
+            }
+        }
+
+        function updateInputList() {
+            const select = document.getElementById('midiInputSelect');
+            select.innerHTML = '<option value="">-- Choose MIDI Input --</option>';
+            if (midiAccess) {
+                Array.from(midiAccess.inputs.values()).forEach(input => {
+                    const option = document.createElement('option');
+                    option.value = input.id;
+                    option.textContent = input.name || 'Unnamed';
+                    if (/akai|force|midi/i.test(input.name)) select.insertBefore(option, select.children[1]);
+                    else select.appendChild(option);
+                });
+            }
+        }
+
+        function onMidiMessage(event) {
+            const [status, data1, data2] = event.data;
+            const command = status >> 4;
+            const channel = (status & 0x0F) + 1;
+
+            if (!TARGET_CHANNELS.includes(channel)) return;
+
+            const now = performance.now() / 1000;
+            const currentTime = now - startTime;
+            lastEventTime = currentTime;
+
+            let ev = { time: currentTime, channel };
+
+            if (command === 9 && data2 > 0) {
+                ev.type = 'noteOn';
+                ev.midi = data1;
+                ev.velocity = data2 / 127;
+                recording.push(ev);
+            } else if (command === 8 || (command === 9 && data2 === 0)) {
+                ev.type = 'noteOff';
+                ev.midi = data1;
+                recording.push(ev);
+            }
+
+            if (recording.length % 8 === 0) analyzeAndUpdateJson();
+            clearTimeout(silenceTimeout);
+            silenceTimeout = setTimeout(stopListening, 6000);
+        }
+
+        function startListening() {
+            const select = document.getElementById('midiInputSelect');
+            if (!select.value) return alert("Select input first.");
+            selectedInput = midiAccess.inputs.get(select.value);
+            if (selectedInput) {
+                selectedInput.onmidimessage = onMidiMessage;
+                startTime = performance.now() / 1000;
+                recording = [];
+                jsonObj = { title: "Captured from Akai Force", bpm: 120, key: "C major", style: "Unknown", sections: {}, arrangement: [] };
+
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                document.getElementById('status').textContent = 'Recording… Play on Force.';
+                document.getElementById('jsonOutput').value = 'Analyzing...\n';
+            }
+        }
+
+        function stopListening() {
+            if (selectedInput) selectedInput.onmidimessage = null;
+            clearTimeout(silenceTimeout);
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('status').textContent = 'Stopped. JSON ready.';
+            analyzeAndUpdateJson(true);
+        }
+
+        function analyzeAndUpdateJson(isFinal = false, retryCount = 0) {
+            if (recording.length < 4) return;
+
+            if (typeof Tone === 'undefined' || typeof Tonal === 'undefined') {
+                console.warn('Libs not ready yet (attempt ' + retryCount + ')');
+                if (retryCount < 10) {  // More retries
+                    setTimeout(() => analyzeAndUpdateJson(isFinal, retryCount + 1), 800);
+                }
+                if (isFinal) {
+                    document.getElementById('jsonOutput').value += '\n[Partial JSON - theory detection skipped (load timing issue). BPM/style basic only.]';
+                    // Fallback: still save basic JSON without theory
+                    document.getElementById('jsonOutput').value = JSON.stringify(jsonObj, null, 2);
+                }
+                return;
+            }
+
+            console.log('Analysis running - Tonal ready');
+
+            // Full analysis code here (same as before, using Tonal. and Tone.)
+            const active = {};
+            recording.forEach(ev => {
+                const key = `${ev.midi || 'off'}-${ev.channel}`;
+                if (ev.type === 'noteOn') active[key] = ev.time;
+                else if (ev.type === 'noteOff' && active[key] !== undefined) {
+                    ev.duration = ev.time - active[key];
+                    delete active[key];
+                }
+            });
+
+            const drumHits = recording.filter(e => (e.channel === 9 || e.channel === 10) && e.type === 'noteOn').map(e => e.time);
+            if (drumHits.length > 4) {
+                const diffs = [];
+                for (let i = 1; i < drumHits.length; i++) diffs.push(drumHits[i] - drumHits[i-1]);
+                const avg = diffs.reduce((a,b)=>a+b,0) / diffs.length;
+                detectedBPM = Math.round(60 / avg);
+                if (detectedBPM < 50 || detectedBPM > 200) detectedBPM = 120;
+            }
+            jsonObj.bpm = detectedBPM;
+
+            const notes = [...new Set(recording.filter(e => e.type === 'noteOn').map(e => Tone.Midi(e.midi).toNote()))];
+            if (notes.length > 5) {
+                const detected = Tonal.Scale.detect(notes);
+                if (detected.length > 0) {
+                    const tonic = detected[0].tonic;
+                    detectedKey = Tonal.Key.majorKey(tonic)?.natural || 'C major';
+                }
+            }
+            jsonObj.key = detectedKey;
+
+            const hasDrums = hasChannel(10) || hasChannel(9);
+            const hasPadsStrings = hasChannel(6) || hasChannel(2);
+            const hasBassChords = hasChannel(3) && hasChannel(4);
+            if (detectedBPM > 135 && hasDrums) detectedStyle = 'Electronic / Dance';
+            else if (hasPadsStrings && !hasDrums) detectedStyle = 'Ambient / Cinematic';
+            else if (hasBassChords && hasDrums) detectedStyle = 'Pop / Hip-Hop / Rock';
+            else detectedStyle = 'General / Mixed';
+            jsonObj.style = detectedStyle;
+
+            const barLengthSec = (60 / detectedBPM) * 4;
+            const maxTime = recording[recording.length-1]?.time || 0;
+            const barCount = Math.ceil(maxTime / barLengthSec) || 1;
+            const bars = Array(barCount).fill().map((_,i) => {
+                const s = i * barLengthSec;
+                return recording.filter(e => e.time >= s && e.time < s + barLengthSec);
+            });
+
+            const barSigs = bars.map(bar => {
+                const ch = {};
+                bar.forEach(e => {
+                    if (e.type !== 'noteOn') return;
+                    if (!ch[e.channel]) ch[e.channel] = [];
+                    ch[e.channel].push(Tone.Midi(e.midi).toNote());
+                });
+                return Object.entries(ch).map(([c, ns]) => `ch${c}:${Tonal.Chord.detect(ns.sort())?.[0] || ns.join(',')}`).join(';');
+            });
+
+            const sections = detectSections(barSigs);
+
+            jsonObj.arrangement = sections.map(s => s.label);
+            jsonObj.sections = {};
+
+            sections.forEach(sec => {
+                const startSec = sec.start * barLengthSec;
+                const endSec = (sec.start + sec.length) * barLengthSec;
+                const secEvents = recording.filter(e => e.time >= startSec && e.time < endSec);
+
+                const loops = {};
+                TARGET_CHANNELS.forEach(ch => {
+                    const isDrumChannel = (ch === 9 || ch === 10);
+                    const chEvents = secEvents.filter(e => e.channel === ch && e.type === 'noteOn').map(e => {
+                        const ev = {
+                            time: Tone.Time(e.time - startSec).toBarsBeatsSixteenths(),
+                            duration: e.duration ? Tone.Time(e.duration).toNotation() : '8n',
+                            velocity: e.velocity || 0.8
+                        };
+                        if (isDrumChannel) {
+                            // GM drums: store the raw MIDI number — note number IS the drum identity
+                            // (36=kick, 38=snare, 42=closed hihat, 46=open hihat, etc.)
+                            ev.note = e.midi; // numeric MIDI note number
+                        } else {
+                            ev.note = Tone.Midi(e.midi).toNote();
+                        }
+                        return ev;
+                    });
+                    if (chEvents.length) loops[CHANNEL_LABELS[ch]] = chEvents;
+                });
+
+                jsonObj.sections[sec.label] = {
+                    startBar: sec.start,
+                    lengthBars: sec.length,
+                    duration: `${sec.length}m`,
+                    loops
+                };
+            });
+
+            document.getElementById('jsonOutput').value = JSON.stringify(jsonObj, null, 2);
+        }
+
+        // detectSections and hasChannel functions unchanged from previous
+
+        function detectSections(patterns) {
+            if (!patterns.length) return [];
+            const sections = [];
+            let i = 0;
+            let counters = { intro:0, verse:0, chorus:0, bridge:0, outro:0 };
+            while (i < patterns.length) {
+                let bestLen = 1, bestRepeats = 1;
+                for (let len = 1; len <= Math.min(16, patterns.length - i); len++) {
+                    const sub = patterns.slice(i, i + len).join('~~');
+                    let repeats = 1;
+                    let j = i + len;
+                    while (j + len <= patterns.length) {
+                        if (patterns.slice(j, j + len).join('~~') === sub) { repeats++; j += len; } else break;
+                    }
+                    if (repeats > bestRepeats || (repeats === bestRepeats && len > bestLen)) {
+                        bestRepeats = repeats; bestLen = len;
+                    }
+                }
+                let label = i === 0 ? 'intro' : (bestRepeats >= 2 ? 'chorus' : 'verse');
+                if (sections.length > 3 && bestRepeats === 1) label = 'bridge';
+                if (i > patterns.length * 0.75) label = 'outro';
+                counters[label] = (counters[label] || 0) + 1;
+                if (counters[label] > 1) label += counters[label];
+                sections.push({ start: i, length: bestLen * bestRepeats, label, repeatCount: bestRepeats });
+                i += bestLen * bestRepeats;
+            }
+            return sections;
+        }
+
+        function hasChannel(ch) {
+            return recording.some(e => e.channel === ch);
+        }
+
+        document.getElementById('startBtn').onclick = startListening;
+        document.getElementById('stopBtn').onclick = stopListening;
+        document.getElementById('refreshMidiBtn').onclick = updateInputList;
+
+        initMidi();
+    </script>
+</body>
+</html>

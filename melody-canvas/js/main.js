@@ -16,9 +16,10 @@ async function boot() {
     initStylePanel();
     initPopup();
 
+    // Render + audio tick loop
     renderer.setAnimationLoop(() => {
       const now = performance.now();
-      const dt  = Math.min((now - lastTime) / 1000, 0.1);
+      const dt  = Math.min((now - lastTime) / 1000, 0.1); // seconds, capped
       lastTime  = now;
 
       tickAudio(dt);
@@ -31,24 +32,13 @@ async function boot() {
   }
 }
 
-document.getElementById('tone-btn').addEventListener('click', async (e) => {
-  const btn = e.currentTarget;
+document.getElementById('tone-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('tone-btn');
   btn.textContent = '...';
   btn.disabled = true;
-  try {
-    // Tone.start() must be called directly inside a user gesture handler.
-    // It internally calls context.resume() — do not call it again separately
-    // as that races and can hit InvalidStateError on an already-resuming context.
-    await Tone.start();
-    await initTone();
-    initAudio();
-    btn.textContent = '✓ Audio Ready';
-    console.log('[Boot] AudioContext state:', Tone.context.state);
-  } catch(err) {
-    console.error('[Boot] Audio init failed:', err);
-    btn.textContent = '✕ Failed — click to retry';
-    btn.disabled = false;
-  }
+  await initTone();
+  initAudio();         // attach analysers now that voices exist
+  btn.textContent = '✓ Audio Ready';
 });
 
 boot();

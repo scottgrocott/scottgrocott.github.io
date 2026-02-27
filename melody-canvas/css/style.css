@@ -1,0 +1,540 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+
+/* ─── RESET ─────────────────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 100vw; height: 100vh; overflow: hidden;
+  background: #0e0e0e;
+  font-family: 'Space Mono', monospace;
+  color: #ccc;
+  display: flex;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CANVAS AREA — fills space left of panel, hidden when popped out
+   ═══════════════════════════════════════════════════════════════ */
+#canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  transition: background 0.3s;
+}
+#canvas-container canvas { display: block; width: 100% !important; height: 100% !important; }
+#canvas-container.empty  { background: #111; }
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTROL PANEL — right sidebar
+   ═══════════════════════════════════════════════════════════════ */
+#control-panel {
+  width: 320px;
+  flex-shrink: 0;
+  height: 100vh;
+  background: #141414;
+  border-left: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── PANEL HEADER ──────────────────────────────────────────── */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #222;
+  background: #0e0e0e;
+  flex-shrink: 0;
+}
+.panel-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.15em;
+  color: #fff;
+}
+.icon-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid #333;
+  color: #aaa;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: border-color 0.2s, color 0.2s;
+}
+.icon-btn:hover { border-color: #ff6600; color: #ff6600; }
+
+/* ─── SECTIONS ──────────────────────────────────────────────── */
+.panel-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid #1a1a1a;
+  flex-shrink: 0;
+}
+.panel-section.grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex-shrink: 1;
+}
+.section-label {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+/* ─── MIDI ROW ──────────────────────────────────────────────── */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#midi-select {
+  flex: 1;
+  background: #0e0e0e;
+  border: 1px solid #2a2a2a;
+  color: #ccc;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  padding: 7px 10px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23555' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 26px;
+}
+#midi-select:hover { border-color: #444; }
+
+#status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #2a2a2a; flex-shrink: 0; transition: background 0.3s;
+}
+#status-dot.connected { background: #00ff88; box-shadow: 0 0 6px #00ff88; }
+#status-dot.playing   { background: #ff6600; box-shadow: 0 0 8px #ff6600; }
+#status-dot.error     { background: #ff4455; }
+#status-text { color: #555; font-size: 9px; letter-spacing: 0.08em; }
+
+/* ─── ACTION BUTTON ─────────────────────────────────────────── */
+.action-btn {
+  background: #ff6600;
+  color: #000;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: background 0.2s, opacity 0.2s;
+  width: 100%;
+}
+.action-btn:hover    { background: #ff8833; }
+.action-btn:disabled { opacity: 0.4; cursor: default; background: #555; color: #999; }
+
+/* ─── LAYER LIST ────────────────────────────────────────────── */
+#layer-list { display: flex; flex-direction: column; gap: 4px; }
+
+.layer-row {
+  display: grid;
+  grid-template-columns: 10px 1fr auto 8px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  transition: border-color 0.15s, background 0.15s;
+  cursor: default;
+}
+.layer-row.active {
+  border-color: #2a2a2a;
+  background: #1a1a1a;
+}
+
+.layer-swatch {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.layer-name  { font-size: 10px; color: #888; letter-spacing: 0.04em; }
+.layer-shader { font-size: 9px; color: #444; letter-spacing: 0.04em; text-align: right; }
+.layer-indicator {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #222;
+  transition: background 0.1s;
+}
+.layer-indicator.on { background: #00ff88; box-shadow: 0 0 4px #00ff88; }
+.layer-row.active .layer-name { color: #ccc; }
+
+/* ─── ACTIVITY LOG ──────────────────────────────────────────── */
+#activity-log {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 10px;
+  line-height: 1.6;
+  color: #444;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #222 transparent;
+}
+#activity-log::-webkit-scrollbar { width: 4px; }
+#activity-log::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+
+.log-row          { white-space: pre; padding: 1px 0; color: #444; }
+.log-row.note-on  { color: #00cc66; }
+.log-row.note-off { color: #336644; }
+.log-row.warn     { color: #ff9900; }
+.log-row.err      { color: #ff4455; }
+.log-row.good     { color: #4499ff; }
+
+/* ─── FOOTER BAR ────────────────────────────────────────────── */
+#footer-bar {
+  padding: 10px 16px;
+  border-top: 1px solid #1a1a1a;
+  background: #0e0e0e;
+  flex-shrink: 0;
+}
+#footer {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── NO MIDI WARNING ───────────────────────────────────────── */
+#no-midi-warning {
+  position: fixed; inset: 0; z-index: 200;
+  flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.95); color: #fff; gap: 16px; display: none;
+}
+#no-midi-warning h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px; letter-spacing: 0.05em; color: #ff4455;
+}
+#no-midi-warning p {
+  font-size: 12px; color: #888; max-width: 400px;
+  text-align: center; line-height: 1.8;
+}
+
+/* ─── POPUP CANVAS WINDOW (minimal chrome) ──────────────────── */
+/* Nothing needed here — popup gets its own inline style doc */
+/* ═══════════════════════════════════════════════════════════════
+   COLLAPSIBLE LAYER ROWS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* wrapper replaces old .layer-row as the outer container */
+.layer-wrapper {
+  border: 1px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.layer-wrapper:has(.layer-row.active) {
+  border-color: #2a2a2a;
+}
+
+/* header row — now a button-style strip */
+.layer-row {
+  display: grid;
+  grid-template-columns: 10px 1fr auto 8px 14px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 4px 4px 0 0;
+  transition: background 0.12s;
+}
+.layer-row:hover { background: #1c1c1c; }
+.layer-row.active { background: #1a1a1a; }
+
+/* chevron */
+.layer-chevron {
+  font-size: 14px;
+  color: #444;
+  transition: transform 0.2s, color 0.2s;
+  display: inline-block;
+  line-height: 1;
+}
+.layer-chevron.open {
+  transform: rotate(90deg);
+  color: #ff6600;
+}
+
+/* collapsible body */
+.layer-body {
+  display: none;
+  background: #0f0f0f;
+  border-top: 1px solid #1e1e1e;
+  padding: 0;
+  overflow: hidden;
+}
+.layer-body.open {
+  display: block;
+  padding: 10px 10px 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SYNTH GUI
+   ═══════════════════════════════════════════════════════════════ */
+
+.gui-placeholder {
+  font-size: 9px;
+  color: #444;
+  letter-spacing: 0.06em;
+  padding: 4px 2px;
+}
+
+.gui-section-label {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ff6600;
+  margin: 10px 0 6px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #222;
+}
+.gui-section-label:first-child { margin-top: 0; }
+
+.gui-sub-label {
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: #555;
+  margin: 8px 0 4px;
+}
+
+.gui-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 52px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.gui-label {
+  font-size: 9px;
+  color: #666;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gui-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  background: #2a2a2a;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.gui-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ff6600;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.gui-slider::-webkit-slider-thumb:hover {
+  background: #ff8833;
+  box-shadow: 0 0 6px rgba(255,102,0,0.5);
+}
+.gui-slider::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  border: none;
+  border-radius: 50%;
+  background: #ff6600;
+  cursor: pointer;
+}
+
+.gui-value {
+  font-size: 8px;
+  color: #888;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* select (waveform picker) */
+.gui-select {
+  grid-column: 2 / 4;
+  background: #0e0e0e;
+  border: 1px solid #2a2a2a;
+  color: #ccc;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.gui-select:hover { border-color: #444; }
+.gui-select:focus { border-color: #ff6600; }
+
+/* ─── FULL-WIDTH GUI ROW (algorithm selector) ───────────────── */
+.gui-row-full {
+  grid-template-columns: 64px 1fr;
+}
+.gui-select-full {
+  grid-column: 2 / 3;
+  background: #111;
+  border-color: #ff6600;
+  color: #ff9944;
+  font-size: 10px;
+  padding: 5px 8px;
+}
+.gui-select-full:hover,
+.gui-select-full:focus { border-color: #ff8833; outline: none; }
+
+/* ═══════════════════════════════════════════════════════════════
+   STYLE DETECTION PANEL
+   ═══════════════════════════════════════════════════════════════ */
+#style-section {
+  flex-shrink: 0;
+}
+
+#style-display {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#style-genre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.12em;
+  color: #ff6600;
+  line-height: 1;
+  min-height: 26px;
+  transition: color 0.4s;
+}
+
+#style-subgenre {
+  font-size: 10px;
+  color: #888;
+  letter-spacing: 0.08em;
+  min-height: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#style-context {
+  font-size: 9px;
+  color: #958f8f;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  min-height: 12px;
+}
+
+/* confidence bars */
+.style-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.style-bar-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.style-bar-label {
+  font-size: 9px;
+  color: #958f8f;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.style-bar-track {
+  height: 3px;
+  background: #1e1e1e;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.style-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: #ff6600;
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── COLLAPSIBLE CHANNEL BODIES (gui styles appended earlier) ── */
+.layer-wrapper { display: flex; flex-direction: column; }
+.layer-body    { display: none; padding: 0 6px 8px; flex-direction: column; gap: 2px; }
+.layer-body.open { display: flex; }
+.layer-chevron { font-size: 14px; color: #444; transition: transform 0.2s; cursor: pointer; }
+.layer-chevron.open { transform: rotate(90deg); color: #ff6600; }
+
+.gui-section-label {
+  font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #555; margin: 6px 0 3px; padding-left: 2px;
+}
+.gui-sub-label {
+  font-size: 8px; color: #444; letter-spacing: 0.06em; margin: 4px 0 2px; padding-left: 2px;
+}
+.gui-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 44px;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+}
+.gui-label  { font-size: 9px; color: #666; letter-spacing: 0.04em; }
+.gui-value  { font-size: 9px; color: #888; text-align: right; letter-spacing: 0.02em; }
+.gui-slider {
+  width: 100%; height: 3px; appearance: none; -webkit-appearance: none;
+  background: #2a2a2a; border-radius: 2px; outline: none; cursor: pointer;
+}
+.gui-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 10px; height: 10px;
+  border-radius: 50%; background: #ff6600; cursor: pointer;
+  transition: background 0.15s;
+}
+.gui-slider:hover::-webkit-slider-thumb { background: #ff8833; }
+.gui-select {
+  background: #111; border: 1px solid #2a2a2a; color: #888;
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  padding: 3px 6px; border-radius: 3px; outline: none; cursor: pointer;
+  width: 100%;
+}
+.gui-select:hover, .gui-select:focus { border-color: #444; }
+.gui-placeholder {
+  font-size: 9px; color: #444; font-style: italic;
+  padding: 6px 2px; letter-spacing: 0.04em;
+}
+.gui-row-full   { grid-template-columns: 64px 1fr; }
+.gui-select-full {
+  background: #111; border-color: #ff6600; color: #ff9944;
+  font-size: 10px; padding: 5px 8px;
+}
+.gui-select-full:hover, .gui-select-full:focus { border-color: #ff8833; outline: none; }

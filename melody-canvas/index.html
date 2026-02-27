@@ -97,25 +97,7 @@
     }
   }
   </script>
-  <!-- Tone.js: loaded but AudioContext creation deferred until user gesture.
-       We override Tone's default context immediately after load with a
-       suspended placeholder so it doesn't grab a virtual audio device. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-  <script>
-    // Tone 14 creates an AudioContext at parse time which may auto-suspend.
-    // We just ensure it stays suspended until the user clicks Enable Audio.
-    // Do NOT close it — calling close() then resume() throws InvalidStateError.
-    (function() {
-      try {
-        if (Tone.context && Tone.context.rawContext) {
-          Tone.context.rawContext.suspend().catch(() => {});
-        }
-        console.log('[Boot] Tone context state:', Tone.context.state);
-      } catch(e) {
-        console.warn('[Boot] Context suspend failed:', e);
-      }
-    })();
-  </script>
   <script type="module" src="/mick/js/main.js"></script>
 
 </body>
