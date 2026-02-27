@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MELODY CANVAS — Control</title>
+  <link rel="stylesheet" href="/jason/css/style.css">
+</head>
+<body>
+
+  <!-- Canvas lives here until popped out -->
+  <div id="canvas-container"></div>
+
+  <!-- ═══ CONTROL PANEL ══════════════════════════════════════ -->
+  <div id="control-panel">
+
+    <!-- Fixed header — never scrolls -->
+    <div class="panel-header">
+      <span class="panel-title">MELODY CANVAS</span>
+      <button id="popup-btn" class="icon-btn" title="Pop canvas out to new window">⧉ Pop Out Canvas</button>
+    </div>
+
+    <!-- Scrollable body — everything below the header -->
+    <div id="panel-scroll">
+
+      <!-- MIDI device -->
+      <section class="panel-section">
+        <div class="section-label">MIDI Input</div>
+        <div class="row">
+          <select id="midi-select"><option value="">— Select device —</option></select>
+          <div id="status-dot"></div>
+          <span id="status-text">No device</span>
+        </div>
+      </section>
+
+      <!-- Audio -->
+      <section class="panel-section">
+        <div class="section-label">Audio</div>
+        <button id="tone-btn" class="action-btn">▶ Enable Audio</button>
+      </section>
+
+      <!-- Hand Tracking — injected here by panel.js (_buildHandSection) -->
+
+      <!-- Style Detection -->
+      <section class="panel-section" id="style-section">
+        <div class="section-label">Style Detection</div>
+        <div id="style-display">
+          <div id="style-genre">—</div>
+          <div id="style-subgenre"></div>
+          <div id="style-context"></div>
+          <div class="style-bars">
+            <div class="style-bar-row">
+              <span class="style-bar-label">—</span>
+              <div class="style-bar-track"><div class="style-bar-fill" id="style-bar-0"></div></div>
+            </div>
+            <div class="style-bar-row">
+              <span class="style-bar-label">—</span>
+              <div class="style-bar-track"><div class="style-bar-fill" id="style-bar-1"></div></div>
+            </div>
+            <div class="style-bar-row">
+              <span class="style-bar-label">—</span>
+              <div class="style-bar-track"><div class="style-bar-fill" id="style-bar-2"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Channel layers -->
+      <section class="panel-section">
+        <div class="section-label">Channel Layers</div>
+        <div id="layer-list">
+          <!-- Populated by panel.js -->
+        </div>
+      </section>
+
+      <!-- Activity log -->
+      <section class="panel-section grow">
+        <div class="section-label">Activity</div>
+        <div id="activity-log"></div>
+      </section>
+
+      <div id="footer-bar">
+        <span id="footer">Play a note or chord</span>
+      </div>
+
+    </div><!-- /#panel-scroll -->
+
+  </div><!-- /#control-panel -->
+
+  <!-- No MIDI warning -->
+  <div id="no-midi-warning">
+    <h2>MIDI Not Supported</h2>
+    <p>Your browser doesn't support the Web MIDI API.<br>Please use Chrome or Edge.</p>
+  </div>
+
+  <!-- Three.js WebGPU + TSL -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three":        "https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.webgpu.js",
+      "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.webgpu.js",
+      "three/tsl":    "https://cdn.jsdelivr.net/npm/three@0.171.0/build/three.tsl.js",
+      "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.171.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script>
+    (function() {
+      try {
+        if (Tone.context && Tone.context.rawContext) {
+          Tone.context.rawContext.suspend().catch(() => {});
+        }
+        console.log('[Boot] Tone context state:', Tone.context.state);
+      } catch(e) {
+        console.warn('[Boot] Context suspend failed:', e);
+      }
+    })();
+  </script>
+  <script type="module" src="/jason/js/main.js"></script>
+
+</body>
+</html>
