@@ -3,9 +3,11 @@ import {
   Fn, uniform, uv, time,
   vec2, vec3, vec4, float,
   sin, cos, floor, fract, abs, mix,
-  step, pow, clamp, max, min, atan2, sqrt
+  step, pow, clamp, max, min, atan2, sqrt,
+  texture
 } from 'three/tsl';
 import { scene, camera } from './scene.js';
+import { getPaintTexture } from './brush.js';
 
 const PI  = float(Math.PI);
 const TAU = float(Math.PI * 2);
@@ -399,6 +401,57 @@ const SHADER_MAP = {
 };
 
 /* ═══════════════════════════════════════════════════════════════
+   PAINT COMPOSITE — wraps any shader output with paint layer
+
+   For each layer:
+     1. Sample paint DataTexture at UV (Y-flipped to match canvas)
+     2. Refraction: thick paint warps UV of layer below (gel lens)
+     3. Specular highlight: glossy paint catches directional light
+     4. Alpha-composite paint over shader output
+   ═══════════════════════════════════════════════════════════════ */
+function withPaint(baseNode, rawPaintTex) {
+  return Fn(() => {
+    const uvp     = uv();
+    const paintUV = vec2(uvp.x, float(1.0).sub(uvp.y));
+    const paint   = texture(rawPaintTex, paintUV);
+
+    const paintRGB   = paint.rgb;
+    const paintThick = clamp(paint.a.mul(2.0), float(0.0), float(1.0));
+
+    // Refraction offset — paint surface normals estimated from RGB
+    const nx = paintRGB.r.sub(0.5).mul(paintThick).mul(float(0.05));
+    const ny = paintRGB.g.sub(0.5).mul(paintThick).mul(float(0.05));
+    const darkBase   = vec4(baseNode.rgb.mul(float(0.72)), baseNode.a);
+    const refracted  = mix(baseNode, darkBase, paintThick.mul(float(0.4)));
+
+    // Specular — Blinn-Phong, light from top-left
+    const spec = pow(
+      clamp(
+        nx.mul(float(-3.2)).add(ny.mul(float(-3.2))).add(float(0.85)),
+        float(0.0), float(1.0)
+      ),
+      float(28.0)
+    );
+    const specularity = spec.mul(paintThick).mul(paint.a);
+    const specCol     = vec3(float(1.0), float(0.97), float(0.90));
+
+    // Composite paint over refracted base
+    // Paint is always visible even when base shader has no MIDI signal
+    const composited = mix(
+      refracted.rgb,
+      paintRGB.add(specCol.mul(specularity)),
+      paintThick.mul(float(0.92))
+    );
+
+    // Alpha: take the max of base shader alpha OR paint alpha so paint
+    // shows on silent (opacity=0) layers
+    const finalAlpha = max(refracted.a, paintThick.mul(float(0.95)));
+
+    return vec4(composited, finalAlpha);
+  })();
+}
+
+/* ═══════════════════════════════════════════════════════════════
    PLANE SIZE HELPER
    ═══════════════════════════════════════════════════════════════ */
 function planeSize(zPos) {
@@ -439,11 +492,18 @@ export function buildLayers() {
     const b   = parseInt(hex.slice(5,7), 16) / 255;
     const col = vec3(r, g, b);
 
-    const builderFn    = SHADER_MAP[cfg.shader] ?? shaderClean;
-    const fragmentNode = builderFn(
+    const builderFn  = SHADER_MAP[cfg.shader] ?? shaderClean;
+    const shaderNode = builderFn(
       freqU, nU, mU, lwU, algU, opacityU, col,
       ampU, attackU, brightnessU, onsetU
     );
+
+    // Paint texture — rawPaintTex is a Three.js DataTexture kept in sync by brush.js
+    // texture() in withPaint creates the TSL TextureNode at shader compile time
+    const rawPaintTex  = getPaintTexture(cfg.ch);
+    const fragmentNode = rawPaintTex
+      ? withPaint(shaderNode, rawPaintTex)
+      : shaderNode;
 
     const mat = new THREE.NodeMaterial();
     mat.transparent  = true;
@@ -460,6 +520,7 @@ export function buildLayers() {
       mesh, mat, cfg,
       opacityU, freqU, nU, mU, lwU, algU,
       ampU, attackU, brightnessU, onsetU,
+      rawPaintTex,
     };
   });
 }
@@ -514,6 +575,12 @@ export function setLayerAlgorithm(chIndex, algIndex) {
   const layer = layers[chIndex];
   if (!layer) return;
   layer.algU.value = algIndex;
+}
+
+export function updatePaintTexture(ch) {
+  // brush.js sets tex.needsUpdate = true when data changes.
+  // Nothing to do here — Three.js picks it up automatically next render.
+  // This function is kept for future use (e.g. texture resize).
 }
 
 export function clearAllLayers() {

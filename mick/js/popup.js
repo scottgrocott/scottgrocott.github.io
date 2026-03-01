@@ -6,17 +6,21 @@
    canvas — no GPU context is recreated. All app logic (MIDI,
    audio, shaders) stays in the parent window.
 
-   The popup listens for resize events and forwards them back to
-   the parent so the renderer and layer geometry stay correct.
+   Key fix: the popup document links back to the parent stylesheet
+   so that adopted elements (tool panel, cursor, trigger bar) keep
+   all their CSS. body gets position:relative so absolute children
+   anchor correctly.
    ═══════════════════════════════════════════════════════════════ */
 
 import { renderer, camera } from './scene.js';
+import { setCursorContainer } from './hand.js';
+import { setToolPanelContainer } from './toolpanel.js';
 
 let popupWin   = null;
 let isDetached = false;
 let popBtn     = null;
 
-/* ─── INIT — called from main.js after DOM is ready ─────────── */
+/* ─── INIT ───────────────────────────────────────────────────── */
 export function initPopup() {
   popBtn = document.getElementById('popup-btn');
   popBtn.addEventListener('click', () => {
@@ -31,13 +35,12 @@ export function initPopup() {
 /* ─── DETACH — move canvas into popup ───────────────────────── */
 function detachCanvas() {
   const canvas = renderer.domElement;
-
   const sw = screen.availWidth;
   const sh = screen.availHeight;
 
   popupWin = window.open(
     '', 'MIDICanvas',
-    `width=${sw},height=${sh},left=0,top=0,menubar=no,toolbar=no,location=no,status=no`
+    'width=' + sw + ',height=' + sh + ',left=0,top=0,menubar=no,toolbar=no,location=no,status=no'
   );
 
   if (!popupWin) {
@@ -45,32 +48,47 @@ function detachCanvas() {
     return;
   }
 
-  /* Minimal popup document */
-  popupWin.document.write(`<!DOCTYPE html>
-<html>
-<head>
-  <title>MIDI Canvas</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:100%; height:100%; overflow:hidden; background:#fff; }
-    canvas { display:block; width:100% !important; height:100% !important; }
-  </style>
-</head>
-<body></body>
-</html>`);
+  // Resolve parent stylesheet URL
+  const styleLink = document.querySelector('link[rel="stylesheet"]');
+  const styleHref = styleLink
+    ? styleLink.href
+    : (window.location.origin + '/jason/css/style.css');
+
+  // Grab Google Fonts link if present
+  const fontLink = document.querySelector('link[href*="fonts.googleapis"]');
+  const fontTag  = fontLink
+    ? '<link rel="stylesheet" href="' + fontLink.href + '">'
+    : '';
+
+  popupWin.document.write(
+    '<!DOCTYPE html>' +
+    '<html>' +
+    '<head>' +
+    '<meta charset="UTF-8">' +
+    '<title>MIDI Canvas</title>' +
+    fontTag +
+    '<link rel="stylesheet" href="' + styleHref + '">' +
+    '<style>' +
+    '* { margin:0; padding:0; box-sizing:border-box; }' +
+    'html, body { width:100%; height:100%; overflow:hidden; background:#fff; position:relative; }' +
+    'canvas { display:block; width:100% !important; height:100% !important; }' +
+    '</style>' +
+    '</head>' +
+    '<body></body>' +
+    '</html>'
+  );
   popupWin.document.close();
 
-  /* Adopt the canvas into the popup document and append */
+  /* Adopt canvas into popup */
   const adopted = popupWin.document.adoptNode(canvas);
   popupWin.document.body.appendChild(adopted);
 
-  /* Resize renderer to popup dimensions */
+  /* Move cursor and tool panel into popup */
+  setCursorContainer(popupWin.document.body);
+  setToolPanelContainer(popupWin.document.body);
+
   resizeToWindow(popupWin);
-
-  /* Forward popup resize events to renderer */
   popupWin.addEventListener('resize', () => resizeToWindow(popupWin));
-
-  /* If popup is closed by the user, reclaim the canvas */
   popupWin.addEventListener('beforeunload', () => {
     if (isDetached) reclaimCanvas(true);
   });
@@ -87,12 +105,12 @@ function reclaimCanvas(popupAlreadyClosed = false) {
   const canvas    = renderer.domElement;
   const container = document.getElementById('canvas-container');
 
-  /* Move canvas back */
   const adopted = document.adoptNode(canvas);
   container.appendChild(adopted);
   container.style.background = '';
 
-  /* Resize renderer to parent dimensions */
+  setCursorContainer(container);
+  setToolPanelContainer(container);
   resizeToWindow(window);
 
   if (!popupAlreadyClosed) {
@@ -104,15 +122,12 @@ function reclaimCanvas(popupAlreadyClosed = false) {
   popBtn.textContent = '⧉ Pop Out Canvas';
 }
 
-/* ─── RESIZE RENDERER + CAMERA + LAYER PLANES ──────────────── */
+/* ─── RESIZE ─────────────────────────────────────────────────── */
 function resizeToWindow(win) {
   const w = win.innerWidth;
   const h = win.innerHeight;
-
   renderer.setSize(w, h);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
-
-  /* Fire a synthetic resize so layers.js rebuilds plane geometry */
   window.dispatchEvent(new Event('resize'));
 }
