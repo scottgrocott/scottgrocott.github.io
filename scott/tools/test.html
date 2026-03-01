@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+<button onclick="play()">Play Tone</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.3.5/Tone.js"></script>
+<script>
+async function play() {
+  await Tone.start();
+  const synth = new Tone.Synth().toDestination();
+  synth.triggerAttackRelease("C4", "8n");
+  console.log('Triggered C4');
+}
+</script>
+</body>
+</html>

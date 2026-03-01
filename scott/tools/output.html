@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Song Player</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.3.5/Tone.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; color: #333; }
+        h1 { color: #2c3e50; }
+        textarea { width: 100%; height: 220px; font-family: monospace; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 18px; margin: 8px 8px 8px 0; background: #3498db; color: white; border: none; cursor: pointer; border-radius: 4px; font-size: 14px; }
+        button:hover { background: #2980b9; }
+        button:disabled { background: #aaa; cursor: default; }
+        #status { font-weight: bold; margin: 15px 0; min-height: 1.5em; color: #27ae60; }
+        #progress { font-size: 0.9em; color: #555; margin-top: 4px; font-family: monospace; }
+        #report { margin-top: 25px; }
+        .section { border: 1px solid #ddd; padding: 12px; margin-bottom: 12px; background: white; border-radius: 6px; }
+        .section h3 { margin: 0 0 8px 0; color: #2c3e50; }
+        .loop { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; }
+        .loop button { padding: 5px 12px; font-size: 12px; margin: 2px; }
+    </style>
+</head>
+<body>
+    <h1>JSON Song Player</h1>
+    <textarea id="jsonInput" placeholder="Paste JSON here..."></textarea><br>
+    <button id="loadBtn">Load JSON</button>
+    <button id="playFullBtn" disabled>Play Full Song</button>
+    <button id="stopBtn" disabled>Stop</button>
+    <button id="resumeBtn">Resume Audio</button>
+    <button id="testNoteBtn">Test Beep</button>
+    <div id="status">Ready. Paste JSON → Load → Resume Audio → Play.</div>
+    <div id="progress"></div>
+    <div id="report"></div>
+
+    <script>
+    // ─────────────────────────────────────────────────────────────────
+    // CRITICAL: No Tone nodes are created at the top level.
+    // Every single Tone object is created inside initAudio() or later,
+    // which only runs after a user gesture (button click).
+    //
+    // Creating ANY Tone node (even Tone.Gain) at script parse time
+    // causes "AudioContext encountered an error" because the browser
+    // blocks AudioContext creation / use before a user gesture.
+    // ─────────────────────────────────────────────────────────────────
+
+    // Pure JS state — no Tone objects
+    let parsedJson = null;
+    let fullParts = [];
+    let currentPart = null;
+    let progressInterval = null;
+    let audioReady = false;
+
+    // These are all null until initAudio() runs
+    let masterGain = null;
+    let reverb = null;
+    let synths = null;
+    let drumSynth = null;
+
+    // ── GM Drum Synthesizer ───────────────────────────────────────────
+    // All nodes connect directly to a destination gain — no Reverb.
+    class DrumSynth {
+        constructor(dest) {
+            this.kick = new Tone.MembraneSynth({
+                pitchDecay: 0.07, octaves: 6,
+                oscillator: { type: 'sine' },
+                envelope: { attack: 0.001, decay: 0.35, sustain: 0, release: 0.2 },
+                volume: 2
+            }).connect(dest);
+
+            this.snareNoise = new Tone.NoiseSynth({
+                noise: { type: 'white' },
+                envelope: { attack: 0.001, decay: 0.15, sustain: 0, release: 0.06 },
+                volume: -2
+            }).connect(dest);
+
+            this.snareTone = new Tone.Synth({
+                oscillator: { type: 'triangle' },
+                envelope: { attack: 0.001, decay: 0.08, sustain: 0, release: 0.04 },
+                volume: -8
+            }).connect(dest);
+
+            this.hhClosed = new Tone.NoiseSynth({
+                noise: { type: 'white' },
+                envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.02 },
+                volume: -8
+            });
+            this.hhClosedF = new Tone.Filter({ frequency: 9000, type: 'highpass' });
+            this.hhClosed.connect(this.hhClosedF);
+            this.hhClosedF.connect(dest);
+
+            this.hhOpen = new Tone.NoiseSynth({
+                noise: { type: 'white' },
+                envelope: { attack: 0.001, decay: 0.4, sustain: 0.05, release: 0.3 },
+                volume: -8
+            });
+            this.hhOpenF = new Tone.Filter({ frequency: 8000, type: 'highpass' });
+            this.hhOpen.connect(this.hhOpenF);
+            this.hhOpenF.connect(dest);
+
+            this.ride = new Tone.NoiseSynth({
+                noise: { type: 'white' },
+                envelope: { attack: 0.001, decay: 0.9, sustain: 0, release: 0.5 },
+                volume: -14
+            });
+            this.rideF = new Tone.Filter({ frequency: 6000, type: 'highpass' });
+            this.ride.connect(this.rideF);
+            this.rideF.connect(dest);
+
+            this.crash = new Tone.NoiseSynth({
+                noise: { type: 'white' },
+                envelope: { attack: 0.001, decay: 1.5, sustain: 0, release: 1.0 },
+                volume: -10
+            });
+            this.crashF = new Tone.Filter({ frequency: 5000, type: 'highpass' });
+            this.crash.connect(this.crashF);
+            this.crashF.connect(dest);
+
+            this.tomHi  = new Tone.MembraneSynth({ pitchDecay: 0.04, octaves: 4, envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.12 }, volume: -2 }).connect(dest);
+            this.tomMid = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, envelope: { attack: 0.001, decay: 0.22, sustain: 0, release: 0.15 }, volume: -2 }).connect(dest);
+            this.tomLow = new Tone.MembraneSynth({ pitchDecay: 0.07, octaves: 5, envelope: { attack: 0.001, decay: 0.28, sustain: 0, release: 0.18 }, volume: -2 }).connect(dest);
+
+            this.rimshot = new Tone.Synth({
+                oscillator: { type: 'square' },
+                envelope: { attack: 0.001, decay: 0.04, sustain: 0, release: 0.02 },
+                volume: -8
+            }).connect(dest);
+
+            this.clap = new Tone.NoiseSynth({
+                noise: { type: 'pink' },
+                envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.05 },
+                volume: -6
+            }).connect(dest);
+
+            this.cowbell = new Tone.Synth({
+                oscillator: { type: 'square' },
+                envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.2 },
+                volume: -14
+            }).connect(dest);
+        }
+
+        trigger(note, time, velocity = 0.8) {
+            const midi = typeof note === 'number' ? note : Tone.Frequency(note).toMidi();
+            const v = Math.max(0, Math.min(1, velocity));
+            try {
+                if      (midi === 35 || midi === 36)                               { this.kick.triggerAttackRelease('C1', '8n', time, v); }
+                else if (midi === 37)                                              { this.rimshot.triggerAttackRelease('G4', '32n', time, v); }
+                else if (midi === 38 || midi === 40)                              { this.snareNoise.triggerAttackRelease('16n', time, v * 0.9); this.snareTone.triggerAttackRelease('D4', '32n', time, v * 0.4); }
+                else if (midi === 39)                                              { this.clap.triggerAttackRelease('16n', time, v); }
+                else if (midi === 42 || midi === 44)                              { this.hhClosed.triggerAttackRelease('32n', time, v * 0.7); }
+                else if (midi === 46)                                              { this.hhOpen.triggerAttackRelease('16n', time, v * 0.7); }
+                else if (midi === 41 || midi === 43)                              { this.tomLow.triggerAttackRelease('F2', '8n', time, v); }
+                else if (midi === 45 || midi === 47)                              { this.tomMid.triggerAttackRelease('A2', '8n', time, v); }
+                else if (midi === 48 || midi === 50)                              { this.tomHi.triggerAttackRelease('D3', '8n', time, v); }
+                else if (midi === 49 || midi === 52 || midi === 55 || midi === 57){ this.crash.triggerAttackRelease('4n', time, v * 0.8); }
+                else if (midi === 51 || midi === 53 || midi === 59)               { this.ride.triggerAttackRelease('8n', time, v * 0.6); }
+                else if (midi === 54)                                              { this.hhClosed.triggerAttackRelease('32n', time, v * 0.5); }
+                else if (midi === 56)                                              { this.cowbell.triggerAttackRelease('A4', '8n', time, v * 0.6); }
+                else if (midi >= 60 && midi <= 64)                                { this.tomHi.triggerAttackRelease(['A3','G3','F3','E3','D3'][midi-60], '16n', time, v * 0.7); }
+                else { this.rimshot.triggerAttackRelease('C5', '32n', time, v * 0.3); console.log('Unmapped drum midi:', midi); }
+            } catch(err) { console.warn('Drum error midi', midi, err.message); }
+        }
+
+        dispose() {
+            [this.kick, this.snareNoise, this.snareTone,
+             this.hhClosed, this.hhClosedF, this.hhOpen, this.hhOpenF,
+             this.ride, this.rideF, this.crash, this.crashF,
+             this.tomHi, this.tomMid, this.tomLow,
+             this.rimshot, this.clap, this.cowbell
+            ].forEach(n => { try { n.dispose(); } catch(e) {} });
+        }
+    }
+
+    // ── Audio init — called once on first user interaction ────────────
+    async function initAudio() {
+        if (audioReady) return true;
+        try {
+            await Tone.start();
+            await Tone.context.resume();
+
+            // NOW it is safe to create Tone nodes
+            masterGain = new Tone.Gain(1.0).toDestination();
+            reverb = new Tone.Reverb({ decay: 1.5, wet: 0.15 });
+            reverb.connect(masterGain);
+
+            audioReady = true;
+            setStatus('Audio ready — press Play.');
+            console.log('AudioContext state:', Tone.context.state);
+            return true;
+        } catch(err) {
+            setStatus('Audio init failed: ' + err.message);
+            console.error('initAudio error:', err);
+            return false;
+        }
+    }
+
+    function createSynths() {
+        // Dispose old nodes
+        if (synths) Object.values(synths).forEach(s => { try { s.dispose(); } catch(e) {} });
+        if (drumSynth) { try { drumSynth.dispose(); } catch(e) {} }
+
+        synths = {};
+
+        synths.bass = new Tone.Synth({
+            oscillator: { type: 'sawtooth' },
+            envelope: { attack: 0.05, decay: 0.3, sustain: 0.8, release: 1.0 },
+            volume: -6
+        }).connect(reverb);
+
+        synths.chords = new Tone.PolySynth(Tone.Synth, {
+            maxPolyphony: 16,
+            options: { oscillator: { type: 'triangle' }, envelope: { attack: 0.1, decay: 0.5, sustain: 0.8, release: 2 } }
+        });
+        synths.chords.volume.value = -8;
+        synths.chords.connect(reverb);
+
+        synths.pad = new Tone.PolySynth(Tone.Synth, {
+            maxPolyphony: 16,
+            options: { oscillator: { type: 'sine' }, envelope: { attack: 1.5, decay: 1, sustain: 0.9, release: 4 } }
+        });
+        synths.pad.volume.value = -10;
+        synths.pad.connect(reverb);
+
+        synths.strings = new Tone.PolySynth(Tone.Synth, {
+            maxPolyphony: 16,
+            options: { oscillator: { type: 'sawtooth' }, envelope: { attack: 0.3, decay: 0.8, sustain: 0.9, release: 3 } }
+        });
+        synths.strings.volume.value = -8;
+        synths.strings.connect(reverb);
+
+        synths.percussion = new Tone.NoiseSynth({
+            noise: { type: 'pink' },
+            envelope: { attack: 0.005, decay: 0.15, sustain: 0, release: 0.1 },
+            volume: -14
+        }).connect(masterGain);
+
+        drumSynth = new DrumSynth(masterGain);
+        console.log('Synths created');
+    }
+
+    async function safeStop() {
+        if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+        if (audioReady) {
+            Tone.Transport.stop();
+            Tone.Transport.cancel(0);
+            Tone.Transport.position = 0;
+        }
+        fullParts.forEach(p => { try { p.stop(); p.dispose(); } catch(e) {} });
+        fullParts = [];
+        if (currentPart) { try { currentPart.stop(); currentPart.dispose(); } catch(e) {} currentPart = null; }
+        document.getElementById('progress').textContent = '';
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    function setStatus(msg) { document.getElementById('status').textContent = msg; }
+    function durationToSeconds(d) { return Tone.Time(d).toSeconds(); }
+
+    function getSectionAtTime(secs) {
+        let t = 0;
+        for (const name of (parsedJson?.arrangement || [])) {
+            const sec = parsedJson.sections[name];
+            if (!sec) continue;
+            const dur = durationToSeconds(sec.duration);
+            if (secs < t + dur) return name;
+            t += dur;
+        }
+        return 'end';
+    }
+
+    async function loadJson() {
+        const text = document.getElementById('jsonInput').value.trim();
+        if (!text) return;
+        try {
+            parsedJson = JSON.parse(text);
+            document.getElementById('playFullBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = false;
+            setStatus(`Loaded "${parsedJson.title || 'Song'}" — ${parsedJson.bpm} BPM. Click Resume Audio then Play.`);
+            generateReport();
+        } catch(e) { setStatus('Invalid JSON: ' + e.message); }
+    }
+
+    function generateReport() {
+        const report = document.getElementById('report');
+        report.innerHTML = '<h2>Song Structure</h2>';
+        if (!parsedJson?.sections) return;
+        parsedJson.arrangement?.forEach(name => {
+            const sec = parsedJson.sections[name];
+            if (!sec) return;
+            const div = document.createElement('div');
+            div.className = 'section';
+            div.innerHTML = `<h3>${name} (${sec.lengthBars} bars)</h3>`;
+            Object.entries(sec.loops || {}).forEach(([inst, evts]) => {
+                const ldiv = document.createElement('div');
+                ldiv.className = 'loop';
+                ldiv.innerHTML = `<span>${inst} (${evts.length} events)</span>`;
+                const btn = document.createElement('button');
+                btn.textContent = 'Loop';
+                btn.onclick = () => playLoop(inst, evts);
+                ldiv.appendChild(btn);
+                div.appendChild(ldiv);
+            });
+            report.appendChild(div);
+        });
+    }
+
+    async function playFullSong() {
+        if (!await initAudio()) return;
+        await safeStop();
+        createSynths();
+        Tone.Transport.bpm.value = parsedJson.bpm || 120;
+
+        let offset = 0;
+        parsedJson.arrangement.forEach(name => {
+            const sec = parsedJson.sections[name];
+            if (!sec) return;
+            const dur = durationToSeconds(sec.duration);
+
+            Object.entries(sec.loops || {}).forEach(([inst, evts]) => {
+                let p;
+                if (inst === 'drums' || inst === 'percussion') {
+                    p = new Tone.Part((time, e) => { drumSynth.trigger(e.note, time, e.velocity); }, evts);
+                } else {
+                    const s = synths[inst];
+                    if (!s) { console.warn('No synth for:', inst); return; }
+                    p = new Tone.Part((time, e) => {
+                        try { s.triggerAttackRelease(e.note, e.duration, time, e.velocity); }
+                        catch(err) { console.warn(inst, e.note, err.message); }
+                    }, evts);
+                }
+                p.start(offset);
+                p.stop(offset + dur + 0.5);
+                fullParts.push(p);
+            });
+
+            console.log(`"${name}" @${offset.toFixed(1)}s for ${dur.toFixed(1)}s`);
+            offset += dur;
+        });
+
+        const total = offset;
+        Tone.Transport.start('+0.3');
+        setStatus(`Playing — ${Math.round(total)}s total`);
+
+        progressInterval = setInterval(() => {
+            const pos = Tone.Transport.seconds;
+            const pct = Math.min(100, (pos / total * 100)).toFixed(0);
+            const f = Math.floor(pct / 5);
+            document.getElementById('progress').textContent =
+                `[${'█'.repeat(f)}${'░'.repeat(20-f)}] ${pct}% — ${pos.toFixed(1)}s/${total.toFixed(1)}s — ${getSectionAtTime(pos)}`;
+            if (pos >= total) { clearInterval(progressInterval); progressInterval = null; setStatus('Done.'); }
+        }, 250);
+    }
+
+    async function playLoop(inst, events) {
+        if (!await initAudio()) return;
+        await safeStop();
+        createSynths();
+
+        let maxTime = 0;
+        events.forEach(e => { const t = Tone.Time(e.time).toSeconds(); if (t > maxTime) maxTime = t; });
+        const loopEnd = maxTime + Tone.Time('1m').toSeconds();
+
+        if (inst === 'drums' || inst === 'percussion') {
+            currentPart = new Tone.Part((time, e) => { drumSynth.trigger(e.note, time, e.velocity); }, events);
+        } else {
+            const s = synths[inst];
+            if (!s) return alert('No synth for ' + inst);
+            currentPart = new Tone.Part((time, e) => {
+                try { s.triggerAttackRelease(e.note, e.duration, time, e.velocity); }
+                catch(err) { console.warn(err.message); }
+            }, events);
+        }
+        currentPart.loop = true;
+        currentPart.loopEnd = loopEnd;
+        currentPart.start(0);
+        Tone.Transport.start('+0.2');
+        setStatus(`Looping: ${inst} (${events.length} events)`);
+    }
+
+    async function testNote() {
+        if (!await initAudio()) return;
+        const s = new Tone.PolySynth(Tone.Synth).connect(masterGain);
+        s.triggerAttackRelease(['C3', 'E3', 'G3'], '4n');
+        setStatus('Test chord played');
+    }
+
+    // Wire up buttons — no Tone calls here, just DOM
+    document.getElementById('loadBtn').onclick = loadJson;
+    document.getElementById('playFullBtn').onclick = playFullSong;
+    document.getElementById('stopBtn').onclick = safeStop;
+    document.getElementById('resumeBtn').onclick = initAudio;
+    document.getElementById('testNoteBtn').onclick = testNote;
+
+    // ── Nothing else runs at page load ────────────────────────────────
+    </script>
+</body>
+</html>

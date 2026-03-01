@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIDI Studio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --bg: #0a0a0c;
+    --surface: #111116;
+    --surface2: #18181f;
+    --border: #2a2a35;
+    --accent: #e8ff47;
+    --accent2: #47ffe0;
+    --accent3: #ff476e;
+    --text: #e8e8f0;
+    --muted: #555568;
+    --track-h: #1e1e28;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BG */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+  }
+
+  header span {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* UPLOAD */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(232,255,71,0.03);
+  }
+  .upload-zone input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .upload-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    opacity: 0.5;
+  }
+  .upload-zone p {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .upload-zone .filename {
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: 8px;
+    font-size: 0.85rem;
+  }
+
+  /* TRANSPORT */
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #000; border-color: var(--accent); }
+  .btn.primary:hover { background: #fff; border-color: #fff; }
+  .btn.danger { background: var(--accent3); color: #fff; border-color: var(--accent3); }
+  .btn:disabled { opacity: 0.3; pointer-events: none; }
+
+  .time-display {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    margin-top: 16px;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* STATUS */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  .status-dot.playing { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 1s infinite; }
+  .status-dot.ready { background: var(--accent2); }
+  .status-dot.error { background: var(--accent3); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* SELECT */
+  select {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    outline: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+  select:hover { border-color: var(--accent2); }
+  select:focus { border-color: var(--accent); }
+
+  /* MIDI OUTPUT */
+  .midi-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .midi-label { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+
+  /* TRACKS */
+  .tracks-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .track-row {
+    background: var(--track-h);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: 24px 1fr 180px 100px 80px 80px;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s;
+  }
+  .track-row.active { border-color: var(--accent); }
+  .track-row:hover { border-color: var(--border); background: #20202a; }
+
+  .track-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .track-info { min-width: 0; }
+  .track-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .track-meta {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .track-instrument {
+    font-size: 0.7rem;
+    color: var(--accent2);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .channel-select { width: 100%; }
+
+  .mute-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    width: 100%;
+  }
+  .mute-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+  .mute-btn.muted { background: var(--accent3); color: #fff; border-color: var(--accent3); }
+
+  .vol-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .vol-wrap input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+  .vol-wrap input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  /* VU meter */
+  .vu {
+    width: 6px;
+    height: 30px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .vu-fill {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to top, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: height 0.05s;
+    margin-top: auto;
+  }
+
+  /* MESSAGES LOG */
+  .log {
+    font-size: 0.65rem;
+    color: var(--muted);
+    max-height: 80px;
+    overflow-y: auto;
+    line-height: 1.8;
+    font-family: 'Space Mono', monospace;
+  }
+  .log .entry { display: block; }
+  .log .entry.warn { color: var(--accent3); }
+  .log .entry.ok { color: var(--accent2); }
+  .log .entry.info { color: var(--accent); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* RESPONSIVE */
+  @media(max-width: 700px) {
+    .track-row { grid-template-columns: 20px 1fr; grid-template-rows: auto auto auto; }
+    .time-display { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>MIDI STUDIO</h1>
+    <span>Multi-track sequencer + MIDI output</span>
+  </header>
+
+  <!-- FILE LOAD -->
+  <div class="panel">
+    <div class="panel-title">Load MIDI File</div>
+    <div class="upload-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".mid,.midi">
+      <div class="upload-icon">♩</div>
+      <p>Drop a .mid file here or click to browse</p>
+      <div class="filename" id="fileName"></div>
+    </div>
+  </div>
+
+  <!-- MIDI OUTPUT -->
+  <div class="panel">
+    <div class="panel-title">MIDI Output</div>
+    <div class="midi-row">
+      <span class="midi-label">Port:</span>
+      <select id="midiOut">
+        <option value="">-- No MIDI Output --</option>
+      </select>
+      <button class="btn" id="refreshMidi">Refresh Ports</button>
+      <div class="status-pill" id="midiStatus">
+        <div class="status-dot" id="midiDot"></div>
+        <span id="midiStatusText">No MIDI access</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSPORT -->
+  <div class="panel">
+    <div class="panel-title">Transport</div>
+    <div class="transport">
+      <button class="btn primary" id="playBtn" disabled>▶ Play</button>
+      <button class="btn" id="stopBtn" disabled>■ Stop</button>
+      <div class="status-pill" id="playStatus">
+        <div class="status-dot" id="playDot"></div>
+        <span id="playStatusText">No file loaded</span>
+      </div>
+      <div class="time-display" id="timeDisplay">0:00.000</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKS -->
+  <div class="panel">
+    <div class="panel-title">Tracks</div>
+    <div class="tracks-grid" id="tracksGrid">
+      <div style="font-size:0.75rem;color:var(--muted);padding:20px;text-align:center;">Load a MIDI file to see tracks</div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="panel">
+    <div class="panel-title">Log</div>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<script>
+// ─── MIDI FILE PARSER (no external lib, pure JS) ───────────────────────────
+function parseMidi(buffer) {
+  const view = new DataView(buffer);
+  let pos = 0;
+
+  function read(n) {
+    let val = 0;
+    for (let i = 0; i < n; i++) val = (val << 8) | view.getUint8(pos++);
+    return val;
+  }
+  function readVLQ() {
+    let val = 0, b;
+    do { b = view.getUint8(pos++); val = (val << 7) | (b & 0x7f); } while (b & 0x80);
+    return val;
+  }
+  function readBytes(n) {
+    const arr = new Uint8Array(buffer, pos, n); pos += n; return arr;
+  }
+
+  // Header
+  if (read(4) !== 0x4d546864) throw new Error('Not a MIDI file');
+  read(4); // header length
+  const format = read(2);
+  const numTracks = read(2);
+  const timeDivision = read(2);
+  const ticksPerBeat = timeDivision & 0x7fff;
+
+  const tracks = [];
+  for (let t = 0; t < numTracks; t++) {
+    if (read(4) !== 0x4d54726b) throw new Error('Bad track header');
+    const trackLen = read(4);
+    const endPos = pos + trackLen;
+    const events = [];
+    let tick = 0;
+    let runningStatus = 0;
+
+    while (pos < endPos) {
+      const delta = readVLQ();
+      tick += delta;
+      let statusByte = view.getUint8(pos);
+
+      if (statusByte & 0x80) { pos++; } 
+      else { statusByte = runningStatus; }
+      
+      if (statusByte === 0xff) {
+        // Meta
+        const metaType = view.getUint8(pos++);
+        const len = readVLQ();
+        const data = readBytes(len);
+        let text;
+        if (metaType === 0x51 && len === 3) {
+          const tempo = (data[0] << 16) | (data[1] << 8) | data[2];
+          events.push({ tick, type: 'tempo', tempo });
+        } else if (metaType === 0x03 || metaType === 0x04) {
+          text = new TextDecoder().decode(data);
+          events.push({ tick, type: 'name', text });
+        } else if (metaType === 0x2f) {
+          events.push({ tick, type: 'end' });
+          break;
+        } else {
+          events.push({ tick, type: 'meta', metaType, data });
+        }
+      } else if (statusByte === 0xf0 || statusByte === 0xf7) {
+        const len = readVLQ();
+        readBytes(len);
+      } else {
+        runningStatus = statusByte;
+        const eventType = (statusByte >> 4) & 0xf;
+        const channel = statusByte & 0xf;
+
+        if (eventType === 0x8 || eventType === 0x9) {
+          const note = view.getUint8(pos++);
+          const velocity = view.getUint8(pos++);
+          const isOn = eventType === 0x9 && velocity > 0;
+          events.push({ tick, type: isOn ? 'noteOn' : 'noteOff', channel, note, velocity });
+        } else if (eventType === 0xa) {
+          const note = view.getUint8(pos++); const pressure = view.getUint8(pos++);
+          events.push({ tick, type: 'polyPressure', channel, note, pressure });
+        } else if (eventType === 0xb) {
+          const ctrl = view.getUint8(pos++); const val = view.getUint8(pos++);
+          events.push({ tick, type: 'cc', channel, ctrl, value: val });
+        } else if (eventType === 0xc) {
+          const program = view.getUint8(pos++);
+          events.push({ tick, type: 'programChange', channel, program });
+        } else if (eventType === 0xd) {
+          const pressure = view.getUint8(pos++);
+          events.push({ tick, type: 'channelPressure', channel, pressure });
+        } else if (eventType === 0xe) {
+          const lsb = view.getUint8(pos++); const msb = view.getUint8(pos++);
+          events.push({ tick, type: 'pitchBend', channel, value: ((msb << 7) | lsb) - 8192 });
+        } else {
+          pos++;
+        }
+      }
+    }
+    pos = endPos;
+    tracks.push(events);
+  }
+  return { format, numTracks, ticksPerBeat, tracks };
+}
+
+// Convert ticks to seconds given tempo map
+function buildTempoMap(allTracks) {
+  const map = [{ tick: 0, tempo: 500000, time: 0 }]; // default 120 BPM
+  for (const track of allTracks) {
+    for (const ev of track) {
+      if (ev.type === 'tempo') {
+        const last = map[map.length - 1];
+        // (don't duplicate tick 0 if found in first track)
+        if (ev.tick === 0) { map[0].tempo = ev.tempo; continue; }
+        map.push({ tick: ev.tick, tempo: ev.tempo, time: 0 });
+      }
+    }
+  }
+  map.sort((a, b) => a.tick - b.tick);
+  return map;
+}
+
+function ticksToSeconds(tick, ticksPerBeat, tempoMap) {
+  let time = 0;
+  for (let i = 0; i < tempoMap.length; i++) {
+    const seg = tempoMap[i];
+    const nextTick = i + 1 < tempoMap.length ? tempoMap[i + 1].tick : Infinity;
+    if (tick <= seg.tick) break;
+    const endTick = Math.min(tick, nextTick);
+    time += ((endTick - seg.tick) / ticksPerBeat) * (seg.tempo / 1e6);
+    if (tick <= nextTick) break;
+  }
+  return time;
+}
+
+// ─── GM INSTRUMENT MAP ─────────────────────────────────────────────────────
+const GM_NAMES = [
+  'Acoustic Grand','Bright Acoustic','Electric Grand','Honky-tonk','Electric Piano 1','Electric Piano 2','Harpsichord','Clavinet',
+  'Celesta','Glockenspiel','Music Box','Vibraphone','Marimba','Xylophone','Tubular Bells','Dulcimer',
+  'Drawbar Organ','Percussive Organ','Rock Organ','Church Organ','Reed Organ','Accordion','Harmonica','Tango Accordion',
+  'Nylon Guitar','Steel Guitar','Jazz Guitar','Clean Guitar','Muted Guitar','Overdriven Guitar','Distortion Guitar','Guitar Harmonics',
+  'Acoustic Bass','Finger Bass','Pick Bass','Fretless Bass','Slap Bass 1','Slap Bass 2','Synth Bass 1','Synth Bass 2',
+  'Violin','Viola','Cello','Contrabass','Tremolo Strings','Pizzicato Strings','Orchestral Harp','Timpani',
+  'String Ensemble 1','String Ensemble 2','Synth Strings 1','Synth Strings 2','Choir Aah','Voice Ooh','Synth Voice','Orchestra Hit',
+  'Trumpet','Trombone','Tuba','Muted Trumpet','French Horn','Brass Section','Synth Brass 1','Synth Brass 2',
+  'Soprano Sax','Alto Sax','Tenor Sax','Baritone Sax','Oboe','English Horn','Bassoon','Clarinet',
+  'Piccolo','Flute','Recorder','Pan Flute','Blown Bottle','Shakuhachi','Whistle','Ocarina',
+  'Lead 1 Square','Lead 2 Sawtooth','Lead 3 Calliope','Lead 4 Chiff','Lead 5 Charang','Lead 6 Voice','Lead 7 Fifths','Lead 8 Bass+Lead',
+  'Pad 1 New Age','Pad 2 Warm','Pad 3 Polysynth','Pad 4 Choir','Pad 5 Bowed','Pad 6 Metallic','Pad 7 Halo','Pad 8 Sweep',
+  'FX 1 Rain','FX 2 Soundtrack','FX 3 Crystal','FX 4 Atmosphere','FX 5 Brightness','FX 6 Goblins','FX 7 Echoes','FX 8 Sci-fi',
+  'Sitar','Banjo','Shamisen','Koto','Kalimba','Bag Pipe','Fiddle','Shanai',
+  'Tinkle Bell','Agogo','Steel Drums','Woodblock','Taiko Drum','Melodic Tom','Synth Drum','Reverse Cymbal',
+  'Guitar Fret Noise','Breath Noise','Seashore','Bird Tweet','Telephone Ring','Helicopter','Applause','Gunshot'
+];
+
+// ─── TONE.JS INSTRUMENT FACTORY ────────────────────────────────────────────
+function createToneInstrument(program, isPercussion) {
+  if (isPercussion) {
+    return new Tone.MembraneSynth({ pitchDecay: 0.04, octaves: 4,
+      envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.1 } }).toDestination();
+  }
+  // Piano-like (0-7)
+  if (program < 8) {
+    return new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'triangle' },
+      envelope: { attack: 0.005, decay: 0.3, sustain: 0.4, release: 1.2 }
+    }).toDestination();
+  }
+  // Chromatic perc (8-15)
+  if (program < 16) {
+    return new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.5 }
+    }).toDestination();
+  }
+  // Organ (16-23)
+  if (program < 24) {
+    return new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'square' },
+      envelope: { attack: 0.01, decay: 0, sustain: 1, release: 0.1 }
+    }).toDestination();
+  }
+  // Guitar (24-31)
+  if (program < 32) {
+    return new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'sawtooth' },
+      envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.6 }
+    }).toDestination();
+  }
+  // Bass (32-39)
+  if (program < 40) {
+    return new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'sawtooth' },
+      envelope: { attack: 0.01, decay: 0.3, sustain: 0.5, release: 0.3 }
+    }).toDestination();
+  }
+  // Strings (40-47)
+  if (program < 48) {
+    return new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'sawtooth' },
+      envelope: { attack: 0.1, decay: 0.1, sustain: 0.8, release: 0.5 }
+    }).toDestination();
+  }
+  // Ensemble (48-55)
+  if (program < 56) {
+    return new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'sawtooth' },
+      envelope: { attack: 0.08, decay: 0.2, sustain: 0.7, release: 0.8 }
+    }).toDestination();
+  }
+  // Brass (56-63)
+  if (program < 64) {
+    return new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'sawtooth' },
+      envelope: { attack: 0.05, decay: 0.1, sustain: 0.9, release: 0.3 }
+    }).toDestination();
+  }
+  // Reed/Wind (64-79)
+  if (program < 80) {
+    return new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.05, decay: 0.1, sustain: 0.9, release: 0.2 }
+    }).toDestination();
+  }
+  // Leads / Pads / Synths (80-127)
+  return new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: program < 96 ? 'sawtooth' : 'sine' },
+    envelope: { attack: 0.05, decay: 0.2, sustain: 0.6, release: 1.0 }
+  }).toDestination();
+}
+
+function midiNoteToFreq(note) {
+  return 440 * Math.pow(2, (note - 69) / 12);
+}
+function midiNoteToName(note) {
+  const names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  return names[note % 12] + Math.floor(note / 12 - 1);
+}
+
+// ─── APP STATE ──────────────────────────────────────────────────────────────
+let midiAccess = null;
+let selectedOutput = null;
+let parsedMidi = null;
+let trackStates = [];
+let scheduleIds = [];
+let playStartAudioTime = 0;   // Tone.context.currentTime when playback started
+let playStartPerfTime = 0;    // performance.now() when playback started
+let duration = 0;
+let rafId = null;
+let isPlaying = false;
+let tempoMap = [];
+
+const COLORS = ['#e8ff47','#47ffe0','#ff476e','#ff9f47','#c847ff','#47a6ff','#ff47d4','#7fff47'];
+
+// ─── DOM REFS ───────────────────────────────────────────────────────────────
+const fileInput = document.getElementById('fileInput');
+const fileName = document.getElementById('fileName');
+const dropZone = document.getElementById('dropZone');
+const midiOutSelect = document.getElementById('midiOut');
+const refreshMidiBtn = document.getElementById('refreshMidi');
+const playBtn = document.getElementById('playBtn');
+const stopBtn = document.getElementById('stopBtn');
+const timeDisplay = document.getElementById('timeDisplay');
+const progressFill = document.getElementById('progressFill');
+const tracksGrid = document.getElementById('tracksGrid');
+const logEl = document.getElementById('log');
+const playDot = document.getElementById('playDot');
+const playStatusText = document.getElementById('playStatusText');
+const midiDot = document.getElementById('midiDot');
+const midiStatusText = document.getElementById('midiStatusText');
+
+// ─── LOG ────────────────────────────────────────────────────────────────────
+function log(msg, type = '') {
+  const el = document.createElement('span');
+  el.className = 'entry ' + type;
+  el.textContent = '▸ ' + msg;
+  logEl.appendChild(el);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+// ─── MIDI ACCESS ─────────────────────────────────────────────────────────────
+async function initMidi() {
+  if (!navigator.requestMIDIAccess) {
+    log('Web MIDI API not supported in this browser', 'warn');
+    midiStatusText.textContent = 'Not supported';
+    midiDot.className = 'status-dot error';
+    return;
+  }
+  try {
+    midiAccess = await navigator.requestMIDIAccess();
+    populateMidiOutputs();
+    midiAccess.onstatechange = populateMidiOutputs;
+    log('MIDI access granted', 'ok');
+  } catch (e) {
+    log('MIDI access denied: ' + e.message, 'warn');
+    midiStatusText.textContent = 'Access denied';
+    midiDot.className = 'status-dot error';
+  }
+}
+
+function populateMidiOutputs() {
+  const current = midiOutSelect.value;
+  midiOutSelect.innerHTML = '<option value="">-- No MIDI Output --</option>';
+  if (!midiAccess) return;
+  let count = 0;
+  for (const [id, port] of midiAccess.outputs) {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = port.name;
+    if (id === current) opt.selected = true;
+    midiOutSelect.appendChild(opt);
+    count++;
+  }
+  if (count === 0) {
+    midiStatusText.textContent = 'No ports found';
+    midiDot.className = 'status-dot';
+  } else {
+    midiStatusText.textContent = `${count} port${count > 1 ? 's' : ''} available`;
+    midiDot.className = 'status-dot ready';
+  }
+  updateSelectedOutput();
+}
+
+function updateSelectedOutput() {
+  const id = midiOutSelect.value;
+  if (!id || !midiAccess) { selectedOutput = null; return; }
+  selectedOutput = midiAccess.outputs.get(id);
+  if (selectedOutput) log(`MIDI output: ${selectedOutput.name}`, 'info');
+}
+
+midiOutSelect.addEventListener('change', updateSelectedOutput);
+refreshMidiBtn.addEventListener('click', populateMidiOutputs);
+
+// ─── FILE HANDLING ───────────────────────────────────────────────────────────
+function handleFile(file) {
+  if (!file || !file.name.match(/\.midi?$/i)) { log('Not a MIDI file', 'warn'); return; }
+  fileName.textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      parsedMidi = parseMidi(e.target.result);
+      log(`Loaded: ${file.name} — format ${parsedMidi.format}, ${parsedMidi.numTracks} tracks, ${parsedMidi.ticksPerBeat} TPB`, 'ok');
+      processMidi();
+    } catch (err) {
+      log('Parse error: ' + err.message, 'warn');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  handleFile(e.dataTransfer.files[0]);
+});
+
+// ─── PROCESS MIDI ────────────────────────────────────────────────────────────
+function processMidi() {
+  // Dispose old instruments
+  for (const ts of trackStates) {
+    if (ts.instrument) { try { ts.instrument.dispose(); } catch(e){} }
+  }
+  trackStates = [];
+
+  tempoMap = buildTempoMap(parsedMidi.tracks);
+
+  // Calculate duration
+  let maxTick = 0;
+  for (const track of parsedMidi.tracks) {
+    for (const ev of track) if (ev.tick > maxTick) maxTick = ev.tick;
+  }
+  duration = ticksToSeconds(maxTick, parsedMidi.ticksPerBeat, tempoMap);
+
+  // Build track states
+  let colorIdx = 0;
+  for (let i = 0; i < parsedMidi.tracks.length; i++) {
+    const track = parsedMidi.tracks[i];
+    
+    // Find name
+    let name = null;
+    for (const ev of track) if (ev.type === 'name') { name = ev.text; break; }
+
+    // Find program changes and channels used
+    const programs = {};
+    const channels = new Set();
+    for (const ev of track) {
+      if (ev.type === 'programChange') programs[ev.channel] = ev.program;
+      if (ev.channel !== undefined) channels.add(ev.channel);
+    }
+    
+    // Skip empty tracks
+    const hasNotes = track.some(ev => ev.type === 'noteOn');
+    if (!hasNotes && !name) continue;
+
+    const mainChannel = channels.size > 0 ? [...channels][0] : 0;
+    const isPercussion = mainChannel === 9;
+    const program = programs[mainChannel] !== undefined ? programs[mainChannel] : 0;
+    const instrName = isPercussion ? 'Drums / Percussion' : GM_NAMES[program] || 'Unknown';
+    const noteCount = track.filter(e => e.type === 'noteOn').length;
+
+    const instrument = createToneInstrument(program, isPercussion);
+    // Set volume
+    if (instrument.volume) instrument.volume.value = 0;
+
+    trackStates.push({
+      trackIndex: i,
+      name: name || `Track ${i + 1}`,
+      program,
+      isPercussion,
+      instrument,
+      muted: false,
+      volume: 0.8,
+      midiChannel: mainChannel,
+      color: COLORS[colorIdx % COLORS.length],
+      instrName,
+      noteCount,
+      originalChannel: mainChannel,
+    });
+    colorIdx++;
+  }
+
+  renderTracks();
+  playBtn.disabled = false;
+  playStatusText.textContent = 'Ready';
+  playDot.className = 'status-dot ready';
+  log(`Processed ${trackStates.length} active tracks, duration ~${duration.toFixed(1)}s`, 'info');
+}
+
+// ─── RENDER TRACKS ───────────────────────────────────────────────────────────
+function renderTracks() {
+  tracksGrid.innerHTML = '';
+  for (let i = 0; i < trackStates.length; i++) {
+    const ts = trackStates[i];
+    const row = document.createElement('div');
+    row.className = 'track-row';
+    row.id = `track-row-${i}`;
+    row.style.borderLeftColor = ts.color;
+    row.style.borderLeftWidth = '3px';
+
+    // Channel options
+    let channelOptions = '';
+    for (let ch = 0; ch < 16; ch++) {
+      channelOptions += `<option value="${ch}" ${ch === ts.midiChannel ? 'selected' : ''}>Ch ${ch + 1}${ch === 9 ? ' (Drums)' : ''}</option>`;
+    }
+
+    row.innerHTML = `
+      <div class="track-num" style="color:${ts.color}">${i + 1}</div>
+      <div class="track-info">
+        <div class="track-name">${ts.name}</div>
+        <div class="track-meta">${ts.noteCount} notes · prog ${ts.program}</div>
+      </div>
+      <div class="track-instrument">${ts.instrName}</div>
+      <select class="channel-select" data-track="${i}" onchange="setChannel(${i}, this.value)">
+        ${channelOptions}
+      </select>
+      <button class="mute-btn" id="mute-btn-${i}" onclick="toggleMute(${i})">Mute</button>
+      <div class="vol-wrap">
+        <input type="range" min="0" max="1" step="0.01" value="${ts.volume}" 
+          onchange="setVolume(${i}, this.value)" oninput="setVolume(${i}, this.value)">
+      </div>
+    `;
+    tracksGrid.appendChild(row);
+  }
+}
+
+function setChannel(trackIdx, ch) {
+  trackStates[trackIdx].midiChannel = parseInt(ch);
+  log(`Track ${trackIdx + 1}: MIDI channel → ${parseInt(ch) + 1}`);
+}
+
+function toggleMute(trackIdx) {
+  const ts = trackStates[trackIdx];
+  ts.muted = !ts.muted;
+  const btn = document.getElementById(`mute-btn-${trackIdx}`);
+  btn.classList.toggle('muted', ts.muted);
+  if (ts.instrument && ts.instrument.volume) {
+    ts.instrument.volume.value = ts.muted ? -Infinity : volumeToDb(ts.volume);
+  }
+  log(`Track ${trackIdx + 1}: ${ts.muted ? 'Muted' : 'Unmuted'}`);
+}
+
+function volumeToDb(v) { return v === 0 ? -Infinity : 20 * Math.log10(v); }
+
+function setVolume(trackIdx, v) {
+  const ts = trackStates[trackIdx];
+  ts.volume = parseFloat(v);
+  if (ts.instrument && ts.instrument.volume && !ts.muted) {
+    ts.instrument.volume.value = volumeToDb(ts.volume);
+  }
+}
+
+// ─── PLAYBACK ────────────────────────────────────────────────────────────────
+// Strategy:
+//   - Tone.js audio: schedule via Tone.Transport at offset seconds from position 0
+//   - MIDI output: use Web MIDI send(data, performanceTimestamp) — this is the
+//     correct clock for MIDI. We record performance.now() at the moment Transport
+//     starts, then each event fires at (playStartPerfTime + evTimeSecs * 1000).
+
+async function play() {
+  if (isPlaying) return;
+
+  // Must resume AudioContext from a user gesture
+  await Tone.start();
+  // Reset transport to zero cleanly
+  Tone.Transport.stop();
+  Tone.Transport.position = 0;
+  for (const id of scheduleIds) Tone.Transport.clear(id);
+  scheduleIds = [];
+
+  allNotesOff();
+
+  isPlaying = true;
+  playBtn.disabled = true;
+  stopBtn.disabled = false;
+  playDot.className = 'status-dot playing';
+  playStatusText.textContent = 'Playing';
+
+  // Schedule all events relative to Transport position 0 (seconds offset)
+  for (let ti = 0; ti < trackStates.length; ti++) {
+    const ts = trackStates[ti];
+    const track = parsedMidi.tracks[ts.trackIndex];
+
+    for (const ev of track) {
+      const evSec = ticksToSeconds(ev.tick, parsedMidi.ticksPerBeat, tempoMap);
+      // Transport.schedule time string "+X" means X seconds from NOW when transport starts.
+      // Instead, pass a plain number which is the Transport position in seconds.
+      const tPos = evSec; // Transport position in seconds
+
+      if (ev.type === 'noteOn') {
+        const id = Tone.Transport.schedule((audioTime) => {
+          // ── Tone.js audio ──
+          if (!ts.muted) {
+            try {
+              if (ts.isPercussion) {
+                ts.instrument.triggerAttackRelease(midiNoteToFreq(ev.note), '16n', audioTime);
+              } else {
+                ts.instrument.triggerAttack(midiNoteToName(ev.note), audioTime, ev.velocity / 127);
+              }
+            } catch(e) {}
+          }
+          // ── MIDI output ──
+          // audioTime is Web Audio context time. Convert to performance.now domain:
+          // perfTime = playStartPerfTime + (audioTime - playStartAudioTime) * 1000
+          if (selectedOutput) {
+            const ch = ts.midiChannel & 0x0f;
+            const perfTimestamp = playStartPerfTime + (audioTime - playStartAudioTime) * 1000;
+            try { selectedOutput.send([0x90 | ch, ev.note & 0x7f, ev.velocity & 0x7f], perfTimestamp); } catch(e) {}
+          }
+        }, tPos);
+        scheduleIds.push(id);
+
+      } else if (ev.type === 'noteOff') {
+        const id = Tone.Transport.schedule((audioTime) => {
+          if (!ts.muted && !ts.isPercussion) {
+            try { ts.instrument.triggerRelease(midiNoteToName(ev.note), audioTime); } catch(e) {}
+          }
+          if (selectedOutput) {
+            const ch = ts.midiChannel & 0x0f;
+            const perfTimestamp = playStartPerfTime + (audioTime - playStartAudioTime) * 1000;
+            try { selectedOutput.send([0x80 | ch, ev.note & 0x7f, 0], perfTimestamp); } catch(e) {}
+          }
+        }, tPos);
+        scheduleIds.push(id);
+
+      } else if (ev.type === 'programChange') {
+        const id = Tone.Transport.schedule((audioTime) => {
+          if (selectedOutput) {
+            const ch = ts.midiChannel & 0x0f;
+            const perfTimestamp = playStartPerfTime + (audioTime - playStartAudioTime) * 1000;
+            try { selectedOutput.send([0xC0 | ch, ev.program & 0x7f], perfTimestamp); } catch(e) {}
+          }
+        }, tPos);
+        scheduleIds.push(id);
+
+      } else if (ev.type === 'cc') {
+        const id = Tone.Transport.schedule((audioTime) => {
+          if (selectedOutput) {
+            const ch = ts.midiChannel & 0x0f;
+            const perfTimestamp = playStartPerfTime + (audioTime - playStartAudioTime) * 1000;
+            try { selectedOutput.send([0xB0 | ch, ev.ctrl & 0x7f, ev.value & 0x7f], perfTimestamp); } catch(e) {}
+          }
+        }, tPos);
+        scheduleIds.push(id);
+
+      } else if (ev.type === 'pitchBend') {
+        const id = Tone.Transport.schedule((audioTime) => {
+          if (selectedOutput) {
+            const ch = ts.midiChannel & 0x0f;
+            const val = ev.value + 8192;
+            const lsb = val & 0x7f, msb = (val >> 7) & 0x7f;
+            const perfTimestamp = playStartPerfTime + (audioTime - playStartAudioTime) * 1000;
+            try { selectedOutput.send([0xE0 | ch, lsb, msb], perfTimestamp); } catch(e) {}
+          }
+        }, tPos);
+        scheduleIds.push(id);
+      }
+    }
+  }
+
+  // End event
+  const endId = Tone.Transport.schedule(() => {
+    if (isPlaying) stopPlayback(true);
+  }, duration + 0.5);
+  scheduleIds.push(endId);
+
+  // Capture both clocks at the same moment, then start Transport
+  // We use a small lookahead so audio clock lines up with what we stored
+  playStartAudioTime = Tone.context.currentTime + 0.05;
+  playStartPerfTime = performance.now() + 50; // same 50ms offset
+
+  Tone.Transport.start('+0.05'); // start transport in 50ms
+  startRAF();
+  log(`Playback started — ${trackStates.length} tracks, ${duration.toFixed(1)}s`, 'ok');
+
+  // Send program changes immediately to set up MIDI device instruments
+  if (selectedOutput) {
+    for (const ts of trackStates) {
+      const ch = ts.midiChannel & 0x0f;
+      if (!ts.isPercussion) {
+        try { selectedOutput.send([0xC0 | ch, ts.program & 0x7f]); } catch(e) {}
+      }
+    }
+  }
+}
+
+function stopPlayback(ended = false) {
+  if (!isPlaying && !ended) return;
+  isPlaying = false;
+
+  for (const id of scheduleIds) Tone.Transport.clear(id);
+  scheduleIds = [];
+  Tone.Transport.stop();
+  Tone.Transport.position = 0;
+
+  allNotesOff();
+
+  playBtn.disabled = !parsedMidi;
+  stopBtn.disabled = true;
+  playDot.className = 'status-dot ready';
+  playStatusText.textContent = ended ? 'Finished' : 'Stopped';
+  timeDisplay.textContent = '0:00.000';
+  progressFill.style.width = '0%';
+  cancelAnimationFrame(rafId);
+  if (!ended) log('Stopped', 'warn');
+  else log('Playback complete', 'ok');
+}
+
+function allNotesOff() {
+  for (const ts of trackStates) {
+    try { if (ts.instrument && ts.instrument.releaseAll) ts.instrument.releaseAll(); } catch(e) {}
+  }
+  if (selectedOutput) {
+    for (let ch = 0; ch < 16; ch++) {
+      try {
+        selectedOutput.send([0xB0 | ch, 123, 0]); // All Notes Off CC
+        selectedOutput.send([0xB0 | ch, 120, 0]); // All Sound Off CC
+      } catch(e) {}
+    }
+  }
+}
+
+function startRAF() {
+  function frame() {
+    if (!isPlaying) return;
+    // elapsed = how far into the song we are
+    const elapsed = (performance.now() - playStartPerfTime) / 1000;
+    const safeElapsed = Math.max(0, elapsed);
+    const pct = Math.min(100, (safeElapsed / duration) * 100);
+    progressFill.style.width = pct + '%';
+    const mins = Math.floor(safeElapsed / 60);
+    const secs = (safeElapsed % 60).toFixed(3).padStart(6, '0');
+    timeDisplay.textContent = `${mins}:${secs}`;
+    rafId = requestAnimationFrame(frame);
+  }
+  rafId = requestAnimationFrame(frame);
+}
+
+playBtn.addEventListener('click', play);
+stopBtn.addEventListener('click', () => stopPlayback(false));
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+initMidi();
+log('MIDI Studio ready — load a .mid file to begin');
+</script>
+</body>
+</html>

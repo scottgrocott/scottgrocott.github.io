@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Gesture Builder</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <style>
+    body { font-family: Arial; background:#111; color:#eee; text-align:center; }
+    video, canvas { position:absolute; left:0; top:0; }
+    #container { position:relative; width:640px; height:480px; margin:auto; }
+    textarea { width:90%; height:120px; margin-top:10px; background:#222; color:#0f0; }
+    select, button { margin:5px; padding:5px 10px; }
+    #legend {
+      width:90%;
+      margin:10px auto;
+      background:#1a1a1a;
+      padding:10px;
+      border:1px solid #333;
+      text-align:left;
+    }
+    .legend-row {
+      display:flex;
+      justify-content:space-between;
+      padding:4px 0;
+      border-bottom:1px solid #333;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Gesture Builder</h2>
+
+<div id="container">
+  <video id="video" width="640" height="480" autoplay muted></video>
+  <canvas id="canvas" width="640" height="480"></canvas>
+</div>
+
+<br>
+
+<select id="gestureType">
+  <option value="pointing">pointing</option>
+  <option value="draw">draw</option>
+  <option value="erase">erase</option>
+</select>
+
+<br>
+
+<h3>Current Capture</h3>
+<textarea id="captureOutput"></textarea>
+
+<br>
+<button id="addGesture">Add To Master</button>
+
+<h3>Master Gesture JSON</h3>
+<textarea id="masterOutput"></textarea>
+
+<h3>Gesture Legend</h3>
+<div id="legend"></div>
+
+<script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const captureOutput = document.getElementById("captureOutput");
+const masterOutput = document.getElementById("masterOutput");
+const legendDiv = document.getElementById("legend");
+
+let stableStart = null;
+let lastStableLandmarks = null;
+const HOLD_TIME = 1000;
+const STABILITY_THRESHOLD = 0.01;
+
+function distance(a,b){
+  return Math.sqrt(
+    Math.pow(a.x - b.x,2) +
+    Math.pow(a.y - b.y,2) +
+    Math.pow(a.z - b.z,2)
+  );
+}
+
+function isStable(current, previous){
+  if(!previous) return false;
+  let total=0;
+  for(let i=0;i<current.length;i++){
+    total += distance(current[i], previous[i]);
+  }
+  return (total/current.length) < STABILITY_THRESHOLD;
+}
+
+function buildMasterFromDropdown(){
+  const select = document.getElementById("gestureType");
+  const obj = {};
+  for(let option of select.options){
+    obj[option.value] = [];
+  }
+  return obj;
+}
+
+function updateLegend(masterObj){
+  legendDiv.innerHTML = "";
+
+  for (let key in masterObj){
+    const row = document.createElement("div");
+    row.className = "legend-row";
+    row.innerHTML = `<span>${key}</span><span>${masterObj[key].length}</span>`;
+    legendDiv.appendChild(row);
+  }
+}
+
+function getMasterObject(){
+  let masterObj;
+
+  if(masterOutput.value.trim() !== ""){
+    try{
+      masterObj = JSON.parse(masterOutput.value);
+    } catch(e){
+      alert("Invalid JSON in master textarea.");
+      return null;
+    }
+  } else {
+    masterObj = buildMasterFromDropdown();
+  }
+
+  return masterObj;
+}
+
+document.getElementById("addGesture").onclick = () => {
+  if(captureOutput.value.trim() === "") return;
+
+  const masterObj = getMasterObject();
+  if(!masterObj) return;
+
+  const type = document.getElementById("gestureType").value;
+
+  if(!masterObj[type]){
+    masterObj[type] = [];
+  }
+
+  masterObj[type].push(JSON.parse(captureOutput.value));
+
+  masterOutput.value = JSON.stringify(masterObj, null, 2);
+  captureOutput.value = "";
+
+  updateLegend(masterObj);
+};
+
+const hands = new Hands({
+  locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+});
+
+hands.setOptions({
+  maxNumHands: 1,
+  modelComplexity: 1,
+  minDetectionConfidence: 0.7,
+  minTrackingConfidence: 0.7
+});
+
+hands.onResults(results => {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if(results.multiHandLandmarks.length > 0){
+    const landmarks = results.multiHandLandmarks[0];
+
+    drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color:"#00FF00"});
+    drawLandmarks(ctx, landmarks, {color:"#FF0000"});
+
+    if(isStable(landmarks, lastStableLandmarks)){
+      if(!stableStart){
+        stableStart = Date.now();
+      }
+
+      if(Date.now() - stableStart > HOLD_TIME){
+        captureOutput.value = JSON.stringify(landmarks, null, 2);
+        stableStart = null;
+      }
+
+    } else {
+      stableStart = null;
+    }
+
+    lastStableLandmarks = landmarks.map(p => ({...p}));
+  }
+});
+
+const camera = new Camera(video,{
+  onFrame: async () => {
+    await hands.send({image: video});
+  },
+  width:640,
+  height:480
+});
+
+camera.start();
+</script>
+
+</body>
+</html>
