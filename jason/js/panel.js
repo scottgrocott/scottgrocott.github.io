@@ -12,9 +12,7 @@
 
 import { LAYER_CONFIG, GEO_ALGORITHMS, setLayerAlgorithm } from './layers.js';
 import { voices }                                           from './synth.js';
-import { initHand, setHandLayer, setPreviewCanvas,
-         startCalibration, clearCalibration, isCalibrated,
-         onCalibrationChange }                              from './hand.js';
+import { initHand, setPreviewCanvas, startCalibration, clearCalibration, onCalibrationChange } from './hand.js';
 
 let layerListEl = null;
 let logEl       = null;
@@ -101,155 +99,139 @@ let _handEnableBtn = null;
 let _handEnabled   = false;
 
 function _buildHandSection() {
-  // Insert before the style section
-  const styleSection = document.getElementById('style-section');
-  if (!styleSection) return;
+  /* ══════════════════════════════════════════════════════════════
+     Build the hand tracking panel as a FIXED bottom-left overlay
+     on the main page. This is a large, prominent panel separate
+     from the right control panel sidebar.
+     ══════════════════════════════════════════════════════════════ */
+  const panel = document.createElement('div');
+  panel.id = 'hand-panel';
 
-  const section = document.createElement('section');
-  section.className = 'panel-section';
-  section.id        = 'hand-section';
+  /* ── HEADER BAR ── */
+  const header = document.createElement('div');
+  header.className = 'hand-panel-header';
+  header.innerHTML = `<span class="hand-panel-title">HAND CURSOR</span>`;
 
-  /* ── SECTION LABEL ── */
-  const sectionLabel = document.createElement('div');
-  sectionLabel.className   = 'section-label';
-  sectionLabel.textContent = 'Hand Cursor';
-  section.appendChild(sectionLabel);
+  /* ── COLLAPSE TOGGLE ── */
+  const collapseBtn = document.createElement('button');
+  collapseBtn.className = 'hand-panel-collapse';
+  collapseBtn.textContent = '▾';
+  collapseBtn.title = 'Collapse panel';
+  header.appendChild(collapseBtn);
+  panel.appendChild(header);
 
-  /* ── CAMERA PREVIEW CANVAS — always visible ── */
+  /* ── BODY (collapsible) ── */
+  const body = document.createElement('div');
+  body.id = 'hand-panel-body';
+
+  /* ── CAMERA PREVIEW CANVAS ── */
   const previewCanvas = document.createElement('canvas');
   previewCanvas.id     = 'hand-preview';
-  previewCanvas.width  = 288;
-  previewCanvas.height = 162;
-  section.appendChild(previewCanvas);
-
-  // Register with hand.js so tickHand() can draw to it immediately
+  previewCanvas.width  = 640;
+  previewCanvas.height = 360;
+  body.appendChild(previewCanvas);
   setPreviewCanvas(previewCanvas);
-
-  /* ── ENABLE BUTTON ── */
-  _handEnableBtn = document.createElement('button');
-  _handEnableBtn.id          = 'hand-enable-btn';
-  _handEnableBtn.className   = 'action-btn';
-  _handEnableBtn.textContent = '◉ Enable Hand Tracking';
-  _handEnableBtn.style.marginTop = '8px';
-  section.appendChild(_handEnableBtn);
 
   /* ── STATUS LINE ── */
   _handStatusEl = document.createElement('div');
   _handStatusEl.id = 'hand-status';
-  section.appendChild(_handStatusEl);
+  body.appendChild(_handStatusEl);
   _setHandStatus('Inactive — click Enable to start');
 
+  /* ── CONTROLS ROW ── */
+  const ctrlRow = document.createElement('div');
+  ctrlRow.className = 'hand-panel-controls';
+
+  /* Enable button */
+  _handEnableBtn = document.createElement('button');
+  _handEnableBtn.id          = 'hand-enable-btn';
+  _handEnableBtn.className   = 'action-btn hand-enable-btn';
+  _handEnableBtn.textContent = '◉ Enable Tracking';
+  ctrlRow.appendChild(_handEnableBtn);
+
+  // Layer selection moved to tool panel dropdown
+  body.appendChild(ctrlRow);
+
   /* ── CALIBRATION CONTROLS ── */
-  const calibRow = document.createElement('div');
-  calibRow.style.cssText = 'display:flex; gap:6px; margin-top:8px;';
+  const calibSection = document.createElement('div');
+  calibSection.className = 'hand-calib-section';
 
-  const calibBtn = document.createElement('button');
-  calibBtn.id          = 'calib-btn';
-  calibBtn.className   = 'calib-btn';
-  calibBtn.textContent = '⊹ Calibrate Canvas';
+  const calibLabel = document.createElement('div');
+  calibLabel.className   = 'hand-calib-label';
+  calibLabel.textContent = 'CANVAS CALIBRATION';
+  calibSection.appendChild(calibLabel);
 
-  const clearBtn = document.createElement('button');
-  clearBtn.id          = 'calib-clear-btn';
-  clearBtn.className   = 'calib-clear-btn';
-  clearBtn.textContent = '✕';
-  clearBtn.title       = 'Clear calibration';
-  clearBtn.style.display = 'none';
+  const calibStatus = document.createElement('div');
+  calibStatus.id        = 'hand-calib-status';
+  calibStatus.className = 'hand-calib-status';
+  calibStatus.textContent = 'No calibration — using full frame';
+  calibSection.appendChild(calibStatus);
 
-  calibRow.append(calibBtn, clearBtn);
-  section.appendChild(calibRow);
+  const calibBtns = document.createElement('div');
+  calibBtns.className = 'hand-calib-btns';
 
-  const calibStatusEl = document.createElement('div');
-  calibStatusEl.id        = 'calib-status';
-  calibStatusEl.className = 'calib-status';
-  section.appendChild(calibStatusEl);
+  const startCalibBtn = document.createElement('button');
+  startCalibBtn.id          = 'hand-calib-start';
+  startCalibBtn.className   = 'hand-calib-btn hand-calib-btn-start';
+  startCalibBtn.textContent = '⊹ Start Calibration';
+  startCalibBtn.title       = 'Click 4 corners on the preview (TL → TR → BR → BL)';
 
-  // Wire calibration state changes → UI feedback
-  onCalibrationChange(({ phase, pointsCollected }) => {
-    const cornerNames = ['top-left','top-right','bottom-right','bottom-left'];
-    const cornerCodes = ['TL','TR','BR','BL'];
-    if (phase === 'collecting') {
-      calibBtn.textContent    = `◉ Click ${cornerCodes[pointsCollected]}… (${pointsCollected}/4)`;
-      calibBtn.classList.add('collecting');
-      clearBtn.style.display  = 'none';
-      calibStatusEl.textContent = `Step ${pointsCollected + 1}/4 — click the ${cornerNames[pointsCollected]} corner of the physical canvas`;
-      calibStatusEl.className = 'calib-status collecting';
-      previewCanvas.style.cursor = 'crosshair';
-    } else if (phase === 'done') {
-      calibBtn.textContent    = '⊹ Recalibrate';
-      calibBtn.classList.remove('collecting');
-      clearBtn.style.display  = 'block';
-      calibStatusEl.textContent = '✓ Calibrated — saved to storage';
-      calibStatusEl.className = 'calib-status done';
-      previewCanvas.style.cursor = 'default';
-    } else {
-      calibBtn.textContent    = '⊹ Calibrate Canvas';
-      calibBtn.classList.remove('collecting');
-      clearBtn.style.display  = 'none';
-      calibStatusEl.textContent = _handEnabled ? 'No calibration — full-frame mode' : '';
-      calibStatusEl.className = 'calib-status';
-      previewCanvas.style.cursor = 'default';
-    }
-  });
+  const clearCalibBtn = document.createElement('button');
+  clearCalibBtn.id          = 'hand-calib-clear';
+  clearCalibBtn.className   = 'hand-calib-btn hand-calib-btn-clear';
+  clearCalibBtn.textContent = '✕ Clear';
+  clearCalibBtn.title       = 'Remove calibration, revert to full frame';
 
-  calibBtn.addEventListener('click', () => {
+  calibBtns.append(startCalibBtn, clearCalibBtn);
+  calibSection.appendChild(calibBtns);
+  body.appendChild(calibSection);
+
+  /* ── Wire calibration callbacks ── */
+  startCalibBtn.addEventListener('click', () => {
     if (!_handEnabled) {
-      calibStatusEl.textContent = 'Enable hand tracking first';
-      calibStatusEl.className   = 'calib-status warn';
+      _setHandStatus('Enable hand tracking first');
       return;
     }
     startCalibration();
   });
 
-  clearBtn.addEventListener('click', () => {
+  clearCalibBtn.addEventListener('click', () => {
     clearCalibration();
   });
 
-  /* ── LAYER DROPDOWN ── */
-  const dropRow = document.createElement('div');
-  dropRow.className = 'row';
-  dropRow.style.marginTop = '8px';
-
-  const dropLabel = document.createElement('span');
-  dropLabel.className   = 'section-label';
-  dropLabel.style.cssText = 'margin:0; white-space:nowrap;';
-  dropLabel.textContent = 'Hand Layer';
-
-  const layerSelect = document.createElement('select');
-  layerSelect.id        = 'hand-layer-select';
-  layerSelect.className = 'hand-layer-select';
-
-  // Populate with the 10 main channels (CH 1-10, indices 0-9)
-  // Listed in natural CH order (1 at top)
-  const MAIN_CHANNELS = [...LAYER_CONFIG]
-    .filter(cfg => cfg.ch <= 9)
-    .sort((a, b) => a.ch - b.ch);
-
-  MAIN_CHANNELS.forEach(cfg => {
-    const opt = document.createElement('option');
-    opt.value       = cfg.ch;
-    opt.textContent = `CH ${cfg.ch + 1} — ${cfg.label}`;
-    // Color swatch via data attribute (used in CSS for the left border trick)
-    opt.dataset.color = cfg.color === '#111111' ? '#888888' : cfg.color;
-    layerSelect.appendChild(opt);
+  onCalibrationChange(({ phase, pointsCollected }) => {
+    const statusEl = document.getElementById('hand-calib-status');
+    if (!statusEl) return;
+    if (phase === 'collecting') {
+      statusEl.textContent = `Collecting: click corner ${pointsCollected + 1} of 4 on the preview`;
+      statusEl.className   = 'hand-calib-status collecting';
+      startCalibBtn.textContent = `⊹ ${pointsCollected}/4 — Click next corner`;
+    } else if (phase === 'done') {
+      statusEl.textContent = '✓ Calibrated — canvas mapped';
+      statusEl.className   = 'hand-calib-status done';
+      startCalibBtn.textContent = '⊹ Recalibrate';
+    } else {
+      statusEl.textContent = 'No calibration — using full frame';
+      statusEl.className   = 'hand-calib-status';
+      startCalibBtn.textContent = '⊹ Start Calibration';
+    }
   });
 
-  layerSelect.addEventListener('change', () => {
-    const ch = parseInt(layerSelect.value, 10);
-    setHandLayer(ch);
-    _updateDropdownAccent(layerSelect, ch);
+  panel.appendChild(body);
+
+  /* ── COLLAPSE LOGIC ── */
+  let collapsed = false;
+  collapseBtn.addEventListener('click', () => {
+    collapsed = !collapsed;
+    body.style.display    = collapsed ? 'none' : '';
+    collapseBtn.textContent = collapsed ? '▸' : '▾';
   });
 
-  dropRow.append(dropLabel, layerSelect);
-  section.appendChild(dropRow);
-
-  // Set initial accent to CH 1
-  _updateDropdownAccent(layerSelect, 0);
-
-  // Wire enable button
+  /* ── WIRE BUTTONS ── */
   _handEnableBtn.addEventListener('click', () => _enableHandTracking());
 
-  // Insert before style-section
-  styleSection.insertAdjacentElement('beforebegin', section);
+  /* ── APPEND TO BODY (fixed position, outside panel sidebar) ── */
+  document.body.appendChild(panel);
 }
 
 /* ── ENABLE HAND TRACKING (lazy-loads MediaPipe on first click) ── */
@@ -265,11 +247,7 @@ async function _enableHandTracking() {
     _handEnabled = true;
     _handEnableBtn.textContent = '✓ Hand Tracking Active';
     _handEnableBtn.style.background = '#00aa55';
-    if (!isCalibrated()) {
-      _setHandStatus('Tip: calibrate canvas for precise tracking');
-    } else {
-      _setHandStatus('Calibrated tracking active');
-    }
+    _setHandStatus('Point your index finger at the screen');
     logActivity('Hand tracking enabled', 'good');
   } catch(err) {
     _handEnableBtn.textContent = '✕ Error — click to retry';

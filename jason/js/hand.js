@@ -27,6 +27,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 import { LAYER_CONFIG } from './layers.js';
+import { initGestures, updateGesture, clearGesture, getCurrentGesture } from './gesture.js';
 
 /* ─── LAYER COLOR LOOKUP ─────────────────────────────────────────────────── */
 const LAYER_COLORS = new Array(16).fill('#ffffff');
@@ -41,7 +42,8 @@ const STORAGE_KEY = 'melodyCanvas_calibration_v1';
 let video      = null;
 let previewCvs = null;
 let previewCtx = null;
-let cursorEl   = null;
+let cursorEl            = null;
+let pendingCursorParent = null;  // set before initHand if canvas is in popup
 
 let activeLayer   = 0;
 let lastLandmarks = null;
@@ -201,12 +203,17 @@ export function setHandLayer(index) {
 }
 
 export function getHandCursorState() {
-  return { x: cursorNorm.x, y: cursorNorm.y, active: cursorActive, layerIndex: activeLayer };
+  return {
+    x:           cursorNorm.x,
+    y:           cursorNorm.y,
+    active:      cursorActive,
+    layerIndex:  activeLayer,
+    gesture:     getCurrentGesture(),
+  };
 }
 
 export function tickHand(dt) {
-  // Apply velocity prediction every frame — decouples cursor display rate
-  // from MediaPipe detection rate (~15fps → smooth 60fps cursor)
+  // Apply velocity prediction every frame
   if (cursorActive && predActive) {
     const { x, y } = getPredictedPosition();
     const cont = cursorEl?.parentElement;
@@ -216,6 +223,10 @@ export function tickHand(dt) {
       cursorNorm = { x, y };
     }
   }
+
+  // Update cursor ring style based on active gesture
+  _updateCursorGestureStyle();
+
   tickBrush(dt);
   if (previewCtx) renderPreview();
 }
@@ -250,6 +261,7 @@ export function isCalibrated() {
 
 /** Re-parent cursor overlay (called by popup.js when canvas moves) */
 export function setCursorContainer(newParent) {
+  pendingCursorParent = newParent;
   if (!cursorEl || !newParent) return;
   newParent.appendChild(cursorEl);
 }
@@ -265,6 +277,7 @@ export async function initHand() {
   setupCursorOverlay();
   setupBrushSound();
   _loadCalibration();
+  await initGestures();
   console.log('[Hand] Initialised');
 }
 
@@ -337,12 +350,16 @@ function onHandResults(results) {
     filterX.reset();
     filterY.reset();
     resetPrediction();
+    clearGesture();
     updateCursor(false, 0, 0);
     return;
   }
 
   const lm = results.multiHandLandmarks[0];
   lastLandmarks = lm;
+
+  // Classify gesture from full landmark set
+  updateGesture(lm);
 
   // Landmark 8 = index finger tip, normalised video coords [0,1]
   const tx = lm[8].x;
@@ -570,7 +587,8 @@ function setupCursorOverlay() {
   });
   cursorEl.appendChild(dot);
 
-  document.getElementById('canvas-container')?.appendChild(cursorEl);
+  const cursorParent = pendingCursorParent ?? document.getElementById('canvas-container');
+  cursorParent?.appendChild(cursorEl);
   applyCursorColor();
 }
 
@@ -602,6 +620,41 @@ function applyCursorColor() {
   cursorEl.style.boxShadow   = `0 0 10px ${color}99, 0 0 3px ${color}`;
   const dot = cursorEl.querySelector('div');
   if (dot) dot.style.background = color;
+}
+
+let _lastGestureStyle = null;
+function _updateCursorGestureStyle() {
+  if (!cursorEl) return;
+  const g = getCurrentGesture();
+  if (g === _lastGestureStyle) return;
+  _lastGestureStyle = g;
+
+  const dot = cursorEl.querySelector('div');
+
+  if (g === 'draw') {
+    // Filled spray dot — layer color, pulsing glow
+    const color = LAYER_COLORS[activeLayer];
+    cursorEl.style.borderColor  = color;
+    cursorEl.style.boxShadow    = `0 0 16px ${color}cc, 0 0 4px ${color}`;
+    cursorEl.style.width        = '28px';
+    cursorEl.style.height       = '28px';
+    if (dot) { dot.style.background = color; dot.style.opacity = '0.6'; }
+  } else if (g === 'erase') {
+    // White outlined square-ish eraser
+    cursorEl.style.borderColor  = '#ffffff';
+    cursorEl.style.boxShadow    = '0 0 8px rgba(255,255,255,0.5)';
+    cursorEl.style.width        = '36px';
+    cursorEl.style.height       = '36px';
+    cursorEl.style.borderRadius = '4px';
+    if (dot) { dot.style.background = 'rgba(255,255,255,0.2)'; dot.style.opacity = '1'; }
+  } else {
+    // Default / pointing — layer color, standard ring
+    applyCursorColor();
+    cursorEl.style.width        = '20px';
+    cursorEl.style.height       = '20px';
+    cursorEl.style.borderRadius = '50%';
+    if (dot) dot.style.opacity = '1';
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -680,6 +733,31 @@ function renderPreview() {
     previewCtx.arc(tip.x, tip.y, 5, 0, Math.PI * 2);
     previewCtx.fill();
   }
+
+  // ── Gesture indicator ──────────────────────────────────────────────────
+  const g = getCurrentGesture();
+  const GESTURE_COLORS = { pointing: '#44aaff', draw: '#ff6600', erase: '#ff4455' };
+  const gColor = GESTURE_COLORS[g] ?? '#444444';
+  const gLabel = g ? g.toUpperCase() : 'NO GESTURE';
+
+  // Background pill
+  const tw = 90, th = 16, tx2 = pw - tw - 4, ty2 = 4;
+  previewCtx.fillStyle = 'rgba(0,0,0,0.6)';
+  previewCtx.beginPath();
+  previewCtx.roundRect(tx2, ty2, tw, th, 4);
+  previewCtx.fill();
+
+  // Colored dot
+  previewCtx.fillStyle = gColor;
+  previewCtx.beginPath();
+  previewCtx.arc(tx2 + 10, ty2 + 8, 4, 0, Math.PI * 2);
+  previewCtx.fill();
+
+  // Label
+  previewCtx.fillStyle = gColor;
+  previewCtx.font      = 'bold 9px monospace';
+  previewCtx.textAlign = 'left';
+  previewCtx.fillText(gLabel, tx2 + 18, ty2 + 11);
 }
 
 /* ─── CALIBRATION OVERLAY ─────────────────────────────────────────────────
@@ -790,7 +868,9 @@ function updateBrushFreq() {
 
 function tickBrush(dt) {
   if (!brushReady || !brushGain) return;
-  const isMoving = cursorActive && movementEMA > STILL_THR;
+  const g        = getCurrentGesture();
+  const isDraw   = g === 'draw';
+  const isMoving = cursorActive && isDraw && movementEMA > STILL_THR;
   const target   = isMoving ? 0.07 : 0;
   const current  = brushGain.gain.value;
   const lerpRate = target > current ? dt * 14 : dt * 5;
