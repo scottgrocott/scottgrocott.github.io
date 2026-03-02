@@ -16,11 +16,21 @@ import { tickBillboards, loadSpriteAssets, scatterProps } from './scatter.js';
 import { initAudio, toneReady }             from './audio.js';
 import { hud }                              from './hud.js';
 import { dropOnRandomPeak }                 from './spawn.js';
+import { tickSoundtrack }                   from './soundtrack.js';
+import { pollGamepad, releaseGamepadAxes,
+         registerGamepadShootCallback,
+         registerGamepadFreeCamCallback,
+         registerGamepadSpawnDroneCallback } from './gamepad.js';
 
 // ---- Register input callbacks (breaks circular deps) ----
 registerShootCallback(shootBullet);
 registerFreeCamCallback(toggleFreeCam);
 registerSpawnDroneCallback(spawnDrone);
+
+// Gamepad uses the same callbacks — both devices fire the same actions
+registerGamepadShootCallback(shootBullet);
+registerGamepadFreeCamCallback(toggleFreeCam);
+registerGamepadSpawnDroneCallback(spawnDrone);
 
 // ---- Ground plane ----
 (function buildGround() {
@@ -84,12 +94,17 @@ engine.runRenderLoop(() => {
   queryPhysics(player, drones);
   yukaManager.update(yukaTime.update().getDelta());
 
+  pollGamepad(dt);        // gamepad → inputState (before tick so player reads it)
+
   tickPlayer(dt);
   tickLadders();
   tickDrones(dt);
   tickBullets(dt);
   tickBillboards();
   tickExplosions(dt);
+  tickSoundtrack(playerRig.position, dt);  // contextual music zone update
+
+  releaseGamepadAxes();   // clear axis-driven booleans after tick
 
   scene.render();
 });

@@ -2,7 +2,8 @@
 //  audio.js — Tone.js sound synthesis
 // ============================================================
 
-import { camera } from './core.js';
+import { camera }            from './core.js';
+import { initSoundtrack }    from './soundtrack.js';
 
 export let toneReady = false;
 
@@ -12,6 +13,7 @@ export async function initAudio() {
   try {
     await Tone.start();
     _startWind();
+    initSoundtrack();
     toneReady = true;
   } catch (e) {
     console.warn('Audio init failed:', e);
