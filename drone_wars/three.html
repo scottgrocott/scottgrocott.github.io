@@ -88,12 +88,50 @@ const CONFIG = {
   droneRiseHeight: 8,
 
   // Drone flight behaviour
-  droneMaxSpeed: 2,
+  droneMaxSpeed: 5,
   dronePathRadius: 4.0,   // waypoint arrival radius — larger = smoother advance through waypoints
   droneFlightHeight: 2.5, // minimum Y height drones fly at (set to clear your ground floor)
 
   // Freecam / noclip
   freeFlyCamSpeed: 20,   // units per second in freecam
+
+  // ---- SPRITE SCATTER ----
+  // Grid layout for each sprite sheet (cols x rows).
+  // Tweak these once you can see the sheets in-game.
+  sheetGrids: {
+    sheet_rocks:  { cols: 4, rows: 2 },   // rocks.png
+    sheet_veg:    { cols: 4, rows: 2 },   // vegitation.png
+    sheet_veg01:  { cols: 4, rows: 2 },   // vegitation01.png
+    sheet_map:    { cols: 4, rows: 4 },   // map-assets.png   (buildings/walls)
+    sheet_map01:  { cols: 4, rows: 2 },   // map-assets01.png (stumps)
+    sheet_map02:  { cols: 4, rows: 4 },   // map-assets02.png (buildings/walls)
+  },
+
+  scatter: {
+    // ---- Vegetation (weeds) — instanced, maximum density ----
+    vegSampleCount: 30000,    // probe rays just for veg — processed async in chunks
+    vegSteepDensity:  0.9,    // probability on steep faces
+    vegFlatDensity:   0.35,   // probability on flat areas (all elevations)
+    vegSize: { w: 0.6, h: 0.9 },  // small weeds — base size, ±40% random scale
+
+    // ---- Other props (rocks, stumps, wall boxes) — sparse individual meshes ----
+    sampleCount: 6000,
+    flatRockDensity:   0.10,
+    flatStumpDensity:  0.06,
+    flatBoxDensity:    0.02,
+    buildingRingRadius: 22,
+    buildingRingDensity: 0.7,
+
+    // Slope thresholds
+    flatThreshold:  0.85,
+    steepThreshold: 0.45,
+    elevationSplit: 2,
+
+    // Non-veg billboard sizes
+    rockSize:  { w: 2.0, h: 1.8 },
+    stumpSize: { w: 1.5, h: 2.0 },
+    boxSize:   { w: 4.0, h: 5.0 },
+  },
 
   // Gun
   gunRange: 200,
@@ -227,6 +265,8 @@ async function initPhysics() {
 // All raycasting uses Three.js only — zero Rapier/WASM involvement.
 // Building meshes collected into raycastMeshes[] as they load.
 const raycastMeshes = [];
+let _sceneData = null;
+let _spriteLoadPromise = Promise.resolve();
 const _threeRaycaster = new THREE.Raycaster();
 let _rayQueryResults = {};
 
@@ -523,9 +563,15 @@ function loadBuildings(data) {
         if (!isTerrain) {
           buildStaticCollider(model);
         } else {
-          // Terrain gets its own collider — same trimesh path
-          // (If the model is too heavy at 3MB, comment out the next line until decimated)
           buildStaticCollider(model);
+          // Scatter props once terrain geometry AND all sprite textures are ready
+          const terrainMeshes = [];
+          model.traverse(n => { if (n.isMesh) terrainMeshes.push(n); });
+          setTimeout(async () => {
+            model.updateWorldMatrix(true, true);
+            await _spriteLoadPromise; // guaranteed textures have images
+            scatterProps(_sceneData, terrainMeshes);
+          }, 200);
         }
         console.log('✅ ' + (isTerrain ? 'Terrain' : 'Building') + ' loaded:', b.id);
       },
@@ -1245,12 +1291,383 @@ function tickBullets(dt) {
 }
 
 // ============================================================
+//  SPRITE SCATTER SYSTEM
+// ============================================================
+// Billboards that face the camera, cut from sprite sheet atlases.
+// Placed after terrain loads by sampling the terrain geometry.
+
+const scatterGroup = new THREE.Group();
+scene.add(scatterGroup);
+
+// Loaded atlas textures keyed by sheet id
+const atlasTextures = {};
+
+// Load all spritesheet textures from the JSON assets array.
+// Returns a Promise that resolves once every sheet has loaded.
+function loadSpriteAssets(assets) {
+  const sheets = assets.filter(a => a.type === 'spritesheet');
+  if (!sheets.length) return Promise.resolve();
+
+  return new Promise(resolve => {
+    let remaining = sheets.length;
+    sheets.forEach(a => {
+      texLoader.load(
+        a.src,
+        (tex) => {
+          // onLoad — image is now available
+          tex.encoding = THREE.sRGBEncoding;
+          atlasTextures[a.id] = { tex, category: a.category, id: a.id };
+          console.log('🌿 Sprite sheet loaded:', a.id);
+          remaining--;
+          if (remaining === 0) resolve();
+        },
+        undefined,
+        (err) => {
+          // onError — still decrement so we don't hang forever
+          console.warn('⚠️ Sprite sheet failed:', a.id, err);
+          remaining--;
+          if (remaining === 0) resolve();
+        }
+      );
+    });
+  });
+}
+
+// Pick a random sprite cell from a sheet and return a cropped material.
+// Only call this AFTER loadSpriteAssets() has resolved.
+function makeBillboardMat(sheetId) {
+  const entry = atlasTextures[sheetId];
+  if (!entry || !entry.tex.image) return null;
+  const grid = CONFIG.sheetGrids[sheetId] || { cols: 4, rows: 2 };
+  const col = Math.floor(Math.random() * grid.cols);
+  const row = Math.floor(Math.random() * grid.rows);
+  const t = entry.tex.clone();
+  t.needsUpdate = true;
+  t.repeat.set(1 / grid.cols, 1 / grid.rows);
+  t.offset.set(col / grid.cols, 1 - (row + 1) / grid.rows);
+  return new THREE.MeshBasicMaterial({
+    map: t, transparent: true, alphaTest: 0.15,
+    depthWrite: false, side: THREE.DoubleSide,
+  });
+}
+
+// ---- Individual billboard (rocks, stumps, boxes) ----
+function makeBillboard(sheetId, worldPos, w, h) {
+  const mat = makeBillboardMat(sheetId);
+  if (!mat) return null;
+  const geo  = new THREE.PlaneGeometry(w, h);
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(worldPos);
+  mesh.position.y += h * 0.5;
+  mesh.userData.isBillboard = true;
+  scatterGroup.add(mesh);
+  return mesh;
+}
+
+// ============================================================
+//  INSTANCED VEGETATION SYSTEM
+//  One InstancedMesh per unique sprite cell = one draw call each.
+//  Handles tens of thousands of weeds cheaply.
+// ============================================================
+const vegInstances = [];   // { mesh: InstancedMesh, count, capacity, dummy }
+const _vegDummy    = new THREE.Object3D();
+
+function getVegSheetCells(data) {
+  // Build list of all unique {sheetId, col, row} combos for veg sheets
+  const cells = [];
+  data.assets.filter(a => a.type === 'spritesheet' && a.category === 'vegetation').forEach(a => {
+    const grid = CONFIG.sheetGrids[a.id] || { cols: 4, rows: 2 };
+    for (let r = 0; r < grid.rows; r++) {
+      for (let c = 0; c < grid.cols; c++) {
+        cells.push({ sheetId: a.id, col: c, row: r, grid });
+      }
+    }
+  });
+  return cells;
+}
+
+function buildVegInstancedMeshes(data, capacity) {
+  // capacity = max instances per cell — pre-allocate
+  const cells = getVegSheetCells(data);
+  if (!cells.length) return;
+
+  const geo = new THREE.PlaneGeometry(1, 1); // unit plane — scale via matrix
+
+  cells.forEach(cell => {
+    const entry = atlasTextures[cell.sheetId];
+    if (!entry || !entry.tex.image) return;
+
+    const t = entry.tex.clone();
+    t.needsUpdate = true;
+    t.repeat.set(1 / cell.grid.cols, 1 / cell.grid.rows);
+    t.offset.set(cell.col / cell.grid.cols, 1 - (cell.row + 1) / cell.grid.rows);
+
+    const mat = new THREE.MeshBasicMaterial({
+      map: t, transparent: true, alphaTest: 0.15,
+      depthWrite: false, side: THREE.DoubleSide,
+    });
+
+    const mesh = new THREE.InstancedMesh(geo, mat, capacity);
+    mesh.count = 0; // start empty — filled during scatter
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    mesh.frustumCulled = false; // we do our own culling via visibility
+    scatterGroup.add(mesh);
+
+    vegInstances.push({ mesh, count: 0, capacity, cellKey: `${cell.sheetId}_${cell.col}_${cell.row}` });
+  });
+
+  console.log(`🌿 Instanced veg meshes created: ${vegInstances.length} cells, ${capacity} capacity each`);
+}
+
+// Add one weed instance — picks a random cell mesh, sets matrix
+function addVegInstance(worldX, worldY, worldZ, w, h) {
+  if (!vegInstances.length) return;
+  const si   = Math.floor(Math.random() * vegInstances.length);
+  const slot = vegInstances[si];
+  if (slot.count >= slot.capacity) return;
+
+  _vegDummy.position.set(worldX, worldY + h * 0.5, worldZ);
+  _vegDummy.scale.set(w, h, 1);
+  _vegDummy.rotation.y = 0;
+  _vegDummy.updateMatrix();
+  slot.mesh.setMatrixAt(slot.count, _vegDummy.matrix);
+  slot.count++;
+  slot.mesh.count = slot.count;
+  slot.mesh.instanceMatrix.needsUpdate = true;
+
+  // Record for fast per-frame rotation updates
+  recordVegInstanceData(si, worldX, worldY, worldZ, w, h);
+}
+
+// ---- Terrain raycast helper ----
+const _scatterRay = new THREE.Raycaster();
+const _up         = new THREE.Vector3(0, 1, 0);
+
+function sampleTerrainAt(x, z, terrainMeshes) {
+  _scatterRay.set(new THREE.Vector3(x, 300, z), new THREE.Vector3(0, -1, 0));
+  _scatterRay.far = 600;
+  const hits = _scatterRay.intersectObjects(terrainMeshes, false);
+  if (!hits.length) return null;
+  const h = hits[0];
+  const normal = h.face
+    ? h.face.normal.clone().transformDirection(h.object.matrixWorld).normalize()
+    : _up.clone();
+  return { y: h.point.y, normal };
+}
+
+// Building positions for perimeter ring
+const buildingPositions = [];
+
+// ---- Main scatter entry point — called after terrain + sprites both ready ----
+async function scatterProps(data, terrainMeshes) {
+  const SC  = CONFIG.scatter;
+  const rng = (min, max) => min + Math.random() * (max - min);
+
+  const byCategory = {};
+  data.assets.filter(a => a.type === 'spritesheet').forEach(a => {
+    if (!byCategory[a.category]) byCategory[a.category] = [];
+    byCategory[a.category].push(a.id);
+  });
+  const rockSheets  = byCategory['rocks']     || [];
+  const stumpSheets = byCategory['stumps']    || [];
+  const wallSheets  = byCategory['buildings'] || [];
+  function randSheet(arr) { return arr.length ? arr[Math.floor(Math.random()*arr.length)] : null; }
+
+  // Compute terrain bounding box
+  const terrainBox = new THREE.Box3();
+  terrainMeshes.forEach(m => { m.updateWorldMatrix(true,false); terrainBox.union(new THREE.Box3().setFromObject(m)); });
+  const bmin = terrainBox.min, bmax = terrainBox.max;
+  const bw = bmax.x - bmin.x, bd = bmax.z - bmin.z;
+  console.log(`🗺️ Terrain bbox: X[${bmin.x.toFixed(1)}→${bmax.x.toFixed(1)}] Z[${bmin.z.toFixed(1)}→${bmax.z.toFixed(1)}]`);
+
+  // =========================================================
+  //  PASS 1 — VEGETATION (instanced, async chunked)
+  // =========================================================
+  const vegCells  = Math.ceil(Math.sqrt(SC.vegSampleCount));
+  const vegCellW  = bw / vegCells;
+  const vegCellD  = bd / vegCells;
+  const CHUNK     = 60; // rows per frame — keeps hang under ~16ms
+  let vegPlaced   = 0;
+
+  // Pre-build instanced meshes with capacity estimate
+  const estVeg = Math.ceil(SC.vegSampleCount * SC.vegFlatDensity * 1.8);
+  buildVegInstancedMeshes(data, estVeg);
+
+  // Process in async row chunks
+  for (let gx = 0; gx < vegCells; gx++) {
+    if (gx % CHUNK === 0) {
+      // Yield to browser — keeps UI responsive during build
+      await new Promise(r => setTimeout(r, 0));
+    }
+    for (let gz = 0; gz < vegCells; gz++) {
+      const x = bmin.x + (gx + Math.random()) * vegCellW;
+      const z = bmin.z + (gz + Math.random()) * vegCellD;
+      const s = sampleTerrainAt(x, z, terrainMeshes);
+      if (!s) continue;
+
+      const slopeUp = s.normal.dot(_up);
+      const eligible = slopeUp <= SC.steepThreshold
+        ? Math.random() < SC.vegSteepDensity
+        : (slopeUp >= SC.flatThreshold ? Math.random() < SC.vegFlatDensity : false);
+
+      if (eligible) {
+        const scale = rng(0.6, 1.4);
+        addVegInstance(x, s.y, z, SC.vegSize.w * scale, SC.vegSize.h * scale);
+        // Double-up on steep faces for crevasse fill
+        if (slopeUp <= SC.steepThreshold && Math.random() < 0.6) {
+          addVegInstance(x + rng(-0.8,0.8), s.y, z + rng(-0.8,0.8),
+            SC.vegSize.w * rng(0.5,1.1), SC.vegSize.h * rng(0.5,1.1));
+        }
+        vegPlaced++;
+      }
+    }
+  }
+  console.log(`🌿 Veg instances placed: ${vegPlaced}`);
+
+  // =========================================================
+  //  PASS 2 — ROCKS / STUMPS / BOXES (individual, sparse)
+  // =========================================================
+  const propCells = Math.ceil(Math.sqrt(SC.sampleCount));
+  const propCellW = bw / propCells;
+  const propCellD = bd / propCells;
+  let propPlaced  = 0;
+
+  for (let gx = 0; gx < propCells; gx++) {
+    if (gx % CHUNK === 0) await new Promise(r => setTimeout(r, 0));
+    for (let gz = 0; gz < propCells; gz++) {
+      const x = bmin.x + (gx + Math.random()) * propCellW;
+      const z = bmin.z + (gz + Math.random()) * propCellD;
+      const s = sampleTerrainAt(x, z, terrainMeshes);
+      if (!s) continue;
+
+      const slopeUp    = s.normal.dot(_up);
+      const isFlat     = slopeUp >= SC.flatThreshold;
+      const isElevated = s.y > SC.elevationSplit;
+      if (!isFlat) continue; // rocks/stumps/boxes only on flat
+
+      const roll = Math.random();
+      const pos  = new THREE.Vector3(x, s.y, z);
+
+      if (isElevated) {
+        if (roll < SC.flatRockDensity && rockSheets.length) {
+          const r = SC.rockSize;
+          makeBillboard(randSheet(rockSheets), pos, r.w * rng(0.8,1.5), r.h * rng(0.7,1.3));
+          propPlaced++;
+        } else if (roll < SC.flatRockDensity + SC.flatStumpDensity && stumpSheets.length) {
+          const r = SC.stumpSize;
+          makeBillboard(randSheet(stumpSheets), pos, r.w * rng(0.8,1.2), r.h * rng(0.8,1.2));
+          propPlaced++;
+        } else if (roll < SC.flatRockDensity + SC.flatStumpDensity + SC.flatBoxDensity && wallSheets.length) {
+          const r = SC.boxSize;
+          makeBillboard(randSheet(wallSheets), pos, r.w * rng(0.7,1.3), r.h * rng(0.7,1.3));
+          propPlaced++;
+        }
+      } else {
+        if (roll < SC.flatBoxDensity && wallSheets.length) {
+          const r = SC.boxSize;
+          makeBillboard(randSheet(wallSheets), pos, r.w * rng(0.8,1.4), r.h * rng(0.8,1.4));
+          propPlaced++;
+        }
+      }
+    }
+  }
+
+  // ---- Building perimeter rings ----
+  buildingPositions.forEach(bp => {
+    for (let i = 0; i < 48; i++) {
+      if (Math.random() > SC.buildingRingDensity) continue;
+      const angle = (i / 48) * Math.PI * 2 + rng(-0.15, 0.15);
+      const dist  = SC.buildingRingRadius * rng(0.7, 1.1);
+      const rx = bp.x + Math.cos(angle) * dist;
+      const rz = bp.z + Math.sin(angle) * dist;
+      const s = sampleTerrainAt(rx, rz, terrainMeshes);
+      const ry = s ? s.y : bp.y;
+      // Perimeter veg goes through instanced system too
+      const scale = rng(0.9, 1.8);
+      addVegInstance(rx, ry, rz, SC.vegSize.w * scale * 1.4, SC.vegSize.h * scale * 1.4);
+      propPlaced++;
+    }
+  });
+
+  console.log(`🪨 Props placed: ${propPlaced}`);
+}
+
+// ============================================================
+//  FRUSTUM CULLING + BILLBOARD FACING
+// ============================================================
+const _billboardFrustum    = new THREE.Frustum();
+const _billboardProjMatrix = new THREE.Matrix4();
+const _iPos  = new THREE.Vector3();
+const _iQuat = new THREE.Quaternion();
+const _iScl  = new THREE.Vector3();
+const _iMat  = new THREE.Matrix4();
+
+// Cache per-slot: flat arrays of [x,y,z, sx,sy] for each instance
+// Built once during scatter, reused every frame for rotation updates
+const vegInstanceData = []; // parallel to vegInstances: Float32Array [x,y,z,sx,sy, ...]
+
+// Called by addVegInstance to also record position/scale for fast frame updates
+function recordVegInstanceData(slotIndex, x, y, z, w, h) {
+  if (!vegInstanceData[slotIndex]) vegInstanceData[slotIndex] = [];
+  vegInstanceData[slotIndex].push(x, y + h * 0.5, z, w, h);
+}
+
+let _lastBillboardYaw = null;
+
+function tickBillboards() {
+  _billboardProjMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+  _billboardFrustum.setFromProjectionMatrix(_billboardProjMatrix);
+
+  const camYaw = pointerLock.euler.y;
+  const faceY  = camYaw + Math.PI;
+  const yawChanged = (faceY !== _lastBillboardYaw);
+
+  // ---- Individual billboards (rocks, stumps, boxes) ----
+  scatterGroup.children.forEach(m => {
+    if (!m.userData.isBillboard) return;
+    const inFrustum = _billboardFrustum.intersectsObject(m);
+    m.visible = inFrustum;
+    if (inFrustum && yawChanged) m.rotation.y = faceY;
+  });
+
+  // ---- Instanced veg — only rebuild matrices when camera rotates ----
+  if (yawChanged) {
+    _iQuat.setFromAxisAngle(_up, faceY);
+    vegInstances.forEach((slot, si) => {
+      const data = vegInstanceData[si];
+      if (!data) return;
+      const stride = 5; // x,y,z,w,h
+      for (let i = 0; i < slot.count; i++) {
+        const base = i * stride;
+        _iPos.set(data[base], data[base+1], data[base+2]);
+        _iScl.set(data[base+3], data[base+4], 1);
+        _iMat.compose(_iPos, _iQuat, _iScl);
+        slot.mesh.setMatrixAt(i, _iMat);
+      }
+      slot.mesh.instanceMatrix.needsUpdate = true;
+    });
+    _lastBillboardYaw = faceY;
+  }
+}
+
+// ============================================================
 //  SCENE JSON LOADER
 // ============================================================
 async function loadScene() {
   const res  = await fetch(SCENE_JSON);
   const data = await res.json();
   console.log('📦 Scene loaded. Buildings:', data.buildings.length, '| Waypoints:', data.waypoints.length);
+
+  // Load sprite sheet textures — capture the promise so scatter can await it
+  _spriteLoadPromise = loadSpriteAssets(data.assets);
+
+  // Collect building positions for perimeter ring scatter
+  data.buildings.forEach(b => {
+    if (b.class !== 'terrain') {
+      const [bx, by, bz] = b.position.split(' ').map(Number);
+      buildingPositions.push({ x: bx, y: by, z: bz });
+    }
+  });
 
   data.waypoints.forEach(wp => {
     const [x,y,z] = wp.position.split(' ').map(Number);
@@ -1275,6 +1692,7 @@ async function loadScene() {
   });
 
   loadBuildings(data);
+  _sceneData = data; // keep reference for scatter
 }
 
 // ============================================================
@@ -1299,6 +1717,7 @@ function animate() {
   tickLadders();
   tickDrones(dt);
   tickBullets(dt);
+  tickBillboards();
 
   renderer.render(scene, camera);
 }

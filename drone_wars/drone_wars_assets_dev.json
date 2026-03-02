@@ -1,74 +1,28 @@
 {
   "assets": [
-    {
-      "id": "object_0_glb",
-      "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_0.glb"
-    },
-    {
-      "id": "object_1_glb",
-      "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_1.glb"
-    },
-    {
-      "id": "object_3_glb",
-      "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_3.glb"
-    },
-    {
-      "id": "terrain",
-      "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/terrain02.glb"
-    }
+    { "id": "object_0_glb", "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_0.glb" },
+    { "id": "object_1_glb", "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_1.glb" },
+    { "id": "object_3_glb", "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/object_3.glb" },
+    { "id": "terrain",      "src": "https://scottgrocott.github.io/metal_throne/assets/models/non-optimized/terrain02.glb" },
+    { "id": "sheet_rocks",  "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/rocks.png",        "type": "spritesheet", "category": "rocks" },
+    { "id": "sheet_veg",    "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/vegitation.png",   "type": "spritesheet", "category": "vegetation" },
+    { "id": "sheet_veg01",  "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/vegitation01.png", "type": "spritesheet", "category": "vegetation" },
+    { "id": "sheet_map",    "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/map-assets.png",   "type": "spritesheet", "category": "buildings" },
+    { "id": "sheet_map01",  "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/map-assets01.png", "type": "spritesheet", "category": "stumps" },
+    { "id": "sheet_map02",  "src": "https://scottgrocott.github.io/metal_throne/assets/img/mood_boards/copilot/map-assets02.png", "type": "spritesheet", "category": "buildings" }
   ],
   "buildings": [
-    {
-      "id": "object_0",
-      "model": "#object_0_glb",
-      "position": "0 2 22.42035",
-      "rotation": "0 0 0",
-      "scale": "15 15 15",
-      "class": "collidable"
-    },
-    {
-      "id": "object_1",
-      "model": "#object_1_glb",
-      "position": "-12.17603 3 0",
-      "rotation": "0 0 0",
-      "scale": "15 15 15",
-      "class": "collidable"
-    },
-    {
-      "id": "object_3",
-      "model": "#object_3_glb",
-      "position": "0 2 -19.54585",
-      "rotation": "0 0 0",
-      "scale": "15 15 15",
-      "class": "collidable"
-    },
-    {
-      "id": "terrain",
-      "model": "#terrain",
-      "position": "0 -9 0",
-      "rotation": "0 0 0",
-      "scale": "14 14 14",
-      "class": "terrain"
-    }
+    { "id": "object_0", "model": "#object_0_glb", "position": "0 2 22.42035",   "rotation": "0 0 0", "scale": "15 15 15", "class": "collidable" },
+    { "id": "object_1", "model": "#object_1_glb", "position": "-12.17603 3 0",  "rotation": "0 0 0", "scale": "15 15 15", "class": "collidable" },
+    { "id": "object_3", "model": "#object_3_glb", "position": "0 2 -19.54585",  "rotation": "0 0 0", "scale": "15 15 15", "class": "collidable" },
+    { "id": "terrain",  "model": "#terrain",       "position": "0 -9 0",         "rotation": "0 0 0", "scale": "14 14 14", "class": "terrain" }
   ],
   "waypoints": [
-    {
-      "position": "0 20 0"
-    },
-    {
-      "position": "25 25 15"
-    },
-    {
-      "position": "10 15 35"
-    },
-    {
-      "position": "-25 30 15"
-    },
-    {
-      "position": "-10 18 -25"
-    },
-    {
-      "position": "20 22 -20"
-    }
+    { "position": "0 20 0" },
+    { "position": "25 25 15" },
+    { "position": "10 15 35" },
+    { "position": "-25 30 15" },
+    { "position": "-10 18 -25" },
+    { "position": "20 22 -20" }
   ]
 }
