@@ -74,7 +74,10 @@ export function buildVegInstancedMeshes(data, capacity) {
     mat.useAlphaFromDiffuseTexture  = true;
     mat.alphaCutOff                 = 0.15;
     mat.transparencyMode            = BABYLON.Material.MATERIAL_ALPHATEST;
-    mat.disableLighting             = true;
+    // Keep lighting ON so Babylon includes these meshes in the fog pipeline.
+    // Drive brightness via emissive so sprites aren't shaded dark by scene lights.
+    mat.emissiveColor               = BABYLON.Color3.White();
+    mat.disableLighting             = false;
     mat.backFaceCulling             = false;
 
     const mesh = BABYLON.MeshBuilder.CreatePlane('vp', { width: 1, height: 1 }, scene);
@@ -279,7 +282,9 @@ function _makeBillboardMat(sheetId) {
   mat.useAlphaFromDiffuseTexture = true;
   mat.alphaCutOff                = 0.15;
   mat.transparencyMode           = BABYLON.Material.MATERIAL_ALPHATEST;
-  mat.disableLighting            = true;
+  // Keep lighting ON for fog. emissiveColor white prevents shading from scene lights.
+  mat.emissiveColor              = BABYLON.Color3.White();
+  mat.disableLighting            = false;
   mat.backFaceCulling            = false;
   return mat;
 }

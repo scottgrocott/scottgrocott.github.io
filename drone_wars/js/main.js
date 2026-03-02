@@ -15,6 +15,7 @@ import { tickExplosions }                   from './explosions.js';
 import { tickBillboards, loadSpriteAssets, scatterProps } from './scatter.js';
 import { initAudio, toneReady }             from './audio.js';
 import { hud }                              from './hud.js';
+import { dropOnRandomPeak }                 from './spawn.js';
 
 // ---- Register input callbacks (breaks circular deps) ----
 registerShootCallback(shootBullet);
@@ -37,6 +38,7 @@ registerSpawnDroneCallback(spawnDrone);
 // ---- Scene loading ----
 let _sceneData          = null;
 let _spriteLoadPromise  = Promise.resolve();
+let _terrainMeshes      = [];  // populated by onTerrainReady, used for peak scan
 
 async function loadScene() {
   const res  = await fetch(SCENE_JSON);
@@ -61,6 +63,7 @@ async function loadScene() {
 
   loadBuildings(data, subMeshes => {
     // Called when terrain finishes loading
+    _terrainMeshes = subMeshes;
     setTimeout(async () => {
       await _spriteLoadPromise;
       scatterProps(_sceneData, subMeshes);
@@ -96,8 +99,18 @@ async function boot() {
   await initPhysics();
   initLadders();
   await loadScene();
-  await sleep(500);
+
+  // Wait for terrain GLB to finish loading so world matrices are ready for ray-casts.
+  // loadBuildings fires onTerrainReady synchronously inside the ImportMeshAsync .then(),
+  // so we poll _terrainMeshes with a short back-off rather than adding another promise chain.
+  await _waitForTerrain();
+
+  await sleep(100);
   initPlayer();
+
+  // Scan terrain and freefall onto a random mountain peak
+  dropOnRandomPeak(_terrainMeshes);
+
   hud.hideLoading();
 
   // Audio must be started on a user gesture
@@ -112,5 +125,19 @@ async function boot() {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/** Poll until the terrain GLB has loaded (onTerrainReady populated _terrainMeshes). */
+async function _waitForTerrain(timeoutMs = 15_000) {
+  const start = performance.now();
+  while (!_terrainMeshes.length) {
+    if (performance.now() - start > timeoutMs) {
+      console.warn('[spawn] Timed out waiting for terrain — dropping at origin.');
+      return;
+    }
+    await sleep(100);
+  }
+  // One extra frame to let Babylon finalise world matrices after the mesh is added
+  await sleep(50);
+}
 
 boot();
