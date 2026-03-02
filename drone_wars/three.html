@@ -52,7 +52,7 @@
   <div id="hud-ammo">SHOTS FIRED: 0</div>
 </div>
 <div id="info">
-  WASD — Move &nbsp;|&nbsp; MOUSE — Look &nbsp;|&nbsp; SPACE — Jump &nbsp;|&nbsp; C — Duck &nbsp;|&nbsp; 0 — Spawn Drone &nbsp;|&nbsp; LEFT CLICK — Shoot &nbsp;|&nbsp; CLICK — Lock Mouse
+  WASD — Move &nbsp;|&nbsp; MOUSE — Look &nbsp;|&nbsp; SPACE — Jump &nbsp;|&nbsp; C — Duck &nbsp;|&nbsp; F — FreeCam &nbsp;|&nbsp; 0 — Spawn Drone &nbsp;|&nbsp; LEFT CLICK — Shoot &nbsp;|&nbsp; CLICK — Lock Mouse
 </div>
 
 <!-- Three.js -->
@@ -80,14 +80,20 @@ const LADDER_TEX = 'https://scottgrocott.github.io/metal_throne/assets/img/ladde
 
 // ---- CONFIGURABLE GAME SETTINGS ----
 const CONFIG = {
-  // Drone launch building origin (drones "emerge" from this point)
-  // Match this to the building you want drones to emerge from (use its JSON position)
-  launchPoint: { x: 0, y: 5, z: 0 },
+  // Drone launch building origin — the "stargate" that must be destroyed
+  launchPoint: { x: -13, y: 2, z: 2.8 },
+
+  // How high (world Y) the drone must rise to before engaging pathfinding
+  // (set this to clear the top of the smoke stack)
+  droneRiseHeight: 8,
 
   // Drone flight behaviour
   droneMaxSpeed: 5,
   dronePathRadius: 4.0,   // waypoint arrival radius — larger = smoother advance through waypoints
   droneFlightHeight: 2.5, // minimum Y height drones fly at (set to clear your ground floor)
+
+  // Freecam / noclip
+  freeFlyCamSpeed: 20,   // units per second in freecam
 
   // Gun
   gunRange: 200,
@@ -131,12 +137,30 @@ scene.fog = new THREE.Fog(0x87CEEB, 100, 800);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 20000);
 
-// ---- LIGHTING ----
-scene.add(new THREE.AmbientLight(0xBBBBBB, 1));
-const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-dirLight.position.set(1, 1, 0);
-dirLight.castShadow = true;
-scene.add(dirLight);
+// ---- LIGHTING — midday bright sun ----
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambientLight);
+
+const sunLight = new THREE.DirectionalLight(0xfffde8, 2.2);
+sunLight.position.set(80, 200, 60);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.width  = 2048;
+sunLight.shadow.mapSize.height = 2048;
+sunLight.shadow.camera.near = 1;
+sunLight.shadow.camera.far  = 800;
+sunLight.shadow.camera.left   = -200;
+sunLight.shadow.camera.right  =  200;
+sunLight.shadow.camera.top    =  200;
+sunLight.shadow.camera.bottom = -200;
+sunLight.shadow.bias = -0.0003;
+sunLight.shadow.normalBias = 0.02;
+scene.add(sunLight);
+
+// Soft fill from sky (hemisphere)
+const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x8B7355, 0.5);
+scene.add(hemiLight);
+
+const dirLight = sunLight; // keep dirLight reference for any existing code
 
 // ---- RESIZE ----
 window.addEventListener('resize', () => {
@@ -278,6 +302,7 @@ const player = {
   rigidBody: null, collider: null,
   isGrounded: false, justJumped: false,
   onLadder: false, isDucking: false,
+  freeCam: false,
   keys: { w:false, s:false, a:false, d:false, space:false, duck:false },
   moveDir: new THREE.Vector3(),
   shotsFired: 0,
@@ -307,6 +332,21 @@ window.addEventListener('keydown', e => {
   if (e.code==='KeyA'||e.code==='ArrowLeft')  player.keys.a = true;
   if (e.code==='KeyD'||e.code==='ArrowRight') player.keys.d = true;
   if (e.code==='Space') { player.keys.space = true; e.preventDefault(); }
+  if (e.code==='KeyF') {
+    player.freeCam = !player.freeCam;
+    if (player.freeCam) {
+      // Freeze physics body so it doesn't fall while flying
+      if (player.rigidBody) player.rigidBody.setEnabled(false);
+    } else {
+      // Re-enable physics and teleport body to current camera position
+      if (player.rigidBody) {
+        player.rigidBody.setEnabled(true);
+        player.rigidBody.setTranslation({ x: playerRig.position.x, y: playerRig.position.y, z: playerRig.position.z }, true);
+        player.rigidBody.setLinvel({ x:0, y:0, z:0 }, true);
+      }
+    }
+    console.log('🎥 FreeCam:', player.freeCam ? 'ON' : 'OFF');
+  }
   if (e.code==='KeyC') player.keys.duck = true;
   if (e.code==='Digit0' || e.code==='Numpad0') spawnDrone();
 });
@@ -334,11 +374,40 @@ document.addEventListener('mousedown', async (e) => {
 function tickPlayer(dt) {
   if (!player.rigidBody) return;
 
-  // Duck
+  // ---- FREECAM MODE ----
+  if (player.freeCam) {
+    const speed = CONFIG.freeFlyCamSpeed;
+    const yaw   = pointerLock.euler.y;
+    const pitch = pointerLock.euler.x;
+    const fwd   = new THREE.Vector3(-Math.sin(yaw)*Math.cos(pitch), Math.sin(pitch), -Math.cos(yaw)*Math.cos(pitch));
+    const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
+    const move  = new THREE.Vector3();
+
+    if (player.keys.w) move.addScaledVector(fwd, 1);
+    if (player.keys.s) move.addScaledVector(fwd, -1);
+    if (player.keys.a) move.addScaledVector(right, -1);
+    if (player.keys.d) move.addScaledVector(right, 1);
+    if (player.keys.space) move.y += 1;     // float up
+    if (player.keys.duck)  move.y -= 1;     // float down
+
+    if (move.length() > 0) move.normalize();
+    playerRig.position.addScaledVector(move, speed * dt);
+
+    const p = playerRig.position;
+    document.getElementById('hud-grounded').textContent = 'GROUNDED: FREECAM';
+    document.getElementById('hud-duck').textContent     = 'DUCK: —';
+    document.getElementById('hud-pos').textContent      = `POS: ${p.x.toFixed(1)}, ${p.y.toFixed(1)}, ${p.z.toFixed(1)}`;
+    document.getElementById('hud-ammo').textContent     = 'SHOTS FIRED: ' + player.shotsFired;
+    return;
+  }
+
+  // Duck — camera lowers when ducking (was inverted: tippy-toes instead of crouch)
   const wantDuck = player.keys.duck;
   if (wantDuck !== player.isDucking) {
     player.isDucking = wantDuck;
-    camera.position.y = player.isDucking ? PLAYER.duckHeight * 0.5 : 0;
+    // Standing: camera at 0 (relative to playerRig which is already at PLAYER.height)
+    // Ducking: camera drops by (PLAYER.height - PLAYER.duckHeight)
+    camera.position.y = player.isDucking ? -(PLAYER.height - PLAYER.duckHeight) : 0;
   }
 
   const yaw = pointerLock.euler.y;
@@ -416,9 +485,16 @@ function syncPhysicsReads() {
 const buildingBodies = [];
 
 function loadBuildings(data) {
+  // Pre-load ground texture for terrain reuse
+  const terrainGroundTex = texLoader.load(GROUND_TEX);
+  terrainGroundTex.wrapS = terrainGroundTex.wrapT = THREE.RepeatWrapping;
+  terrainGroundTex.repeat.set(2250, 2250); // same tiling as the flat ground plane
+
   data.buildings.forEach(b => {
     const [px, py, pz] = b.position.split(' ').map(Number);
-    const [sx, sy, sz] = (b.scale||'1 1 1').split(' ').map(n => Number(n) * 1.15);
+    const [sx, sy, sz] = (b.scale||'1 1 1').split(' ').map(n => Number(n) * (b.class === 'terrain' ? 1 : 1.15));
+
+    const isTerrain = b.class === 'terrain';
 
     gltfLoader.load(
       b.model.startsWith('#') ? getAssetSrc(data.assets, b.model.slice(1)) : b.model,
@@ -426,13 +502,35 @@ function loadBuildings(data) {
         const model = gltf.scene;
         model.position.set(px, py, pz);
         model.scale.set(sx, sy, sz);
-        model.traverse(n => { if (n.isMesh) { n.castShadow = true; n.receiveShadow = true; raycastMeshes.push(n); } });
+        model.traverse(n => {
+          if (n.isMesh) {
+            n.castShadow  = !isTerrain; // terrain receives but doesn't self-cast (perf)
+            n.receiveShadow = true;
+            if (isTerrain) {
+              // Force the ground texture onto all terrain meshes at the same tiling level
+              const mat = new THREE.MeshStandardMaterial({
+                map: terrainGroundTex,
+                roughness: 0.95,
+                metalness: 0.05,
+                color: 0x8B7355,
+              });
+              n.material = mat;
+            }
+            raycastMeshes.push(n);
+          }
+        });
         scene.add(model);
-        buildStaticCollider(model);
-        console.log('✅ Building loaded:', b.id);
+        if (!isTerrain) {
+          buildStaticCollider(model);
+        } else {
+          // Terrain gets its own collider — same trimesh path
+          // (If the model is too heavy at 3MB, comment out the next line until decimated)
+          buildStaticCollider(model);
+        }
+        console.log('✅ ' + (isTerrain ? 'Terrain' : 'Building') + ' loaded:', b.id);
       },
       null,
-      (e) => console.error('❌ Building load error:', b.id, e)
+      (e) => console.error('❌ Load error:', b.id, e)
     );
   });
 }
@@ -599,10 +697,17 @@ function updateDroneSpatial(synth, dronePos) {
     const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
     if (!isFinite(dist) || dist < 0.01) return; // too close or invalid, skip
 
-    // Volume falloff
-    const maxDist = 50;
-    const vol = dist < maxDist ? -18 + (1 - dist/maxDist) * 16 : -60;
-    if (isFinite(vol)) synth.vol.volume.setTargetAtTime(vol, Tone.now(), 0.1);
+    // Volume falloff — smooth inverse-square-ish curve over a long range
+    const maxDist = 120;  // audible out to 120 units (was 50)
+    const minVol  = -60;
+    const maxVol  = -4;
+    // Smooth rolloff: starts at maxVol when very close, falls off gradually
+    const normDist = Math.min(dist / maxDist, 1.0);
+    const vol = dist < maxDist
+      ? maxVol + (minVol - maxVol) * (normDist * normDist)  // quadratic — gentle at close range, steeper further out
+      : minVol;
+    // Use a long time constant (0.8s) so volume changes feel gradual, not snappy
+    if (isFinite(vol)) synth.vol.volume.setTargetAtTime(vol, Tone.now(), 0.8);
 
     // Pan — guard zero horizontal length
     const hLen = Math.sqrt(dx*dx + dz*dz);
@@ -690,9 +795,10 @@ function spawnDrone() {
   const R = window.RAPIER;
 
   const lp = CONFIG.launchPoint;
-  const ox = lp.x + (Math.random() - 0.5) * 4;
-  const oz = lp.z + (Math.random() - 0.5) * 4;
-  const oy = lp.y + 1 + Math.random() * 2;
+  // Spawn exactly at the launch point with no random scatter — rises straight up
+  const ox = lp.x;
+  const oz = lp.z;
+  const oy = lp.y;
 
   const spawnPos = new THREE.Vector3(ox, oy, oz);
   const color = randomRGB();
@@ -723,11 +829,7 @@ function spawnDrone() {
 
   scene.add(group);
 
-  // Spawn marker
-  const marker = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffff00 }));
-  marker.position.copy(spawnPos);
-  scene.add(marker);
-  setTimeout(() => scene.remove(marker), 3000);
+  // [REMOVED] spawn marker sphere — was debug only
 
   // ---- Physics (kinematic) ----
   const body = physicsWorld.createRigidBody(
@@ -752,14 +854,103 @@ function spawnDrone() {
   // Each drone gets a unique height offset so they fly at different levels
   const heightOffset = (droneCount % 5) * 1.2 - 2.4;
 
+  // Drone AI state machine
+  // 'rising'  — ascending from stargate to clear smoke stack
+  // 'patrol'  — following waypoints
+  // 'hunting' — locked onto player, closing in to ram
+  let droneState = 'rising';
+  let huntCooldown = 0; // seconds remaining on hunt mode after losing LOS
+
+  // Detection raycaster — reused per drone
+  const detectRay = new THREE.Raycaster();
+
+  function canSeePlayer() {
+    const dp = pos;
+    const pp = playerRig.position;
+    const toPlayer = new THREE.Vector3(pp.x - dp.x, pp.y - dp.y, pp.z - dp.z);
+    const dist = toPlayer.length();
+    if (dist > 60) return false; // beyond detection range
+    toPlayer.normalize();
+    detectRay.set(new THREE.Vector3(dp.x, dp.y, dp.z), toPlayer);
+    detectRay.far = dist;
+    const hits = detectRay.intersectObjects(raycastMeshes, false);
+    // No geometry blocking the line of sight
+    return hits.length === 0;
+  }
+
   function updateMovement(dt, wallPush) {
     if (!flightWaypoints.length) return;
+
+    // ---- RISE PHASE ----
+    if (droneState === 'rising') {
+      const targetY = CONFIG.droneRiseHeight;
+      const dy = targetY - pos.y;
+      const riseSpeed = CONFIG.droneMaxSpeed * 0.6;
+      vel.set(0, dy > 0 ? riseSpeed : 0, 0);
+      pos.y += vel.y * dt;
+      if (pos.y >= targetY) {
+        pos.y = targetY;
+        droneState = 'patrol';
+      }
+      group.position.copy(pos);
+      try { body.setNextKinematicTranslation({ x: pos.x, y: pos.y, z: pos.z }); } catch(e) {}
+      return;
+    }
+
+    // ---- DETECT PLAYER — upgrade to hunt ----
+    if (droneState === 'patrol') {
+      if (canSeePlayer()) {
+        droneState = 'hunting';
+        huntCooldown = 4.0; // chase for at least 4 seconds after losing sight
+      }
+    }
+
+    // ---- HUNT MODE ----
+    if (droneState === 'hunting') {
+      huntCooldown -= dt;
+      const pp = playerRig.position;
+      const dx = pp.x - pos.x;
+      const dy = pp.y - pos.y;
+      const dz = pp.z - pos.z;
+      const fullDist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      const invDist = fullDist > 0.01 ? 1 / fullDist : 0;
+      const speed = CONFIG.droneMaxSpeed * 1.6; // faster when hunting
+
+      const desiredX = dx * invDist * speed;
+      const desiredY = dy * invDist * speed;
+      const desiredZ = dz * invDist * speed;
+
+      const turn = Math.min(1, dt * 5);
+      vel.x += (desiredX - vel.x) * turn;
+      vel.y += (desiredY - vel.y) * turn;
+      vel.z += (desiredZ - vel.z) * turn;
+
+      if (wallPush) { vel.x += wallPush.x * 0.12; vel.z += wallPush.z * 0.12; }
+
+      const spd = vel.length();
+      if (spd > speed) vel.multiplyScalar(speed / spd);
+
+      pos.x += vel.x * dt;
+      pos.y += vel.y * dt;
+      pos.z += vel.z * dt;
+      group.position.copy(pos);
+      if (spd > 0.1) group.rotation.y = Math.atan2(vel.x, vel.z);
+      try { body.setNextKinematicTranslation({ x: pos.x, y: pos.y, z: pos.z }); } catch(e) {}
+
+      // Revert to patrol if hunt timer runs out and no sight
+      if (huntCooldown <= 0 && !canSeePlayer()) {
+        droneState = 'patrol';
+      }
+      return;
+    }
+
+    // ---- PATROL MODE ----
     const target = flightWaypoints[wpIndex % flightWaypoints.length];
     const ty = CONFIG.droneFlightHeight + heightOffset;
     const dx = target.x - pos.x;
     const dy = ty - pos.y;
     const dz = target.z - pos.z;
-    const dist = Math.sqrt(dx*dx + dz*dz); // horizontal dist for waypoint advance
+    const dist = Math.sqrt(dx*dx + dz*dz);
 
     if (dist < CONFIG.dronePathRadius) {
       wpIndex = (wpIndex + 1) % flightWaypoints.length;
@@ -769,25 +960,17 @@ function spawnDrone() {
     const fullDist = Math.sqrt(dx*dx + dy*dy + dz*dz);
     const invDist = fullDist > 0.01 ? 1 / fullDist : 0;
 
-    // Desired velocity = toward waypoint
     const desiredX = dx * invDist * speed;
     const desiredY = dy * invDist * speed;
     const desiredZ = dz * invDist * speed;
 
-    // Steer toward desired — quick turn rate
     const turn = Math.min(1, dt * 4);
     vel.x += (desiredX - vel.x) * turn;
     vel.y += (desiredY - vel.y) * turn;
     vel.z += (desiredZ - vel.z) * turn;
 
-    // Apply wall avoidance — push vel away from nearby surfaces
-    // Weight is high so drones actively hug around walls rather than through them
-    if (wallPush) {
-      vel.x += wallPush.x * 0.15;
-      vel.z += wallPush.z * 0.15;
-    }
+    if (wallPush) { vel.x += wallPush.x * 0.15; vel.z += wallPush.z * 0.15; }
 
-    // Clamp to max speed
     const spd = vel.length();
     if (spd > speed) vel.multiplyScalar(speed / spd);
 
@@ -796,14 +979,8 @@ function spawnDrone() {
     pos.z += vel.z * dt;
 
     group.position.copy(pos);
-
-    if (spd > 0.1) {
-      group.rotation.y = Math.atan2(vel.x, vel.z);
-    }
-
-    try {
-      body.setNextKinematicTranslation({ x: pos.x, y: pos.y, z: pos.z });
-    } catch(e) {}
+    if (spd > 0.1) group.rotation.y = Math.atan2(vel.x, vel.z);
+    try { body.setNextKinematicTranslation({ x: pos.x, y: pos.y, z: pos.z }); } catch(e) {}
   }
 
   // ---- Tone.js buzz synth ----
@@ -820,6 +997,9 @@ function spawnDrone() {
     detonatorMesh: detMesh,
     color,
     detonatorArmed: false,
+    // Expose state so external code (e.g. bullet hits) can trigger hunt mode
+    getState: () => droneState,
+    triggerHunt: () => { droneState = 'hunting'; huntCooldown = 6.0; },
   };
   // Arm after 2.5s — enough time to rise clear of launch geometry
   setTimeout(() => { if (!drone.dead) drone.detonatorArmed = true; }, 2500);
@@ -1026,9 +1206,10 @@ function tickBullets(dt) {
           // Direct detonator hit — instant kill
           killDrone(drone);
         } else {
-          // Body hit — bump + increment hit counter
+          // Body hit — bump + increment hit counter + ALERT the drone to hunt player
           drone.hitCount++;
           playBulletHit();
+          drone.triggerHunt(); // drone spins and hunts the player
 
           // Bump the drone visually/physically — offset its vehicle position
           const knockDir = new THREE.Vector3(b.dir.x, 0.5, b.dir.z).normalize();
