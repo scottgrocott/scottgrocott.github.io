@@ -15,7 +15,7 @@
     { "id": "object_0", "model": "#object_0_glb", "position": "0 2 22.42035",   "rotation": "0 0 0", "scale": "15 15 15", "class": "collidable" },
     { "id": "object_1", "model": "#object_1_glb", "position": "-12.17603 3 0",  "rotation": "0 0 0", "scale": "15 15 15", "class": "collidable" },
     { "id": "object_3", "model": "#object_3_glb", "position": "0 2 -19.54585",  "rotation": "0 0 0", "scale": "15 15 15", "class": "collidable" },
-    { "id": "terrain",  "model": "#terrain",       "position": "0 -9 0",         "rotation": "0 0 0", "scale": "14 14 14", "class": "terrain" }
+    { "id": "terrain",  "model": "#terrain",       "position": "0 -4.5 0",         "rotation": "0 0 0", "scale": "7 7 7", "class": "terrain" }
   ],
   "waypoints": [
     { "position": "0 20 0" },
