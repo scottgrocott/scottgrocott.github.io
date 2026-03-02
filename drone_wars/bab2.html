@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Drone Wars - Babylon.js</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { overflow:hidden; background:#000; font-family:Arial,sans-serif; height:100%; }
+    canvas { display:block; width:100%; height:100%; touch-action:none; }
+    #loading {
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      background:#111; color:#fff; font-size:22px; z-index:100; flex-direction:column; gap:12px;
+    }
+    #loading.hidden { display:none; }
+    #crosshair {
+      position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+      width:16px; height:16px; pointer-events:none; z-index:10;
+    }
+    #crosshair::before, #crosshair::after {
+      content:''; position:absolute; background:rgba(255,255,255,0.8);
+    }
+    #crosshair::before { width:2px; height:16px; left:7px; top:0; }
+    #crosshair::after  { width:16px; height:2px; left:0; top:7px; }
+    #hud {
+      position:fixed; bottom:20px; left:20px; color:#0f0; font-size:13px;
+      font-family:monospace; text-shadow:0 0 4px #0f0; pointer-events:none; z-index:10;
+    }
+    #info {
+      position:fixed; top:10px; left:50%; transform:translateX(-50%);
+      color:rgba(255,255,255,0.5); font-size:12px; pointer-events:none; z-index:10;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <div>DRONE WARS</div>
+  <div style="font-size:14px; color:#888">Loading assets...</div>
+</div>
+
+<div id="crosshair"></div>
+<div id="hud">
+  <div id="hud-drones">DRONES: 0</div>
+  <div id="hud-grounded">GROUNDED: YES</div>
+</div>
+<div id="info">WASD / Arrows — Move  |  MOUSE — Look  |  SPACE — Jump  |  0 — Spawn Drone  |  CLICK — Lock Mouse</div>
+
+<canvas id="renderCanvas" touch-action="none"></canvas>
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/yuka@0.7.8/build/yuka.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+
+<script type="module">
+  import RAPIER from 'https://scottgrocott.github.io/metal_throne/assets/js/rapier3d-compat/rapier.mjs';
+  window.RAPIER = RAPIER;
+</script>
+
+<script>
+// ============================================================
+//  DRONE WARS — Babylon.js (mouse look directions corrected)
+// ============================================================
+
+const SCENE_JSON = '/drone_wars/drone_wars_assets_dev.json';
+const BUZZ_SRC   = 'https://scottgrocott.github.io/metal_throne/assets/audio/buzz.mp3';
+const GROUND_TEX = 'https://scottgrocott.github.io/metal_throne/assets/img/gpt_ground.png';
+const LADDER_TEX = 'https://scottgrocott.github.io/metal_throne/assets/img/ladder.png';
+
+const PLAYER = { height: 1.6, radius: 0.4, mass: 80, jumpForce: 1000, moveSpeed: 5000, maxVelocity: 5 };
+
+const LADDERS = [
+  { position: [-5,    0,    0],      height: 5,  width: .5, climbSpeed: 3 },
+  { position: [0,   -0.60296, -9.54734], height: 10, width: 1, climbSpeed: 7 },
+  { position: [-11.44083, 0, 1.05525],   height: 8,  width: 1, climbSpeed: 7 },
+  { position: [-0.83595, 0, 38.20815],   height: 10, width: 1, climbSpeed: 7 },
+];
+
+// ── Babylon Setup ────────────────────────────────────────────────
+const canvas = document.getElementById('renderCanvas');
+const engine = new BABYLON.Engine(canvas, true);
+const scene = new BABYLON.Scene(engine);
+scene.clearColor = BABYLON.Color4.FromHexString('#87CEEB');
+scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+scene.fogColor = BABYLON.Color3.FromHexString('#87CEEB');
+scene.fogStart = 100;
+scene.fogEnd = 800;
+
+const camera = new BABYLON.FreeCamera('cam', new BABYLON.Vector3(0, PLAYER.height, 0), scene);
+camera.minZ = 0.1;
+camera.maxZ = 20000;
+
+new BABYLON.HemisphericLight('hemi', new BABYLON.Vector3(0,1,0), scene).intensity = 1;
+const dirLight = new BABYLON.DirectionalLight('dir', new BABYLON.Vector3(1,-1,0), scene);
+dirLight.intensity = 0.6;
+
+const shadowGen = new BABYLON.ShadowGenerator(1024, dirLight);
+shadowGen.useBlurExponentialShadowMap = true;
+
+scene.imageProcessingConfiguration.toneMappingEnabled = true;
+scene.imageProcessingConfiguration.toneMappingType = BABYLON.ImageProcessingConfiguration.TONEMAPPING_ACES;
+scene.imageProcessingConfiguration.exposure = 1.2;
+
+window.addEventListener('resize', () => engine.resize());
+
+// ── Pointer Lock + Mouse Look (corrected directions) ─────────────
+let locked = false;
+let yaw = 0, pitch = 0;
+
+canvas.addEventListener('click', () => canvas.requestPointerLock());
+document.addEventListener('pointerlockchange', () => locked = document.pointerLockElement === canvas);
+
+canvas.addEventListener('mousemove', e => {
+  if (!locked) return;
+
+  // Standard FPS controls: mouse right → look right, mouse up → look up
+  yaw   += e.movementX * 0.002;
+  pitch += e.movementY * 0.002;
+
+  pitch = Math.max(-Math.PI/2 + 0.01, Math.min(Math.PI/2 - 0.01, pitch));
+  camera.rotation.set(pitch, yaw, 0);
+});
+
+// ── Ground ───────────────────────────────────────────────────────
+const groundTex = new BABYLON.Texture(GROUND_TEX, scene);
+groundTex.uScale = groundTex.vScale = 2250;
+const groundMat = new BABYLON.PBRMaterial('ground', scene);
+groundMat.albedoTexture = groundTex;
+groundMat.roughness = 0.95;
+groundMat.metallic = 0.05;
+groundMat.albedoColor = new BABYLON.Color3(0.545, 0.451, 0.333);
+
+const ground = BABYLON.MeshBuilder.CreateGround('ground', {width:10000, height:10000}, scene);
+ground.material = groundMat;
+ground.receiveShadows = true;
+
+// ── Physics ──────────────────────────────────────────────────────
+let physicsWorld = null;
+let physicsReady = false;
+let accumulator = 0;
+const PHYSICS_DT = 1/60;
+
+async function initPhysics() {
+  while (!window.RAPIER) await new Promise(r => setTimeout(r, 50));
+  await RAPIER.init();
+  physicsWorld = new RAPIER.World({ x:0, y:-9.81, z:0 });
+  physicsReady = true;
+
+  const groundBody = physicsWorld.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(0, -0.5, 0));
+  physicsWorld.createCollider(RAPIER.ColliderDesc.cuboid(5000, 0.5, 5000), groundBody);
+  console.log('Physics ready');
+}
+
+function stepPhysics(dt) {
+  if (!physicsReady) return;
+  accumulator += dt;
+  while (accumulator >= PHYSICS_DT) {
+    physicsWorld.step();
+    accumulator -= PHYSICS_DT;
+  }
+}
+
+// ── Player ───────────────────────────────────────────────────────
+const player = {
+  rigidBody: null, collider: null,
+  isGrounded: false, justJumped: false, onLadder: false,
+  keys: { w:false, s:false, a:false, d:false, space:false }
+};
+
+function initPlayer() {
+  const pos = camera.position;
+  player.rigidBody = physicsWorld.createRigidBody(
+    RAPIER.RigidBodyDesc.dynamic().setTranslation(pos.x, pos.y, pos.z).lockRotations().setLinearDamping(5)
+  );
+  player.collider = physicsWorld.createCollider(
+    RAPIER.ColliderDesc.capsule(PLAYER.height/2 - PLAYER.radius, PLAYER.radius)
+      .setMass(PLAYER.mass).setFriction(0).setRestitution(0),
+    player.rigidBody
+  );
+}
+
+window.addEventListener('keydown', e => {
+  const code = e.code;
+  if (code === 'KeyW' || code === 'ArrowUp')    player.keys.w = true;
+  if (code === 'KeyS' || code === 'ArrowDown')  player.keys.s = true;
+  if (code === 'KeyA' || code === 'ArrowLeft')  player.keys.a = true;
+  if (code === 'KeyD' || code === 'ArrowRight') player.keys.d = true;
+  if (code === 'Space') { player.keys.space = true; e.preventDefault(); }
+});
+
+window.addEventListener('keyup', e => {
+  const code = e.code;
+  if (code === 'KeyW' || code === 'ArrowUp')    player.keys.w = false;
+  if (code === 'KeyS' || code === 'ArrowDown')  player.keys.s = false;
+  if (code === 'KeyA' || code === 'ArrowLeft')  player.keys.a = false;
+  if (code === 'KeyD' || code === 'ArrowRight') player.keys.d = false;
+  if (code === 'Space') { player.keys.space = false; player.justJumped = false; }
+});
+
+function tickPlayer(dt) {
+  if (!player.rigidBody) return;
+  checkGrounded();
+
+  const yawRad = camera.rotation.y;
+  let moveX = 0, moveZ = 0;
+
+  if (player.keys.w) { moveX += Math.sin(yawRad); moveZ += Math.cos(yawRad); }
+  if (player.keys.s) { moveX -= Math.sin(yawRad); moveZ -= Math.cos(yawRad); }
+  if (player.keys.a) { moveX -= Math.cos(yawRad); moveZ += Math.sin(yawRad); }
+  if (player.keys.d) { moveX += Math.cos(yawRad); moveZ -= Math.sin(yawRad); }
+
+  if (moveX !== 0 || moveZ !== 0) {
+    const len = Math.hypot(moveX, moveZ);
+    moveX /= len; moveZ /= len;
+  }
+
+  const vel = player.rigidBody.linvel();
+  const hspeed = Math.hypot(vel.x, vel.z);
+  if (hspeed < PLAYER.maxVelocity) {
+    player.rigidBody.applyImpulse(
+      { x: moveX * PLAYER.moveSpeed * dt, y: 0, z: moveZ * PLAYER.moveSpeed * dt },
+      true
+    );
+  }
+
+  if (player.keys.space && player.isGrounded && !player.justJumped && !player.onLadder) {
+    player.rigidBody.applyImpulse({ x:0, y:PLAYER.jumpForce, z:0 }, true);
+    player.justJumped = true;
+  }
+
+  const p = player.rigidBody.translation();
+  camera.position.set(p.x, p.y, p.z);
+
+  document.getElementById('hud-grounded').textContent = `GROUNDED: ${player.isGrounded ? 'YES' : 'NO'}`;
+}
+
+function checkGrounded() {
+  if (!player.rigidBody) return;
+  const pos = player.rigidBody.translation();
+  const ray = new RAPIER.Ray({x:pos.x,y:pos.y,z:pos.z}, {x:0,y:-1,z:0});
+  player.isGrounded = physicsWorld.castRay(ray, PLAYER.height/2 + 0.15, true) !== null;
+}
+
+// ── Ladders ──────────────────────────────────────────────────────
+const ladderTex = new BABYLON.Texture(LADDER_TEX, scene);
+const ladders = [];
+
+function initLadders() {
+  LADDERS.forEach(def => {
+    const mat = new BABYLON.StandardMaterial('', scene);
+    mat.diffuseTexture = ladderTex;
+    mat.backFaceCulling = false;
+
+    const mesh = BABYLON.MeshBuilder.CreateBox('', {width:def.width, height:def.height, depth:0.05}, scene);
+    mesh.material = mat;
+    mesh.position.set(def.position[0], def.position[1] + def.height/2, def.position[2]);
+
+    ladders.push({ pos: new BABYLON.Vector3(...def.position), ...def });
+  });
+}
+
+let climbUp = false, climbDown = false;
+window.addEventListener('keydown', e => {
+  if (e.code === 'KeyW' || e.code === 'ArrowUp')   climbUp = true;
+  if (e.code === 'KeyS' || e.code === 'ArrowDown') climbDown = true;
+});
+window.addEventListener('keyup', e => {
+  if (e.code === 'KeyW' || e.code === 'ArrowUp')   climbUp = false;
+  if (e.code === 'KeyS' || e.code === 'ArrowDown') climbDown = false;
+});
+
+function tickLadders() {
+  if (!player.rigidBody) return;
+  const p = player.rigidBody.translation();
+  const pos = new BABYLON.Vector3(p.x, p.y, p.z);
+  player.onLadder = false;
+
+  for (const l of ladders) {
+    if (Math.abs(pos.x - l.pos.x) < l.width/2 + 0.5 &&
+        Math.abs(pos.y - (l.pos.y + l.height/2)) < l.height/2 + 0.5 &&
+        Math.abs(pos.z - l.pos.z) < 1) {
+      player.onLadder = true;
+      if (climbUp || climbDown) {
+        const dir = climbUp ? 1 : -1;
+        const vel = player.rigidBody.linvel();
+        player.rigidBody.setLinvel({ x: vel.x*0.5, y: dir * l.climbSpeed, z: vel.z*0.5 }, true);
+      }
+      return;
+    }
+  }
+}
+
+// ── Buildings ────────────────────────────────────────────────────
+async function loadBuildings(data) {
+  for (const b of data.buildings) {
+    const [px,py,pz] = b.position.split(' ').map(Number);
+    const [sx,sy,sz] = (b.scale || '1 1 1').split(' ').map(Number);
+    const url = b.model.startsWith('#') ? getAssetSrc(data.assets, b.model.slice(1)) : b.model;
+
+    try {
+      const result = await BABYLON.SceneLoader.ImportMeshAsync('', '', url, scene);
+      const root = result.meshes[0];
+      root.position.set(px, py, pz);
+      root.scaling.set(sx, sy, sz);
+
+      result.meshes.forEach(m => {
+        if (m.material) {
+          m.receiveShadows = true;
+          shadowGen.addShadowCaster(m);
+        }
+      });
+
+      buildStaticCollider(result.meshes);
+      console.log(`Building loaded: ${b.id}`);
+    } catch (err) {
+      console.error(`Building load failed ${b.id}:`, err);
+    }
+  }
+}
+
+function getAssetSrc(assets, id) {
+  return assets.find(a => a.id === id)?.src || null;
+}
+
+function buildStaticCollider(meshes) {
+  const vertices = [];
+  const indices = [];
+  let vertexOffset = 0;
+
+  meshes.forEach(mesh => {
+    if (!(mesh instanceof BABYLON.Mesh) || !mesh.geometry) return;
+
+    const pos = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+    if (!pos || pos.length % 3 !== 0) {
+      console.warn(`Skipping ${mesh.name} - no/invalid positions`);
+      return;
+    }
+
+    const world = mesh.getWorldMatrix();
+    for (let i = 0; i < pos.length; i += 3) {
+      const v = BABYLON.Vector3.TransformCoordinates(
+        new BABYLON.Vector3(pos[i], pos[i+1], pos[i+2]), world
+      );
+      vertices.push(v.x, v.y, v.z);
+    }
+
+    const meshIdx = mesh.getIndices() || [];
+    if (meshIdx.length > 0) {
+      for (let i = 0; i < meshIdx.length; i++) {
+        indices.push(vertexOffset + meshIdx[i]);
+      }
+    } else {
+      for (let i = 0; i < pos.length / 3; i++) {
+        indices.push(vertexOffset + i);
+      }
+    }
+
+    vertexOffset += pos.length / 3;
+  });
+
+  if (vertices.length < 3 || indices.length % 3 !== 0) {
+    console.warn(`No valid geometry for collider — verts:${vertices.length}, tris:${indices.length/3}`);
+    return;
+  }
+
+  const body = physicsWorld.createRigidBody(RAPIER.RigidBodyDesc.fixed());
+  const desc = RAPIER.ColliderDesc.trimesh(new Float32Array(vertices), new Uint32Array(indices));
+  physicsWorld.createCollider(desc, body);
+
+  console.log(`Trimesh collider created — verts: ${vertices.length/3}, tris: ${indices.length/3}`);
+}
+
+// ── Drones ───────────────────────────────────────────────────────
+const drones = [];
+let droneCount = 0;
+const yukaManager = new YUKA.EntityManager();
+const yukaTime = new YUKA.Time();
+const waypoints = [];
+
+function randomColor() {
+  return new BABYLON.Color3(Math.random(), Math.random()*0.5 + 0.3, Math.random()*0.3);
+}
+
+function spawnDrone() {
+  if (!physicsReady) return;
+  const x = (Math.random()-0.5)*20;
+  const z = (Math.random()-0.5)*20;
+
+  const group = new BABYLON.TransformNode('drone', scene);
+  group.position.set(x,20,z);
+
+  const bodyMat = new BABYLON.PBRMaterial('', scene);
+  bodyMat.albedoColor = randomColor();
+  bodyMat.emissiveColor = bodyMat.albedoColor.clone();
+  bodyMat.emissiveIntensity = 0.6;
+  bodyMat.metallic = 0.3;
+  bodyMat.roughness = 0.5;
+
+  const bodyMesh = BABYLON.MeshBuilder.CreateBox('', {width:1.5,height:0.25,depth:1.5}, scene);
+  bodyMesh.material = bodyMat;
+  bodyMesh.parent = group;
+
+  const rotorMat = new BABYLON.PBRMaterial('', scene);
+  rotorMat.albedoColor = new BABYLON.Color3(1,0.13,0);
+  rotorMat.emissiveColor = rotorMat.albedoColor.clone();
+  rotorMat.emissiveIntensity = 1;
+
+  [[-0.8,0.15,-0.8],[0.8,0.15,-0.8],[-0.8,0.15,0.8],[0.8,0.15,0.8]].forEach(p => {
+    const r = BABYLON.MeshBuilder.CreateCylinder('', {diameter:0.6, height:0.05, tessellation:8}, scene);
+    r.material = rotorMat;
+    r.position.set(...p);
+    r.parent = group;
+  });
+
+  const physicsBody = physicsWorld.createRigidBody(
+    RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(x,20,z)
+  );
+  const collider = physicsWorld.createCollider(
+    RAPIER.ColliderDesc.ball(0.6).setMass(2).setFriction(0).setRestitution(0.3),
+    physicsBody
+  );
+
+  const vehicle = new YUKA.Vehicle();
+  vehicle.position.set(x,20,z);
+  vehicle.maxSpeed = 8;
+  vehicle.smoothingFactor = 0.05;
+
+  vehicle.setRenderComponent(group, (ent, render) => {
+    render.position.set(ent.position.x, ent.position.y, ent.position.z);
+    const q = new BABYLON.Quaternion(ent.rotation.x, ent.rotation.y, ent.rotation.z, ent.rotation.w);
+    const e = new BABYLON.Vector3();
+    q.toEulerAnglesToRef(e);
+    e.x = e.z = 0;
+    render.rotationQuaternion = BABYLON.Quaternion.FromEulerVector(e);
+
+    physicsBody.setNextKinematicTranslation({x:ent.position.x,y:ent.position.y,z:ent.position.z});
+    physicsBody.setNextKinematicRotation({
+      x:render.rotationQuaternion.x, y:render.rotationQuaternion.y,
+      z:render.rotationQuaternion.z, w:render.rotationQuaternion.w
+    });
+  });
+
+  const path = new YUKA.Path();
+  path.loop = true;
+  waypoints.forEach(w => path.add(new YUKA.Vector3(w.x,w.y,w.z)));
+  vehicle.steering.add(new YUKA.FollowPathBehavior(path, 3));
+  yukaManager.add(vehicle);
+
+  const sound = new Howl({
+    src:[BUZZ_SRC], loop:true, volume:0.5, autoplay:true,
+    spatial:true, refDistance:5, maxDistance:50, rolloffFactor:1
+  });
+
+  drones.push({ group, physicsBody, collider, vehicle, sound, dead:false, id: ++droneCount });
+  document.getElementById('hud-drones').textContent = `DRONES: ${drones.filter(d=>!d.dead).length}`;
+
+  setTimeout(() => {
+    const d = drones.find(d => d.id === droneCount);
+    if (d) killDrone(d);
+  }, 50000);
+}
+
+function killDrone(drone) {
+  if (!drone || drone.dead) return;
+  drone.dead = true;
+  yukaManager.remove(drone.vehicle);
+
+  const pos = drone.group.position;
+  const oldBody = drone.physicsBody;
+  const oldCol  = drone.collider;
+
+  drone.physicsBody = physicsWorld.createRigidBody(
+    RAPIER.RigidBodyDesc.dynamic().setTranslation(pos.x, pos.y, pos.z)
+  );
+  drone.collider = physicsWorld.createCollider(
+    RAPIER.ColliderDesc.cuboid(0.5,0.5,0.5).setMass(2).setRestitution(0.3).setFriction(0.5),
+    drone.physicsBody
+  );
+  drone.physicsBody.setAngvel({x:(Math.random()-0.5)*10, y:(Math.random()-0.5)*10, z:(Math.random()-0.5)*10}, true);
+
+  setTimeout(() => {
+    physicsWorld.removeCollider(oldCol, true);
+    physicsWorld.removeRigidBody(oldBody);
+  }, 50);
+
+  drone.sound.stop();
+  drone.sound.unload();
+
+  setTimeout(() => {
+    drone.group.dispose();
+    physicsWorld.removeCollider(drone.collider, true);
+    physicsWorld.removeRigidBody(drone.physicsBody);
+    const idx = drones.indexOf(drone);
+    if (idx > -1) drones.splice(idx, 1);
+    document.getElementById('hud-drones').textContent = `DRONES: ${drones.filter(d=>!d.dead).length}`;
+  }, 5000);
+}
+
+function tickDrones() {
+  drones.forEach(d => {
+    if (d.dead && d.physicsBody) {
+      const p = d.physicsBody.translation();
+      d.group.position.set(p.x, p.y, p.z);
+      const r = d.physicsBody.rotation();
+      if (!d.group.rotationQuaternion) d.group.rotationQuaternion = new BABYLON.Quaternion();
+      d.group.rotationQuaternion.set(r.x, r.y, r.z, r.w);
+    }
+    if (d.sound.playing()) {
+      const pos = d.group.position;
+      d.sound.pos(pos.x, pos.y, pos.z);
+    }
+  });
+}
+
+function tickAudio() {
+  Howler.pos(camera.position.x, camera.position.y, camera.position.z);
+  const fwd = camera.getDirection(BABYLON.Vector3.Forward());
+  Howler.orientation(fwd.x, fwd.y, fwd.z, 0, 1, 0);
+}
+
+// ── Scene Load ───────────────────────────────────────────────────
+async function loadScene() {
+  const res = await fetch(SCENE_JSON);
+  const data = await res.json();
+
+  data.waypoints.forEach(wp => {
+    const [x,y,z] = wp.position.split(' ').map(Number);
+    waypoints.push({x,y,z});
+  });
+
+  await loadBuildings(data);
+}
+
+// ── Main Loop ────────────────────────────────────────────────────
+let last = performance.now();
+
+engine.runRenderLoop(() => {
+  const now = performance.now();
+  const dt = Math.min((now - last)/1000, 0.1);
+  last = now;
+
+  stepPhysics(dt);
+  yukaManager.update(yukaTime.update().getDelta());
+
+  tickPlayer(dt);
+  tickLadders();
+  tickDrones();
+  tickAudio();
+
+  scene.render();
+});
+
+// ── Start ────────────────────────────────────────────────────────
+async function boot() {
+  await initPhysics();
+  initLadders();
+  await loadScene();
+  await new Promise(r => setTimeout(r, 800));
+  initPlayer();
+  document.getElementById('loading').classList.add('hidden');
+
+  window.addEventListener('keydown', e => {
+    if (e.code === 'Digit0' || e.code === 'Numpad0') spawnDrone();
+  });
+}
+
+boot().catch(console.error);
+</script>
+</body>
+</html>

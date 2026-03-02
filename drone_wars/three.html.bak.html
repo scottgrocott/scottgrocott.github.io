@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Drone Wars</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #000; font-family: Arial, sans-serif; }
+    canvas { display: block; }
+    #loading {
+      position: fixed; inset: 0; display: flex; align-items: center;
+      justify-content: center; background: #111; color: #fff;
+      font-size: 22px; z-index: 100; flex-direction: column; gap: 12px;
+    }
+    #loading.hidden { display: none; }
+    #crosshair {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px; height: 16px; pointer-events: none;
+    }
+    #crosshair::before, #crosshair::after {
+      content: ''; position: absolute; background: rgba(255,255,255,0.8);
+    }
+    #crosshair::before { width: 2px; height: 16px; left: 7px; top: 0; }
+    #crosshair::after  { width: 16px; height: 2px; left: 0; top: 7px; }
+    #hud {
+      position: fixed; bottom: 20px; left: 20px;
+      color: #0f0; font-size: 13px; font-family: monospace;
+      text-shadow: 0 0 4px #0f0; pointer-events: none;
+    }
+    #info {
+      position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.5); font-size: 12px; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <div>DRONE WARS</div>
+  <div style="font-size:14px; color:#888">Loading assets...</div>
+</div>
+
+<div id="crosshair"></div>
+<div id="hud">
+  <div id="hud-drones">DRONES: 0</div>
+  <div id="hud-grounded">GROUNDED: YES</div>
+</div>
+<div id="info">WASD — Move &nbsp;|&nbsp; MOUSE — Look &nbsp;|&nbsp; SPACE — Jump &nbsp;|&nbsp; 0 — Spawn Drone &nbsp;|&nbsp; CLICK — Lock Mouse</div>
+
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- GLTFLoader -->
+<script>
+// Inline GLTFLoader r128 subset — loads our GLTF files
+</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<!-- Yuka -->
+<script src="https://cdn.jsdelivr.net/npm/yuka@0.7.8/build/yuka.min.js"></script>
+<!-- Howler -->
+<script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+<!-- Rapier (ES module — loaded separately) -->
+<script type="module">
+  import RAPIER from 'https://scottgrocott.github.io/metal_throne/assets/js/rapier3d-compat/rapier.mjs';
+  window.RAPIER = RAPIER;
+</script>
+
+<script>
+// ============================================================
+//  DRONE WARS — Pure Three.js
+// ============================================================
+
+// ---- CONSTANTS ----
+const SCENE_JSON = '/drone_wars/drone_wars_assets_dev.json';
+const BUZZ_SRC   = 'https://scottgrocott.github.io/metal_throne/assets/audio/buzz.mp3';
+const GROUND_TEX = 'https://scottgrocott.github.io/metal_throne/assets/img/gpt_ground.png';
+const LADDER_TEX = 'https://scottgrocott.github.io/metal_throne/assets/img/ladder.png';
+
+const PLAYER = {
+  height: 1.6, radius: 0.4, mass: 80,
+  jumpForce: 1000, moveSpeed: 5000, maxVelocity: 5
+};
+
+const LADDERS = [
+  { position: [-5,    0,    0],      height: 5,  width: .5, climbSpeed: 3 },
+  { position: [0,   -0.60296, -9.54734], height: 10, width: 1, climbSpeed: 7 },
+  { position: [-11.44083, 0, 1.05525],   height: 8,  width: 1, climbSpeed: 7 },
+  { position: [-0.83595, 0, 38.20815],   height: 10, width: 1, climbSpeed: 7 },
+];
+
+// ---- THREE.JS SETUP ----
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB);
+scene.fog = new THREE.Fog(0x87CEEB, 100, 800);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 20000);
+
+// ---- LIGHTING ----
+scene.add(new THREE.AmbientLight(0xBBBBBB, 1));
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+dirLight.position.set(1, 1, 0);
+dirLight.castShadow = true;
+scene.add(dirLight);
+
+// ---- RESIZE ----
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ---- POINTER LOCK ----
+const pointerLock = {
+  locked: false,
+  euler: new THREE.Euler(0, 0, 0, 'YXZ'),
+  PI_2: Math.PI / 2
+};
+
+document.addEventListener('click', () => {
+  renderer.domElement.requestPointerLock();
+});
+document.addEventListener('pointerlockchange', () => {
+  pointerLock.locked = document.pointerLockElement === renderer.domElement;
+});
+document.addEventListener('mousemove', (e) => {
+  if (!pointerLock.locked) return;
+  const sens = 0.002;
+  pointerLock.euler.y -= e.movementX * sens;
+  pointerLock.euler.x -= e.movementY * sens;
+  pointerLock.euler.x = Math.max(-pointerLock.PI_2, Math.min(pointerLock.PI_2, pointerLock.euler.x));
+  camera.quaternion.setFromEuler(pointerLock.euler);
+});
+
+// ---- TEXTURE LOADER ----
+const texLoader = new THREE.TextureLoader();
+const gltfLoader = new THREE.GLTFLoader();
+
+// ---- GROUND ----
+const groundTex = texLoader.load(GROUND_TEX);
+groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping;
+groundTex.repeat.set(2250, 2250);
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(10000, 10000),
+  new THREE.MeshStandardMaterial({ map: groundTex, roughness: 0.95, metalness: 0.05, color: 0x8B7355 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ============================================================
+//  RAPIER PHYSICS
+// ============================================================
+let physicsWorld = null;
+let physicsReady = false;
+let physicsAccumulator = 0;
+const PHYSICS_DT = 1 / 60;
+
+async function initPhysics() {
+  while (!window.RAPIER) await sleep(100);
+  await window.RAPIER.init();
+  physicsWorld = new window.RAPIER.World({ x: 0, y: -9.81, z: 0 });
+  physicsReady = true;
+  console.log('✅ Rapier physics initialized');
+
+  // Ground collider — large flat cuboid at y=0
+  const R = window.RAPIER;
+  const groundBody = physicsWorld.createRigidBody(R.RigidBodyDesc.fixed().setTranslation(0, -0.5, 0));
+  physicsWorld.createCollider(R.ColliderDesc.cuboid(5000, 0.5, 5000), groundBody);
+}
+
+function stepPhysics(dt) {
+  if (!physicsReady) return;
+  physicsAccumulator += Math.min(dt, 0.1);
+  while (physicsAccumulator >= PHYSICS_DT) {
+    physicsWorld.step();
+    physicsAccumulator -= PHYSICS_DT;
+  }
+}
+
+// ============================================================
+//  PLAYER
+// ============================================================
+const playerRig = new THREE.Group();
+playerRig.position.set(0, PLAYER.height, 0);
+playerRig.add(camera);
+scene.add(playerRig);
+
+const player = {
+  rigidBody: null, collider: null,
+  isGrounded: false, justJumped: false,
+  onLadder: false, climbDir: 0,
+  keys: { w:false, s:false, a:false, d:false, space:false, climbUp:false, climbDown:false },
+  moveDir: new THREE.Vector3()
+};
+
+function initPlayer() {
+  const R = window.RAPIER;
+  const pos = playerRig.position;
+  player.rigidBody = physicsWorld.createRigidBody(
+    R.RigidBodyDesc.dynamic()
+      .setTranslation(pos.x, pos.y, pos.z)
+      .lockRotations()
+      .setLinearDamping(5.0)
+  );
+  player.collider = physicsWorld.createCollider(
+    R.ColliderDesc.capsule(PLAYER.height/2 - PLAYER.radius, PLAYER.radius)
+      .setMass(PLAYER.mass).setFriction(0).setRestitution(0),
+    player.rigidBody
+  );
+  console.log('✅ Player physics body created');
+}
+
+// Keys
+const KEY = (code, down) => {
+  if (code==='KeyW'||code==='ArrowUp')    player.keys.w = down;
+  if (code==='KeyS'||code==='ArrowDown')  player.keys.s = down;
+  if (code==='KeyA'||code==='ArrowLeft')  player.keys.a = down;
+  if (code==='KeyD'||code==='ArrowRight') player.keys.d = down;
+  if (code==='Space') { player.keys.space = down; if (!down) player.justJumped = false; }
+};
+window.addEventListener('keydown', e => { KEY(e.code, true);  e.preventDefault && (e.code==='Space') && e.preventDefault(); });
+window.addEventListener('keyup',   e => { KEY(e.code, false); });
+
+function tickPlayer(dt) {
+  if (!player.rigidBody) return;
+
+  checkGrounded();
+
+  const yaw = pointerLock.euler.y;
+  player.moveDir.set(0, 0, 0);
+  if (player.keys.w) { player.moveDir.x -= Math.sin(yaw); player.moveDir.z -= Math.cos(yaw); }
+  if (player.keys.s) { player.moveDir.x += Math.sin(yaw); player.moveDir.z += Math.cos(yaw); }
+  if (player.keys.a) { player.moveDir.x -= Math.cos(yaw); player.moveDir.z += Math.sin(yaw); }
+  if (player.keys.d) { player.moveDir.x += Math.cos(yaw); player.moveDir.z -= Math.sin(yaw); }
+  if (player.moveDir.length() > 0) player.moveDir.normalize();
+
+  const vel = player.rigidBody.linvel();
+  const hspeed = Math.sqrt(vel.x*vel.x + vel.z*vel.z);
+  if (hspeed < PLAYER.maxVelocity) {
+    player.rigidBody.applyImpulse({
+      x: player.moveDir.x * PLAYER.moveSpeed * dt,
+      y: 0,
+      z: player.moveDir.z * PLAYER.moveSpeed * dt
+    }, true);
+  }
+
+  if (player.keys.space && player.isGrounded && !player.justJumped && !player.onLadder) {
+    player.rigidBody.applyImpulse({ x:0, y:PLAYER.jumpForce, z:0 }, true);
+    player.justJumped = true;
+  }
+
+  // Sync to Three.js
+  const p = player.rigidBody.translation();
+  playerRig.position.set(p.x, p.y, p.z);
+
+  // HUD
+  document.getElementById('hud-grounded').textContent = 'GROUNDED: ' + (player.isGrounded ? 'YES' : 'NO');
+}
+
+function checkGrounded() {
+  const R = window.RAPIER;
+  const pos = player.rigidBody.translation();
+  const ray = new R.Ray({ x:pos.x, y:pos.y, z:pos.z }, { x:0, y:-1, z:0 });
+  const hit = physicsWorld.castRay(ray, PLAYER.height/2 + 0.15, true);
+  player.isGrounded = hit !== null;
+}
+
+// ============================================================
+//  BUILDINGS
+// ============================================================
+const buildingBodies = [];
+
+function loadBuildings(data) {
+  data.buildings.forEach(b => {
+    const [px, py, pz] = b.position.split(' ').map(Number);
+    const [sx, sy, sz] = (b.scale||'1 1 1').split(' ').map(Number);
+
+    gltfLoader.load(
+      b.model.startsWith('#') ? getAssetSrc(data.assets, b.model.slice(1)) : b.model,
+      (gltf) => {
+        const model = gltf.scene;
+        model.position.set(px, py, pz);
+        model.scale.set(sx, sy, sz);
+        model.traverse(n => { if (n.isMesh) { n.castShadow = true; n.receiveShadow = true; } });
+        scene.add(model);
+        buildStaticCollider(model);
+        console.log('✅ Building loaded:', b.id);
+      },
+      null,
+      (e) => console.error('❌ Building load error:', b.id, e)
+    );
+  });
+}
+
+function getAssetSrc(assets, id) {
+  const a = assets.find(a => a.id === id);
+  return a ? a.src : null;
+}
+
+function buildStaticCollider(model) {
+  const R = window.RAPIER;
+  const vertices = [];
+  const indices  = [];
+  let idx = 0;
+
+  model.updateWorldMatrix(true, true);
+  model.traverse(node => {
+    if (!node.isMesh) return;
+    const geo = node.geometry;
+    const pos = geo.attributes.position;
+    const tmp = new THREE.Vector3();
+    for (let i = 0; i < pos.count; i++) {
+      tmp.fromBufferAttribute(pos, i).applyMatrix4(node.matrixWorld);
+      vertices.push(tmp.x, tmp.y, tmp.z);
+    }
+    const baseIdx = idx;
+    if (geo.index) {
+      for (let i = 0; i < geo.index.count; i++) indices.push(baseIdx + geo.index.getX(i));
+      idx += pos.count;
+    } else {
+      for (let i = 0; i < pos.count; i++) indices.push(baseIdx + i);
+      idx += pos.count;
+    }
+  });
+
+  const body = physicsWorld.createRigidBody(R.RigidBodyDesc.fixed());
+  physicsWorld.createCollider(
+    R.ColliderDesc.trimesh(new Float32Array(vertices), new Uint32Array(indices)),
+    body
+  );
+  buildingBodies.push(body);
+  console.log('✅ Static collider created, triangles:', indices.length / 3);
+}
+
+// ============================================================
+//  LADDERS
+// ============================================================
+const ladderTexture = texLoader.load(LADDER_TEX);
+const ladderInstances = [];
+
+function initLadders() {
+  LADDERS.forEach(def => {
+    const [lx, ly, lz] = def.position;
+
+    // Visual mesh
+    const mat = new THREE.MeshStandardMaterial({ map: ladderTexture, side: THREE.DoubleSide });
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(def.width, def.height, 0.05), mat);
+    mesh.position.set(lx, ly + def.height / 2, lz);
+    scene.add(mesh);
+
+    ladderInstances.push({
+      position: new THREE.Vector3(lx, ly, lz),
+      height: def.height, width: def.width,
+      climbSpeed: def.climbSpeed,
+      active: false
+    });
+  });
+  console.log('✅ Ladders initialized:', ladderInstances.length);
+}
+
+// Key state for climbing
+let climbUp = false, climbDown = false;
+window.addEventListener('keydown', e => { if (e.code==='KeyW'||e.code==='ArrowUp')   climbUp=true;  if (e.code==='KeyS'||e.code==='ArrowDown') climbDown=true; });
+window.addEventListener('keyup',   e => { if (e.code==='KeyW'||e.code==='ArrowUp')   climbUp=false; if (e.code==='KeyS'||e.code==='ArrowDown') climbDown=false; });
+
+function tickLadders() {
+  if (!player.rigidBody) return;
+  const pp = player.rigidBody.translation();
+  const pv = new THREE.Vector3(pp.x, pp.y, pp.z);
+
+  player.onLadder = false;
+
+  ladderInstances.forEach(l => {
+    const dx = Math.abs(pv.x - l.position.x);
+    const dy = Math.abs(pv.y - (l.position.y + l.height/2));
+    const dz = Math.abs(pv.z - l.position.z);
+    const on = dx < (l.width/2 + 0.5) && dy < (l.height/2 + 0.5) && dz < 1.0;
+
+    if (on) {
+      player.onLadder = true;
+      if (climbUp || climbDown) {
+        const dir = climbUp ? 1 : -1;
+        const vel = player.rigidBody.linvel();
+        player.rigidBody.setLinvel({ x: vel.x*0.5, y: dir*l.climbSpeed, z: vel.z*0.5 }, true);
+      }
+    }
+  });
+}
+
+// ============================================================
+//  YUKA AI
+// ============================================================
+const yukaManager = new YUKA.EntityManager();
+const yukaTime    = new YUKA.Time();
+const flightWaypoints = [];
+
+// ============================================================
+//  DRONES
+// ============================================================
+const drones = [];
+let droneCount = 0;
+
+function randomRGB() {
+  return new THREE.Color(Math.random(), Math.random() * 0.5 + 0.3, Math.random() * 0.3);
+}
+
+function spawnDrone() {
+  if (!physicsReady) return;
+  const R = window.RAPIER;
+
+  const ox = (Math.random() - 0.5) * 20;
+  const oz = (Math.random() - 0.5) * 20;
+  const spawnPos = new THREE.Vector3(ox, 20, oz);
+  const color = randomRGB();
+
+  // ---- Visual ----
+  const group = new THREE.Group();
+  group.position.copy(spawnPos);
+
+  const bodyMat = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.6, metalness: 0.3, roughness: 0.5 });
+  group.add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.25, 1.5), bodyMat));
+
+  const rotorMat = new THREE.MeshStandardMaterial({ color: 0xff2200, emissive: 0xff2200, emissiveIntensity: 1 });
+  const rotorGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.05, 8);
+  [[-0.8,0.15,-0.8],[0.8,0.15,-0.8],[-0.8,0.15,0.8],[0.8,0.15,0.8]].forEach(([x,y,z]) => {
+    const r = new THREE.Mesh(rotorGeo, rotorMat);
+    r.position.set(x, y, z);
+    group.add(r);
+  });
+  scene.add(group);
+
+  // Debug: add a tiny bright marker at spawn so we can see if group is positioned right
+  const marker = new THREE.Mesh(
+    new THREE.SphereGeometry(0.3, 8, 8),
+    new THREE.MeshBasicMaterial({ color: 0xffff00 })
+  );
+  marker.position.copy(spawnPos);
+  scene.add(marker);
+  setTimeout(() => scene.remove(marker), 3000); // remove after 3s
+
+  // ---- Physics (kinematic) ----
+  const body = physicsWorld.createRigidBody(
+    R.RigidBodyDesc.kinematicPositionBased().setTranslation(ox, 20, oz)
+  );
+  const collider = physicsWorld.createCollider(
+    R.ColliderDesc.ball(0.6).setMass(2).setFriction(0).setRestitution(0.3),
+    body
+  );
+
+  // ---- Yuka ----
+  const vehicle = new YUKA.Vehicle();
+  vehicle.maxSpeed = 8;
+  vehicle.mass = 1;
+  vehicle.smoothingFactor = 0.05;
+  vehicle.velocity.set(0.1, 0, 0.1);
+  vehicle.position.set(ox, 20, oz);
+
+  // Reusable objects — avoid GC pressure in hot path
+  const _euler = new THREE.Euler(0,0,0,'YXZ');
+  const _quat  = new THREE.Quaternion();
+
+  vehicle.setRenderComponent(group, (entity, mesh) => {
+// Reusable objects — avoid GC pressure in hot path
+  const _euler = new THREE.Euler(0,0,0,'YXZ');
+  const _quat  = new THREE.Quaternion();
+  const _tmpQuat = new THREE.Quaternion(); // Add a temporary Three.js quaternion
+
+  vehicle.setRenderComponent(group, (entity, mesh) => {
+    mesh.position.set(entity.position.x, entity.position.y, entity.position.z);
+    
+    // 1. Convert YUKA quaternion to THREE quaternion to safely read it
+    _tmpQuat.set(entity.rotation.x, entity.rotation.y, entity.rotation.z, entity.rotation.w);
+
+    // 2. Safely apply the rotation calculations
+    _euler.setFromQuaternion(_tmpQuat, 'YXZ');
+    _euler.x = 0; // Flatten to yaw-only so drone stays level
+    _euler.z = 0; 
+    
+    _quat.setFromEuler(_euler);
+    mesh.quaternion.copy(_quat);
+    
+    // Kinematic body sync — Rapier needs plain object {x,y,z,w}
+    body.setNextKinematicTranslation({ x: entity.position.x, y: entity.position.y, z: entity.position.z });
+    body.setNextKinematicRotation({ x: _quat.x, y: _quat.y, z: _quat.z, w: _quat.w });
+  });
+  });
+
+  const path = new YUKA.Path();
+  path.loop = true;
+  flightWaypoints.forEach(wp => path.add(new YUKA.Vector3(wp.x, wp.y, wp.z)));
+  vehicle.steering.add(new YUKA.FollowPathBehavior(path, 3.0));
+
+  yukaManager.add(vehicle);
+
+  // ---- Sound ----
+  const sound = new Howl({
+    src: [BUZZ_SRC], loop: true, volume: 0.5,
+    autoplay: true, spatial: true,
+    refDistance: 5, maxDistance: 50, rolloffFactor: 1
+  });
+
+  const drone = { group, body, collider, vehicle, sound, dead: false, id: ++droneCount };
+  drones.push(drone);
+  document.getElementById('hud-drones').textContent = 'DRONES: ' + drones.filter(d=>!d.dead).length;
+  console.log('🛸 Drone spawned at', ox.toFixed(2), 20, oz.toFixed(2));
+
+  // Auto-kill after 50s for demo
+  setTimeout(() => killDrone(drone), 50000);
+}
+
+function killDrone(drone) {
+  if (drone.dead) return;
+  drone.dead = true;
+
+  const R = window.RAPIER;
+  const pos = drone.group.position;
+
+  // Stop Yuka
+  yukaManager.remove(drone.vehicle);
+
+  // Switch to dynamic physics
+  const oldC = drone.collider;
+  const oldB = drone.body;
+
+  drone.body = physicsWorld.createRigidBody(
+    R.RigidBodyDesc.dynamic().setTranslation(pos.x, pos.y, pos.z)
+  );
+  drone.collider = physicsWorld.createCollider(
+    R.ColliderDesc.cuboid(0.5, 0.5, 0.5).setMass(2).setRestitution(0.3).setFriction(0.5),
+    drone.body
+  );
+  drone.body.setAngvel({ x:(Math.random()-0.5)*10, y:(Math.random()-0.5)*10, z:(Math.random()-0.5)*10 }, true);
+
+  // Safe deferred removal of old kinematic body
+  setTimeout(() => {
+    try { physicsWorld.removeCollider(oldC, true); } catch(e){}
+    try { physicsWorld.removeRigidBody(oldB); } catch(e){}
+  }, 50);
+
+  // Stop buzz
+  drone.sound.stop();
+  drone.sound.unload();
+
+  // Remove after 5s
+  setTimeout(() => {
+    scene.remove(drone.group);
+    try { physicsWorld.removeCollider(drone.collider, true); } catch(e){}
+    try { physicsWorld.removeRigidBody(drone.body); } catch(e){}
+    drones.splice(drones.indexOf(drone), 1);
+    document.getElementById('hud-drones').textContent = 'DRONES: ' + drones.filter(d=>!d.dead).length;
+  }, 5000);
+
+  console.log('🪦 Drone killed:', drone.id);
+}
+
+function tickDrones() {
+  drones.forEach(drone => {
+    if (drone.dead && drone.body) {
+      // Sync falling drone from physics
+      const p = drone.body.translation();
+      const r = drone.body.rotation();
+      drone.group.position.set(p.x, p.y, p.z);
+      drone.group.quaternion.set(r.x, r.y, r.z, r.w);
+    }
+    // Spatial audio position
+    if (drone.sound && drone.sound.playing()) {
+      const pos = drone.group.position;
+      drone.sound.pos(pos.x, pos.y, pos.z);
+    }
+  });
+}
+
+// Update Howler listener to follow camera
+function tickAudio() {
+  const camWorld = new THREE.Vector3();
+  camera.getWorldPosition(camWorld);
+  const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+  Howler.pos(camWorld.x, camWorld.y, camWorld.z);
+  Howler.orientation(fwd.x, fwd.y, fwd.z, 0, 1, 0);
+}
+
+// Spawn key
+window.addEventListener('keydown', e => {
+  if (e.code === 'Digit0' || e.code === 'Numpad0') spawnDrone();
+});
+
+// ============================================================
+//  SCENE JSON LOADER
+// ============================================================
+async function loadScene() {
+  const res  = await fetch(SCENE_JSON);
+  const data = await res.json();
+  console.log('📦 Scene loaded. Buildings:', data.buildings.length, '| Waypoints:', data.waypoints.length);
+
+  data.waypoints.forEach(wp => {
+    const [x,y,z] = wp.position.split(' ').map(Number);
+    flightWaypoints.push(new YUKA.Vector3(x, y, z));
+  });
+
+  loadBuildings(data);
+}
+
+// ============================================================
+//  MAIN LOOP
+// ============================================================
+let lastTime = performance.now();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const now = performance.now();
+  const dt = Math.min((now - lastTime) / 1000, 0.1);
+  lastTime = now;
+
+  stepPhysics(dt);
+
+  const yukaD = yukaTime.update().getDelta();
+  yukaManager.update(yukaD);
+
+  tickPlayer(dt);
+  tickLadders();
+  tickDrones();
+  tickAudio();
+
+  renderer.render(scene, camera);
+}
+
+// ============================================================
+//  BOOT
+// ============================================================
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function boot() {
+  await initPhysics();
+  initLadders();
+  await loadScene();
+
+  // Wait for at least one building collider to be ready
+  await sleep(500);
+
+  initPlayer();
+
+  document.getElementById('loading').classList.add('hidden');
+  animate();
+}
+
+boot();
+</script>
+</body>
+</html>

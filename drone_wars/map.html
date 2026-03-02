@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heightmap to Three.js Geometry SPA</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #status { margin-top: 10px; color: green; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label for="imageUpload">Upload Grayscale Heightmap:</label>
+        <input type="file" id="imageUpload" accept="image/*">
+        <button id="exportBtn" disabled>Export as GLB</button>
+        <div id="status"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.134.0/examples/js/exporters/GLTFExporter.js"></script>
+    <script type="module">
+        // Three.js setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(5, 10, 5);
+        scene.add(dirLight);
+
+        camera.position.set(0, 50, 100);
+        camera.lookAt(0, 0, 0);
+
+        let terrainMesh = null;
+        const exporter = new THREE.GLTFExporter();
+
+        // Controls (simple orbit-like with mouse)
+        let isDragging = false;
+        let previousMouseX = 0, previousMouseY = 0;
+
+        window.addEventListener('mousedown', (e) => { isDragging = true; });
+        window.addEventListener('mouseup', (e) => { isDragging = false; });
+        window.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - previousMouseX;
+                const deltaY = e.clientY - previousMouseY;
+                camera.position.x -= deltaX * 0.1;
+                camera.position.z += deltaY * 0.1;
+                camera.lookAt(0, 0, 0);
+            }
+            previousMouseX = e.clientX;
+            previousMouseY = e.clientY;
+        });
+
+        window.addEventListener('wheel', (e) => {
+            camera.position.y += e.deltaY * 0.1;
+            camera.lookAt(0, 0, 0);
+        });
+
+        // Animate loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle image upload
+        document.getElementById('imageUpload').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    generateTerrain(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Generate terrain from grayscale image
+        function generateTerrain(img) {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, img.width, img.height).data;
+
+            const segments = Math.min(img.width - 1, 256);  // Limit for performance
+            const geometry = new THREE.PlaneGeometry(100, 100, segments, segments);
+            geometry.rotateX(-Math.PI / 2);
+
+            const vertices = geometry.attributes.position.array;
+
+            const scale = 20;  // Height scale factor
+
+            for (let i = 0; i < vertices.length; i += 3) {
+                const x = Math.floor(((vertices[i] + 50) / 100) * (img.width - 1));
+                const z = Math.floor(((vertices[i + 2] + 50) / 100) * (img.height - 1));
+                const pixelIndex = (z * img.width + x) * 4;
+                const heightValue = imageData[pixelIndex] / 255;  // Grayscale value 0-1
+                vertices[i + 1] = heightValue * scale;
+            }
+
+            geometry.computeVertexNormals();
+
+            const material = new THREE.MeshStandardMaterial({
+                color: 0xaaaaaa,
+                wireframe: false
+            });
+
+            if (terrainMesh) scene.remove(terrainMesh);
+            terrainMesh = new THREE.Mesh(geometry, material);
+            scene.add(terrainMesh);
+
+            document.getElementById('exportBtn').disabled = false;
+            document.getElementById('status').textContent = 'Terrain generated!';
+        }
+
+        // Export as GLB
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            if (!terrainMesh) return;
+
+            exporter.parse(terrainMesh, (glb) => {
+                const blob = new Blob([glb], { type: 'application/octet-stream' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'terrain.glb';
+                a.click();
+                URL.revokeObjectURL(url);
+            }, { binary: true });
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
