@@ -119,7 +119,7 @@ const CONFIG = {
     flatRockDensity:   0.10,
     flatStumpDensity:  0.06,
     flatBoxDensity:    0.02,
-    buildingRingRadius: 22,
+    buildingRingRadius: 10,    // base radius — innermost ring sits right at the building edge
     buildingRingDensity: 0.7,
 
     // Slope thresholds
@@ -1144,6 +1144,254 @@ function spawnDrone() {
   console.log('🛸 Drone spawned #' + drone.id, 'at', ox.toFixed(2), oy.toFixed(2), oz.toFixed(2));
 }
 
+// ============================================================
+//  EXPLOSION / SMOKE / FIRE PARTICLE SYSTEM
+// ============================================================
+const activeEffects = [];
+
+// ---- Generate soft circular canvas textures ----
+function makeParticleTex(innerColor, outerColor, size = 64) {
+  const c   = document.createElement('canvas');
+  c.width   = size; c.height = size;
+  const ctx = c.getContext('2d');
+  const r   = size / 2;
+  const grd = ctx.createRadialGradient(r, r, 0, r, r, r);
+  grd.addColorStop(0,   innerColor);
+  grd.addColorStop(0.4, outerColor);
+  grd.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, size, size);
+  return new THREE.CanvasTexture(c);
+}
+
+// Pre-bake textures once
+const _texFireCore  = makeParticleTex('rgba(255,255,220,1)',  'rgba(255,160,0,0.7)');
+const _texFireMid   = makeParticleTex('rgba(255,120,0,0.95)', 'rgba(200,40,0,0.5)');
+const _texFlame     = makeParticleTex('rgba(255,80,0,0.9)',   'rgba(255,200,0,0.4)');
+const _texSmokeLt   = makeParticleTex('rgba(180,170,160,0.7)','rgba(120,115,110,0.0)');
+const _texSmokeDk   = makeParticleTex('rgba(60,55,50,0.8)',   'rgba(30,28,25,0.0)');
+const _texEmber     = makeParticleTex('rgba(255,240,80,1)',    'rgba(255,100,0,0.0)', 32);
+
+// Shared unit-quad geometry
+const _pGeo = new THREE.PlaneGeometry(1, 1);
+
+// ---- Material factory — NormalBlending for all, texture does the softness ----
+function makePartMat(tex, opacity) {
+  return new THREE.MeshBasicMaterial({
+    map: tex,
+    transparent: true,
+    opacity,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    blending: THREE.NormalBlending,
+  });
+}
+
+// ---- One particle ----
+function makeParticle(tex, pos, vel, life, size, growRate, fadeStart) {
+  const mat  = makePartMat(tex, 1.0);
+  const mesh = new THREE.Mesh(_pGeo, mat);
+  mesh.position.copy(pos);
+  mesh.scale.setScalar(size);
+  // Random initial spin for variety
+  mesh.rotation.z = Math.random() * Math.PI * 2;
+  return { mesh, vel: vel.clone(), life, maxLife: life, size, growRate, fadeStart, mat };
+}
+
+// ---- FIREBALL burst ----
+function spawnFireball(group) {
+  const particles = [];
+  for (let i = 0; i < 32; i++) {
+    const isCore = i < 10;
+    const tex    = isCore ? _texFireCore : _texFireMid;
+    const vel    = new THREE.Vector3(
+      (Math.random()-0.5) * 7,
+      Math.random() * 6 + 2,
+      (Math.random()-0.5) * 7
+    );
+    const size = isCore ? 1.0 + Math.random()*1.2 : 0.5 + Math.random()*0.9;
+    const life = 0.25 + Math.random() * 0.45;
+    const p    = makeParticle(tex, new THREE.Vector3(), vel, life, size, 2.5, 0.5);
+    group.add(p.mesh);
+    particles.push(p);
+  }
+  return particles;
+}
+
+// ---- Sustained flames ----
+function spawnFlames(group) {
+  const particles = [];
+  for (let i = 0; i < 20; i++) {
+    const vel = new THREE.Vector3(
+      (Math.random()-0.5) * 1.4,
+      2.0 + Math.random() * 3.0,
+      (Math.random()-0.5) * 1.4
+    );
+    const size = 0.5 + Math.random() * 0.7;
+    const life = 0.4 + Math.random() * 0.6;
+    const p    = makeParticle(_texFlame, new THREE.Vector3(
+      (Math.random()-0.5)*0.3, (Math.random()-0.5)*0.2, (Math.random()-0.5)*0.3
+    ), vel, life, size, 1.2, 0.4);
+    group.add(p.mesh);
+    particles.push(p);
+  }
+  return particles;
+}
+
+// ---- Smoke puffs — trail downward toward ground ----
+function spawnSmokePuff(offset, group) {
+  const particles = [];
+  for (let i = 0; i < 8; i++) {
+    const isDark = Math.random() < 0.5;
+    const tex    = isDark ? _texSmokeDk : _texSmokeLt;
+    const vel    = new THREE.Vector3(
+      (Math.random()-0.5) * 1.0,
+      -0.6 - Math.random() * 1.8,   // downward smoke trail
+      (Math.random()-0.5) * 1.0
+    );
+    const size = 0.6 + Math.random() * 1.0;
+    const life = 1.0 + Math.random() * 1.2;
+    const pos  = offset.clone().add(new THREE.Vector3(
+      (Math.random()-0.5)*0.5, 0, (Math.random()-0.5)*0.5
+    ));
+    const p = makeParticle(tex, pos, vel, life, size, 3.0, 0.3);
+    group.add(p.mesh);
+    particles.push(p);
+  }
+  return particles;
+}
+
+// ---- Embers — bright tiny sparks ----
+function spawnEmbers(group) {
+  const particles = [];
+  for (let i = 0; i < 24; i++) {
+    const vel = new THREE.Vector3(
+      (Math.random()-0.5) * 11,
+      Math.random() * 9 + 2,
+      (Math.random()-0.5) * 11
+    );
+    const size = 0.08 + Math.random() * 0.14;
+    const life = 0.7 + Math.random() * 1.6;
+    const p    = makeParticle(_texEmber, new THREE.Vector3(), vel, life, size, 0, 0.6);
+    group.add(p.mesh);
+    particles.push(p);
+  }
+  return particles;
+}
+
+// ---- Main effect spawner ----
+function spawnExplosionEffect(droneGroup) {
+  const fxGroup = new THREE.Group();
+  droneGroup.add(fxGroup);
+
+  const fireball = spawnFireball(fxGroup);
+  const embers   = spawnEmbers(fxGroup);
+
+  let flamesSpawned = false;
+  let smokeTimer    = 0;
+  let elapsed       = 0;
+  const totalLife   = 5.0;
+  const allParticles    = [...fireball, ...embers];
+  const flameParticles  = [];
+
+  activeEffects.push({
+    fxGroup, allParticles, flameParticles,
+    smokeTimer, flamesSpawned, elapsed, totalLife,
+
+    update(dt) {
+      this.elapsed += dt;
+      const t = this.elapsed;
+      const gravity = -3.5;
+
+      // Spawn flames at ~0.05s
+      if (!this.flamesSpawned && t > 0.05) {
+        this.flamesSpawned = true;
+        const fp = spawnFlames(fxGroup);
+        this.flameParticles.push(...fp);
+        this.allParticles.push(...fp);
+      }
+
+      // Recycle flame particles while fire is alive
+      if (t < 3.8) {
+        for (const p of this.flameParticles) {
+          if (p.life <= 0) {
+            p.mesh.visible = true;
+            p.mesh.position.set(
+              (Math.random()-0.5)*0.4,
+              (Math.random()-0.5)*0.2,
+              (Math.random()-0.5)*0.4
+            );
+            p.vel.set(
+              (Math.random()-0.5)*1.4,
+              2.0 + Math.random()*3.0,
+              (Math.random()-0.5)*1.4
+            );
+            p.life    = 0.4 + Math.random()*0.6;
+            p.maxLife = p.life;
+            p.size    = 0.5 + Math.random()*0.7;
+            p.mesh.scale.setScalar(p.size);
+            p.mat.opacity = 1.0;
+          }
+        }
+      }
+
+      // Periodic smoke
+      this.smokeTimer += dt;
+      if (t < 4.2 && this.smokeTimer >= 0.07) {
+        this.smokeTimer = 0;
+        const offset = new THREE.Vector3(
+          (Math.random()-0.5)*0.3, -0.1, (Math.random()-0.5)*0.3
+        );
+        const sp = spawnSmokePuff(offset, fxGroup);
+        this.allParticles.push(...sp);
+      }
+
+      // Tick all
+      for (const p of this.allParticles) {
+        if (p.life <= 0) continue;
+        p.life -= dt;
+        const norm = Math.max(0, p.life / p.maxLife);
+
+        p.mesh.position.x += p.vel.x * dt;
+        p.mesh.position.y += p.vel.y * dt;
+        p.mesh.position.z += p.vel.z * dt;
+        p.vel.y += gravity * dt;
+
+        // Grow
+        const s = p.size * (1 + p.growRate * (1 - norm));
+        p.mesh.scale.setScalar(s);
+
+        // Fade — hold opacity until fadeStart fraction of life remains
+        const fadeNorm = norm < p.fadeStart ? norm / p.fadeStart : 1.0;
+        p.mat.opacity = fadeNorm;
+
+        // Slow spin
+        p.mesh.rotation.z += dt * 0.4 * (p.size > 0.5 ? 1 : -1);
+
+        // Billboard
+        p.mesh.rotation.y = pointerLock.euler.y + Math.PI;
+
+        if (p.life <= 0) p.mesh.visible = false;
+      }
+    }
+  });
+}
+
+
+
+// Tick all active explosion effects — called from main loop
+function tickExplosions(dt) {
+  for (let i = activeEffects.length - 1; i >= 0; i--) {
+    const fx = activeEffects[i];
+    fx.update(dt);
+    if (fx.elapsed >= fx.totalLife) {
+      // Cleanup handled by killDrone's setTimeout — just remove from list
+      activeEffects.splice(i, 1);
+    }
+  }
+}
+
+
 function killDrone(drone, fromDetonator = false) {
   if (drone.dead) return;
   drone.dead = true;
@@ -1152,6 +1400,7 @@ function killDrone(drone, fromDetonator = false) {
   const pos = drone.group.position;
 
   playExplosion(pos);
+  spawnExplosionEffect(drone.group);
 
   drone.group.traverse(n => {
     if (n.isMesh && n.material) {
@@ -1661,21 +1910,37 @@ async function scatterProps(data, terrainMeshes) {
     }
   }
 
-  // ---- Building perimeter rings ----
+  // ---- Building perimeter seam fill — dense multi-ring ----
+  // The goal is to pack weeds tight at the terrain/building intersection
+  // so the hard geometry edge disappears into vegetation.
   buildingPositions.forEach(bp => {
-    for (let i = 0; i < 48; i++) {
-      if (Math.random() > SC.buildingRingDensity) continue;
-      const angle = (i / 48) * Math.PI * 2 + rng(-0.15, 0.15);
-      const dist  = SC.buildingRingRadius * rng(0.7, 1.1);
-      const rx = bp.x + Math.cos(angle) * dist;
-      const rz = bp.z + Math.sin(angle) * dist;
-      const s = sampleTerrainAt(rx, rz, terrainMeshes);
-      const ry = s ? s.y : bp.y;
-      // Perimeter veg goes through instanced system too
-      const scale = rng(0.9, 1.8);
-      addVegInstance(rx, ry, rz, SC.vegSize.w * scale * 1.4, SC.vegSize.h * scale * 1.4);
-      propPlaced++;
-    }
+
+    // Three concentric rings: innermost is densest and closest
+    const rings = [
+      { count: 80,  radiusMul: 0.55, density: 1.00, sizeMin: 1.0, sizeMax: 2.2 },  // right at base
+      { count: 100, radiusMul: 0.75, density: 0.95, sizeMin: 0.8, sizeMax: 1.8 },  // mid ring
+      { count: 90,  radiusMul: 1.00, density: 0.80, sizeMin: 0.6, sizeMax: 1.4 },  // outer fringe
+      { count: 60,  radiusMul: 1.25, density: 0.55, sizeMin: 0.5, sizeMax: 1.1 },  // sparse fade-out
+    ];
+
+    rings.forEach(ring => {
+      for (let i = 0; i < ring.count; i++) {
+        if (Math.random() > ring.density) continue;
+
+        // Full 360° with fine jitter so there are no obvious gaps
+        const angle = (i / ring.count) * Math.PI * 2 + rng(-0.25, 0.25);
+        const dist  = SC.buildingRingRadius * ring.radiusMul * rng(0.88, 1.12);
+        const rx    = bp.x + Math.cos(angle) * dist;
+        const rz    = bp.z + Math.sin(angle) * dist;
+
+        const s  = sampleTerrainAt(rx, rz, terrainMeshes);
+        const ry = s ? s.y : bp.y;
+
+        const scale = rng(ring.sizeMin, ring.sizeMax);
+        addVegInstance(rx, ry, rz, SC.vegSize.w * scale, SC.vegSize.h * scale);
+        propPlaced++;
+      }
+    });
   });
 
   console.log(`🪨 Props placed: ${propPlaced}`);
@@ -1807,6 +2072,7 @@ function animate() {
   tickDrones(dt);
   tickBullets(dt);
   tickBillboards();
+  tickExplosions(dt);
 
   renderer.render(scene, camera);
 }
