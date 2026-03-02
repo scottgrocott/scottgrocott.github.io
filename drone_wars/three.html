@@ -331,8 +331,92 @@ function stepPhysics(dt) {
 }
 
 // ============================================================
-//  PLAYER
+//  DRONE COCKPIT PROPS — visible in freecam, attached to camera
 // ============================================================
+const cockpitGroup = new THREE.Group();
+camera.add(cockpitGroup);
+cockpitGroup.visible = false;
+
+(function buildCockpit() {
+  // Materials — match drone aesthetic
+  const bodyMat  = new THREE.MeshStandardMaterial({ color: 0x334433, metalness: 0.6, roughness: 0.4 });
+  const armMat   = new THREE.MeshStandardMaterial({ color: 0x223322, metalness: 0.7, roughness: 0.3 });
+  const rotorMat = new THREE.MeshStandardMaterial({ color: 0xff2200, emissive: 0xff1100, emissiveIntensity: 0.8, metalness: 0.4, roughness: 0.5 });
+  const detMat   = new THREE.MeshStandardMaterial({ color: 0xff4400, emissive: 0xff0000, emissiveIntensity: 1.2, metalness: 0.8, roughness: 0.2 });
+
+  // Body stub — partially visible at bottom of screen
+  const bodyGeo = new THREE.BoxGeometry(0.22, 0.04, 0.18);
+  const body    = new THREE.Mesh(bodyGeo, bodyMat);
+  body.position.set(0, -0.14, -0.28);
+  cockpitGroup.add(body);
+
+  // Two front arms extending left and right
+  const armGeo = new THREE.BoxGeometry(0.28, 0.025, 0.035);
+
+  const armL = new THREE.Mesh(armGeo, armMat);
+  armL.position.set(-0.16, -0.13, -0.30);
+  armL.rotation.y =  0.22; // angle outward
+  cockpitGroup.add(armL);
+
+  const armR = new THREE.Mesh(armGeo, armMat);
+  armR.position.set( 0.16, -0.13, -0.30);
+  armR.rotation.y = -0.22;
+  cockpitGroup.add(armR);
+
+  // Rotor discs on each arm tip
+  const rotorGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.008, 10);
+
+  const rotorL = new THREE.Mesh(rotorGeo, rotorMat);
+  rotorL.position.set(-0.265, -0.12, -0.36);
+  rotorL.userData.isCockpitRotor = true;
+  rotorL.userData.spinDir = 1;
+  cockpitGroup.add(rotorL);
+
+  const rotorR = new THREE.Mesh(rotorGeo, rotorMat);
+  rotorR.position.set( 0.265, -0.12, -0.36);
+  rotorR.userData.isCockpitRotor = true;
+  rotorR.userData.spinDir = -1;
+  cockpitGroup.add(rotorR);
+
+  // Detonator nub on body — the "gun barrel" feel
+  const detGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.07, 7);
+  const det    = new THREE.Mesh(detGeo, detMat);
+  det.rotation.x = Math.PI / 2;
+  det.position.set(0, -0.13, -0.36);
+  cockpitGroup.add(det);
+})();
+
+// Cockpit sway state
+const cockpitSway = { pitch: 0, roll: 0, bob: 0, bobT: 0 };
+
+function tickCockpit(dt, moveVec) {
+  if (!player.freeCam) return;
+
+  // Target pitch/roll from movement direction
+  const targetPitch = moveVec.y *  0.08;           // nose dips forward when climbing
+  const targetRoll  = -moveVec.x * 0.06;           // bank on strafe
+  const lerpT       = Math.min(1, dt * 5);
+
+  cockpitSway.pitch += (targetPitch - cockpitSway.pitch) * lerpT;
+  cockpitSway.roll  += (targetRoll  - cockpitSway.roll)  * lerpT;
+
+  // Idle bob
+  cockpitSway.bobT += dt * 1.4;
+  cockpitSway.bob   = Math.sin(cockpitSway.bobT) * 0.002;
+
+  cockpitGroup.rotation.x = cockpitSway.pitch;
+  cockpitGroup.rotation.z = cockpitSway.roll;
+  cockpitGroup.position.y = cockpitSway.bob;
+
+  // Spin rotors
+  cockpitGroup.children.forEach(c => {
+    if (c.userData.isCockpitRotor) {
+      c.rotation.y += dt * 28 * c.userData.spinDir;
+    }
+  });
+}
+
+
 const playerRig = new THREE.Group();
 playerRig.position.set(0, PLAYER.height, 0);
 playerRig.add(camera);
@@ -374,6 +458,7 @@ window.addEventListener('keydown', e => {
   if (e.code==='Space') { player.keys.space = true; e.preventDefault(); }
   if (e.code==='KeyF') {
     player.freeCam = !player.freeCam;
+    cockpitGroup.visible = player.freeCam;
     if (player.freeCam) {
       // Freeze physics body so it doesn't fall while flying
       if (player.rigidBody) player.rigidBody.setEnabled(false);
@@ -384,6 +469,9 @@ window.addEventListener('keydown', e => {
         player.rigidBody.setTranslation({ x: playerRig.position.x, y: playerRig.position.y, z: playerRig.position.z }, true);
         player.rigidBody.setLinvel({ x:0, y:0, z:0 }, true);
       }
+      // Reset cockpit sway
+      cockpitSway.pitch = 0; cockpitSway.roll = 0;
+      cockpitGroup.rotation.set(0,0,0);
     }
     console.log('🎥 FreeCam:', player.freeCam ? 'ON' : 'OFF');
   }
@@ -432,6 +520,7 @@ function tickPlayer(dt) {
 
     if (move.length() > 0) move.normalize();
     playerRig.position.addScaledVector(move, speed * dt);
+    tickCockpit(dt, move);
 
     const p = playerRig.position;
     document.getElementById('hud-grounded').textContent = 'GROUNDED: FREECAM';
