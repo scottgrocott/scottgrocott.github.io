@@ -28,9 +28,13 @@ const FLIGHT_HEIGHT_ABOVE = 4;  // metres above the surface for the waypoint Y
 const RAY_FROM_HEIGHT  = 500;   // cast ray downward from this absolute Y
 
 // ---- Module state ----
-let _debugMeshes = [];
+let _debugMeshes  = [];
 let _debugVisible = false;
-let _flatPoints  = [];   // { x, y, z } world positions on the flat surface
+let _flatPoints   = [];   // { x, y, z } world positions on the flat surface
+let _terrainMaxY  = 0;    // highest terrain point found during scan
+
+/** Returns the highest terrain Y found by the last scanFlatAreas() call. */
+export function getTerrainMaxY() { return _terrainMaxY; }
 
 // ============================================================
 //  Public API
@@ -66,6 +70,7 @@ export async function scanFlatAreas(terrainMeshes) {
 
   const rayDir = new BABYLON.Vector3(0, -1, 0);
   const rawFlat = [];
+  let   maxY    = -Infinity;
 
   // Predicate: only hit these terrain meshes
   const pred = m => terrainMeshes.includes(m);
@@ -89,6 +94,9 @@ export async function scanFlatAreas(terrainMeshes) {
       const hit = scene.pickWithRay(ray, pred);
       if (!hit?.hit || !hit.pickedPoint) continue;
 
+      // Track highest point regardless of slope
+      if (hit.pickedPoint.y > maxY) maxY = hit.pickedPoint.y;
+
       const normal = hit.getNormal(true);
       if (!normal) continue;
 
@@ -107,9 +115,10 @@ export async function scanFlatAreas(terrainMeshes) {
 
   // 3. Greedy spatial cluster: keep one representative per CLUSTER_RADIUS
   const clustered = _clusterPoints(rawFlat, CLUSTER_RADIUS);
-  _flatPoints = clustered;
+  _flatPoints  = clustered;
+  _terrainMaxY = maxY;
 
-  console.info(`[flatnav] ${clustered.length} navmesh waypoints after clustering`);
+  console.info(`[flatnav] ${clustered.length} navmesh waypoints after clustering — terrain max Y: ${maxY.toFixed(1)}`);
 
   // 4. Register with drone flight system
   const droneFlightY = CONFIG.droneFlightHeight ?? 3;

@@ -1,6 +1,13 @@
 // ============================================================
 //  drones.js — Drone AI, spawning, combat and lifecycle
 //
+//  New behaviours:
+//  - Drone #1 rises to skyPatrolHeight and orbits the player
+//    launch point in a wide circle before joining normal patrol.
+//  - Each time a drone is killed its world position is recorded.
+//    The next spawned drone starts in 'investigating' state and
+//    flies directly to that location before switching to patrol.
+//
 //  Performance notes:
 //  - Rotor meshes cached per drone at spawn — no getChildMeshes() in tick
 //  - Shared materials for rotors + detonator (compiled once, reused)
@@ -24,6 +31,10 @@ let          droneCount      = 0;
 export const yukaManager = new YUKA.EntityManager();
 export const yukaTime    = new YUKA.Time();
 
+// ---- Last explosion position — passed to the next spawned drone ----
+// null means no explosion has happened yet (or next drone has already consumed it)
+let _pendingInvestigatePos = null;   // { x, y, z }
+
 // ---- Shared materials (compiled once, reused across all drones) ----
 let _rotorMat = null;
 let _detMat   = null;
@@ -45,12 +56,9 @@ function _getDetMat() {
 }
 
 // ---- Module-level scratch objects for canSeePlayer (never reallocated) ----
-const _seeRay    = new BABYLON.Ray(BABYLON.Vector3.Zero(), BABYLON.Vector3.Forward(), 1);
+const _seeRay     = new BABYLON.Ray(BABYLON.Vector3.Zero(), BABYLON.Vector3.Forward(), 1);
 const _seeScratch = new BABYLON.Vector3();
-const _rayPred   = m => raycastMeshes.includes(m);
-
-// ---- White flash colour (shared, never reallocated) ----
-const _WHITE = new BABYLON.Color3(1, 1, 1);
+const _rayPred    = m => raycastMeshes.includes(m);
 
 export function addWaypoint(x, y, z) {
   flightWaypoints.push(new YUKA.Vector3(x, y, z));
@@ -59,7 +67,10 @@ export function addWaypoint(x, y, z) {
 // ============================================================
 //  Spawn
 // ============================================================
-export function spawnDrone() {
+
+// playerSpawnPos: optional {x,y,z} — passed by main.js after the player
+// has actually landed so drone #1 knows where to fly to.
+export function spawnDrone(playerSpawnPos) {
   if (!physicsReady) return;
 
   const R     = window.RAPIER;
@@ -71,7 +82,6 @@ export function spawnDrone() {
   group.position.set(ox, oy, oz);
   group.rotationQuaternion = new BABYLON.Quaternion();
 
-  // Body — unique material per drone (color varies)
   const bodyMat = new BABYLON.PBRMaterial(`bodyMat_${droneCount}`, scene);
   bodyMat.albedoColor   = color;
   bodyMat.emissiveColor = color.scale(0.6);
@@ -80,20 +90,18 @@ export function spawnDrone() {
   bodyMesh.material = bodyMat;
   bodyMesh.parent   = group;
 
-  // Rotors — shared material
-  const rotorMat  = _getRotorMat();
+  const rotorMat    = _getRotorMat();
   const rotorMeshes = [];
   for (const [rx, ry, rz] of [[-0.8, 0.15, -0.8], [0.8, 0.15, -0.8], [-0.8, 0.15, 0.8], [0.8, 0.15, 0.8]]) {
     const r = BABYLON.MeshBuilder.CreateCylinder('dr', { diameter: 0.6, height: 0.05 }, scene);
     r.material = rotorMat;
     r.position.set(rx, ry, rz);
     r.parent = group;
-    rotorMeshes.push(r);   // ← cached reference, never call getChildMeshes() in tick
+    rotorMeshes.push(r);
   }
 
-  // Detonator — shared material
   const detMesh = BABYLON.MeshBuilder.CreateCylinder('det', { diameter: 0.24, height: 0.5 }, scene);
-  detMesh.material          = _getDetMat();
+  detMesh.material           = _getDetMat();
   detMesh.rotationQuaternion = BABYLON.Quaternion.RotationAxis(new BABYLON.Vector3(1, 0, 0), Math.PI / 2);
   detMesh.position.set(0, 0, 0.9);
   detMesh.parent = group;
@@ -113,17 +121,50 @@ export function spawnDrone() {
   vehicle.position.set(ox, oy, oz);
   yukaManager.add(vehicle);
 
-  // ---- Per-drone scratch vectors (pre-allocated, reused in closures) ----
-  const vel       = new BABYLON.Vector3(1, 0, 0);
-  const pos       = new BABYLON.Vector3(ox, oy, oz);
-  const _velScale = new BABYLON.Vector3();   // scratch for vel*dt without alloc
+  // ---- Per-drone scratch vectors ----
+  const vel = new BABYLON.Vector3(1, 0, 0);
+  const pos = new BABYLON.Vector3(ox, oy, oz);
 
-  const heightOff   = (droneCount % 5) * 1.2 - 2.4;
-  let   droneState  = 'rising';
+  const heightOff    = (droneCount % 5) * 1.2 - 2.4;
   let   huntCooldown = 0;
-  let   wpIndex     = Math.floor(Math.random() * Math.max(1, flightWaypoints.length));
+  let   wpIndex      = Math.floor(Math.random() * Math.max(1, flightWaypoints.length));
 
-  // ---- canSeePlayer — reuses module-level Ray + scratch, no allocation ----
+  // ---- Determine initial state for this drone ----
+  // Drone #1 (droneCount === 0 before increment): sky patrol above spawn
+  // Any drone spawned after an explosion: investigate that position first
+  // All others: normal rising → patrol
+  const isFirstDrone      = droneCount === 0;
+  const investigateTarget = !isFirstDrone ? _pendingInvestigatePos : null;
+  if (investigateTarget) _pendingInvestigatePos = null;   // consume it
+
+  // Sky patrol orbit state (first drone only)
+  let   skyOrbitAngle  = 0;
+  let   skyTotalAngle  = 0;   // accumulated — lap count = skyTotalAngle / (2π)
+  // Orbit centre — use the explicitly passed spawn position if available,
+  // otherwise fall back to camera position at the moment we reach SKY_H.
+  let   skyOrbitCX     = playerSpawnPos ? playerSpawnPos.x : null;
+  let   skyOrbitCZ     = playerSpawnPos ? playerSpawnPos.z : null;
+  const SKY_H          = CONFIG.skyPatrolHeight  ?? 40;
+  const SKY_R          = CONFIG.skyPatrolRadius  ?? 30;
+  const SKY_SPD        = CONFIG.skyPatrolSpeed   ?? 0.6;   // radians/sec
+  const SKY_LAPS       = CONFIG.skyPatrolLaps    ?? 2;
+  const SKY_DONE_ANGLE = Math.PI * 2 * SKY_LAPS;
+  const INV_SPD        = CONFIG.investigateSpeed ?? CONFIG.droneMaxSpeed * 1.4;
+  const INV_ARRIVE_R   = 6;
+
+  let droneState = isFirstDrone      ? 'risingToSky'
+                 : investigateTarget ? 'rising'
+                 : 'rising';
+  // First drone states: risingToSky → flyingToSky → skyPatrol → patrol
+  // Other drones:       rising → investigating (if explosion pending) → patrol
+
+  // For investigation drones we switch to 'investigating' once they finish rising
+  const _investigateAfterRise = !!investigateTarget;
+  const _investigatePos = investigateTarget
+    ? { x: investigateTarget.x, y: investigateTarget.y, z: investigateTarget.z }
+    : null;
+
+  // ---- canSeePlayer ----
   function canSeePlayer() {
     const pp = camera.globalPosition;
     _seeScratch.set(pp.x - pos.x, pp.y - pos.y, pp.z - pos.z);
@@ -138,16 +179,132 @@ export function spawnDrone() {
   }
 
   function updateMovement(dt, wallPush) {
-    if (!flightWaypoints.length) return;
 
+    // ── Sky patrol sequence (drone #1 only) ─────────────────────
+    //  Stage 1: risingToSky  — rise slowly from launch point
+    //  Stage 2: flyingToSky  — fly horizontally at SKY_H toward player
+    //  Stage 3: skyPatrol    — orbit above player for SKY_LAPS then descend
+    // ─────────────────────────────────────────────────────────────
+
+    if (droneState === 'risingToSky') {
+      // Rise at a visible speed — half of droneMaxSpeed so player can watch it climb
+      const riseSpd = CONFIG.droneMaxSpeed * 0.5;
+      pos.y += riseSpd * dt;
+      vel.set(0, riseSpd, 0);
+      if (pos.y >= SKY_H) {
+        pos.y = SKY_H;
+        // If spawn pos wasn't passed in, latch camera position now as fallback
+        if (skyOrbitCX === null) {
+          skyOrbitCX = camera.globalPosition.x;
+          skyOrbitCZ = camera.globalPosition.z;
+        }
+        droneState = 'flyingToSky';
+      }
+      _applyPos();
+      return;
+    }
+
+    if (droneState === 'flyingToSky') {
+      // Fly at SKY_H toward the player spawn position
+      const spd = CONFIG.droneMaxSpeed;
+      const dx  = skyOrbitCX - pos.x;
+      const dz  = skyOrbitCZ - pos.z;
+      const dyH = SKY_H - pos.y;
+      const hDist = Math.sqrt(dx * dx + dz * dz);
+
+      // Arrived above player — start orbiting
+      if (hDist < SKY_R * 0.5) {
+        skyOrbitAngle = Math.atan2(pos.z - skyOrbitCZ, pos.x - skyOrbitCX);
+        skyTotalAngle = 0;
+        droneState    = 'skyPatrol';
+        return;
+      }
+
+      const inv = 1 / hDist;
+      vel.x += (dx * inv * spd - vel.x) * Math.min(1, dt * 3);
+      vel.y += (dyH - vel.y) * Math.min(1, dt * 2);
+      vel.z += (dz * inv * spd - vel.z) * Math.min(1, dt * 3);
+      const s = vel.length(); if (s > spd) vel.scaleInPlace(spd / s);
+      pos.x += vel.x * dt; pos.y += vel.y * dt; pos.z += vel.z * dt;
+      if (s > 0.1) BABYLON.Quaternion.RotationYawPitchRollToRef(
+        Math.atan2(vel.x, vel.z), 0, 0, group.rotationQuaternion
+      );
+      _applyPos();
+      return;
+    }
+
+    if (droneState === 'skyPatrol') {
+      const step    = SKY_SPD * dt;
+      skyOrbitAngle += step;
+      skyTotalAngle += step;
+
+      // Target point on the orbit circle around player spawn
+      const tx  = skyOrbitCX + Math.cos(skyOrbitAngle) * SKY_R;
+      const tz  = skyOrbitCZ + Math.sin(skyOrbitAngle) * SKY_R;
+      const dx  = tx - pos.x;
+      const dz  = tz - pos.z;
+      const dyH = SKY_H - pos.y;
+      const spd = CONFIG.droneMaxSpeed;
+
+      vel.x += (dx - vel.x) * Math.min(1, dt * 4);
+      vel.y += (dyH - vel.y) * Math.min(1, dt * 3);
+      vel.z += (dz - vel.z) * Math.min(1, dt * 4);
+      const s = vel.length(); if (s > spd) vel.scaleInPlace(spd / s);
+      pos.x += vel.x * dt; pos.y += vel.y * dt; pos.z += vel.z * dt;
+      if (s > 0.1) BABYLON.Quaternion.RotationYawPitchRollToRef(
+        Math.atan2(vel.x, vel.z), 0, 0, group.rotationQuaternion
+      );
+      _applyPos();
+
+      if (skyTotalAngle >= SKY_DONE_ANGLE) {
+        droneState = 'patrol';
+        console.info('[drone#1] Sky patrol complete — joining ground patrol');
+      }
+      return;
+    }
+
+    // ── Normal rise ─────────────────────────────────────────────
     if (droneState === 'rising') {
       const dy = CONFIG.droneRiseHeight - pos.y;
       vel.set(0, dy > 0 ? CONFIG.droneMaxSpeed * 0.6 : 0, 0);
       pos.y += vel.y * dt;
-      if (pos.y >= CONFIG.droneRiseHeight) { pos.y = CONFIG.droneRiseHeight; droneState = 'patrol'; }
+      if (pos.y >= CONFIG.droneRiseHeight) {
+        pos.y = CONFIG.droneRiseHeight;
+        droneState = _investigateAfterRise ? 'investigating' : 'patrol';
+      }
       _applyPos();
       return;
     }
+
+    // ── Investigate last explosion ───────────────────────────────
+    if (droneState === 'investigating') {
+      if (!_investigatePos) { droneState = 'patrol'; return; }
+      const dx  = _investigatePos.x - pos.x;
+      const dy  = _investigatePos.y - pos.y;
+      const dz  = _investigatePos.z - pos.z;
+      const len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (len < INV_ARRIVE_R) {
+        // Arrived — hover briefly then join patrol
+        droneState = 'patrol';
+        console.info(`[drone#${drone.id}] Investigation complete`);
+        return;
+      }
+      const inv = 1 / len;
+      const trn = Math.min(1, dt * 4);
+      vel.x += (dx * inv * INV_SPD - vel.x) * trn;
+      vel.y += (dy * inv * INV_SPD - vel.y) * trn;
+      vel.z += (dz * inv * INV_SPD - vel.z) * trn;
+      const s = vel.length(); if (s > INV_SPD) vel.scaleInPlace(INV_SPD / s);
+      pos.x += vel.x * dt; pos.y += vel.y * dt; pos.z += vel.z * dt;
+      if (s > 0.1) BABYLON.Quaternion.RotationYawPitchRollToRef(Math.atan2(vel.x, vel.z), 0, 0, group.rotationQuaternion);
+      _applyPos();
+      // If player spotted during approach — switch to hunt
+      if (canSeePlayer()) { droneState = 'hunting'; huntCooldown = 6.0; }
+      return;
+    }
+
+    // ── Patrol / hunt (unchanged from original) ──────────────────
+    if (!flightWaypoints.length) return;
 
     if (droneState === 'patrol' && canSeePlayer()) { droneState = 'hunting'; huntCooldown = 4.0; }
 
@@ -164,7 +321,6 @@ export function spawnDrone() {
       vel.z += (dz * inv * spd - vel.z) * trn;
       if (wallPush) { vel.x += wallPush.x * 0.12; vel.z += wallPush.z * 0.12; }
       const s = vel.length(); if (s > spd) vel.scaleInPlace(spd / s);
-      // Manual scale-add: pos += vel * dt  (no temporary Vector3)
       pos.x += vel.x * dt; pos.y += vel.y * dt; pos.z += vel.z * dt;
       if (s > 0.1) BABYLON.Quaternion.RotationYawPitchRollToRef(Math.atan2(vel.x, vel.z), 0, 0, group.rotationQuaternion);
       _applyPos();
@@ -172,7 +328,7 @@ export function spawnDrone() {
       return;
     }
 
-    // Patrol
+    // Patrol waypoints
     const target = flightWaypoints[wpIndex % flightWaypoints.length];
     const ty     = CONFIG.droneFlightHeight + heightOff;
     const dx     = target.x - pos.x, dy = ty - pos.y, dz = target.z - pos.z;
@@ -207,8 +363,8 @@ export function spawnDrone() {
     body,
     vehicle,
     synth,
-    rotorMeshes,       // cached — used in tickDrones rotor spin
-    bodyMat,           // kept for kill flash
+    rotorMeshes,
+    bodyMat,
     dead:           false,
     id:             ++droneCount,
     hitCount:       0,
@@ -235,10 +391,12 @@ export function killDrone(drone) {
   const R   = window.RAPIER;
   const pos = drone.group.position;
 
+  // Record explosion position for the next spawned drone to investigate
+  _pendingInvestigatePos = { x: pos.x, y: pos.y, z: pos.z };
+
   playExplosion();
   spawnExplosionEffect(drone.group);
 
-  // Flash body orange — only touch body material (rotors/det are shared)
   drone.bodyMat.albedoColor.set(1, 0.53, 0);
   drone.bodyMat.emissiveColor.set(1, 0.27, 0);
 
@@ -270,16 +428,15 @@ export function killDrone(drone) {
     if (idx >= 0) drones.splice(idx, 1);
     hud.setDrones(drones.filter(d => !d.dead).length);
   }, 5000);
-//added by scott: respawn a new drone after one is killed, to keep the action going
-      setTimeout(() => {
-        spawnDrone()
-      }, 5000);
+
+  // Respawn — the new drone will pick up _pendingInvestigatePos
+  setTimeout(() => { spawnDrone(); }, 5000);
 }
 
 // ============================================================
 //  Tick
 // ============================================================
-const _rotorSpeeds = [20, 22, 18, 24];   // slight variation per rotor
+const _rotorSpeeds = [20, 22, 18, 24];
 
 export function tickDrones(dt) {
   for (const drone of drones) {
@@ -298,7 +455,6 @@ export function tickDrones(dt) {
     drone.updateMovement(dt, qr?.wallPush ?? null);
     if (drone.synth) updateDroneSpatial(drone.synth, drone.group.position);
 
-    // Spin rotors using cached refs — no getChildMeshes() allocation
     for (let i = 0; i < drone.rotorMeshes.length; i++) {
       drone.rotorMeshes[i].rotation.y += dt * _rotorSpeeds[i] * (1 + drone.id * 0.15);
     }
@@ -307,7 +463,7 @@ export function tickDrones(dt) {
   }
 }
 
-// ---- Detonator collision (no new allocations) ----
+// ---- Detonator collision ----
 function _checkDetonatorCollision(drone) {
   if (!player.rigidBody) return;
   const detWorld = drone.detonatorMesh.getAbsolutePosition();

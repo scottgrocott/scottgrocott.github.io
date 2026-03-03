@@ -8,11 +8,24 @@ export const LADDER_TEX  = 'https://scottgrocott.github.io/metal_throne/assets/i
 
 export const CONFIG = {
   launchPoint:       { x: -13, y: 2, z: 2.8 },
-  droneRiseHeight:   8,
-  droneMaxSpeed:     5,
+  droneRiseHeight:   200,
+  droneMaxSpeed:     10,
   dronePathRadius:   4.0,
   droneFlightHeight: 2.5,
   freeFlyCamSpeed:   20,
+
+  // ---- First-drone sky patrol --------------------------------
+  // Drone #1 rises to this height and orbits the launch point
+  // before descending to join the normal ground patrol.
+  skyPatrolHeight:   40,    // metres above world origin
+  skyPatrolRadius:   30,    // orbit radius around launch point
+  skyPatrolSpeed:    20,   // radians per second (orbit angular velocity)
+  skyPatrolLaps:     2,     // full 360° orbits before joining ground patrol
+
+  // ---- Investigation -----------------------------------------
+  // Speed at which a respawned drone flies to the last explosion site.
+  // Set higher than droneMaxSpeed for a sense of urgency.
+  investigateSpeed:  8,
 
   sheetGrids: {
     sheet_rocks:  { cols: 4, rows: 2 },

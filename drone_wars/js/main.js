@@ -2,7 +2,7 @@
 //  main.js — Boot sequence and main game loop
 // ============================================================
 
-import { engine, scene }                    from './core.js';
+import { engine, scene, camera }             from './core.js';
 import { SCENE_JSON, GROUND_TEX, CONFIG }   from './config.js';
 import { initPhysics, stepPhysics, syncPhysicsReads, queryPhysics } from './physics.js';
 import { registerShootCallback, registerFreeCamCallback, registerSpawnDroneCallback } from './input.js';
@@ -21,9 +21,9 @@ import { pollGamepad, releaseGamepadAxes,
          registerGamepadShootCallback,
          registerGamepadFreeCamCallback,
          registerGamepadSpawnDroneCallback } from './gamepad.js';
-import { scanFlatAreas }                    from './flatnav.js';
+import { scanFlatAreas, getTerrainMaxY }     from './flatnav.js';
 import { buildTerrainNodeMaterial,
-         applyTerrainNodeMaterial }         from './terrainmaterial.js';
+         applyTerrainNodeMaterial }         from './terrainMaterial.js';
 
 // ---- Register input callbacks ----
 registerShootCallback(shootBullet);
@@ -185,25 +185,35 @@ async function _startGame() {
     setTimeout(() => overlay.remove(), 420);
   }
 
-  // ── Do all user-gesture-gated work HERE, before the drop ──
+  hud.hideLoading();
 
-  // 1. Audio context — must be created/resumed on a user gesture
+  // Drop player — dropOnRandomPeak teleports the physics body to a peak
+  dropOnRandomPeak(_terrainMeshes);
+
+  // Audio on user gesture
   try { await initAudio(); } catch (_) {}
 
-  // 2. Pointer lock — also needs a gesture; requesting it now means
-  //    the browser handles the permission prompt before the drop,
-  //    not during the first physics frame.
-  try {
-    await document.body.requestPointerLock?.();
-  } catch (_) {}
+  // Wait for the player to physically land before spawning drone #1.
+  // dropOnRandomPeak puts the player in freefall — we poll until vertical
+  // velocity is near zero and Y has stabilised, then read the landed position.
+  await _waitForPlayerToLand();
 
-  // 3. One extra frame — lets the browser settle the pointer lock
-  //    grant and any pending microtasks before physics starts moving
-  await sleep(150);
+  const landedPos = {
+    x: player.rigidBody?.translation().x ?? camera.globalPosition.x,
+    y: player.rigidBody?.translation().y ?? camera.globalPosition.y,
+    z: player.rigidBody?.translation().z ?? camera.globalPosition.z,
+  };
 
-  // 4. Now hide the HUD and drop — world is truly ready
-  hud.hideLoading();
-  dropOnRandomPeak(_terrainMeshes);
+  // Set sky patrol height to just above the highest terrain point so the
+  // drone clears every peak on its way to the player. Add 20m headroom.
+  const terrainTop = getTerrainMaxY();
+  if (terrainTop > 0) {
+    CONFIG.skyPatrolHeight = terrainTop + 20;
+    console.info(`[main] skyPatrolHeight set to ${CONFIG.skyPatrolHeight.toFixed(1)} (terrain top: ${terrainTop.toFixed(1)})`);
+  }
+
+  console.info(`[main] Player landed at (${landedPos.x.toFixed(1)}, ${landedPos.y.toFixed(1)}, ${landedPos.z.toFixed(1)}) — spawning drone`);
+  spawnDrone(landedPos);
 }
 
 // ---- Game loop ----
@@ -257,6 +267,21 @@ async function _waitForTerrain(timeoutMs = 15_000) {
     await sleep(100);
   }
   await sleep(50);
+}
+
+/** Poll until the player's rigid body has landed (vertical velocity near zero). */
+async function _waitForPlayerToLand(timeoutMs = 8000) {
+  const start = performance.now();
+  // First wait a minimum time for physics to kick in after the teleport
+  await sleep(400);
+  while (performance.now() - start < timeoutMs) {
+    try {
+      const vel = player.rigidBody?.linvel();
+      if (vel && Math.abs(vel.y) < 0.5) return;   // settled
+    } catch (_) {}
+    await sleep(100);
+  }
+  console.warn('[main] Timed out waiting for player to land — spawning drone anyway');
 }
 
 boot();
