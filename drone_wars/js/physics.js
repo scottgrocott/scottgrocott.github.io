@@ -4,29 +4,50 @@
 
 import { scene } from './core.js';
 
-export let physicsWorld     = null;
-export let physicsReady     = false;
-let       physicsAccumulator = 0;
-const     PHYSICS_DT         = 1 / 60;
+export let physicsWorld      = null;
+export let physicsReady      = false;
+let        physicsAccumulator = 0;
+const      PHYSICS_DT         = 1 / 60;
 
-export const raycastMeshes = [];
+// Use a Set for O(1) raycast predicate lookups (was Array.includes = O(n))
+const _raycastSet = new Set();
+export const raycastMeshes = new Proxy(_raycastSet, {
+  // Allow callers to still do raycastMeshes.push(m) and raycastMeshes.includes(m)
+  get(target, prop) {
+    if (prop === 'push')     return m => target.add(m);
+    if (prop === 'includes') return m => target.has(m);
+    if (prop === 'length')   return target.size;
+    if (prop === Symbol.iterator) return () => target[Symbol.iterator]();
+    return typeof target[prop] === 'function' ? target[prop].bind(target) : target[prop];
+  },
+});
 
-// Per-frame cache written by syncPhysicsReads(), consumed by game systems
 export const physCache = {
   playerPos:  { x: 0, y: 0, z: 0 },
   playerVel:  { x: 0, y: 0, z: 0 },
   deadDrones: {},
 };
 
-// Per-frame ray-query results written by queryPhysics(), keyed by drone.id
 export let rayQueryResults = {};
 
-// ---- Wall-avoidance ray directions (8 cardinal/diagonal) ----
+// ---- Wall-avoidance ray directions (pre-allocated, never recreated) ----
 const WALL_SENSE_DIST = 5.0;
 const WALL_AVOID_DIRS = Array.from({ length: 8 }, (_, i) => {
   const a = (i / 8) * Math.PI * 2;
   return new BABYLON.Vector3(Math.cos(a), 0, Math.sin(a)).normalize();
 });
+
+// Pre-allocated Ray objects — one per wall-sense direction, reused every frame
+const _wallRays = WALL_AVOID_DIRS.map(
+  dir => new BABYLON.Ray(BABYLON.Vector3.Zero(), dir, WALL_SENSE_DIST)
+);
+// One reusable Ray for detonator checks
+const _detRay   = new BABYLON.Ray(BABYLON.Vector3.Zero(), BABYLON.Vector3.Forward(), 0.5);
+// Scratch vectors to avoid per-frame allocations in queryPhysics
+const _fwdScratch = new BABYLON.Vector3();
+
+// Predicate function reference — stable, not recreated each call
+const _rayPredicate = m => _raycastSet.has(m);
 
 // ---- Public API ----
 
@@ -41,7 +62,6 @@ export async function initPhysics() {
     R.RigidBodyDesc.fixed().setTranslation(0, -0.5, 0),
   );
   physicsWorld.createCollider(R.ColliderDesc.cuboid(5000, 0.5, 5000), groundBody);
-
   physicsReady = true;
 }
 
@@ -54,12 +74,6 @@ export function stepPhysics(dt) {
   }
 }
 
-/**
- * syncPhysicsReads — snapshot Rapier state into physCache once per frame
- * so that render-thread code never stalls on repeated Rapier calls.
- * @param {object} player
- * @param {Array}  drones
- */
 export function syncPhysicsReads(player, drones) {
   if (!physicsReady) return;
 
@@ -70,15 +84,18 @@ export function syncPhysicsReads(player, drones) {
       physCache.playerPos.x = p.x; physCache.playerPos.y = p.y; physCache.playerPos.z = p.z;
       physCache.playerVel.x = v.x; physCache.playerVel.y = v.y; physCache.playerVel.z = v.z;
     }
-  } catch (_) { /* Rapier may throw if body is removed mid-frame */ }
+  } catch (_) {}
 
-  physCache.deadDrones = {};
+  // Reuse the existing deadDrones object — clear properties instead of reallocating
+  const dd = physCache.deadDrones;
+  for (const k in dd) delete dd[k];
+
   for (const d of drones) {
     if (!d.dead || !d.body) continue;
     try {
       const p = d.body.translation();
       const r = d.body.rotation();
-      physCache.deadDrones[d.id] = {
+      dd[d.id] = {
         pos: { x: p.x, y: p.y, z: p.z },
         rot: { x: r.x, y: r.y, z: r.z, w: r.w },
       };
@@ -86,17 +103,13 @@ export function syncPhysicsReads(player, drones) {
   }
 }
 
-/**
- * queryPhysics — run scene ray-casts for wall avoidance & detonator checks.
- * Results stored in rayQueryResults, keyed by drone.id.
- * @param {object} player
- * @param {Array}  drones
- */
 export function queryPhysics(player, drones) {
-  rayQueryResults = {};
-  player.isGrounded = physCache.playerPos.y <= 1.6 + 0.25; // PLAYER.height + margin
+  // Clear by deleting keys — no new object allocation
+  const rqr = rayQueryResults;
+  for (const k in rqr) delete rqr[k];
 
-  if (!raycastMeshes.length) return;
+  player.isGrounded = physCache.playerPos.y <= 1.6 + 0.25;
+  if (!_raycastSet.size) return;
 
   for (const drone of drones) {
     if (drone.dead) continue;
@@ -104,28 +117,32 @@ export function queryPhysics(player, drones) {
     const pos    = drone.group.position;
     const result = { wallPush: { x: 0, z: 0 }, detonatorHit: false };
 
-    for (const dir of WALL_AVOID_DIRS) {
-      const ray = new BABYLON.Ray(pos, dir, WALL_SENSE_DIST);
-      const hit = scene.pickWithRay(ray, m => raycastMeshes.includes(m));
+    // Reuse pre-allocated Ray objects — just update origin each frame
+    for (let i = 0; i < _wallRays.length; i++) {
+      _wallRays[i].origin.copyFrom(pos);
+      const hit = scene.pickWithRay(_wallRays[i], _rayPredicate);
       if (hit?.hit) {
         const strength = (1 - hit.distance / WALL_SENSE_DIST) * 6;
-        result.wallPush.x -= dir.x * strength;
-        result.wallPush.z -= dir.z * strength;
+        result.wallPush.x -= WALL_AVOID_DIRS[i].x * strength;
+        result.wallPush.z -= WALL_AVOID_DIRS[i].z * strength;
       }
     }
 
     if (drone.detonatorArmed) {
       const detWorld = drone.detonatorMesh.getAbsolutePosition();
-      const fwd      = new BABYLON.Vector3(0, 0, 1);
-      fwd.rotateByQuaternionToRef(drone.group.rotationQuaternion, fwd);
-      const ray = new BABYLON.Ray(detWorld, fwd.normalize(), 0.5);
-      const hit = scene.pickWithRay(ray, m => raycastMeshes.includes(m));
+      // Rotate forward vector into drone's local space — reuse scratch vector
+      _fwdScratch.set(0, 0, 1);
+      _fwdScratch.rotateByQuaternionToRef(drone.group.rotationQuaternion, _fwdScratch);
+      _fwdScratch.normalizeToRef(_fwdScratch);
+      // Reuse pre-allocated det ray
+      _detRay.origin.copyFrom(detWorld);
+      _detRay.direction.copyFrom(_fwdScratch);
+      const hit = scene.pickWithRay(_detRay, _rayPredicate);
       if (hit?.hit) result.detonatorHit = true;
     }
 
-    rayQueryResults[drone.id] = result;
+    rqr[drone.id] = result;
   }
 }
 
-// ---- Helpers ----
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
