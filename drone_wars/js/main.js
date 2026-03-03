@@ -21,6 +21,9 @@ import { pollGamepad, releaseGamepadAxes,
          registerGamepadShootCallback,
          registerGamepadFreeCamCallback,
          registerGamepadSpawnDroneCallback } from './gamepad.js';
+import { scanFlatAreas, showFlatNavDebug }  from './flatnav.js';
+import { buildTerrainNodeMaterial,
+         applyTerrainNodeMaterial }         from './terrainMaterial.js';
 
 // ---- Register input callbacks (breaks circular deps) ----
 registerShootCallback(shootBullet);
@@ -71,9 +74,25 @@ async function loadScene() {
       .forEach(([wx, wy, wz]) => addWaypoint(wx, wy, wz));
   });
 
-  loadBuildings(data, subMeshes => {
-    // Called when terrain finishes loading
+  loadBuildings(data, async subMeshes => {
     _terrainMeshes = subMeshes;
+
+    // ── a) Rocky-dirt slope-aware node material ───────────────
+    try {
+      const terrainMat = await buildTerrainNodeMaterial();
+      applyTerrainNodeMaterial(terrainMat, subMeshes);
+    } catch (e) {
+      console.warn('[main] Node material failed, keeping default terrain mat:', e);
+    }
+
+    // ── b) Flat-area drone nav-mesh (non-blocking async scan) ─
+    scanFlatAreas(subMeshes).then(count => {
+      console.info(`[main] flatnav: ${count} terrain waypoints added`);
+    }).catch(e => {
+      console.warn('[main] flatnav scan failed:', e);
+    });
+
+    // ── c) Sprite scatter (unchanged) ────────────────────────
     setTimeout(async () => {
       await _spriteLoadPromise;
       scatterProps(_sceneData, subMeshes);
@@ -102,7 +121,7 @@ engine.runRenderLoop(() => {
   tickBullets(dt);
   tickBillboards();
   tickExplosions(dt);
-  tickSoundtrack(playerRig.position, dt);  // contextual music zone update
+  tickSoundtrack(playerRig.position, dt);
 
   releaseGamepadAxes();   // clear axis-driven booleans after tick
 
@@ -115,20 +134,15 @@ async function boot() {
   initLadders();
   await loadScene();
 
-  // Wait for terrain GLB to finish loading so world matrices are ready for ray-casts.
-  // loadBuildings fires onTerrainReady synchronously inside the ImportMeshAsync .then(),
-  // so we poll _terrainMeshes with a short back-off rather than adding another promise chain.
   await _waitForTerrain();
 
   await sleep(100);
   initPlayer();
 
-  // Scan terrain and freefall onto a random mountain peak
   dropOnRandomPeak(_terrainMeshes);
 
   hud.hideLoading();
 
-  // Audio must be started on a user gesture
   let audioStarted = false;
   const startAudio = async () => {
     if (audioStarted) return;
@@ -141,7 +155,6 @@ async function boot() {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-/** Poll until the terrain GLB has loaded (onTerrainReady populated _terrainMeshes). */
 async function _waitForTerrain(timeoutMs = 15_000) {
   const start = performance.now();
   while (!_terrainMeshes.length) {
@@ -151,7 +164,6 @@ async function _waitForTerrain(timeoutMs = 15_000) {
     }
     await sleep(100);
   }
-  // One extra frame to let Babylon finalise world matrices after the mesh is added
   await sleep(50);
 }
 
