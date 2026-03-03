@@ -128,6 +128,8 @@ export function spawnDrone(playerSpawnPos) {
   const heightOff    = (droneCount % 5) * 1.2 - 2.4;
   let   huntCooldown = 0;
   let   wpIndex      = Math.floor(Math.random() * Math.max(1, flightWaypoints.length));
+  let   _stuckTimer     = 0;
+  let   _preEscapeState = null;
 
   // ---- Determine initial state for this drone ----
   // Drone #1 (droneCount === 0 before increment): sky patrol above spawn
@@ -178,7 +180,43 @@ export function spawnDrone(playerSpawnPos) {
     return !hit.hit;
   }
 
-  function updateMovement(dt, wallPush) {
+  function updateMovement(dt, wallPush, groundY, wallHitCount) {
+
+    // ── Stuck detection — climb escape ───────────────────────────
+    if (droneState === 'climbEscape') {
+      const targetY  = (CONFIG.skyPatrolHeight ?? 80);
+      const climbSpd = CONFIG.droneMaxSpeed * 3;
+      pos.y += climbSpd * dt;
+      vel.x *= 0.7;
+      vel.z *= 0.7;
+      vel.y  = climbSpd;
+      pos.x += vel.x * dt;
+      pos.z += vel.z * dt;
+      _applyPos();
+      // Only exit once we've fully cleared the highest terrain point
+      if (pos.y >= targetY) {
+        pos.y       = targetY;
+        droneState  = _preEscapeState ?? 'patrol';
+        _stuckTimer = 0;
+        console.info(`[drone] Climb escape complete at Y=${targetY} — resuming ${droneState}`);
+      }
+      return;
+    }
+
+    // Only check for new stuck condition when NOT already escaping
+    if (droneState !== 'risingToSky' && droneState !== 'flyingToSky') {
+      if ((wallHitCount ?? 0) >= 3) {
+        _stuckTimer += dt;
+        if (_stuckTimer > 0.4) {
+          _preEscapeState = droneState;
+          droneState      = 'climbEscape';
+          _stuckTimer     = 0;
+          console.info(`[drone] Stuck detected — climbing escape`);
+        }
+      } else {
+        _stuckTimer = Math.max(0, _stuckTimer - dt * 2);
+      }
+    }
 
     // ── Sky patrol sequence (drone #1 only) ─────────────────────
     //  Stage 1: risingToSky  — rise slowly from launch point
@@ -193,13 +231,13 @@ export function spawnDrone(playerSpawnPos) {
       vel.set(0, riseSpd, 0);
       if (pos.y >= SKY_H) {
         pos.y = SKY_H;
-        // If spawn pos wasn't passed in, latch camera position now as fallback
         if (skyOrbitCX === null) {
           skyOrbitCX = camera.globalPosition.x;
           skyOrbitCZ = camera.globalPosition.z;
         }
         droneState = 'flyingToSky';
       }
+      // No terrain avoidance during sky rise — we want to go straight up
       _applyPos();
       return;
     }
@@ -229,6 +267,8 @@ export function spawnDrone(playerSpawnPos) {
       if (s > 0.1) BABYLON.Quaternion.RotationYawPitchRollToRef(
         Math.atan2(vel.x, vel.z), 0, 0, group.rotationQuaternion
       );
+      // Terrain avoidance while flying to player at height
+      _applyTerrainAvoidance(groundY);
       _applyPos();
       return;
     }
@@ -254,6 +294,7 @@ export function spawnDrone(playerSpawnPos) {
       if (s > 0.1) BABYLON.Quaternion.RotationYawPitchRollToRef(
         Math.atan2(vel.x, vel.z), 0, 0, group.rotationQuaternion
       );
+      _applyTerrainAvoidance(groundY);
       _applyPos();
 
       if (skyTotalAngle >= SKY_DONE_ANGLE) {
@@ -297,6 +338,7 @@ export function spawnDrone(playerSpawnPos) {
       const s = vel.length(); if (s > INV_SPD) vel.scaleInPlace(INV_SPD / s);
       pos.x += vel.x * dt; pos.y += vel.y * dt; pos.z += vel.z * dt;
       if (s > 0.1) BABYLON.Quaternion.RotationYawPitchRollToRef(Math.atan2(vel.x, vel.z), 0, 0, group.rotationQuaternion);
+      _applyTerrainAvoidance(groundY);
       _applyPos();
       // If player spotted during approach — switch to hunt
       if (canSeePlayer()) { droneState = 'hunting'; huntCooldown = 6.0; }
@@ -323,6 +365,7 @@ export function spawnDrone(playerSpawnPos) {
       const s = vel.length(); if (s > spd) vel.scaleInPlace(spd / s);
       pos.x += vel.x * dt; pos.y += vel.y * dt; pos.z += vel.z * dt;
       if (s > 0.1) BABYLON.Quaternion.RotationYawPitchRollToRef(Math.atan2(vel.x, vel.z), 0, 0, group.rotationQuaternion);
+      _applyTerrainAvoidance(groundY);
       _applyPos();
       if (huntCooldown <= 0 && !canSeePlayer()) droneState = 'patrol';
       return;
@@ -346,7 +389,28 @@ export function spawnDrone(playerSpawnPos) {
     const s = vel.length(); if (s > spd) vel.scaleInPlace(spd / s);
     pos.x += vel.x * dt; pos.y += vel.y * dt; pos.z += vel.z * dt;
     if (s > 0.1) BABYLON.Quaternion.RotationYawPitchRollToRef(Math.atan2(vel.x, vel.z), 0, 0, group.rotationQuaternion);
+    _applyTerrainAvoidance(groundY);
     _applyPos();
+  }
+
+  // Minimum metres the drone must stay above the terrain surface.
+  // Applied every frame regardless of state so the drone never clips.
+  const MIN_CLEARANCE     = 4.0;   // soft floor — start pushing up here
+  const HARD_CLEARANCE    = 2.0;   // hard floor — teleport up if somehow below
+  const TERRAIN_PUSH_SPD  = CONFIG.droneMaxSpeed * 2.5;
+
+  function _applyTerrainAvoidance(groundY) {
+    if (groundY === null || groundY === undefined) return;
+    const clearance = pos.y - groundY;
+    if (clearance < HARD_CLEARANCE) {
+      // Hard correction — drone has clipped into terrain, snap it out immediately
+      pos.y = groundY + HARD_CLEARANCE;
+      if (vel.y < 0) vel.y = 0;
+    } else if (clearance < MIN_CLEARANCE) {
+      // Soft push — ramp up upward velocity proportional to how close we are
+      const urgency = 1 - (clearance / MIN_CLEARANCE);   // 0 at MIN_CLEARANCE, 1 at surface
+      vel.y = Math.max(vel.y, urgency * TERRAIN_PUSH_SPD);
+    }
   }
 
   function _applyPos() {
@@ -452,7 +516,7 @@ export function tickDrones(dt) {
     }
 
     const qr = rayQueryResults[drone.id];
-    drone.updateMovement(dt, qr?.wallPush ?? null);
+    drone.updateMovement(dt, qr?.wallPush ?? null, qr?.groundY ?? null, qr?.wallHitCount ?? 0);
     if (drone.synth) updateDroneSpatial(drone.synth, drone.group.position);
 
     for (let i = 0; i < drone.rotorMeshes.length; i++) {

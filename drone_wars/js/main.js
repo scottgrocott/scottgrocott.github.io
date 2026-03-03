@@ -22,6 +22,7 @@ import { pollGamepad, releaseGamepadAxes,
          registerGamepadFreeCamCallback,
          registerGamepadSpawnDroneCallback } from './gamepad.js';
 import { scanFlatAreas, getTerrainMaxY }     from './flatnav.js';
+import { initMinimap, tickMinimap }          from './minimap.js';
 import { buildTerrainNodeMaterial,
          applyTerrainNodeMaterial }         from './terrainmaterial.js';
 
@@ -102,11 +103,16 @@ async function loadScene() {
       _setLoadingStatus('Scattering world…');
       await scatterProps(_sceneData, subMeshes);
 
-      // 4. Settling pause — gives the GPU time to upload all the new
-      //    thin-instance matrix buffers before we hand control to the player.
-      //    Without this the first few frames after drop stutter badly.
+      // 4. Settling pause
       _setLoadingStatus('Almost ready…');
       await sleep(800);
+
+      // 5. Init minimap — terrain bounds come from the bounding box we already computed
+      try {
+        const mmBounds = _terrainBounds(subMeshes);
+        mmBounds.maxY = getTerrainMaxY();
+        initMinimap(mmBounds, subMeshes);
+      } catch (e) { console.warn('[main] Minimap init failed:', e); }
 
       console.info('[main] World ready — showing Play button');
       _showPlayButton();
@@ -238,6 +244,10 @@ engine.runRenderLoop(() => {
   tickBillboards();
   tickExplosions(dt);
   tickSoundtrack(playerRig.position, dt);
+  tickMinimap(
+    player.rigidBody ? player.rigidBody.translation() : null,
+    drones,
+  );
 
   releaseGamepadAxes();
 
@@ -267,6 +277,19 @@ async function _waitForTerrain(timeoutMs = 15_000) {
     await sleep(100);
   }
   await sleep(50);
+}
+
+/** Compute world bounding box from terrain sub-meshes. */
+function _terrainBounds(terrainMeshes) {
+  const min = new BABYLON.Vector3( Infinity,  Infinity,  Infinity);
+  const max = new BABYLON.Vector3(-Infinity, -Infinity, -Infinity);
+  for (const m of terrainMeshes) {
+    m.computeWorldMatrix(true);
+    const bb = m.getBoundingInfo().boundingBox;
+    min.minimizeInPlace(bb.minimumWorld);
+    max.maximizeInPlace(bb.maximumWorld);
+  }
+  return { minX: min.x, maxX: max.x, minZ: min.z, maxZ: max.z, minY: min.y, maxY: max.y };
 }
 
 /** Poll until the player's rigid body has landed (vertical velocity near zero). */

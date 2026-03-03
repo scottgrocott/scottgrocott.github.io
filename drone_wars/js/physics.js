@@ -12,7 +12,6 @@ const      PHYSICS_DT         = 1 / 60;
 // Use a Set for O(1) raycast predicate lookups (was Array.includes = O(n))
 const _raycastSet = new Set();
 export const raycastMeshes = new Proxy(_raycastSet, {
-  // Allow callers to still do raycastMeshes.push(m) and raycastMeshes.includes(m)
   get(target, prop) {
     if (prop === 'push')     return m => target.add(m);
     if (prop === 'includes') return m => target.has(m);
@@ -41,8 +40,14 @@ const WALL_AVOID_DIRS = Array.from({ length: 8 }, (_, i) => {
 const _wallRays = WALL_AVOID_DIRS.map(
   dir => new BABYLON.Ray(BABYLON.Vector3.Zero(), dir, WALL_SENSE_DIST)
 );
+
+// Pre-allocated downward ray for terrain ground sensing (one, reused per drone)
+const GROUND_SENSE_DIST = 35;
+const _groundRayDir = new BABYLON.Vector3(0, -1, 0);
+const _groundRay    = new BABYLON.Ray(BABYLON.Vector3.Zero(), _groundRayDir, GROUND_SENSE_DIST);
+
 // One reusable Ray for detonator checks
-const _detRay   = new BABYLON.Ray(BABYLON.Vector3.Zero(), BABYLON.Vector3.Forward(), 0.5);
+const _detRay     = new BABYLON.Ray(BABYLON.Vector3.Zero(), BABYLON.Vector3.Forward(), 0.5);
 // Scratch vectors to avoid per-frame allocations in queryPhysics
 const _fwdScratch = new BABYLON.Vector3();
 
@@ -86,7 +91,6 @@ export function syncPhysicsReads(player, drones) {
     }
   } catch (_) {}
 
-  // Reuse the existing deadDrones object — clear properties instead of reallocating
   const dd = physCache.deadDrones;
   for (const k in dd) delete dd[k];
 
@@ -104,7 +108,6 @@ export function syncPhysicsReads(player, drones) {
 }
 
 export function queryPhysics(player, drones) {
-  // Clear by deleting keys — no new object allocation
   const rqr = rayQueryResults;
   for (const k in rqr) delete rqr[k];
 
@@ -115,9 +118,9 @@ export function queryPhysics(player, drones) {
     if (drone.dead) continue;
 
     const pos    = drone.group.position;
-    const result = { wallPush: { x: 0, z: 0 }, detonatorHit: false };
+    const result = { wallPush: { x: 0, z: 0 }, wallHitCount: 0, detonatorHit: false, groundY: null };
 
-    // Reuse pre-allocated Ray objects — just update origin each frame
+    // ---- Horizontal wall avoidance ----
     for (let i = 0; i < _wallRays.length; i++) {
       _wallRays[i].origin.copyFrom(pos);
       const hit = scene.pickWithRay(_wallRays[i], _rayPredicate);
@@ -125,16 +128,23 @@ export function queryPhysics(player, drones) {
         const strength = (1 - hit.distance / WALL_SENSE_DIST) * 6;
         result.wallPush.x -= WALL_AVOID_DIRS[i].x * strength;
         result.wallPush.z -= WALL_AVOID_DIRS[i].z * strength;
+        result.wallHitCount++;
       }
     }
 
+    // ---- Downward ground ray — terrain height below drone ----
+    _groundRay.origin.copyFrom(pos);
+    const groundHit = scene.pickWithRay(_groundRay, _rayPredicate);
+    if (groundHit?.hit) {
+      result.groundY = groundHit.pickedPoint.y;
+    }
+
+    // ---- Detonator forward ray ----
     if (drone.detonatorArmed) {
       const detWorld = drone.detonatorMesh.getAbsolutePosition();
-      // Rotate forward vector into drone's local space — reuse scratch vector
       _fwdScratch.set(0, 0, 1);
       _fwdScratch.rotateByQuaternionToRef(drone.group.rotationQuaternion, _fwdScratch);
       _fwdScratch.normalizeToRef(_fwdScratch);
-      // Reuse pre-allocated det ray
       _detRay.origin.copyFrom(detWorld);
       _detRay.direction.copyFrom(_fwdScratch);
       const hit = scene.pickWithRay(_detRay, _rayPredicate);
