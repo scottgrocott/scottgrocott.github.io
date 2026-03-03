@@ -23,7 +23,7 @@ import { pollGamepad, releaseGamepadAxes,
          registerGamepadSpawnDroneCallback } from './gamepad.js';
 import { scanFlatAreas, showFlatNavDebug }  from './flatnav.js';
 import { buildTerrainNodeMaterial,
-         applyTerrainNodeMaterial }         from './terrainMaterial.js';
+         applyTerrainNodeMaterial }         from './terrainmaterial.js';
 
 // ---- Register input callbacks (breaks circular deps) ----
 registerShootCallback(shootBullet);
