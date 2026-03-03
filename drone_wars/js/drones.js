@@ -270,6 +270,10 @@ export function killDrone(drone) {
     if (idx >= 0) drones.splice(idx, 1);
     hud.setDrones(drones.filter(d => !d.dead).length);
   }, 5000);
+//added by scott: respawn a new drone after one is killed, to keep the action going
+      setTimeout(() => {
+        spawnDrone()
+      }, 5000);
 }
 
 // ============================================================
