@@ -61,7 +61,7 @@ export async function initPhysics() {
   await window.RAPIER.init();
 
   const R = window.RAPIER;
-  physicsWorld = new R.World({ x: 0, y: -9.81, z: 0 });
+  physicsWorld = new R.World({ x: 0, y: -20.81, z: 0 });
 
   const groundBody = physicsWorld.createRigidBody(
     R.RigidBodyDesc.fixed().setTranslation(0, -0.5, 0),
