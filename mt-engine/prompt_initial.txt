@@ -1,0 +1,604 @@
+# Warzone Engine — Full Build Prompt v2
+
+## Origin
+
+This specification is derived from a beta production application called **Drone Wars** — a working first-person browser game built with BabylonJS, Rapier, YUKA, and ToneJS. Every architectural decision, every named pitfall, and every module boundary in this document was validated in that working codebase. You are not starting from scratch — you are building a clean, generalized version of a proven system.
+
+The goal is a **browser-based game editor and engine shell** capable of loading, editing, and saving complete BabylonJS game configurations as JSON. The editor is always built-in and always present in development. Different "game configs" are selectable from a top-bar dropdown and each loads a fully playable, self-contained game mode on a flat plane using placeholder geometry. The architecture is designed to grow into terrain, scatter, structures, and multi-enemy modes as those features are added per-config.
+
+No bundler. No build step. Vanilla JavaScript ES modules, served as static files.
+
+---
+
+## Libraries
+
+### BabylonJS v8 (CDN → `window.BABYLON`)
+
+The 3D render engine. Responsibilities: WebGL render loop, scene graph, mesh creation, PBR materials, node materials, shadow generator, texture loading, GLB/GLTF import via `SceneLoader.ImportMeshAsync`, raycasting (`scene.pickWithRay`), pointer observables, `TransformNode`, `InstancedMesh`, thin instances, and the `UniversalCamera`. 
+
+**Do not use BabylonJS physics.** Rapier owns all physics. BabylonJS meshes are purely visual — positions are driven by Rapier body translations synced each frame.
+
+Required CDN scripts in this order:
+```
+babylon.js
+babylonjs.loaders.min.js        ← GLB/GLTF support
+babylonjs.materials.min.js      ← node material library
+```
+
+### Rapier3D WASM (CDN → `window.RAPIER`)
+
+The physics engine. All rigid bodies, colliders, impulses, joints, kinematic bodies, and physics raycasts go through Rapier. Runs at a fixed 60Hz timestep driven by an accumulator in `physics.js`. 
+
+**Critical:** Rapier's WASM module throws an unrecoverable `unreachable` trap if any translation component is `NaN` or `undefined`. Every `setTranslation` call must be preceded by an explicit NaN guard:
+```js
+const px = +worldPos.x, py = +worldPos.y, pz = +worldPos.z;
+if (isNaN(px) || isNaN(py) || isNaN(pz)) { console.error('NaN pos', def); return null; }
+```
+This will happen if you spread a BabylonJS `Vector3` — see Vector3 pitfall below.
+
+### YUKA 0.7 (CDN → `window.YUKA`)
+
+AI steering library. Each enemy agent (drone, car, forklift) has a `YUKA.Vehicle` registered in a shared `YUKA.EntityManager`. YUKA computes steering forces and outputs velocity. The actual movement is driven by Rapier kinematic bodies using that velocity — YUKA does not touch physics directly.
+
+Used for: patrol waypoints, pursuit/flee behaviors, state machine velocity transitions. Waypoints are registered as `YUKA.Vector3` entries in `flightWaypoints` (aerial) or `groundWaypoints` (surface). `flatnav.js` scans the terrain mesh to generate ground waypoints automatically.
+
+### ToneJS v14 (CDN → `window.Tone`)
+
+All audio. Must be started inside a user gesture (click or keydown). Guard every audio call with `if (!window.Tone || Tone.context.state !== 'running') return`.
+
+Audio landscape zones based on player distance from map center:
+1. **Outer zone** (far from center): sparse wind/ambient effects, occasional distant sounds
+2. **Mid zone** (approaching center): looping adventure/tension theme, crossfades in
+3. **Inner zone** (near enemy spawn): battle music, enemy synths active
+
+Each zone crossfades via `Tone.Volume` nodes with a shared `Tone.Destination`. Crossfade is driven by distance calculation in `tickSoundtrack`.
+
+Enemy-specific synths: each enemy type has a placeholder synth voice (`MembraneSynth` for drones, `FMSynth` for cars, `AMSynth` for forklifts). Spatial position updates each frame via a `Tone.Panner3D`. Explosion/impact foley uses `NoiseSynth` or `MetalSynth` bursts. Structure topple sounds use staggered `MembraneSynth` hits with random delays 0–600ms.
+
+### Simplex Noise (CDN or inline)
+
+Used in `heightmap.js` as a fallback when no greyscale PNG is provided — generates a procedural terrain heightmap. Also used for scatter variation (density randomness per cell).
+
+---
+
+## Application Shell Architecture
+
+The app is a **game editor and engine** that loads different game configurations from a top-bar dropdown. Each config is a JSON file that describes a complete playable game. The same engine code runs all of them.
+
+### Top-Bar Layout
+
+```
+[ Warzone Engine ▼ CONFIG SELECTOR ] [ ⚙ Editor (F) ] [ 🔊 Audio ] [ ? Help ]
+CONFIG SELECTOR dropdown options:
+  - test.json          — sandbox: experiment freely
+  - drone_wars.json    — enemy: drone (aerial)
+  - car_wars.json      — enemy: car (ground)
+  - forklift_wars.json — enemy: forklift (ground, slower/heavier)
+  - metal_throne.json  — all three enemy types simultaneously
+```
+
+Selecting a config triggers `loadGameConfig(url)` which tears down the current scene (dispose all meshes, remove all Rapier bodies, reset all module state) and re-runs the boot sequence with the new JSON.
+
+### Config JSON Schema
+
+```json
+{
+  "meta": {
+    "id": "drone_wars",
+    "title": "Drone Wars",
+    "description": "Fight aerial drones across rugged terrain"
+  },
+
+  "terrain": {
+    "type": "flat",
+    "size": 700,
+    "heightmap": null,
+    "heightScale": 80,
+    "groundTexture": "/assets/img/ground.png",
+    "shaderLayers": []
+  },
+
+  "enemies": [
+    {
+      "type": "drone",
+      "module": "./enemies/drones.js",
+      "spawnPoint": { "x": -13, "y": 2, "z": 2.8 },
+      "maxCount": 5,
+      "placeholder": "box",
+      "glb": null
+    }
+  ],
+
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 60,
+      "bulletRadius": 0.12,
+      "range": 200,
+      "hitsToKill": 10
+    }
+  ],
+
+  "shelters": [],
+
+  "structures": [],
+
+  "scatterLayers": [],
+
+  "ladders": [],
+
+  "waypoints": [],
+
+  "assets": [],
+
+  "audio": {
+    "outerZone": { "radius": 280, "track": "wind" },
+    "midZone":   { "radius": 150, "track": "adventure" },
+    "innerZone": { "radius": 60,  "track": "battle" }
+  }
+}
+```
+
+---
+
+## Module Architecture
+
+All files are ES modules with named exports only. No default exports. No circular imports — dependency graph flows strictly downward from `main.js`.
+
+```
+main.js
+├── core.js              — engine, scene, camera, shadow generator
+├── config.js            — runtime config store (loaded from JSON, not hardcoded)
+├── look.js              — shared euler state, applyLookDelta, camera quaternion
+├── input.js             — keyboard, mouse, pointer lock, callback registry
+├── inputGuard.js        — suspend/resume mouse, pointer-lock blank frames
+├── physics.js           — Rapier world, step, sync, query
+├── player.js            — capsule body, walk tick, freecam tick, toggleFreeCam
+├── cockpit.js           — first-person weapon sway mesh
+├── hud.js               — DOM overlay: health, ammo, position, enemy count
+│
+├── terrain/
+│   ├── heightmap.js     — PNG greyscale → Float32Array height grid + Rapier heightfield
+│   ├── terrainMesh.js   — BabylonJS GroundMesh or custom from heightmap
+│   ├── terrainMaterial.js — node material: elevation bands + slope blend + fog
+│   └── terrainBounds.js — compute minX/maxX/minZ/maxZ/minY/maxY for minimap + scatter
+│
+├── scatter.js           — sprite-sheet atlases, billboard vegetation, thin instances
+├── flatnav.js           — scan terrain → ground waypoints for surface enemies
+├── spawn.js             — dropOnRandomPeak (aerial) or dropOnFlat (ground) by config
+│
+├── enemies/
+│   ├── enemyBase.js     — shared: spawn, kill, tick, state machine, YUKA integration
+│   ├── drones.js        — aerial enemy: rising/patrol/hunting states, kinematic body
+│   ├── cars.js          — ground enemy: surface pathfinding, wheeled placeholder
+│   └── forklifts.js     — ground enemy: slower, heavier, ram behavior
+│
+├── weapons/
+│   ├── weaponBase.js    — shared: fire, cooldown, ammo, hit detection
+│   └── basicGun.js      — hitscan bullet pool, Rapier sphere bodies
+│
+├── buildings.js         — GLB loading, static Rapier colliders, boundary walls
+├── structures.js        — placeable rigid-body GLB structures (editor-dropped)
+├── ladders.js           — ladder zones, climb detection, tick
+├── bullets.js           — bullet pool, shootBullet, tickBullets, hit callbacks
+├── explosions.js        — particle burst on kill, tickExplosions
+│
+├── shelters/
+│   ├── shelters.js      — physics shelter builder, ladder factory, progression
+│   ├── shelterEditor.js — pointer/keyboard: select, move group, grab part, nudge
+│   └── utils.js         — placeShelterAtPlayer (position snapshot), formatPos
+│
+├── audio.js             — ToneJS init, enemy synths, explosion SFX, spatial audio
+├── soundtrack.js        — zone-based ambient music: outer/mid/inner crossfade
+├── minimap.js           — canvas: terrain heightmap render, player + enemy dots
+│
+├── editor/
+│   ├── editor.js        — master editor panel, always built-in (visible localhost only)
+│   ├── scatterEditor.js — per-layer scatter density/sheet controls
+│   ├── terrainEditor.js — heightmap load, shader layer stack, elevation preview
+│   └── structureEditor.js — drag/drop rigid GLB structures, position/rotate/scale
+│
+└── gamepad.js           — gamepad poll, same callback interface as input.js
+```
+
+---
+
+## Detailed Module Specs
+
+### `core.js`
+Exports: `engine`, `scene`, `camera`, `shadowGenerator`
+
+BabylonJS engine on `#renderCanvas`. Camera is `UniversalCamera` parented to `playerRig`. Shadow generator uses `DirectionalLight`. `scene.clearColor` dark navy. Export `shadowGenerator` so buildings.js and shelters.js can call `shadowGenerator.addShadowCaster(mesh)`.
+
+### `config.js`
+Exports: `getConfig`, `setConfig`, `CONFIG`, `PLAYER`, `LADDERS`
+
+Unlike the beta, this is **not hardcoded constants**. It's a runtime store populated by `loadGameConfig(url)`. `getConfig()` returns the current game config object. `CONFIG` is a live reference updated each load. Initial defaults cover flat plane + one enemy. No imports.
+
+### `look.js`
+Exports: `pointerLock`, `setLookCamera`, `applyLookDelta`
+
+Single source of truth for `{ locked: bool, euler: { x, y, z } }`. `applyLookDelta(dx, dy)` accumulates into euler (adds dx to yaw, adds dy to pitch), clamps pitch to ±PI/2, then drives the camera quaternion via `BABYLON.Quaternion.RotationYawPitchRollToRef`. All look drivers (mouse, gamepad) call this — nothing writes euler directly.
+
+### `input.js`
+Exports: `inputState`, `keys`, `pointerLock`, `registerShootCallback`, `registerFreeCamCallback`, `registerSpawnEnemyCallback`, `setFreeCamActive`, `isMouseSuspended`, `applyLookDelta`
+
+`inputState` and `keys` are the **same object** — `Object.defineProperties` getters bridge `keys.w` to `inputState.moveForward` etc. Both naming conventions work on the same underlying booleans so `player.js` and `gamepad.js` can use whichever they prefer.
+
+Key bindings:
+- **WASD + Arrow keys** → move
+- **Space** → jump, **C** → duck, **Shift** → sprint  
+- **F** → freecam toggle (registered callback, wrapped in main.js)
+- **N / 0 / Numpad0** → spawn enemy manually
+- **Left-click** → shoot — fires if `pointerLock.locked` (walk) OR `_inFreeCam` (flight). This is the fix for "shoot doesn't work in flight mode" on the live site.
+- **Escape** → `document.exitPointerLock()`
+
+### `inputGuard.js`
+Exports: `suspendMouse`, `resumeMouse`, `isMouseSuspended`, `tickInputGuard`
+
+When editor panel is open, `suspendMouse()` blocks all game mouse input. `pointerlockchange` listener sets a 3-frame blank counter — absorbs the large cursor-jump mousemove the browser fires when pointer lock releases (prevents camera snap). Call `tickInputGuard()` once per frame before any input reads.
+
+### `physics.js`
+Exports: `physicsWorld`, `physicsReady`, `raycastMeshes`, `physCache`, `rayQueryResults`, `initPhysics`, `stepPhysics`, `syncPhysicsReads`, `queryPhysics`
+
+Fixed 60Hz accumulator. `syncPhysicsReads` copies positions into `physCache` (avoids WASM boundary crossing in hot loop). `queryPhysics` runs 8-direction wall-avoidance raycasts per enemy and proximity detonation checks. `raycastMeshes` is a Set with a `.push`/`.includes` proxy for backward compatibility.
+
+### `player.js`
+Exports: `player`, `playerRig`, `initPlayer`, `tickPlayer`, `toggleFreeCam`
+
+`playerRig` is a `TransformNode` — camera parents to it. `player.rigidBody` is a Rapier capsule. Walk: impulse-based horizontal movement, jump impulse when grounded. Duck lowers camera.y. Freecam: `rigidBody.setEnabled(false)`, WASD flies in look direction at `CONFIG.freeFlyCamSpeed`.
+
+`toggleFreeCam()` is **wrapped in main.js** as `_toggleFreeCam()` which additionally calls:
+- `setFreeCamActive(player.freeCam)` → input.js (enables shoot-without-pointer-lock)
+- `onFreeCamEnter()` or `onFreeCamExit()` → editor.js (opens/closes panel)
+
+### `terrain/heightmap.js`
+Exports: `loadHeightmap`, `getHeightAt`, `heightmapReady`, `heightGrid`
+
+Accepts a greyscale PNG URL. Draws it to an offscreen `<canvas>`, reads pixels, normalizes to 0–1, multiplies by `CONFIG.terrain.heightScale`. Outputs a `Float32Array` height grid. `getHeightAt(worldX, worldZ)` bilinear-interpolates height for any world position — used by scatter.js, flatnav.js, spawn.js. Also creates a Rapier `heightField` collider for player/enemy physics.
+
+When no PNG is provided, falls back to a flat plane at y=0 or a simplex-noise procedural terrain.
+
+### `terrain/terrainMesh.js`
+Exports: `buildTerrainMesh`, `terrainMeshes`
+
+If heightmap is loaded: `BABYLON.MeshBuilder.CreateGroundFromHeightMap` with the PNG URL. If flat: standard `CreateGround`. Registers all submeshes into `raycastMeshes`. Calls `onTerrainReady(meshes, bounds)` when complete.
+
+### `terrain/terrainMaterial.js`
+Exports: `buildTerrainMaterial`, `applyTerrainMaterial`, `setShaderLayers`
+
+BabylonJS node material with layered elevation bands. Each layer in `CONFIG.terrain.shaderLayers` defines:
+```json
+{ "minElevation": 0, "maxElevation": 0.3, "color": "#3a5a2a", "texture": null, "blend": "smooth" }
+```
+Layers are composited in the node graph by elevation (normalized 0–1 from `heightGrid`). Also handles slope-based blend (flat vs steep) and distance fog. `setShaderLayers(layers)` can be called at runtime from the terrain editor to update live.
+
+### `scatter.js`
+Exports: `loadSpriteAssets`, `scatterProps`, `tickBillboards`, `rebuildScatterLayer`
+
+Sprite-sheet atlas system: loads PNG sheets, crops frames by configurable grid (`cols × rows`). Vegetation uses thin-instances for performance. Props (rocks, stumps, crates) are Y-billboard planes that face the camera each frame via `pointerLock.euler.y`.
+
+**If no sprite sheet is loaded:** scatter renders color-coded placeholder quads — green for vegetation cells, brown for rock cells, grey for props. Color assigned per scatter category so the editor can still visualize density without assets.
+
+`scatterProps` distributes instances across terrain using the height grid: elevation split controls where vegetation vs rocks appear, slope threshold controls steep vs flat placement. All scatter parameters are per-layer and editable at runtime via `scatterEditor.js`.
+
+### `flatnav.js`
+Exports: `scanFlatAreas`, `groundWaypoints`
+
+Raycasts a grid across the terrain from above. Cells where the hit normal Y component > `flatThreshold` are marked navigable. K-means clusters nearby flat samples into waypoints. Both `groundWaypoints` (surface enemies) and `flightWaypoints` (aerial enemies) are populated here. Called once after terrain loads.
+
+### `enemies/enemyBase.js`
+Exports: `createEnemy`, `killEnemy`, `tickEnemies`, `enemies`, `yukaManager`, `yukaTime`
+
+Base factory for all enemy types. Each enemy is a closure with:
+- `group`: BabylonJS `TransformNode` for visuals
+- `body`: Rapier `kinematicPositionBased` rigid body
+- `vehicle`: `YUKA.Vehicle` registered in shared `yukaManager`
+- `state`: string state machine (`rising|patrol|hunting|investigating` for aerial; `idle|patrol|chase|ram` for ground)
+- `synth`: ToneJS voice, disposed on kill
+- `updateMovement(dt)`: called each frame, reads YUKA velocity, writes Rapier position
+- `dead`, `id`, `hitCount`, `detonatorArmed`
+
+`killEnemy` switches body to Dynamic, applies explosion impulse, plays foley, respawns after 5s. All scratch vectors pre-allocated per enemy at spawn — no Vector3 allocation in tick loop.
+
+### `enemies/drones.js`
+Extends `enemyBase`. Aerial states: `rising` → `skyPatrol` → `patrol` → `hunting` → `investigating`. Sky patrol does N orbits before descending. Placeholder: red box with spinning cylinder rotors. Synth: `MembraneSynth` with spatial `Panner3D`.
+
+### `enemies/cars.js`
+Extends `enemyBase`. Ground states: `idle` → `patrol` → `chase` → `ram`. Follows `groundWaypoints`. On player detection switches to chase. Ram: accelerates directly at player, applies collision impulse. Placeholder: blue flattened box with 4 cylinder wheels rotating as speed function. Synth: `FMSynth` engine rumble, pitch scales with speed.
+
+### `enemies/forklifts.js`
+Extends `enemyBase`. Same ground states as car but heavier (3× mass), slower top speed, higher collision impulse. Ram attack: lifts placeholder forks (translate Y), then charges. Placeholder: yellow box body with two thin box forks on front. Synth: `AMSynth` hydraulic hiss loop.
+
+### `weapons/basicGun.js`
+Exports: `initWeapon`, `shootBullet`, `tickBullets`
+
+Pool of Rapier sphere bodies. `shootBullet()` fires from camera position in look direction at `CONFIG.bulletSpeed`. `tickBullets` removes bullets past `bulletLife` seconds. On hit callback: calls `killEnemy` if enemy mesh hit, `destroyShelterAt` if shelter hit. Placeholder muzzle flash: brief emissive sphere scale pulse. Weapon config loaded from JSON — bullet speed, radius, range, and hits-to-kill are all data-driven.
+
+### `structures.js`
+Exports: `loadStructure`, `placeStructure`, `removeStructure`, `tickStructures`, `structures`
+
+Editor-placed rigid body GLB files. Each structure has a Rapier trimesh or convex-hull collider (configurable per-structure in JSON). Position, rotation, and scale are stored in the config and serialized on save. `loadStructure(glbUrl, worldPos, options)` imports the mesh and creates the collider. Falls back to a placeholder box if GLB is null or fails to load. `tickStructures` syncs mesh transforms from Rapier dynamic bodies if the structure is set to `dynamic: true` (collapses on explosion).
+
+### `shelters/shelters.js`
+Unchanged from beta. Full spec retained:
+
+All shelter parts are individual Rapier rigid bodies. Foundation pole = shaft + top-cap (wider, supports 4×4 beams) + mid-collar (halfway up, supports cross-bars). Every shelter auto-spawns one ladder. On explosion, all `isFixed` bodies switch to `Dynamic` before impulses so each piece falls independently. ToneJS topple sounds (40% chance per part, staggered 0–600ms). Progression system: designs sorted by part count ascending, `spawnNextShelter()` advances through them, `shelterProgressionDone` flag stops auto-spawn.
+
+**NaN guard and Vector3 extraction rules apply here exactly as everywhere else.**
+
+### `editor/editor.js`
+Exports: `initEditor`, `tickEditor`, `onFreeCamEnter`, `onFreeCamExit`
+
+**Always built-in.** Visible on localhost only — guarded by `location.hostname` check at module load. On production all functions are no-ops. On localhost the full panel renders.
+
+The editor opens and closes exclusively via the **F key** (freecam toggle). Pressing F enters fly mode AND opens the editor. Pressing F again exits fly mode AND closes the editor. This is intentional UX: fly to a position, set your view, interact with the editor, fly away. Shooting still works in fly mode (left-click).
+
+**Top-bar integration:** The config selector `<select>` in the top bar calls `loadGameConfig(url)` which triggers a full scene teardown and reload. The editor panel remains open across config switches.
+
+Panel sections:
+
+1. **Scene** — config file display, Save JSON button, Copy JSON button
+2. **Terrain** — heightmap PNG file input (drag or browse), heightmap preview thumbnail, height scale slider, shader layer stack (add/remove/reorder elevation bands with color pickers)
+3. **Scatter** — per-layer list: category dropdown, density slider, sheet selector (or "placeholder colors" if no sheet loaded), elevation range handles
+4. **Structures** — list of placed structures with position/rotation/scale inputs; "Add Structure" button opens GLB URL input or file browser
+5. **Shelters** — design dropdown (from `getShelterDesignIds()`), 3-second countdown drop, shelter list, select/edit controls
+6. **Enemies** — per-enemy-type spawn count, spawn point XYZ
+7. **Waypoints** — list of flight/ground waypoints with add/remove/copy
+8. **Player Position** — live XYZ + copy
+9. **Log** — scrolling action log
+
+When panel opens: `suspendMouse()` + `exitPointerLock()`. When closes: `resumeMouse()`. After shelter/structure placement completes: auto-close + `requestPointerLock()`.
+
+### `editor/terrainEditor.js`
+Exports: `initTerrainEditor`, `onHeightmapLoad`
+
+Handles heightmap PNG drop/browse. On file select: calls `loadHeightmap(url)`, rebuilds terrain mesh, re-runs scatter + flatnav, updates shader layers. Exposes shader layer stack UI: each layer is a colored row with elevation range sliders, blend mode dropdown, optional texture URL. Calls `setShaderLayers(layers)` live as user edits.
+
+### `editor/scatterEditor.js`
+Exports: `initScatterEditor`, `rebuildAllLayers`
+
+Per-layer scatter controls. Each layer row: category name, sprite sheet dropdown (lists loaded sheets + "placeholder"), density slider 0–1, elevation min/max, slope filter toggle. "Rebuild" button calls `rebuildScatterLayer(layerIndex)`. Changes are reflected live in the scene.
+
+### `editor/structureEditor.js`
+Exports: `initStructureEditor`
+
+Drag-and-drop GLB structure placement. In freecam mode, hovering over placed structures highlights them. Click selects — shows position/rotation/scale number inputs. Arrow keys nudge (same NUDGE_STEP as shelter editor). Delete key removes. "Add Structure" opens a text input for GLB URL or a file picker for local files (served from a local file server).
+
+### `minimap.js`
+Exports: `initMinimap`, `tickMinimap`
+
+Canvas 220×220px, fixed bottom-right. `initMinimap(bounds, terrainMeshes)` raycasts 80×80 grid from above, maps elevation to a color gradient (dark green → tan → grey → white), caches as `ImageData`. Each frame: restore static heightmap, draw enemy dots per type (red=drone, blue=car, yellow=forklift) with direction ticks, draw player dot (pulsing cyan). Works on flat plane too — just renders a uniform ground color.
+
+### `soundtrack.js`
+Exports: `initSoundtrack`, `tickSoundtrack`
+
+Three ToneJS synth groups driven by player distance from map center (`playerRig.position` length):
+
+- **Outer** (`dist > outerRadius`): sparse wind noise (`NoiseSynth`, filtered), occasional distant impact
+- **Mid** (`dist > innerRadius`): looping adventure theme (`PolySynth` + `Reverb`), crossfades in as player approaches
+- **Inner** (`dist <= innerRadius`): battle music (`DrumMachine` pattern + `Synth` lead), crossfades in near enemy spawn
+
+`tickSoundtrack` runs each frame, computes distance, drives `Tone.Volume` ramps on each group. BPM and note patterns are configurable in the config JSON `audio` block.
+
+### `audio.js`
+Exports: `initAudio`, `createEnemySynth`, `updateEnemySpatial`, `disposeEnemySynth`, `playExplosion`, `playTopple`, `toneReady`
+
+Initializes ToneJS on first user gesture. Creates per-enemy `Panner3D` connected to `Destination`. `updateEnemySpatial(synth, position)` updates panner each frame. `playExplosion()` triggers a `NoiseSynth` burst. `playTopple()` triggers a staggered `MembraneSynth` hit. Enemy synth type is determined by enemy config `type` field.
+
+### `gamepad.js`
+Exports: `pollGamepad`, `releaseGamepadAxes`, `registerGamepadShootCallback`, `registerGamepadFreeCamCallback`, `registerGamepadSpawnEnemyCallback`
+
+Polls `navigator.getGamepads()` each frame. Left stick → `inputState` movement flags with deadzone (0.15). Right stick → `applyLookDelta` with sensitivity scaling. Right trigger → shoot callback. Right bumper → freecam toggle. Left bumper → spawn enemy. `releaseGamepadAxes()` clears axis-driven booleans after each tick — call this at end of render loop.
+
+---
+
+## Boot Sequence (`main.js`)
+
+```
+1.  Render top bar HTML (config selector, editor toggle, audio, help)
+2.  setLookCamera(camera)                    ← look.js needs ref before any input
+3.  Register all callbacks                   ← shoot, freecam, spawnEnemy (keyboard + gamepad)
+4.  await loadGameConfig(DEFAULT_CONFIG_URL) ← reads JSON, populates CONFIG
+5.  initPhysics()                            ← await Rapier WASM
+6.  initLadders()                            ← from config.ladders
+7.  buildTerrain()                           ← flat plane or heightmap, terrain material
+8.  flatnav.scanFlatAreas()                  ← ground + flight waypoints from terrain
+9.  loadBuildings()                          ← GLB structures from config
+10. initPlayer()                             ← Rapier capsule
+11. dropOnStart()                            ← peak or flat based on terrain type
+12. hud.show()
+13. initEditor(() => playerRig.position)     ← no-op on non-localhost
+14. scatter.scatterProps()                   ← populate vegetation + props
+15. _spawnEnemiesAfterLanding()              ← poll isGrounded + linvel.y < 1, then spawn
+16. Audio on first user gesture
+```
+
+**Config switch** (user selects different JSON):
+```
+1. Dispose all meshes
+2. Remove all Rapier bodies (physicsWorld.free() + re-init)
+3. Reset all module state (drones=[], shelters=[], structures=[], etc.)
+4. Re-run boot from step 4
+```
+
+Render loop order (order matters):
+```
+tickInputGuard → stepPhysics → syncPhysicsReads → queryPhysics →
+yukaManager.update → pollGamepad → tickPlayer → tickLadders →
+tickEnemies → tickBullets → tickBillboards → tickExplosions →
+tickSoundtrack → tickShelters → tickStructures → tickMinimap →
+tickEditor → releaseGamepadAxes → scene.render()
+```
+
+---
+
+## The Five Starter Configs
+
+Each is a minimal JSON that loads a fully playable game on a flat 700×700 plane using placeholder geometry. No heightmap, no sprites, no GLB structures — just physics, enemies, and the player.
+
+### `test.json`
+Sandbox. No enemies spawn automatically. All editor features unlocked. Heightmap file input prominent in UI. Use this to prototype new features, test scatter, drop structures, experiment with shader layers.
+
+### `drone_wars.json`
+Enemy: `drones.js`. 3 drones spawn at `launchPoint`, rise to flight height, patrol waypoints, hunt player. Placeholder: red box with spinning cylinder rotors. Audio: `MembraneSynth` engine hum per drone, spatial panning. Shelter progression active.
+
+### `car_wars.json`
+Enemy: `cars.js`. 2 cars patrol ground waypoints from `flatnav`. Chase player on sight. Ram attack. Placeholder: blue flattened box + 4 wheel cylinders. Audio: `FMSynth` engine pitch-scaled by speed. No aerial enemies. Shelter progression active.
+
+### `forklift_wars.json`
+Enemy: `forklifts.js`. 2 forklifts. Heavier, slower, higher collision impulse. Fork-lift attack animation (Y-translate placeholder forks). Placeholder: yellow box + two thin box forks. Audio: `AMSynth` hydraulic hiss. No aerial enemies. Shelter progression active.
+
+### `metal_throne.json`
+All three enemy types active simultaneously: 2 drones + 1 car + 1 forklift. Shared `enemies` array, each with its own YUKA vehicle and Rapier body. YUKA `EntityManager` steers all of them. Audio: all three synth voices layered. Battle zone audio triggers sooner (innerRadius enlarged). Shelter progression uses the most complex designs first (sorted descending, reversed from other modes).
+
+---
+
+## Key Design Decisions (Hard-Won from Beta)
+
+**Freecam = Edit Mode portal.** F toggles freecam. main.js wraps `toggleFreeCam()` to also call `setFreeCamActive(bool)`, `onFreeCamEnter()` / `onFreeCamExit()`. Result: fly mode → editor opens + shoot still works via `_inFreeCam` flag. Walk mode → editor closes + pointer lock re-acquired.
+
+**Position snapshot.** Shelter/structure spawn point is captured at button-press time with explicit `{ x: +pos.x, y: +pos.y, z: +pos.z }` extraction. Player moving during countdown does not move the drop point.
+
+**NaN kills Rapier permanently.** One NaN translation corrupts the Rapier WASM state and causes an `unreachable` trap on every subsequent `physicsWorld.step()` until page reload. The fix is always: coerce with `+value`, check `isNaN`, bail and log before touching Rapier. This applies to every single `setTranslation`, `createRigidBody`, and `ColliderDesc` call in the codebase.
+
+**BabylonJS Vector3 cannot be spread.** `Vector3` properties `x/y/z` are prototype getters, not own enumerable properties. `{ ...vector3 }` silently produces `{}` — all values `undefined`. This is the most common source of NaN-into-Rapier crashes. Always extract: `const x = +v.x, y = +v.y, z = +v.z`.
+
+**Mouse suspension architecture.** `suspendMouse()` → all mouse input blocked. `tickInputGuard()` decrements a 3-frame blank counter after pointer lock release. This prevents the large mousemove delta the browser fires when cursor jumps to its last real position as pointer lock exits.
+
+**Dual naming on inputState.** `keys` and `inputState` are the same object. `Object.defineProperties` getters bridge `keys.w/s/a/d/space` to `inputState.moveForward/moveBack/moveLeft/moveRight/jump`. Both naming conventions live on the same booleans. player.js uses `keys.*`, gamepad.js uses `inputState.*` — no sync needed.
+
+**Shoot works in flight mode.** `mousedown` fires the shoot callback if `pointerLock.locked || _inFreeCam`. Without the `_inFreeCam` flag, left-click in freecam silently does nothing because pointer lock is released when the editor opens. `setFreeCamActive(bool)` is called from main.js's freecam wrapper.
+
+**Rapier heightfield for terrain.** When a heightmap is loaded, create a `R.ColliderDesc.heightField(rows-1, cols-1, heights, scale)` fixed body. This gives the physics world accurate terrain collision without per-frame raycasts. Player capsule and ground enemy bodies collide with it correctly. Aerial enemies ignore it via a collision group mask.
+
+**Config teardown order.** On config switch: dispose BabylonJS meshes first (removes from scene graph), then remove Rapier bodies (avoids orphaned colliders), then clear all module arrays, then re-init. If Rapier world becomes corrupted from a previous NaN crash, call `physicsWorld.free()` and create a new `RAPIER.World` before re-running boot.
+
+**YUKA + terrain.** After `flatnav.scanFlatAreas()` generates ground waypoints, register them with `yukaManager` as `YUKA.Vector3` entries. Surface enemy vehicles steer to these. Flight waypoints are generated separately at a fixed altitude. YUKA only outputs velocity — Rapier moves the actual body, so physics collisions work correctly even while YUKA is steering.
+
+---
+
+## File Structure
+
+```
+/
+├── index.html
+├── main.js
+├── core.js
+├── config.js
+├── look.js
+├── input.js
+├── inputGuard.js
+├── physics.js
+├── player.js
+├── cockpit.js
+├── hud.js
+├── scatter.js
+├── flatnav.js
+├── spawn.js
+├── buildings.js
+├── structures.js
+├── ladders.js
+├── bullets.js
+├── explosions.js
+├── audio.js
+├── soundtrack.js
+├── minimap.js
+├── gamepad.js
+│
+├── terrain/
+│   ├── heightmap.js
+│   ├── terrainMesh.js
+│   ├── terrainMaterial.js
+│   └── terrainBounds.js
+│
+├── enemies/
+│   ├── enemyBase.js
+│   ├── drones.js
+│   ├── cars.js
+│   └── forklifts.js
+│
+├── weapons/
+│   ├── weaponBase.js
+│   └── basicGun.js
+│
+├── shelters/
+│   ├── shelters.js
+│   ├── shelterEditor.js
+│   └── utils.js
+│
+├── editor/
+│   ├── editor.js
+│   ├── terrainEditor.js
+│   ├── scatterEditor.js
+│   └── structureEditor.js
+│
+└── assets/
+    ├── configs/
+    │   ├── test.json
+    │   ├── drone_wars.json
+    │   ├── car_wars.json
+    │   ├── forklift_wars.json
+    │   └── metal_throne.json
+    └── img/
+        └── ground.png
+```
+
+---
+
+## HTML Boilerplate
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Warzone Engine</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+    #top-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+      height: 36px; background: rgba(8,12,8,0.92);
+      border-bottom: 1px solid #2a3a2a;
+      display: flex; align-items: center; gap: 12px; padding: 0 12px;
+    }
+    #top-bar select, #top-bar button {
+      background: #0e1e0e; border: 1px solid #3a6a3a; color: #8aee8a;
+      font-family: inherit; font-size: 11px; padding: 3px 8px;
+      cursor: pointer; border-radius: 2px;
+    }
+    #top-bar .title { color: #4a7a4a; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; }
+    #renderCanvas {
+      width: 100vw; height: 100vh; display: block;
+      touch-action: none; margin-top: 0;
+    }
+  </style>
+  <!-- CDN order: Babylon core → loaders → materials → physics → AI → audio -->
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat/rapier.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/yuka/0.7.0/yuka.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+</head>
+<body>
+  <div id="top-bar">
+    <span class="title">Warzone Engine</span>
+    <select id="config-select">
+      <option value="assets/configs/test.json">Test / Sandbox</option>
+      <option value="assets/configs/drone_wars.json">Drone Wars</option>
+      <option value="assets/configs/car_wars.json">Car Wars</option>
+      <option value="assets/configs/forklift_wars.json">Forklift Wars</option>
+      <option value="assets/configs/metal_throne.json">Metal Throne</option>
+    </select>
+    <button id="btn-editor">⚙ Editor (F)</button>
+    <button id="btn-audio">🔊 Audio</button>
+    <button id="btn-save">💾 Save JSON</button>
+  </div>
+  <canvas id="renderCanvas"></canvas>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
+```

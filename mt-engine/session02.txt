@@ -1,0 +1,167 @@
+# Metal Throne Engine — Session 3 Starter Prompt
+
+## Project Summary
+Browser-based game engine: BabylonJS + Rapier3D + YUKA + ToneJS. ~45 ES modules, no bundler, vanilla JS static files. 5 game configs. Built-in localhost editor (F key = freecam + editor panel).
+
+---
+
+## Current State: Working ✅
+
+- Engine boots, blue sky, directional sun light (sky.js)
+- Player spawns ON terrain surface with Rapier capsule physics
+- WASD + mouse look, freecam (F), shooting (left click)
+- Heightmap terrain: PNG loaded via editor → vertex-stamped → Rapier HeightField collider
+- Terrain visible, correct orientation, player walks on it with physics
+- Scatter sprites (vegetation/rocks) placed on terrain surface
+- All 5 configs load and switch cleanly
+- Enemies spawn and move: cars ram player, forklifts chase, drones patrol above terrain
+- Enemy hit detection + kill/respawn cycle works
+- Shelter drop system works (F → editor → drop shelter)
+- Audio works, config switching works
+- Minimap shows player position + enemy dots
+
+## Architecture: Module Registry Pattern
+All enemy consumers (hud.js, minimap.js, basicGun.js, editor.js) import from `enemyRegistry.js` NOT `enemyBase.js`:
+- `getEnemies()` — all instances
+- `getEnemyCount()` — alive count  
+- `hitEnemy(enemy, damage)` — apply damage
+- `clearEnemies()` — full teardown on config switch
+
+---
+
+## CDN URLs (confirmed working)
+```html
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+<script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/yuka@0.7.8/build/yuka.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+```
+Rapier ESM in physics.js:
+```js
+import * as RAPIER_MODULE from 'https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.19.3/+esm';
+```
+
+---
+
+## Key Architecture Decisions & Pitfalls
+
+1. **RAPIER is ESM** in `physics.js` — `window.RAPIER = RAPIER_MODULE` makes it global
+2. **YUKA is classic script tag** — all usage guarded with `if (!window.YUKA) return`
+3. **BabylonJS Vector3 cannot be spread** — always extract: `const x = +v.x`
+4. **NaN kills Rapier permanently** — every setTranslation uses `safeVec3()` from physics.js
+5. **`camera.globalPosition`** not `camera.getAbsolutePosition()`
+6. **Terrain heightmap** is vertex-stamped manually (not CreateGroundFromHeightMap which ignores data URLs). V-axis is flipped: `v = 1.0 - (row/subdiv)`
+7. **`getTerrainHeightAt(x,z)`** in terrainMesh.js is the single source of truth for all height queries — spawn.js, flatnav.js, cars.js, forklifts.js, drones.js, scatter.js all use this
+8. **Terrain physics** via Rapier HeightField collider in `addTerrainCollider()` — same pixel data, same V-flip as visual mesh
+9. **`tickYUKA()`** must be called every frame in main.js render loop
+10. **`setPlayerRigRef(playerRig)`** must be called after initPlayer() so enemy distToPlayer works
+
+---
+
+## File Structure
+```
+/
+├── index.html
+├── main.js             ← boot, render loop, config switching
+├── core.js             ← BABYLON engine, scene, camera, shadowGenerator
+├── config.js           ← runtime config store
+├── look.js             ← euler look state
+├── input.js            ← keyboard, mouse, pointer lock
+├── inputGuard.js       ← mouse suspension
+├── physics.js          ← Rapier ESM, world, HeightField collider, safeVec3
+├── player.js           ← capsule body, spawns on terrain surface
+├── sky.js              ← blue sky, hemisphere + directional sun
+├── cockpit.js          ← weapon sway
+├── hud.js              ← DOM HUD (imports from enemyRegistry)
+├── scatter.js          ← billboard sprites on terrain surface
+├── flatnav.js          ← terrain scan → waypoints (uses getTerrainHeightAt)
+├── spawn.js            ← dropOnStart (uses getTerrainHeightAt)
+├── buildings.js
+├── structures.js
+├── ladders.js          ← null-guarded for config reload mid-climb
+├── explosions.js
+├── audio.js
+├── soundtrack.js
+├── minimap.js          ← enemy dots + player (imports from enemyRegistry)
+├── gamepad.js
+├── terrain/
+│   ├── terrainMesh.js  ← buildTerrain, getTerrainHeightAt, getTerrainPixelData,
+│   │                      applyHeightmapFromDataUrl, rescaleHeights
+│   ├── heightmap.js    ← legacy, mostly superseded by terrainMesh
+│   ├── terrainMaterial.js
+│   └── terrainBounds.js
+├── enemies/
+│   ├── enemyBase.js    ← EnemyBase class, tickYUKA, setPlayerRigRef,
+│   │                      distToPlayer, getPlayerPos
+│   ├── enemyRegistry.js ← getEnemies, getEnemyCount, hitEnemy, clearEnemies
+│   ├── drones.js       ← flies FLIGHT_ABOVE_TERRAIN above terrain surface
+│   ├── cars.js         ← uses getTerrainHeightAt for ground hugging
+│   └── forklifts.js    ← uses getTerrainHeightAt, fork animation
+├── weapons/
+│   ├── weaponBase.js
+│   └── basicGun.js     ← imports getEnemies+hitEnemy from enemyRegistry
+├── shelters/
+│   ├── shelters.js
+│   ├── shelterEditor.js
+│   └── utils.js
+├── editor/
+│   ├── editor.js       ← initEditorScene(scene) must be called from main.js
+│   │                      terrain section fully wired to applyHeightmapFromDataUrl
+│   └── terrainEditor.js
+└── assets/configs/
+    ├── test.json
+    ├── drone_wars.json
+    ├── car_wars.json
+    ├── forklift_wars.json
+    └── metal_throne.json
+```
+
+---
+
+## Known Issues / Next Steps
+
+- [ ] **Health damage** — enemies physically push player but don't reduce player.health
+- [ ] **Shelter system enhancements:**
+  - Auto-spawn ladder on widest perimeter edge at tallest point
+  - Dynamic side panels (planes) that blow off on explosion
+  - Rubble trapping: if player inside shelter when it collapses, player falls and must escape
+- [ ] **Terrain on minimap** — render heightmap as greyscale background behind enemy/player dots
+- [ ] **GLB model loading** for enemies (replace placeholder boxes)
+- [ ] **Scatter sprite sheets** (replace placeholder colored quads)
+- [ ] **Enemy path following quality** — YUKA currently used for EnemyBase vehicle steering but cars/forklifts/drones use manual tick logic; consider unifying
+- [ ] **github.io deployment** — game playable at `username.github.io/game-name/` by dropping `index.html` + JSON config; all shared assets from central web root
+- [ ] **Config JSON in editor** — terrain file picker works but editor panel sometimes shows stale cached version (hard refresh fixes)
+- [ ] **flatnav re-scan after heightmap load** — scanFlatAreas() runs at boot before heightmap applied; should re-run after editor applies terrain so waypoints sit on actual surface
+- [ ] **Rapier deprecation warning** — `using deprecated parameters for initialization` (cosmetic only)
+- [ ] **ToneJS AudioContext warning on load** — harmless, Chrome blocks autoplay before gesture
+
+---
+
+## Config JSON Shape (test.json example)
+```json
+{
+  "meta": { "id": "test", "title": "Test Arena" },
+  "terrain": {
+    "size": 512,
+    "sizeX": 512,
+    "sizeZ": 512,
+    "subdivisions": 150,
+    "heightScale": 80,
+    "heightmapUrl": "assets/heightmap.png"
+  },
+  "enemies": [
+    { "type": "drone",    "maxCount": 3, "health": 60  },
+    { "type": "car",      "maxCount": 2, "health": 100 },
+    { "type": "forklift", "maxCount": 2, "health": 150 }
+  ],
+  "weapons": [
+    { "bulletSpeed": 80, "bulletRadius": 0.15, "damage": 34,
+      "cooldownMax": 0.12, "ammo": Infinity }
+  ],
+  "scatterLayers": [
+    { "category": "vegetation", "density": 0.15 },
+    { "category": "rock",       "density": 0.04 }
+  ]
+}
+```

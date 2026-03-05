@@ -7,7 +7,7 @@
 //    C                 — crouch/duck
 //    F                 — toggle freecam / fly+edit mode
 //    N or 0            — spawn drone manually
-//    Left-click        — shoot (while pointer-locked)
+//    Left-click        — shoot (pointer-locked OR freecam)
 //    Escape            — release pointer lock
 // ============================================================
 
@@ -16,8 +16,13 @@ import { pointerLock, applyLookDelta } from './look.js';
 
 export { pointerLock };
 
+// ---- Whether player is in freecam (set by main.js) ----
+// Shoot fires on click even without pointer lock when in freecam.
+let _inFreeCam = false;
+export function setFreeCamActive(val) { _inFreeCam = val; }
+
 // ============================================================
-//  Shared input state — 'inputState' (gamepad.js) + 'keys' (player.js)
+//  Shared input state
 // ============================================================
 
 export const inputState = {
@@ -30,7 +35,6 @@ export const inputState = {
   sprint:      false,
 };
 
-// player.js reads: keys.w  keys.s  keys.a  keys.d  keys.space  keys.duck
 Object.defineProperties(inputState, {
   w:        { get() { return this.moveForward; }, set(v) { this.moveForward = v; }, enumerable: true },
   s:        { get() { return this.moveBack;    }, set(v) { this.moveBack    = v; }, enumerable: true },
@@ -73,7 +77,7 @@ const _canvas = document.getElementById('renderCanvas') || document.querySelecto
 if (_canvas) {
   _canvas.addEventListener('click', () => {
     if (isMouseSuspended()) return;
-    if (!document.pointerLockElement) _canvas.requestPointerLock();
+    if (!document.pointerLockElement && !_inFreeCam) _canvas.requestPointerLock();
   });
 }
 
@@ -91,7 +95,7 @@ document.addEventListener('pointerlockerror', () => {
 
 document.addEventListener('mousemove', e => {
   if (isMouseSuspended()) return;
-  if (!pointerLock.locked) return;
+  if (!pointerLock.locked && !_inFreeCam) return;
   applyLookDelta(
     -e.movementX * SENS_Y,
     -e.movementY * SENS_X,
@@ -99,13 +103,16 @@ document.addEventListener('mousemove', e => {
 });
 
 // ============================================================
-//  Mouse-click — shoot
+//  Mouse-click — shoot in walk mode OR freecam
 // ============================================================
 
 document.addEventListener('mousedown', e => {
   if (isMouseSuspended()) return;
-  if (!pointerLock.locked) return;
-  if (e.button === 0) _shootCb?.();
+  if (e.button !== 0) return;
+  // Allow shoot if pointer-locked (walk) OR in freecam (no lock needed)
+  if (pointerLock.locked || _inFreeCam) {
+    _shootCb?.();
+  }
 });
 
 // ============================================================
@@ -116,7 +123,6 @@ document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
   switch (e.code) {
-    // Movement — WASD and Arrow keys both work
     case 'KeyW': case 'ArrowUp':    inputState.moveForward = true;  break;
     case 'KeyS': case 'ArrowDown':  inputState.moveBack    = true;  break;
     case 'KeyA': case 'ArrowLeft':  inputState.moveLeft    = true;  break;
@@ -125,20 +131,15 @@ document.addEventListener('keydown', e => {
     case 'KeyC':                    inputState.duck        = true;  break;
     case 'ShiftLeft': case 'ShiftRight': inputState.sprint = true;  break;
 
-    // F — toggle freecam / fly+edit mode
     case 'KeyF':
       e.preventDefault();
       _freeCamCb?.();
       break;
 
-    // N or 0 — spawn drone
-    case 'KeyN':
-    case 'Digit0':
-    case 'Numpad0':
+    case 'KeyN': case 'Digit0': case 'Numpad0':
       _spawnDroneCb?.();
       break;
 
-    // Escape — release pointer lock (inputGuard blanks 3 frames to absorb cursor snap)
     case 'Escape':
       if (document.pointerLockElement) document.exitPointerLock();
       break;

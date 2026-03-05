@@ -5,13 +5,15 @@
 import { engine, scene }                    from './core.js';
 import { SCENE_JSON, GROUND_TEX, CONFIG }   from './config.js';
 import { initPhysics, stepPhysics, syncPhysicsReads, queryPhysics } from './physics.js';
-import { registerShootCallback, registerFreeCamCallback, registerSpawnDroneCallback } from './input.js';
+import { registerShootCallback, registerFreeCamCallback, registerSpawnDroneCallback, setFreeCamActive } from './input.js';
 import { player, initPlayer, tickPlayer, toggleFreeCam, playerRig } from './player.js';
 import { initLadders, tickLadders }         from './ladders.js';
 import { loadBuildings }                    from './buildings.js';
 import { drones, flightWaypoints, yukaManager, yukaTime, spawnDrone, tickDrones, addWaypoint } from './drones.js';
 import { tickBullets, shootBullet }         from './bullets.js';
 import { tickExplosions }                   from './explosions.js';
+import { tickShelters, shelterProgressionDone,
+         destroyShelterAt, spawnNextShelter }  from './shelters.js';
 import { tickBillboards, loadSpriteAssets, scatterProps } from './scatter.js';
 import { initAudio, toneReady }             from './audio.js';
 import { hud }                              from './hud.js';
@@ -37,10 +39,12 @@ let _shootEnabled = true;
 function _toggleFreeCam() {
   toggleFreeCam();
   if (player.freeCam) {
-    _shootEnabled = false;
+    _shootEnabled = true;   // shoot still works in freecam via setFreeCamActive
+    setFreeCamActive(true);
     onFreeCamEnter();
   } else {
     _shootEnabled = true;
+    setFreeCamActive(false);
     onFreeCamExit();
   }
 }
@@ -138,6 +142,7 @@ engine.runRenderLoop(() => {
   tickBullets(dt);
   tickBillboards();
   tickExplosions(dt);
+  tickShelters();
   tickSoundtrack(playerRig.position, dt);
   tickMinimap(playerRig.position, drones);
   tickEditor();

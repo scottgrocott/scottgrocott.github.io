@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "id": "forklift_wars",
+    "title": "Forklift Wars",
+    "description": "Heavy industrial forklifts on a war path"
+  },
+  "terrain": {
+    "type": "flat",
+    "size": 700,
+    "heightmap": null,
+    "heightScale": 80,
+    "groundTexture": null,
+    "shaderLayers": [
+      { "minElevation": 0, "maxElevation": 1.0, "color": "#2a2418", "texture": null, "blend": "smooth" }
+    ]
+  },
+  "enemies": [
+    {
+      "type": "forklift",
+      "module": "./enemies/forklifts.js",
+      "spawnPoint": { "x": -20, "y": 1, "z": -20 },
+      "maxCount": 2,
+      "placeholder": "box",
+      "glb": null,
+      "hitsToKill": 15
+    }
+  ],
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 55,
+      "bulletRadius": 0.15,
+      "range": 200,
+      "hitsToKill": 15
+    }
+  ],
+  "shelters": [],
+  "structures": [],
+  "scatterLayers": [
+    { "category": "prop", "density": 0.06, "minElevation": 0, "maxElevation": 1.0 }
+  ],
+  "ladders": [],
+  "waypoints": [],
+  "assets": [],
+  "audio": {
+    "outerZone": { "radius": 280, "track": "wind" },
+    "midZone":   { "radius": 150, "track": "adventure" },
+    "innerZone": { "radius": 60,  "track": "battle" }
+  }
+}

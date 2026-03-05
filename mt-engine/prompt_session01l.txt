@@ -1,0 +1,136 @@
+# Metal Throne Engine — Next Session Starter Prompt
+
+## Project Summary
+
+We built a complete browser-based game engine called **Metal Throne Engine** from a detailed spec (Warzone Engine Full Build Prompt v2). It's a BabylonJS + Rapier3D + YUKA + ToneJS game with a built-in editor, 5 game modes, and ~45 ES modules. No bundler, no build step, vanilla JS served as static files.
+
+---
+
+## Current State: Working ✅
+
+- Engine boots, loads config JSON, builds terrain
+- Player spawns with Rapier capsule physics, WASD + mouse look works
+- Freecam (F key) works, editor panel opens on localhost
+- Shooting works (left click fires Rapier sphere bullets)
+- Flatnav generates 12 ground + 64 flight waypoints
+- ToneJS audio starts on first user gesture
+- All 5 configs load: test, drone_wars, car_wars, forklift_wars, metal_throne
+
+## Known Remaining Issues
+
+- ToneJS AudioContext warning on load (harmless — Chrome blocks autoplay before gesture, expected behavior)
+- Rapier deprecation warning: `using deprecated parameters for the initialization function` (cosmetic only)
+- Enemies may not be visible/moving yet (YUKA guards added but not fully tested with drones/cars/forklifts)
+
+---
+
+## CDN URLs (confirmed working)
+
+```html
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+<script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+<!-- Rapier loaded as ESM in physics.js, NOT a script tag -->
+<script src="https://cdn.jsdelivr.net/npm/yuka@0.7.8/build/yuka.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+```
+
+Rapier is imported as ESM directly in `physics.js`:
+```js
+import * as RAPIER_MODULE from 'https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.19.3/+esm';
+```
+
+---
+
+## Key Architecture Decisions & Pitfalls Solved
+
+1. **RAPIER is an ESM import** in `physics.js` — NOT a `<script>` tag. `window.RAPIER = RAPIER_MODULE` makes it globally accessible to all other modules.
+
+2. **YUKA is a classic `<script>` tag** but may not be ready when ES modules first execute. All YUKA usage is guarded with `if (!window.YUKA) return` and lazy-initialized via `_ym()` / `_yt()` helper functions in `enemyBase.js`.
+
+3. **BabylonJS Vector3 cannot be spread** — `{ ...vector3 }` produces `{}`. Always extract: `const x = +v.x, y = +v.y, z = +v.z`.
+
+4. **NaN kills Rapier permanently** — every `setTranslation` call uses `safeVec3()` from `physics.js`.
+
+5. **`camera.getAbsolutePosition()`** does not exist on `UniversalCamera` — use `camera.globalPosition` instead (fixed in `basicGun.js`).
+
+6. **Shoot works in freecam** via `setFreeCamActive(bool)` flag in `input.js`.
+
+7. **`inputState` and `keys` are the same object** — bridged via `Object.defineProperties`.
+
+---
+
+## File Structure
+
+```
+/
+├── index.html          ← entry, CDN scripts (NO rapier script tag)
+├── main.js             ← boot, render loop, config switching, _waitForYuka()
+├── core.js             ← BABYLON engine, scene, camera, shadowGenerator
+├── config.js           ← runtime config store
+├── look.js             ← euler look state, applyLookDelta
+├── input.js            ← keyboard, mouse, pointer lock, callbacks
+├── inputGuard.js       ← mouse suspension, blank-frame counter
+├── physics.js          ← ESM Rapier import, world, step, safeVec3
+├── player.js           ← capsule body, walk + freecam tick
+├── cockpit.js          ← first-person weapon sway
+├── hud.js              ← DOM HUD
+├── scatter.js          ← billboard vegetation
+├── flatnav.js          ← terrain scan → waypoints
+├── spawn.js            ← player drop-on-start
+├── buildings.js        ← GLB buildings
+├── structures.js       ← editor-placed structures
+├── ladders.js          ← ladder zones
+├── explosions.js       ← particle bursts
+├── audio.js            ← ToneJS synths, spatial audio
+├── soundtrack.js       ← zone-based ambient crossfade
+├── minimap.js          ← 220px canvas minimap
+├── gamepad.js          ← gamepad polling
+├── terrain/
+│   ├── heightmap.js, terrainMesh.js, terrainMaterial.js, terrainBounds.js
+├── enemies/
+│   ├── enemyBase.js    ← YUKA lazy-init, kill/respawn (ALL YUKA guarded)
+│   ├── drones.js, cars.js, forklifts.js
+├── weapons/
+│   ├── weaponBase.js, basicGun.js   ← uses camera.globalPosition (not getAbsolutePosition)
+├── shelters/
+│   ├── shelters.js, shelterEditor.js, utils.js
+├── editor/
+│   ├── editor.js, terrainEditor.js, scatterEditor.js, structureEditor.js
+└── assets/configs/
+    ├── test.json, drone_wars.json, car_wars.json, forklift_wars.json, metal_throne.json
+```
+
+---
+#user test feedback
+audio works
+switch between game enviorments works fine and the enemies are all up on me car literally pushes me around.
+no obvious path following
+drop shelter works
+choose terrain button will get file, no errors. i cant see it anywhere. flew around and adjusted the height
+console:
+[3:01:22 PM] Height scale: 166
+[3:01:22 PM] Height scale: 165
+[3:01:22 PM] Height scale: 164
+[3:01:22 PM] Height scale: 163
+[3:01:22 PM] Height scale: 162
+[3:01:22 PM] Height scale: 161
+
+
+
+
+
+----
+
+## Suggested Next Steps
+
+- [ ] Verify drones/cars/forklifts actually spawn and move in their respective configs
+- [ ] Test enemy hit detection and kill/respawn cycle
+- [ ] Test shelter drop system (F → editor → drop shelter)
+- [ ] Add heightmap terrain support (upload PNG in terrain editor)
+- [ ] Polish minimap enemy dots and player direction
+- [ ] Add health damage when enemies hit player
+- [ ] Test config switching (dropdown) — full teardown/reload cycle
+- [ ] GLB model loading for enemies (replace placeholder boxes)
+- [ ] Scatter sprite sheets (replace placeholder colored quads)
+- [ ] Ideally "creating a new game"  on my github.io on any directory off the root (github.io/new-game) by dropping in an index.html and a json config file. all assets will be stored in central directory of web root.

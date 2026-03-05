@@ -12,7 +12,9 @@
 // ============================================================
 
 import { shelters, serializeDesign,
-         addPartToShelter }          from './shelters.js';
+         addPartToShelter,
+         getShelterDesignIds,
+         tickShelters }              from './shelters.js';
 import { initShelterEditor,
          setShelterEditorMode,
          getShelterEditorMode,
@@ -81,6 +83,7 @@ export function onFreeCamExit() {
 
 export function tickEditor() {
   if (!_posDisplay || !_getPlayerPos) return;
+  tickShelters();
   const pos = _getPlayerPos();
   _posDisplay.textContent = pos ? formatPos(pos) : '—';
 }
@@ -303,6 +306,26 @@ function _buildPosSection() {
 function _buildPlaceSection() {
   const sec = _sec('Place Shelter');
 
+  // Design selector
+  const designLabel = document.createElement('div');
+  designLabel.className = 'ed-lbl';
+  designLabel.textContent = 'Design';
+  sec.appendChild(designLabel);
+
+  const designSel = document.createElement('select');
+  designSel.className = 'ed-input';
+  designSel.style.marginBottom = '6px';
+  const refreshDesignOptions = () => {
+    designSel.innerHTML = '';
+    for (const d of getShelterDesignIds()) {
+      const opt = document.createElement('option');
+      opt.value = d.id; opt.textContent = d.label;
+      designSel.appendChild(opt);
+    }
+  };
+  refreshDesignOptions();
+  sec.appendChild(designSel);
+
   const countdown = document.createElement('div');
   countdown.id = 'ed-countdown';
   sec.appendChild(countdown);
@@ -310,7 +333,8 @@ function _buildPlaceSection() {
   sec.appendChild(_btn('⏱ Drop Here (3s)', () => {
     if (_cancelPlace) { _cancelPlace(); _cancelPlace = null; }
     countdown.style.display = 'block';
-    _log('Placing in 3s — step away!');
+    const chosenDesign = designSel.value;
+    _log('Placing "' + chosenDesign + '" in 3s — step away!');
     _cancelPlace = placeShelterAtPlayer(
       _getPlayerPos, 3000,
       s => { countdown.textContent = s > 0 ? 'Placing in ' + s + '…' : 'Placing!'; },
@@ -319,7 +343,6 @@ function _buildPlaceSection() {
         _log('Shelter placed at ' + formatPos(_getPlayerPos?.()));
         _refreshShelterList();
         _cancelPlace = null;
-        // Close panel, resume mouse, re-acquire pointer lock so player can navigate
         const toggle = document.getElementById('ed-toggle');
         toggle?.classList.remove('open');
         _panel.classList.remove('open');
@@ -327,6 +350,7 @@ function _buildPlaceSection() {
         const canvas = document.getElementById('renderCanvas') || document.querySelector('canvas');
         canvas?.requestPointerLock();
       },
+      chosenDesign,
     );
   }));
 

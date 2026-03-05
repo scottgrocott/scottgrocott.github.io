@@ -1,0 +1,36 @@
+{
+  "tracks": [
+    {
+      "id": "track_1",
+      "instrument": {
+        "type": "synth",
+        "engine": "PolySynth",
+        "options": {
+          "oscillator": { "type": "sawtooth" },
+          "envelope": {
+            "attack": 0.01,
+            "decay": 0.2,
+            "sustain": 0.5,
+            "release": 1
+          }
+        },
+        "effects": [
+          { "type": "Reverb", "options": { "decay": 3, "wet": 0.3 } }
+        ]
+      }
+    }
+  ],
+  "sequence": {
+    "meta": { "bpm": 120 },
+    "tracks": [
+      {
+        "id": "track_1",
+        "pattern": [
+          { "time": "0:0:0", "note": "C4", "duration": "8n", "velocity": 0.9 },
+          { "time": "0:1:0", "note": "E4", "duration": "8n", "velocity": 0.9 },
+          { "time": "0:2:0", "note": "G4", "duration": "8n", "velocity": 0.9 }
+        ]
+      }
+    ]
+  }
+}

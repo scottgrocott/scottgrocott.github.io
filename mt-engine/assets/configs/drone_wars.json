@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "id": "drone_wars",
+    "title": "Drone Wars",
+    "description": "Fight aerial drones across rugged terrain"
+  },
+  "terrain": {
+    "type": "flat",
+    "size": 700,
+    "heightmap": null,
+    "heightScale": 80,
+    "groundTexture": null,
+    "shaderLayers": [
+      { "minElevation": 0, "maxElevation": 0.35, "color": "#1e3a10", "texture": null, "blend": "smooth" },
+      { "minElevation": 0.35, "maxElevation": 0.65, "color": "#4a3820", "texture": null, "blend": "smooth" },
+      { "minElevation": 0.65, "maxElevation": 1.0, "color": "#707068", "texture": null, "blend": "smooth" }
+    ]
+  },
+  "enemies": [
+    {
+      "type": "drone",
+      "module": "./enemies/drones.js",
+      "spawnPoint": { "x": -13, "y": 2, "z": 2.8 },
+      "maxCount": 3,
+      "placeholder": "box",
+      "glb": null,
+      "hitsToKill": 10
+    }
+  ],
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 60,
+      "bulletRadius": 0.12,
+      "range": 200,
+      "hitsToKill": 10
+    }
+  ],
+  "shelters": [],
+  "structures": [],
+  "scatterLayers": [
+    { "category": "vegetation", "density": 0.10, "minElevation": 0, "maxElevation": 0.5 },
+    { "category": "rock",       "density": 0.03, "minElevation": 0, "maxElevation": 0.8 }
+  ],
+  "ladders": [],
+  "waypoints": [],
+  "assets": [],
+  "audio": {
+    "outerZone": { "radius": 280, "track": "wind" },
+    "midZone":   { "radius": 150, "track": "adventure" },
+    "innerZone": { "radius": 60,  "track": "battle" }
+  }
+}
