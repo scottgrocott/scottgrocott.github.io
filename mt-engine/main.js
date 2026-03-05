@@ -446,7 +446,7 @@ function _exportGame() {
 </head>
 <body>
   <div id="loading-screen">
-    <div class="load-title">${CONFIG.meta?.title || 'METAL THRONE'}</div>
+    <div class="load-title">${(CONFIG.meta?.title || 'METAL THRONE').toUpperCase()}</div>
     <div class="load-sub" id="load-status">INITIALIZING...</div>
     <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
   </div>
@@ -466,7 +466,14 @@ function _exportGame() {
     <div class="hud-row"><span id="hud-status"></span></div>
   </div>
   <canvas id="minimap-canvas" width="220" height="220"></canvas>
-  <script type="module" src="${engineSrc}"><\/script>
+  <!-- Auto-detect engine: local dev vs deployed — engineSrc baked in as fallback -->
+  <script>
+    const _local = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const _src = _local ? 'http://localhost:83/mt-engine/main.js' : '${engineSrc}';
+    const _s = document.createElement('script');
+    _s.type = 'module'; _s.src = _src;
+    document.head.appendChild(_s);
+  <\/script>
 </body>
 </html>`;
 
@@ -479,4 +486,4 @@ function _exportGame() {
 }
 
 // Kick off
-boot();
+boot(); 

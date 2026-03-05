@@ -1,0 +1,121 @@
+{
+  "meta": {
+    "id": "metal_throne",
+    "title": "Metal Throne",
+    "description": "All three enemy types. Survive the chaos."
+  },
+  "terrain": {
+    "type": "flat",
+    "size": 700,
+    "heightmap": null,
+    "heightScale": 80,
+    "groundTexture": null,
+    "shaderLayers": [
+      {
+        "minElevation": 0,
+        "maxElevation": 0.3,
+        "color": "#1a2010",
+        "texture": null,
+        "blend": "smooth"
+      },
+      {
+        "minElevation": 0.3,
+        "maxElevation": 0.7,
+        "color": "#302820",
+        "texture": null,
+        "blend": "smooth"
+      },
+      {
+        "minElevation": 0.7,
+        "maxElevation": 1,
+        "color": "#505040",
+        "texture": null,
+        "blend": "smooth"
+      }
+    ]
+  },
+  "enemies": [
+    {
+      "type": "drone",
+      "module": "./enemies/drones.js",
+      "spawnPoint": {
+        "x": -10,
+        "y": 2,
+        "z": -10
+      },
+      "maxCount": 2,
+      "placeholder": "box",
+      "glb": null,
+      "hitsToKill": 10
+    },
+    {
+      "type": "car",
+      "module": "./enemies/cars.js",
+      "spawnPoint": {
+        "x": 15,
+        "y": 1,
+        "z": 10
+      },
+      "maxCount": 1,
+      "placeholder": "box",
+      "glb": null,
+      "hitsToKill": 8
+    },
+    {
+      "type": "forklift",
+      "module": "./enemies/forklifts.js",
+      "spawnPoint": {
+        "x": -15,
+        "y": 1,
+        "z": 15
+      },
+      "maxCount": 1,
+      "placeholder": "box",
+      "glb": null,
+      "hitsToKill": 15
+    }
+  ],
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 65,
+      "bulletRadius": 0.12,
+      "range": 200,
+      "hitsToKill": 10
+    }
+  ],
+  "shelters": [],
+  "structures": [],
+  "scatterLayers": [
+    {
+      "category": "vegetation",
+      "density": 0.08,
+      "minElevation": 0,
+      "maxElevation": 0.5
+    },
+    {
+      "category": "rock",
+      "density": 0.04,
+      "minElevation": 0,
+      "maxElevation": 0.8
+    }
+  ],
+  "ladders": [],
+  "waypoints": [],
+  "assets": [],
+  "audio": {
+    "outerZone": {
+      "radius": 280,
+      "track": "wind"
+    },
+    "midZone": {
+      "radius": 130,
+      "track": "adventure"
+    },
+    "innerZone": {
+      "radius": 80,
+      "track": "battle"
+    }
+  }
+}

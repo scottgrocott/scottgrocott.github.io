@@ -133,4 +133,48 @@ console:
 - [ ] Test config switching (dropdown) — full teardown/reload cycle
 - [ ] GLB model loading for enemies (replace placeholder boxes)
 - [ ] Scatter sprite sheets (replace placeholder colored quads)
-- [ ] Ideally "creating a new game"  on my github.io on any directory off the root (github.io/new-game) by dropping in an index.html and a json config file. all assets will be stored in central directory of web root.
+- [ ] Ideally "creating a new game"  on my github.io on any directory off the root (github.io/new-game) by dropping in an index.html and a json config file. all assets will be stored in central directory of web root. (github.io/mt-engine)
+
+
+put big light in the sky very dark . make default sky blue
+games play! all 4 of them. I can kill them!!
+
+ladders bug. happened after i climbed one
+ladders.js:91 Uncaught TypeError: Cannot read properties of null (reading 'position')
+    at tickLadders (ladders.js:91:46)
+    at main.js:139:5
+    at e._renderFrame (abstractEngine.ts:1015:60)
+    at e._processFrame (abstractEngine.ts:991:26)
+    at t._renderLoop (engine.ts:627:14)
+    at _boundRenderFunction (abstractEngine.ts:918:68)
+
+also when a shelter is created, make the ladder appear at a random flat surface on the perimeter edge of the structure that touches the widest part of the structure, default ladder height to tallest point on structure
+after the ladder is added to the structure i want to add a new piece to it called "side". this will be plane "texture later". this will be a dynamic piece. select all the sides that dont have the ladder and randomly attach side panels (some full panels, some partial width) to the structure. these pannels will "blow off" when an explosion occurs and the physics knocks down the sheter. if player is in shelter they fall an have to dig themselves out of the rubble
+
+
+terrain apparently loaded but not seen 
+
+
+[3:47:37 PM] Height scale: 99
+
+[3:47:37 PM] Height scale: 97
+
+[3:47:37 PM] Height scale: 94
+
+[3:47:37 PM] Height scale: 91
+
+[3:47:37 PM] Height scale: 87
+
+[3:47:37 PM] Height scale: 85
+
+[3:47:37 PM] Height scale: 83
+
+[3:41:48 PM] Heightmap loaded: blob:http://localhost:83/1f26a9d8-1d64-4d72-9d77-9747e5fccb1c
+
+terrain visibilty and enemy path following logic dynamically on loaded terrain is priority now
+I want to load any terrain map into a game an observe how the yuka ai performs with my enemies.
+include imported terrain on minimap
+
+
+import { initSky } from './sky.js';
+initSky();
