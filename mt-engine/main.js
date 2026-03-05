@@ -10,7 +10,7 @@ import {
   setFreeCamActive,
 } from './input.js';
 import { tickInputGuard, suspendMouse, resumeMouse } from './inputGuard.js';
-import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider } from './physics.js';
+import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider } from './physics.js';
 import { initPlayer, tickPlayer, toggleFreeCam, player, playerRig } from './player.js';
 import { initCockpit, tickCockpit, disposeCockpit } from './cockpit.js';
 import { tickHUD, hudSetStatus } from './hud.js';
@@ -231,6 +231,60 @@ async function boot() {
   });
 }
 
+// ---- Terrain collider rebuild ----
+// Full physics rebuild after editor applies new heightmap.
+// Destroys and recreates the Rapier world to guarantee zero stale colliders,
+// then re-adds terrain collider + player body. Enemies re-add themselves on next tick.
+async function _fullTerrainPhysicsRebuild() {
+  console.log('[main] Full terrain physics rebuild... wasInFreeCam:', player.freeCam, 'body enabled:', player.rigidBody?.isEnabled());
+
+  // Remember if player was in freecam so we restore it correctly
+  const wasInFreeCam = player.freeCam;
+
+  // Clear everything holding rigid body refs before destroying the world
+  clearEnemies();
+  clearBullets();
+
+  // Tear down physics world completely
+  resetPhysics();
+  await initPhysics();
+
+  // Re-add terrain collider
+  _rebuildTerrainCollider();
+
+  // Re-init player — initPlayer sets freeCam=false and body enabled
+  initPlayer();
+
+  // If we were in freecam before the rebuild, disable the new body
+  // so the player stays in fly mode without falling
+  if (wasInFreeCam) {
+    player.freeCam = true;
+    player.rigidBody.setEnabled(false);
+    console.log('[main] Body disabled for freecam, isEnabled now:', player.rigidBody.isEnabled(), 'handle:', player.rigidBody.handle);
+  } else {
+    window._resnapPlayerToTerrain?.();
+  }
+
+  // Re-spawn enemies from config
+  _spawnEnemiesFromConfig();
+
+  console.log('[main] Terrain physics rebuild complete');
+}
+window._fullTerrainPhysicsRebuild = _fullTerrainPhysicsRebuild;
+
+function _rebuildTerrainCollider() {
+  const pixelData = getTerrainPixelData();
+  if (pixelData) {
+    const t = CONFIG.terrain || {};
+    addTerrainCollider(pixelData, t.sizeX ?? t.size ?? 512, t.sizeZ ?? t.size ?? 512,
+                       t.heightScale ?? 50, 64);
+  } else {
+    const t = CONFIG.terrain || {};
+    addFlatGroundCollider(t.sizeX ?? t.size ?? 512, t.sizeZ ?? t.size ?? 512);
+  }
+}
+window._rebuildTerrainCollider = _rebuildTerrainCollider;
+
 // ---- Config Load ----
 async function loadGameConfig(url) {
   if (_loading) return;
@@ -287,17 +341,10 @@ async function loadGameConfig(url) {
   }
   await loadHeightmap(CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
   await buildTerrain(scene, CONFIG);
+  _rebuildTerrainCollider();
   const terrainMesh = getTerrainMesh();
   const mat = buildTerrainMaterial(CONFIG.terrain);
   if (terrainMesh) applyTerrainMaterial([terrainMesh]);
-
-  // Build Rapier heightfield collider so player walks on terrain surface
-  const _pixelData = getTerrainPixelData();
-  if (_pixelData) {
-    const t = CONFIG.terrain || {};
-    addTerrainCollider(_pixelData, t.sizeX ?? 512, t.sizeZ ?? 512,
-                       t.heightScale ?? 50, 64);
-  }
 
   setLoadStatus('Scanning navigation', 55);
   scanFlatAreas();
@@ -486,4 +533,4 @@ function _exportGame() {
 }
 
 // Kick off
-boot(); 
+boot();

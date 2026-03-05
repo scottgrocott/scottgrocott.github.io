@@ -81,20 +81,22 @@ export function tickBullets(dt) {
     b.life -= dt;
     if (b.life <= 0) { _killBullet(b); _bullets.splice(i, 1); continue; }
 
-    // Sync mesh from physics
+    // Sync mesh from physics — guard against stale body after physics world reset
     if (b.body) {
-      const t = b.body.translation();
+      let t;
+      try { t = b.body.translation(); } catch(e) { _killBullet(b); _bullets.splice(i, 1); continue; }
       const bx = +t.x, by = +t.y, bz = +t.z;
       if (!isNaN(bx)) {
         b.mesh.position.set(bx, by, bz);
 
-        // Hit detection vs enemies — use e.mesh.position (not e.group.position)
+        // Hit detection vs enemies
         for (const enemy of getEnemies()) {
-          if (enemy.dead || !enemy.mesh) continue;
-          const ep = enemy.mesh.position;
+          if (enemy.dead) continue;
+          const ep = enemy.mesh?.position || enemy.group?.position;
+          if (!ep) continue;
           const dx = bx - ep.x, dy = by - ep.y, dz = bz - ep.z;
           if (Math.sqrt(dx*dx + dy*dy + dz*dz) < 1.2) {
-            hitEnemy(enemy, _weapon.damage ?? 34);
+            hitEnemy(enemy);
             _killBullet(b);
             b.dead = true;
             break;

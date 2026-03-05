@@ -3,10 +3,8 @@ import * as RAPIER_MODULE from 'https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-
 
 window.RAPIER = RAPIER_MODULE;
 
-export let physicsWorld = null;
-export let physicsReady = false;
-
-let _terrainColliderHandle = null;
+export let physicsWorld   = null;
+export let physicsReady   = false;
 
 const _raycastMeshSet = new Set();
 export const raycastMeshes = {
@@ -23,14 +21,18 @@ export const raycastMeshes = {
 export const physCache = new Map();
 export const rayQueryResults = [];
 
-const FIXED_DT     = 1 / 60;
+const FIXED_DT   = 1 / 60;
 let   _accumulator = 0;
+
+// ---- Terrain body tracking ----
+let _terrainBody     = null;
+let _terrainCollider = null;
 
 export async function initPhysics() {
   await RAPIER_MODULE.init();
-  physicsWorld = new RAPIER_MODULE.World({ x: 0, y: -20, z: 0 });
+  physicsWorld = new RAPIER_MODULE.World({ x: 0.0, y: -20.0, z: 0.0 });
   physicsReady = true;
-  _terrainColliderHandle = null;
+  window._physicsWorld = physicsWorld;
   console.log('[physics] Rapier world ready');
 }
 
@@ -39,64 +41,57 @@ export function resetPhysics() {
     try { physicsWorld.free(); } catch(e) {}
     physicsWorld = null;
   }
-  physicsReady        = false;
-  _terrainColliderHandle = null;
+  physicsReady     = false;
+  _terrainBody     = null;
+  _terrainCollider = null;
   physCache.clear();
   _accumulator = 0;
 }
 
-/**
- * Build a Rapier HeightField collider from the terrain pixel data.
- * Call this from main.js after buildTerrain() completes.
- *
- * @param {ImageData} imgData   – the raw pixel data (same as terrainMesh uses)
- * @param {number}    sizeX     – world width
- * @param {number}    sizeZ     – world depth
- * @param {number}    heightScale
- * @param {number}    subdiv    – resolution (lower = faster, 64-128 is fine for physics)
- */
-export function addTerrainCollider(imgData, sizeX, sizeZ, heightScale, subdiv = 64) {
-  if (!physicsReady || !physicsWorld || !imgData) return;
-
-  // Remove old terrain collider if rebuilding
-  if (_terrainColliderHandle !== null) {
-    try {
-      const old = physicsWorld.getCollider(_terrainColliderHandle);
-      if (old) physicsWorld.removeCollider(old, false);
-    } catch(e) {}
-    _terrainColliderHandle = null;
+function _removeTerrainCollider() {
+  if (_terrainBody && physicsWorld) {
+    try { physicsWorld.removeRigidBody(_terrainBody); } catch(e) {}
   }
+  _terrainBody     = null;
+  _terrainCollider = null;
+}
+
+export function addTerrainCollider(imgData, sizeX, sizeZ, heightScale, subdiv = 64) {
+  if (!physicsReady || !physicsWorld) return;
+  _removeTerrainCollider();
 
   const rows = subdiv + 1;
   const cols = subdiv + 1;
-  const iw   = imgData.width;
-  const ih   = imgData.height;
-
-  // Sample heights — same V-flip as terrainMesh._stampHeights
   const heights = new Float32Array(rows * cols);
+
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      const u    = col / subdiv;
-      const v    = 1.0 - (row / subdiv);
-      const px   = Math.min(Math.floor(u * iw), iw - 1);
-      const py   = Math.min(Math.floor(v * ih), ih - 1);
-      const grey = imgData.data[(py * iw + px) * 4] / 255;
-      heights[row * cols + col] = grey * heightScale;
+      const u = col / subdiv;
+      const v = row / subdiv;
+      const px = Math.min(Math.floor(u * (imgData.width  - 1)), imgData.width  - 1);
+      const py = Math.min(Math.floor(v * (imgData.height - 1)), imgData.height - 1);
+      heights[row * cols + col] = (imgData.data[(py * imgData.width + px) * 4] / 255) * heightScale;
     }
   }
 
-  // Rapier HeightField: nrows, ncols, heights, scale
-  const scale = { x: sizeX / subdiv, y: 1.0, z: sizeZ / subdiv };
-  const cdesc = RAPIER_MODULE.ColliderDesc.heightfield(
-    subdiv, subdiv, heights, scale
+  _terrainBody = physicsWorld.createRigidBody(RAPIER_MODULE.RigidBodyDesc.fixed());
+  _terrainCollider = physicsWorld.createCollider(
+    RAPIER_MODULE.ColliderDesc.heightfield(subdiv, subdiv, heights, { x: sizeX / subdiv, y: 1.0, z: sizeZ / subdiv }),
+    _terrainBody
   );
+  console.log('[physics] Heightfield terrain collider added', rows, 'x', cols);
+}
 
-  // Centre at world origin (HeightField origin is its corner by default)
-  cdesc.setTranslation(-sizeX / 2, 0, -sizeZ / 2);
+export function addFlatGroundCollider(sizeX = 512, sizeZ = 512) {
+  if (!physicsReady || !physicsWorld) return;
+  _removeTerrainCollider();
 
-  const collider = physicsWorld.createCollider(cdesc);
-  _terrainColliderHandle = collider.handle;
-  console.log('[physics] Terrain heightfield collider added', rows, 'x', cols);
+  _terrainBody = physicsWorld.createRigidBody(RAPIER_MODULE.RigidBodyDesc.fixed());
+  _terrainCollider = physicsWorld.createCollider(
+    RAPIER_MODULE.ColliderDesc.cuboid(sizeX / 2, 0.5, sizeZ / 2).setTranslation(0, -0.5, 0),
+    _terrainBody
+  );
+  console.log('[physics] Flat ground collider added', sizeX, 'x', sizeZ);
 }
 
 export function stepPhysics(dt) {
@@ -126,7 +121,8 @@ export function queryPhysics(origin, radius) {
   ];
   const ray = new RAPIER_MODULE.Ray(origin, {x:1,y:0,z:0});
   for (const d of dirs) {
-    ray.origin = origin; ray.dir = d;
+    ray.origin = origin;
+    ray.dir    = d;
     const hit = physicsWorld.castRay(ray, radius * 3, true);
     if (hit) results.push({ dir: d, toi: hit.timeOfImpact });
   }
@@ -136,7 +132,7 @@ export function queryPhysics(origin, radius) {
 export function safeVec3(x, y, z, label) {
   const px = +x, py = +y, pz = +z;
   if (isNaN(px) || isNaN(py) || isNaN(pz)) {
-    console.error(`[physics] NaN at: ${label}`, x, y, z);
+    console.error('[physics] NaN at:', label, x, y, z);
     return null;
   }
   return { x: px, y: py, z: pz };
