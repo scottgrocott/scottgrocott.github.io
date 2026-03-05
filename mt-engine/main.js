@@ -136,19 +136,19 @@ async function boot() {
   setLoadStatus('Loading config...', 15);
   await loadGameConfig(await _resolveStartConfig());
 
-  // Wire top-bar
-  document.getElementById('config-select').addEventListener('change', async (e) => {
+  // Wire top-bar — all optional so exported minimal index.html works too
+  document.getElementById('config-select')?.addEventListener('change', async (e) => {
     await loadGameConfig(e.target.value);
   });
-  document.getElementById('btn-editor').addEventListener('click', _freecam);
-  document.getElementById('btn-audio').addEventListener('click', async () => {
+  document.getElementById('btn-editor')?.addEventListener('click', _freecam);
+  document.getElementById('btn-audio')?.addEventListener('click', async () => {
     await _startAudio();
     hudSetStatus('🔊 Audio ON');
   });
-  document.getElementById('btn-deploy').addEventListener('click', () => {
+  document.getElementById('btn-deploy')?.addEventListener('click', () => {
     _exportGame();
   });
-  document.getElementById('btn-save').addEventListener('click', () => {
+  document.getElementById('btn-save')?.addEventListener('click', () => {
     const blob = new Blob([JSON.stringify(CONFIG, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
