@@ -1,8 +1,8 @@
 {
   "meta": {
-    "id": "drone_wars",
-    "title": "Drone Wars",
-    "description": "Fight aerial drones across rugged terrain"
+    "id": "car_wars",
+    "title": "Car Wars",
+    "description": "Survive ground assault from armored cars"
   },
   "terrain": {
     "type": "flat",
@@ -13,22 +13,8 @@
     "shaderLayers": [
       {
         "minElevation": 0,
-        "maxElevation": 0.35,
-        "color": "#1e3a10",
-        "texture": null,
-        "blend": "smooth"
-      },
-      {
-        "minElevation": 0.35,
-        "maxElevation": 0.65,
-        "color": "#4a3820",
-        "texture": null,
-        "blend": "smooth"
-      },
-      {
-        "minElevation": 0.65,
         "maxElevation": 1,
-        "color": "#707068",
+        "color": "#243020",
         "texture": null,
         "blend": "smooth"
       }
@@ -36,27 +22,27 @@
   },
   "enemies": [
     {
-      "type": "drone",
-      "module": "./enemies/drones.js",
+      "type": "car",
+      "module": "./enemies/cars.js",
       "spawnPoint": {
-        "x": -13,
-        "y": 2,
-        "z": 2.8
+        "x": 20,
+        "y": 1,
+        "z": 20
       },
-      "maxCount": 3,
+      "maxCount": 2,
       "placeholder": "box",
       "glb": null,
-      "hitsToKill": 10
+      "hitsToKill": 8
     }
   ],
   "weapons": [
     {
       "id": "basic_gun",
       "module": "./weapons/basicGun.js",
-      "bulletSpeed": 60,
+      "bulletSpeed": 70,
       "bulletRadius": 0.12,
       "range": 200,
-      "hitsToKill": 10
+      "hitsToKill": 8
     }
   ],
   "shelters": [],
@@ -64,15 +50,15 @@
   "scatterLayers": [
     {
       "category": "vegetation",
-      "density": 0.1,
+      "density": 0.08,
       "minElevation": 0,
       "maxElevation": 0.5
     },
     {
       "category": "rock",
-      "density": 0.03,
+      "density": 0.05,
       "minElevation": 0,
-      "maxElevation": 0.8
+      "maxElevation": 1
     }
   ],
   "ladders": [],
