@@ -1,0 +1,76 @@
+{
+    "meta": {
+  "id": "level-1",
+  "title": "test",
+  "subtitle": "test"
+},
+  "terrain": {
+    "type": "flat",
+    "size": 700,
+    "heightmap": null,
+    "heightScale": 80,
+    "groundTexture": null,
+    "shaderLayers": [
+      {
+        "minElevation": 0,
+        "maxElevation": 0.4,
+        "color": "#2a4a1a",
+        "texture": null,
+        "blend": "smooth"
+      },
+      {
+        "minElevation": 0.4,
+        "maxElevation": 0.7,
+        "color": "#5a4a30",
+        "texture": null,
+        "blend": "smooth"
+      },
+      {
+        "minElevation": 0.7,
+        "maxElevation": 1,
+        "color": "#888880",
+        "texture": null,
+        "blend": "smooth"
+      }
+    ]
+  },
+  "enemies": [],
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 60,
+      "bulletRadius": 0.12,
+      "range": 200,
+      "hitsToKill": 10
+    }
+  ],
+  "shelters": [],
+  "structures": [],
+  "scatterLayers": [
+    {
+      "category": "vegetation",
+      "density": 0.12,
+      "minElevation": 0,
+      "maxElevation": 0.5
+    }
+  ],
+  "ladders": [],
+  "waypoints": [],
+  "assets": [],
+  "audio": {
+    "outerZone": {
+      "radius": 280,
+      "track": "wind"
+    },
+    "midZone": {
+      "radius": 150,
+      "track": "adventure"
+    },
+    "innerZone": {
+      "radius": 60,
+      "track": "battle"
+    }
+  }
+
+}
