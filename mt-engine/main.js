@@ -54,9 +54,15 @@ function _enginePath(rel) { return `${ENGINE_ROOT}/${rel}`; }
 // Config loading:
 //   1. Try 'game-config.json' next to index.html (standalone deployment)
 //   2. Fall back to engine default
-const _pageBase = window.location.href.replace(/\/[^\/]*$/, '');
+// Base URL of the page (directory containing index.html), no trailing slash
+const _pagePath = window.location.pathname.endsWith('/')
+  ? window.location.pathname.slice(0, -1)
+  : window.location.pathname.replace(/\/[^\/]+$/, '');
+const _pageBase  = window.location.origin + _pagePath;
 const LOCAL_CONFIG   = `${_pageBase}/game-config.json`;
 const DEFAULT_CONFIG = _enginePath('assets/configs/test.json');
+
+console.log('[main] pageBase:', _pageBase, 'ENGINE_ROOT:', ENGINE_ROOT);
 
 // GitHub Pages deployment URL for the engine.
 // Set this in localStorage via the editor, or hardcode for your repo.
@@ -75,10 +81,33 @@ window.setDeployEngineUrl = setDeployEngineUrl; // expose for editor panel
 window.dispatchEvent(new CustomEvent('engine-ready', { detail: { engineRoot: ENGINE_ROOT } }));
 
 async function _resolveStartConfig() {
+  const params = new URLSearchParams(window.location.search);
+
+  // ?config=path/to/any.json  — explicit full path (relative to page or absolute)
+  const configParam = params.get('config');
+  if (configParam) {
+    const url = configParam.startsWith('http') ? configParam : `${_pageBase}/${configParam}`;
+    console.log('[main] Config from URL param:', url);
+    return url;
+  }
+
+  // ?level=N  — loads level-N.json next to index.html, e.g. level-1.json
+  const levelParam = params.get('level');
+  if (levelParam) {
+    const url = `${_pageBase}/level-${levelParam}.json`;
+    try {
+      const r = await fetch(url, { method: 'HEAD' });
+      if (r.ok) { console.log('[main] Level from URL param:', url); return url; }
+      console.warn('[main] Level file not found:', url, '— falling back');
+    } catch(e) {}
+  }
+
+  // Default: try game-config.json next to index.html
   try {
     const r = await fetch(LOCAL_CONFIG, { method: 'HEAD' });
     if (r.ok) { console.log('[main] Local game-config.json found'); return LOCAL_CONFIG; }
   } catch(e) {}
+
   console.log('[main] Using engine default config');
   return DEFAULT_CONFIG;
 }
@@ -239,6 +268,12 @@ async function loadGameConfig(url) {
     return;
   }
 
+  // Update title and loading screen as soon as config is known
+  const _title = CONFIG.meta?.title || 'Metal Throne';
+  document.title = _title;
+  const _loadTitle = document.querySelector('#loading-screen .load-title');
+  if (_loadTitle) _loadTitle.textContent = _title.toUpperCase();
+
   setLoadStatus('Initializing physics', 30);
   await initPhysics();
 
@@ -290,9 +325,21 @@ async function loadGameConfig(url) {
   await _waitForYuka();
   _spawnEnemiesFromConfig();
 
+  const title = CONFIG.meta?.title || 'Metal Throne';
+  const subtitle = CONFIG.meta?.subtitle || '';
+
+  // Update page title
+  document.title = title;
+
+  // Update loading screen title (in case it's still visible during transition)
+  const loadTitle = document.querySelector('#loading-screen .load-title');
+  if (loadTitle) loadTitle.textContent = title.toUpperCase();
+  const loadSub = document.querySelector('#loading-screen .load-sub');
+  if (loadSub && subtitle) loadSub.textContent = subtitle.toUpperCase();
+
   setLoadStatus('Ready!', 100);
   hideLoadingScreen();
-  hudSetStatus(`${CONFIG.meta?.title || 'Game'} loaded`);
+  hudSetStatus(`${title}${subtitle ? ' — ' + subtitle : ''} loaded`);
   _loading = false;
 }
 
