@@ -1,0 +1,13 @@
+{
+  "environment": "Savanna",
+  "paletteType": "Golden Grasslands",
+  "colors": {
+    "savanna_gold": "#D2B55B",
+    "dry_stalk_yellow": "#E4D00A",
+    "acacia_canopy": "#556B2F",
+    "baobab_bark": "#8B5A2B",
+    "baked_red_earth": "#CD5C5C",
+    "dust_cloud": "#D2B48C",
+    "twilight_purple": "#483D8B"
+  }
+}

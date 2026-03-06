@@ -1,0 +1,13 @@
+{
+  "environment": "Tropical Rainforest",
+  "paletteType": "Vibrant Jungle",
+  "colors": {
+    "jungle_deep": "#0B6623",
+    "canopy_emerald": "#50C878",
+    "wet_soil_black": "#1A1110",
+    "bromeliad_red": "#FF2400",
+    "orchid_purple": "#DA70D6",
+    "mahogany_wood": "#C04000",
+    "humid_haze_blue": "#B0E0E6"
+  }
+}

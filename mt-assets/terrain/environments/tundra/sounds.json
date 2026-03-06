@@ -1,0 +1,42 @@
+{
+  "environment": "Tundra",
+  "audioConfig": {
+    "globalReverb": {
+      "decay": 6.0,
+      "preDelay": 0.1,
+      "wet": 0.6
+    },
+    "soundscape":[
+      {
+        "name": "arctic_gale",
+        "description": "High pitched, whistling white noise.",
+        "toneClass": "NoiseSynth",
+        "synthConfig": {
+          "noise": { "type": "white" },
+          "envelope": { "attack": 4.0, "decay": 2.0, "sustain": 0.8, "release": 5.0 }
+        },
+        "effects": {
+          "AutoFilter": { "frequency": 0.02, "type": "sine", "depth": 0.9, "baseFrequency": 800, "octaves": 3, "filter": { "type": "bandpass", "rolloff": -24, "Q": 5 } }
+        },
+        "behavior": { "triggerType": "continuous", "volume": -12 }
+      },
+      {
+        "name": "ice_crack",
+        "description": "Sharp, metallic snap to simulate permafrost or ice shifts.",
+        "toneClass": "MetalSynth",
+        "synthConfig": {
+          "frequency": 200,
+          "envelope": { "attack": 0.001, "decay": 0.4, "release": 0.2 },
+          "harmonicity": 5.1,
+          "modulationIndex": 32,
+          "resonance": 4000,
+          "octaves": 1.5
+        },
+        "effects": {
+          "Reverb": { "decay": 3.0, "wet": 0.5 }
+        },
+        "behavior": { "triggerType": "random_interval", "minIntervalSeconds": 20, "maxIntervalSeconds": 60, "volume": -5 }
+      }
+    ]
+  }
+}

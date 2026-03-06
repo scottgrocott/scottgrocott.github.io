@@ -1,0 +1,18 @@
+{
+  "spriteSheets":[
+    {
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/broadleaf_vines.jpg",
+      "layout": "grid",
+      "columns": 2,
+      "rows": 2,
+      "cellWidth": 256,
+      "cellHeight": 256,
+      "frames":[
+        {"id": "vine_r0_c0", "x": 0, "y": 0, "w": 256, "h": 256},
+        {"id": "vine_r0_c1", "x": 256, "y": 0, "w": 256, "h": 256},
+        {"id": "vine_r1_c0", "x": 0, "y": 256, "w": 256, "h": 256},
+        {"id": "vine_r1_c1", "x": 256, "y": 256, "w": 256, "h": 256}
+      ]
+    }
+  ]
+}

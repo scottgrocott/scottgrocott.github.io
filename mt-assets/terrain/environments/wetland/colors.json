@@ -1,0 +1,13 @@
+{
+  "environment": "Wetland",
+  "paletteType": "Swamp & Marsh",
+  "colors": {
+    "marsh_green": "#556B2F",
+    "mud_brown": "#704214",
+    "duckweed_lime": "#9ACD32",
+    "cattail_brown": "#8B4513",
+    "stagnant_water_blue": "#4682B4",
+    "cypress_bark": "#5C4033",
+    "swamp_murk_gray": "#7A8B8B"
+  }
+}

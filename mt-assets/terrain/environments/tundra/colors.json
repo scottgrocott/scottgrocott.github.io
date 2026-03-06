@@ -1,0 +1,13 @@
+{
+  "environment": "Tundra",
+  "paletteType": "Arctic Frost",
+  "colors": {
+    "glacier_white": "#F8F9FA",
+    "permafrost_gray": "#6E6E6E",
+    "lichen_pale_green": "#8A9A5B",
+    "ice_blue": "#A5F2F3",
+    "alpine_slate": "#708090",
+    "frozen_tussock": "#BDB76B",
+    "winter_sky": "#4682B4"
+  }
+}

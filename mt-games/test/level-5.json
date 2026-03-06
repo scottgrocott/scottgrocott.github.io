@@ -12,23 +12,55 @@
     "sizeZ": 700,
     "subdivisions": 128,
     "heightScale": 80,
-    "environment": "env_mediterranean",
+    "environment": "env_desert",
     "shelterCount": 10,
-    "heightmaps": [
+    "heightmaps":[
       "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png",
       "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png",
       "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map3.png"
     ]
   },
-  "enemies": [
+  "fog": {
+    "enabled": true,
+    "mode": "FOGMODE_LINEAR",
+    "color": { "r": 0.85, "g": 0.75, "b": 0.60 },
+    "density": 0.005,
+    "start": 150.0,
+    "end": 600.0
+  },
+  "water": {
+    "enabled": true,
+    "mesh": {
+      "width": 700,
+      "height": 700,
+      "subdivisions": 32,
+      "position": { "x": 0, "y": 15, "z": 0 }
+    },
+    "material": {
+      "bumpTexture": "https://scottgrocott.github.io/mt-assets/terrain/environments/water.jpg",
+      "windForce": 5.0,
+      "windDirection": { "x": 1, "y": 0.5 },
+      "waveHeight": 0.4,
+      "bumpHeight": 0.1,
+      "waveLength": 0.1,
+      "waveSpeed": 20.0,
+      "waterColor": { "r": 0.05, "g": 0.3, "b": 0.5 },
+      "colorBlendFactor": 0.2,
+      "waterColor2": { "r": 0.1, "g": 0.4, "b": 0.6 },
+      "colorBlendFactor2": 0.2,
+      "disableClipPlane": false,
+      "renderTargetSize": 512
+    }
+  },
+  "enemies":[
     { "type": "drone",    "maxCount": 4, "health": 60,  "hitsToKill": 10 },
     { "type": "car",      "maxCount": 3, "health": 100, "hitsToKill": 8  },
     { "type": "forklift", "maxCount": 2, "health": 150, "hitsToKill": 12 }
   ],
-  "weapons": [
+  "weapons":[
     { "id": "basic_gun", "bulletSpeed": 60, "bulletRadius": 0.12, "range": 200, "hitsToKill": 10 }
   ],
-  "scatterLayers": [
+  "scatterLayers":[
     { "category": "vegetation", "density": 0.10 },
     { "category": "rock",       "density": 0.04 }
   ],

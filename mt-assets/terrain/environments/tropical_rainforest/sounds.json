@@ -1,0 +1,43 @@
+{
+  "environment": "Tropical Rainforest",
+  "audioConfig": {
+    "globalReverb": {
+      "decay": 3.0,
+      "preDelay": 0.08,
+      "wet": 0.4
+    },
+    "soundscape":[
+      {
+        "name": "water_drip",
+        "description": "Short, pitched percussive hits imitating canopy drops.",
+        "toneClass": "MembraneSynth",
+        "synthConfig": {
+          "pitchDecay": 0.05,
+          "octaves": 3,
+          "oscillator": { "type": "sine" },
+          "envelope": { "attack": 0.001, "decay": 0.2, "sustain": 0, "release": 0.1 }
+        },
+        "effects": {
+          "PingPongDelay": { "delayTime": "16n", "feedback": 0.2, "wet": 0.5 }
+        },
+        "behavior": { "triggerType": "random_burst", "burstDurationSeconds": 0.5, "repeatRateHz": 2, "minIntervalSeconds": 1, "maxIntervalSeconds": 4, "volume": -10 }
+      },
+      {
+        "name": "howler_monkey_distant",
+        "description": "Low frequency distorted FM wave.",
+        "toneClass": "FMSynth",
+        "synthConfig": {
+          "harmonicity": 1.5,
+          "modulationIndex": 5,
+          "oscillator": { "type": "sawtooth" },
+          "envelope": { "attack": 0.5, "decay": 1.0, "sustain": 0.8, "release": 2.0 }
+        },
+        "effects": {
+          "Distortion": { "distortion": 0.6, "oversample": "none" },
+          "Filter": { "type": "lowpass", "frequency": 800, "rolloff": -24 }
+        },
+        "behavior": { "triggerType": "random_interval", "minIntervalSeconds": 40, "maxIntervalSeconds": 120, "basePitch": "A2", "volume": -14 }
+      }
+    ]
+  }
+}

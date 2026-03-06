@@ -3,6 +3,40 @@
     {
       "env_id": "env_mediterranean",
       "name": "Mediterranean",
+      "description": "Dry summers, mild wet winters, rocky soils, aromatic shrubs, coastal hillsides and scrublands.",
+      "colors":[
+        { "name": "dry_grass", "hex": "#C9B458" },
+        { "name": "olive_green", "hex": "#6B8E23" },
+        { "name": "dusty_brown", "hex": "#8B6F47" },
+        { "name": "limestone_gray", "hex": "#B7B7B7" },
+        { "name": "sage", "hex": "#9CAF88" }
+      ],
+      "sounds": {
+        "description": "Wind through scrub, cicadas, distant seabirds, dry grass rustling.",
+        "tonejs":[
+          { "sound": "cicadas", "synth": "Tone.NoiseSynth", "config": { "noise": { "type": "brown" }, "envelope": { "attack": 0.01, "decay": 0.2, "sustain": 0.1, "release": 0.05 } } },
+          { "sound": "dry_wind", "synth": "Tone.NoiseSynth", "config": { "noise": { "type": "pink" }, "envelope": { "attack": 2, "decay": 1, "sustain": 0.8, "release": 3 } } }
+        ]
+      },
+      "veg":[
+        "sagebrush",
+        "lavender",
+        "rosemary",
+        "thyme",
+        "rockrose",
+        "fennel",
+        "yarrow",
+        "wild oregano",
+        "broom"
+      ],
+      "trees":[
+        "olive",
+        "cork oak",
+        "holm oak",
+        "stone pine",
+        "carob",
+        "eucalyptus"
+      ],
       "assets": {
         "colors": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/colors.json",
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/sounds.json",
@@ -10,18 +44,64 @@
         "node_mat_rocks": {
           "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_rocks.jpg",
           "uScale": 2.0,
-          "vScale": 2.0
+          "vScale": 2.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 4.0,
+          "minSlope": 0.45,
+          "maxSlope": 1.0,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 2000.0,
+          "heightFalloff": 10.0
         },
         "node_mat_dirt": {
           "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_dirt.jpg",
           "uScale": 4.0,
-          "vScale": 4.0
+          "vScale": 4.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 2.0,
+          "minSlope": 0.0,
+          "maxSlope": 0.55,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 1500.0,
+          "heightFalloff": 10.0
         }
       }
     },
     {
       "env_id": "env_desert",
       "name": "Desert",
+      "description": "Arid climate with sparse vegetation, sand dunes, rocky flats, extreme temperature swings.",
+      "colors":[
+        { "name": "sand", "hex": "#E2C290" },
+        { "name": "dune_shadow", "hex": "#C19A6B" },
+        { "name": "desert_rock", "hex": "#A0522D" },
+        { "name": "sun_bleached", "hex": "#F5DEB3" }
+      ],
+      "sounds": {
+        "description": "Low wind, sand shifting, distant insects.",
+        "tonejs":[
+          { "sound": "sand_wind", "synth": "Tone.NoiseSynth", "config": { "noise": { "type": "white" }, "envelope": { "attack": 3, "decay": 2, "sustain": 0.7, "release": 4 } } },
+          { "sound": "dry_insects", "synth": "Tone.FMSynth", "config": { "harmonicity": 3, "modulationIndex": 10 } }
+        ]
+      },
+      "veg":[
+        "prickly pear cactus",
+        "barrel cactus",
+        "ocotillo",
+        "desert marigold",
+        "creosote bush",
+        "yucca"
+      ],
+      "trees":[
+        "mesquite",
+        "palo verde",
+        "desert willow",
+        "ironwood"
+      ],
       "assets": {
         "colors": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/colors.json",
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/sounds.json",
@@ -29,12 +109,349 @@
         "node_mat_rocks": {
           "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_rocks.jpg",
           "uScale": 2.0,
-          "vScale": 2.0
+          "vScale": 2.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 5.0,
+          "minSlope": 0.4,
+          "maxSlope": 1.0,
+          "slopeFalloff": 0.1,
+          "minHeight": -50.0,
+          "maxHeight": 2000.0,
+          "heightFalloff": 10.0
         },
         "node_mat_dirt": {
           "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_dirt.jpg",
           "uScale": 4.0,
-          "vScale": 4.0
+          "vScale": 4.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 3.0,
+          "minSlope": 0.0,
+          "maxSlope": 0.5,
+          "slopeFalloff": 0.1,
+          "minHeight": -50.0,
+          "maxHeight": 1200.0,
+          "heightFalloff": 15.0
+        }
+      }
+    },
+    {
+      "env_id": "env_temperate_forest",
+      "name": "Temperate Forest",
+      "description": "Moderate rainfall, rich soil, dense vegetation with layered canopy.",
+      "colors":[
+        { "name": "forest_green", "hex": "#228B22" },
+        { "name": "moss", "hex": "#6B8E23" },
+        { "name": "bark_brown", "hex": "#5C4033" },
+        { "name": "leaf_shadow", "hex": "#2F4F4F" }
+      ],
+      "sounds": {
+        "description": "Birdsong, rustling leaves, distant animals, wind through canopy.",
+        "tonejs":[
+          { "sound": "forest_wind", "synth": "Tone.NoiseSynth", "config": { "noise": { "type": "pink" }, "envelope": { "attack": 1, "decay": 1, "sustain": 0.8, "release": 2 } } },
+          { "sound": "bird_chirp", "synth": "Tone.Synth", "config": { "oscillator": { "type": "triangle" }, "envelope": { "attack": 0.01, "decay": 0.1, "sustain": 0.2, "release": 0.3 } } }
+        ]
+      },
+      "veg":[
+        "ferns",
+        "trillium",
+        "wild ginger",
+        "bluebells",
+        "moss",
+        "ivy"
+      ],
+      "trees":[
+        "oak",
+        "maple",
+        "beech",
+        "birch",
+        "elm",
+        "chestnut"
+      ],
+      "assets": {
+        "colors": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/colors.json",
+        "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/sounds.json",
+        "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/sprites.json",
+        "node_mat_rocks": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/node_mat_rocks.jpg",
+          "uScale": 2.0,
+          "vScale": 2.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 4.0,
+          "minSlope": 0.45,
+          "maxSlope": 1.0,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 2000.0,
+          "heightFalloff": 10.0
+        },
+        "node_mat_dirt": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/node_mat_dirt.jpg",
+          "uScale": 4.0,
+          "vScale": 4.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 2.0,
+          "minSlope": 0.0,
+          "maxSlope": 0.55,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 1500.0,
+          "heightFalloff": 10.0
+        }
+      }
+    },
+    {
+      "env_id": "env_tropical_rainforest",
+      "name": "Tropical Rainforest",
+      "description": "Hot, humid, dense vegetation with heavy rainfall and extreme biodiversity.",
+      "colors":[
+        { "name": "jungle_green", "hex": "#0B6623" },
+        { "name": "deep_leaf", "hex": "#014421" },
+        { "name": "wet_soil", "hex": "#3B2F2F" },
+        { "name": "tropical_flower", "hex": "#FF4500" }
+      ],
+      "sounds": {
+        "description": "Insects, frogs, dripping water, birds and distant animal calls.",
+        "tonejs":[
+          { "sound": "rain_drip", "synth": "Tone.MembraneSynth", "config": { "pitchDecay": 0.05, "octaves": 3 } },
+          { "sound": "jungle_insects", "synth": "Tone.NoiseSynth", "config": { "noise": { "type": "white" }, "envelope": { "attack": 0.01, "decay": 0.2, "sustain": 0.2, "release": 0.1 } } }
+        ]
+      },
+      "veg":[
+        "bromeliads",
+        "orchids",
+        "philodendron",
+        "heliconia",
+        "ferns",
+        "ginger plants"
+      ],
+      "trees":[
+        "kapok",
+        "mahogany",
+        "rubber tree",
+        "ceiba",
+        "brazil nut"
+      ],
+      "assets": {
+        "colors": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/colors.json",
+        "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/sounds.json",
+        "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/sprites.json",
+        "node_mat_rocks": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/node_mat_rocks.jpg",
+          "uScale": 2.0,
+          "vScale": 2.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 4.0,
+          "minSlope": 0.45,
+          "maxSlope": 1.0,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 2000.0,
+          "heightFalloff": 10.0
+        },
+        "node_mat_dirt": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/node_mat_dirt.jpg",
+          "uScale": 4.0,
+          "vScale": 4.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 2.0,
+          "minSlope": 0.0,
+          "maxSlope": 0.55,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 1500.0,
+          "heightFalloff": 10.0
+        }
+      }
+    },
+    {
+      "env_id": "env_tundra",
+      "name": "Tundra",
+      "description": "Cold treeless plains with permafrost and low vegetation.",
+      "colors":[
+        { "name": "snow_white", "hex": "#F0F8FF" },
+        { "name": "lichen_green", "hex": "#8A9A5B" },
+        { "name": "frozen_soil", "hex": "#6E6E6E" },
+        { "name": "arctic_sky", "hex": "#B0E0E6" }
+      ],
+      "sounds": {
+        "description": "Cold wind, distant ice cracking, occasional bird calls.",
+        "tonejs":[
+          { "sound": "arctic_wind", "synth": "Tone.NoiseSynth", "config": { "noise": { "type": "white" }, "envelope": { "attack": 4, "decay": 2, "sustain": 0.8, "release": 5 } } },
+          { "sound": "ice_crack", "synth": "Tone.MetalSynth", "config": { "frequency": 200, "envelope": { "attack": 0.001, "decay": 0.4, "release": 0.2 } } }
+        ]
+      },
+      "veg":[
+        "arctic moss",
+        "lichen",
+        "dwarf willow shrubs",
+        "cotton grass",
+        "saxifrage"
+      ],
+      "trees":[],
+      "assets": {
+        "colors": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/colors.json",
+        "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/sounds.json",
+        "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/sprites.json",
+        "node_mat_rocks": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/node_mat_rocks.jpg",
+          "uScale": 2.0,
+          "vScale": 2.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 4.0,
+          "minSlope": 0.45,
+          "maxSlope": 1.0,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 2000.0,
+          "heightFalloff": 10.0
+        },
+        "node_mat_dirt": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/node_mat_dirt.jpg",
+          "uScale": 4.0,
+          "vScale": 4.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 2.0,
+          "minSlope": 0.0,
+          "maxSlope": 0.55,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 1500.0,
+          "heightFalloff": 10.0
+        }
+      }
+    },
+    {
+      "env_id": "env_savanna",
+      "name": "Savanna",
+      "description": "Warm grasslands with scattered trees and seasonal rainfall.",
+      "colors":[
+        { "name": "savanna_gold", "hex": "#D2B55B" },
+        { "name": "dry_grass", "hex": "#C2A15C" },
+        { "name": "dust", "hex": "#B38B6D" },
+        { "name": "acacia_green", "hex": "#6F8F4F" }
+      ],
+      "sounds": {
+        "description": "Wind across grasslands, insects, distant animal calls.",
+        "tonejs":[
+          { "sound": "grass_wind", "synth": "Tone.NoiseSynth", "config": { "noise": { "type": "pink" }, "envelope": { "attack": 2, "decay": 1, "sustain": 0.8, "release": 2 } } },
+          { "sound": "crickets", "synth": "Tone.FMSynth", "config": { "harmonicity": 4, "modulationIndex": 8 } }
+        ]
+      },
+      "veg":[
+        "elephant grass",
+        "red oat grass",
+        "wild basil",
+        "savanna shrubs",
+        "tickseed"
+      ],
+      "trees":[
+        "acacia",
+        "baobab",
+        "marula",
+        "jackalberry"
+      ],
+      "assets": {
+        "colors": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/colors.json",
+        "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/sounds.json",
+        "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/sprites.json",
+        "node_mat_rocks": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/node_mat_rocks.jpg",
+          "uScale": 2.0,
+          "vScale": 2.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 4.0,
+          "minSlope": 0.45,
+          "maxSlope": 1.0,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 2000.0,
+          "heightFalloff": 10.0
+        },
+        "node_mat_dirt": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/node_mat_dirt.jpg",
+          "uScale": 4.0,
+          "vScale": 4.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 2.0,
+          "minSlope": 0.0,
+          "maxSlope": 0.55,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 1500.0,
+          "heightFalloff": 10.0
+        }
+      }
+    },
+    {
+      "env_id": "env_wetland",
+      "name": "Wetland",
+      "description": "Waterlogged soils with marsh plants and slow-moving water.",
+      "colors":[
+        { "name": "marsh_green", "hex": "#556B2F" },
+        { "name": "mud_brown", "hex": "#704214" },
+        { "name": "reed", "hex": "#9DBF7F" },
+        { "name": "water_reflection", "hex": "#6CA6CD" }
+      ],
+      "sounds": {
+        "description": "Frogs, insects, water movement, birds.",
+        "tonejs":[
+          { "sound": "frog_call", "synth": "Tone.MembraneSynth", "config": { "pitchDecay": 0.2, "octaves": 4 } },
+          { "sound": "marsh_insects", "synth": "Tone.NoiseSynth", "config": { "noise": { "type": "pink" }, "envelope": { "attack": 0.05, "decay": 0.3, "sustain": 0.3, "release": 0.2 } } }
+        ]
+      },
+      "veg":[
+        "cattails",
+        "reeds",
+        "sedges",
+        "water lilies",
+        "marsh marigold"
+      ],
+      "trees":[
+        "willow",
+        "bald cypress",
+        "red maple"
+      ],
+      "assets": {
+        "colors": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/colors.json",
+        "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/sounds.json",
+        "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/sprites.json",
+        "node_mat_rocks": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/node_mat_rocks.jpg",
+          "uScale": 2.0,
+          "vScale": 2.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 4.0,
+          "minSlope": 0.45,
+          "maxSlope": 1.0,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 2000.0,
+          "heightFalloff": 10.0
+        },
+        "node_mat_dirt": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/node_mat_dirt.jpg",
+          "uScale": 4.0,
+          "vScale": 4.0,
+          "blendMode": "Normal",
+          "blendWeight": 1.0,
+          "blendSharpness": 2.0,
+          "minSlope": 0.0,
+          "maxSlope": 0.55,
+          "slopeFalloff": 0.15,
+          "minHeight": -50.0,
+          "maxHeight": 1500.0,
+          "heightFalloff": 10.0
         }
       }
     }

@@ -1,0 +1,13 @@
+{
+  "environment": "Temperate Forest",
+  "paletteType": "Woodland Greens",
+  "colors": {
+    "forest_canopy": "#228B22",
+    "moss_carpet": "#6B8E23",
+    "oak_bark": "#5C4033",
+    "deep_leaf_shadow": "#2F4F4F",
+    "fern_frond": "#4E9258",
+    "autumn_crisp_orange": "#D2691E",
+    "forest_floor_loam": "#3E2723"
+  }
+}
