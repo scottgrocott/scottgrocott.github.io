@@ -1,0 +1,123 @@
+{
+  "environment": "Mediterranean",
+  "audioConfig": {
+    "globalReverb": {
+      "decay": 2.5,
+      "preDelay": 0.1,
+      "wet": 0.3
+    },
+    "soundscape":[
+      {
+        "name": "rolling_waves",
+        "description": "Continuous, slow, sweeping brown noise simulating waves hitting the shore.",
+        "toneClass": "NoiseSynth",
+        "synthConfig": {
+          "noise": {
+            "type": "brown"
+          },
+          "envelope": {
+            "attack": 3.0,
+            "decay": 1.0,
+            "sustain": 0.8,
+            "release": 4.0
+          }
+        },
+        "effects": {
+          "AutoFilter": {
+            "frequency": 0.15,
+            "type": "sine",
+            "depth": 1,
+            "baseFrequency": 150,
+            "octaves": 3.5,
+            "filter": {
+              "type": "lowpass",
+              "rolloff": -24,
+              "Q": 1.2
+            }
+          }
+        },
+        "behavior": {
+          "triggerType": "continuous",
+          "volume": -12
+        }
+      },
+      {
+        "name": "summer_cicadas",
+        "description": "High-frequency buzzing modulated rapidly by an LFO to create the classic Mediterranean insect chorus.",
+        "toneClass": "Synth",
+        "synthConfig": {
+          "oscillator": {
+            "type": "pwm",
+            "modulationFrequency": 0.2
+          },
+          "envelope": {
+            "attack": 2.0,
+            "decay": 0.5,
+            "sustain": 1.0,
+            "release": 2.0
+          }
+        },
+        "effects": {
+          "Tremolo": {
+            "frequency": 60,
+            "type": "square",
+            "depth": 0.8,
+            "spread": 0
+          },
+          "Filter": {
+            "type": "bandpass",
+            "frequency": 7500,
+            "Q": 5
+          }
+        },
+        "behavior": {
+          "triggerType": "loop",
+          "loopInterval": "16m",
+          "volume": -18
+        }
+      },
+      {
+        "name": "seagull_call",
+        "description": "FM Synthesis mimicking a bird call with a pitch envelope descending rapidly.",
+        "toneClass": "FMSynth",
+        "synthConfig": {
+          "harmonicity": 1.5,
+          "modulationIndex": 2.5,
+          "oscillator": {
+            "type": "triangle"
+          },
+          "envelope": {
+            "attack": 0.05,
+            "decay": 0.2,
+            "sustain": 0.1,
+            "release": 0.8
+          },
+          "modulation": {
+            "type": "sine"
+          },
+          "modulationEnvelope": {
+            "attack": 0.01,
+            "decay": 0.4,
+            "sustain": 0.0,
+            "release": 0.1
+          }
+        },
+        "effects": {
+          "Chorus": {
+            "frequency": 1.5,
+            "delayTime": 3.5,
+            "depth": 0.7,
+            "wet": 0.4
+          }
+        },
+        "behavior": {
+          "triggerType": "random_interval",
+          "minIntervalSeconds": 15,
+          "maxIntervalSeconds": 45,
+          "basePitch": "C6",
+          "volume": -10
+        }
+      }
+    ]
+  }
+}

@@ -14,7 +14,8 @@
     "heightScale": 80,
     "heightmaps": [
       "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png",
-      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png"
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png",
+	  "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map3.png"
     ]
   },
   "enemies": [

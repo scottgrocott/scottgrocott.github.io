@@ -1,0 +1,128 @@
+{
+  "environment": "Desert",
+  "audioConfig": {
+    "globalReverb": {
+      "decay": 4.5,
+      "preDelay": 0.05,
+      "wet": 0.5
+    },
+    "soundscape":[
+      {
+        "name": "dry_howling_wind",
+        "description": "Pink noise through a highly resonant bandpass filter, mapped to a wandering LFO to simulate gusts through a canyon.",
+        "toneClass": "NoiseSynth",
+        "synthConfig": {
+          "noise": {
+            "type": "pink"
+          },
+          "envelope": {
+            "attack": 4.0,
+            "decay": 2.0,
+            "sustain": 0.6,
+            "release": 5.0
+          }
+        },
+        "effects": {
+          "AutoFilter": {
+            "frequency": 0.05,
+            "type": "triangle",
+            "depth": 0.8,
+            "baseFrequency": 300,
+            "octaves": 4,
+            "filter": {
+              "type": "bandpass",
+              "rolloff": -12,
+              "Q": 3.5
+            }
+          }
+        },
+        "behavior": {
+          "triggerType": "continuous",
+          "volume": -8
+        }
+      },
+      {
+        "name": "rattlesnake_shake",
+        "description": "Extremely fast, short bursts of filtered white noise mimicking a snake's rattle.",
+        "toneClass": "NoiseSynth",
+        "synthConfig": {
+          "noise": {
+            "type": "white"
+          },
+          "envelope": {
+            "attack": 0.01,
+            "decay": 0.05,
+            "sustain": 0.0,
+            "release": 0.01
+          }
+        },
+        "effects": {
+          "Filter": {
+            "type": "highpass",
+            "frequency": 6000,
+            "rolloff": -24
+          },
+          "AutoPanner": {
+            "frequency": 10,
+            "type": "sine",
+            "depth": 1
+          }
+        },
+        "behavior": {
+          "triggerType": "random_burst",
+          "burstDurationSeconds": 1.5,
+          "repeatRateHz": 45,
+          "minIntervalSeconds": 20,
+          "maxIntervalSeconds": 60,
+          "volume": -15
+        }
+      },
+      {
+        "name": "hawk_screech",
+        "description": "Harsh FM synth with a sharp pitch drop and high distortion to mimic a bird of prey.",
+        "toneClass": "FMSynth",
+        "synthConfig": {
+          "harmonicity": 0.8,
+          "modulationIndex": 15,
+          "oscillator": {
+            "type": "sawtooth"
+          },
+          "envelope": {
+            "attack": 0.05,
+            "decay": 0.8,
+            "sustain": 0.1,
+            "release": 1.5
+          },
+          "modulation": {
+            "type": "square"
+          },
+          "modulationEnvelope": {
+            "attack": 0.01,
+            "decay": 0.5,
+            "sustain": 0.0,
+            "release": 0.01
+          }
+        },
+        "effects": {
+          "Distortion": {
+            "distortion": 0.4,
+            "oversample": "2x"
+          },
+          "PingPongDelay": {
+            "delayTime": "8n.",
+            "feedback": 0.3,
+            "wet": 0.4
+          }
+        },
+        "behavior": {
+          "triggerType": "random_interval",
+          "minIntervalSeconds": 30,
+          "maxIntervalSeconds": 90,
+          "basePitch": "F5",
+          "pitchDropOctaves": -1.5,
+          "volume": -6
+        }
+      }
+    ]
+  }
+}

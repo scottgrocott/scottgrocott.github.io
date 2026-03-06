@@ -1,0 +1,18 @@
+{
+  "environment": "Mediterranean",
+  "paletteType": "Earth Tones",
+  "colors": {
+    "terracotta": "#E2725B",
+    "burnt_sienna": "#E97451",
+    "raw_umber": "#826644",
+    "clay_pot": "#C06341",
+    "tuscan_ochre": "#D69F3A",
+    "limestone_warm": "#EAE4D3",
+    "sunbaked_limestone": "#D7CDBB",
+    "olive_drab": "#6B8E23",
+    "cyprus_green": "#4A5D23",
+    "dry_thyme_green": "#737852",
+    "dusty_lavender_earth": "#9A8B95",
+    "weathered_stucco": "#DCC9A8"
+  }
+}

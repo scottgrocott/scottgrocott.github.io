@@ -1,0 +1,18 @@
+{
+  "environment": "Desert",
+  "paletteType": "Earth Tones",
+  "colors": {
+    "dune_sand": "#E1C699",
+    "tumbleweed_tan": "#C2B280",
+    "desert_gold_sand": "#D2B48C",
+    "red_rock_canyon": "#B3543E",
+    "sedona_rust": "#A0522D",
+    "adobe_clay": "#CC8A6E",
+    "mesa_rose": "#B87C76",
+    "sunbaked_dirt": "#B68B5D",
+    "dry_mesquite_wood": "#4A3B32",
+    "sagebrush": "#9DC183",
+    "pale_cactus_green": "#8BA888",
+    "deep_agave_green": "#587058"
+  }
+}

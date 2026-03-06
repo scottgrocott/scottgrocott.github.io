@@ -1,0 +1,35 @@
+{
+  "spriteSheets":[
+    {
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/cactus1.jpg",
+      "layout": "grid",
+      "columns": 4,
+      "rows": 5,
+      "cellWidth": 256,
+      "cellHeight": 256,
+      "frames":[
+        {"id": "cacti_r0_c0", "x": 0, "y": 0, "w": 256, "h": 256}, {"id": "cacti_r0_c1", "x": 256, "y": 0, "w": 256, "h": 256}, {"id": "cacti_r0_c2", "x": 512, "y": 0, "w": 256, "h": 256}, {"id": "cacti_r0_c3", "x": 768, "y": 0, "w": 256, "h": 256},
+        {"id": "cacti_r1_c0", "x": 0, "y": 256, "w": 256, "h": 256}, {"id": "cacti_r1_c1", "x": 256, "y": 256, "w": 256, "h": 256}, {"id": "cacti_r1_c2", "x": 512, "y": 256, "w": 256, "h": 256}, {"id": "cacti_r1_c3", "x": 768, "y": 256, "w": 256, "h": 256},
+        {"id": "cacti_r2_c0", "x": 0, "y": 512, "w": 256, "h": 256}, {"id": "cacti_r2_c1", "x": 256, "y": 512, "w": 256, "h": 256}, {"id": "cacti_r2_c2", "x": 512, "y": 512, "w": 256, "h": 256}, {"id": "cacti_r2_c3", "x": 768, "y": 512, "w": 256, "h": 256},
+        {"id": "cacti_r3_c0", "x": 0, "y": 768, "w": 256, "h": 256}, {"id": "cacti_r3_c1", "x": 256, "y": 768, "w": 256, "h": 256}, {"id": "cacti_r3_c2", "x": 512, "y": 768, "w": 256, "h": 256}, {"id": "cacti_r3_c3", "x": 768, "y": 768, "w": 256, "h": 256},
+        {"id": "cacti_r4_c0", "x": 0, "y": 1024, "w": 256, "h": 256}, {"id": "cacti_r4_c1", "x": 256, "y": 1024, "w": 256, "h": 256}, {"id": "cacti_r4_c2", "x": 512, "y": 1024, "w": 256, "h": 256}, {"id": "cacti_r4_c3", "x": 768, "y": 1024, "w": 256, "h": 256}
+      ]
+    },
+    {
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/veg1.jpg",
+      "layout": "grid",
+      "columns": 4,
+      "rows": 6,
+      "cellWidth": 256,
+      "cellHeight": 256,
+      "frames":[
+        {"id": "desert_r0_c0", "x": 0, "y": 0, "w": 256, "h": 256}, {"id": "desert_r0_c1", "x": 256, "y": 0, "w": 256, "h": 256}, {"id": "desert_r0_c2", "x": 512, "y": 0, "w": 256, "h": 256}, {"id": "desert_r0_c3", "x": 768, "y": 0, "w": 256, "h": 256},
+        {"id": "desert_r1_c0", "x": 0, "y": 256, "w": 256, "h": 256}, {"id": "desert_r1_c1", "x": 256, "y": 256, "w": 256, "h": 256}, {"id": "desert_r1_c2", "x": 512, "y": 256, "w": 256, "h": 256}, {"id": "desert_r1_c3", "x": 768, "y": 256, "w": 256, "h": 256},
+        {"id": "desert_r2_c0", "x": 0, "y": 512, "w": 256, "h": 256}, {"id": "desert_r2_c1", "x": 256, "y": 512, "w": 256, "h": 256}, {"id": "desert_r2_c2", "x": 512, "y": 512, "w": 256, "h": 256}, {"id": "desert_r2_c3", "x": 768, "y": 512, "w": 256, "h": 256},
+        {"id": "desert_r3_c0", "x": 0, "y": 768, "w": 256, "h": 256}, {"id": "desert_r3_c1", "x": 256, "y": 768, "w": 256, "h": 256}, {"id": "desert_r3_c2", "x": 512, "y": 768, "w": 256, "h": 256}, {"id": "desert_r3_c3", "x": 768, "y": 768, "w": 256, "h": 256},
+        {"id": "desert_r4_c0", "x": 0, "y": 1024, "w": 256, "h": 256}, {"id": "desert_r4_c1", "x": 256, "y": 1024, "w": 256, "h": 256}, {"id": "desert_r4_c2", "x": 512, "y": 1024, "w": 256, "h": 256}, {"id": "desert_r4_c3", "x": 768, "y": 1024, "w": 256, "h": 256},
+        {"id": "desert_r5_c0", "x": 0, "y": 1280, "w": 256, "h": 256}, {"id": "desert_r5_c1", "x": 256, "y": 1280, "w": 256, "h": 256}, {"id": "desert_r5_c2", "x": 512, "y": 1280, "w": 256, "h": 256}, {"id": "desert_r5_c3", "x": 768, "y": 1280, "w": 256, "h": 256}
+      ]
+    }
+  ]
+}
