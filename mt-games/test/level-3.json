@@ -1,37 +1,22 @@
 {
   "meta": {
-    "id": "metal_throne",
-    "title": "Metal Throne",
-    "description": "All three enemy types. Survive the chaos."
+    "id": "level-2",
+    "title": "Drone wars",
+    "subtitle": "Level 1"
   },
   "terrain": {
-    "type": "flat",
+    "type": "heightmap",
     "size": 700,
-    "heightmap": null,
+    "sizeX": 700,
+    "sizeZ": 700,
+    "subdivisions": 128,
     "heightScale": 80,
-    "groundTexture": null,
-    "shaderLayers": [
-      {
-        "minElevation": 0,
-        "maxElevation": 0.3,
-        "color": "#1a2010",
-        "texture": null,
-        "blend": "smooth"
-      },
-      {
-        "minElevation": 0.3,
-        "maxElevation": 0.7,
-        "color": "#302820",
-        "texture": null,
-        "blend": "smooth"
-      },
-      {
-        "minElevation": 0.7,
-        "maxElevation": 1,
-        "color": "#505040",
-        "texture": null,
-        "blend": "smooth"
-      }
+    "environment": "env_tropical_rainforest",
+    "shelterCount": 10,
+    "heightmaps": [
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png",
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png",
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map3.png"
     ]
   },
   "enemies": [
@@ -39,47 +24,21 @@
       "type": "drone",
       "module": "./enemies/drones.js",
       "spawnPoint": {
-        "x": -10,
+        "x": -13,
         "y": 2,
-        "z": -10
+        "z": 2.8
       },
-      "maxCount": 2,
+      "maxCount": 3,
       "placeholder": "box",
       "glb": null,
       "hitsToKill": 10
-    },
-    {
-      "type": "car",
-      "module": "./enemies/cars.js",
-      "spawnPoint": {
-        "x": 15,
-        "y": 1,
-        "z": 10
-      },
-      "maxCount": 1,
-      "placeholder": "box",
-      "glb": null,
-      "hitsToKill": 8
-    },
-    {
-      "type": "forklift",
-      "module": "./enemies/forklifts.js",
-      "spawnPoint": {
-        "x": -15,
-        "y": 1,
-        "z": 15
-      },
-      "maxCount": 1,
-      "placeholder": "box",
-      "glb": null,
-      "hitsToKill": 15
     }
   ],
   "weapons": [
     {
       "id": "basic_gun",
       "module": "./weapons/basicGun.js",
-      "bulletSpeed": 65,
+      "bulletSpeed": 60,
       "bulletRadius": 0.12,
       "range": 200,
       "hitsToKill": 10
@@ -90,13 +49,13 @@
   "scatterLayers": [
     {
       "category": "vegetation",
-      "density": 0.08,
+      "density": 0.1,
       "minElevation": 0,
       "maxElevation": 0.5
     },
     {
       "category": "rock",
-      "density": 0.04,
+      "density": 0.03,
       "minElevation": 0,
       "maxElevation": 0.8
     }
@@ -110,12 +69,63 @@
       "track": "wind"
     },
     "midZone": {
-      "radius": 130,
+      "radius": 150,
       "track": "adventure"
     },
     "innerZone": {
-      "radius": 80,
+      "radius": 60,
       "track": "battle"
+    }
+  },
+  "fog": {
+    "enabled": true,
+    "mode": "FOGMODE_LINEAR",
+    "color": {
+      "r": 0.85,
+      "g": 0.75,
+      "b": 0.6
+    },
+    "density": 0.05,
+    "start": 150.0,
+    "end": 600.0
+  },
+  "water": {
+    "enabled": true,
+    "mesh": {
+      "width": 700,
+      "height": 700,
+      "subdivisions": 32,
+      "position": {
+        "x": 0,
+        "y": 15,
+        "z": 0
+      }
+    },
+    "material": {
+      "bumpTexture": "https://scottgrocott.github.io/mt-assets/terrain/environments/water.jpg",
+      "windForce": 5.0,
+      "windDirection": {
+        "x": 1,
+        "y": 0.5
+      },
+      "waveHeight": 0.4,
+      "bumpHeight": 0.1,
+      "waveLength": 0.1,
+      "waveSpeed": 20.0,
+      "waterColor": {
+        "r": 0.05,
+        "g": 0.3,
+        "b": 0.5
+      },
+      "colorBlendFactor": 0.2,
+      "waterColor2": {
+        "r": 0.1,
+        "g": 0.4,
+        "b": 0.6
+      },
+      "colorBlendFactor2": 0.2,
+      "disableClipPlane": false,
+      "renderTargetSize": 512
     }
   }
 }
