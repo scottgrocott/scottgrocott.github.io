@@ -1,0 +1,16 @@
+{
+  "spriteSheets":[
+    {
+      "url": "https://scottgrocott.github.io/mt-assets/shelters/metal_panels.png",
+      "layout": "grid",
+      "columns": 4,
+      "rows": 2,
+      "cellWidth": 256,
+      "cellHeight": 512,
+      "frames":[
+        {"id": "rust_r0_c0", "x": 0, "y": 0, "w": 256, "h": 512}, {"id": "rust_r0_c1", "x": 256, "y": 0, "w": 256, "h": 512}, {"id": "rust_r0_c2", "x": 512, "y": 0, "w": 256, "h": 512}, {"id": "rust_r0_c3", "x": 768, "y": 0, "w": 256, "h": 512},
+        {"id": "rust_r1_c0", "x": 0, "y": 512, "w": 256, "h": 512}, {"id": "rust_r1_c1", "x": 256, "y": 512, "w": 256, "h": 512}, {"id": "rust_r1_c2", "x": 512, "y": 512, "w": 256, "h": 512}, {"id": "rust_r1_c3", "x": 768, "y": 512, "w": 256, "h": 512}
+      ]
+    }
+  ]
+}
