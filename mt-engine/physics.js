@@ -105,6 +105,17 @@ export function addTerrainCollider(imgData, sizeX, sizeZ, heightScale, subdiv = 
   console.log('[physics] Terrain trimesh collider:', vertCount, 'verts |', indices.length / 3, 'tris');
 }
 
+// Add a static box collider at world position (wx, wy, wz) with half-extents (hw, hh, hd)
+// rotY is Y-axis rotation in radians
+export function addBoxCollider(wx, wy, wz, hw, hh, hd, rotY = 0) {
+  if (!physicsReady || !physicsWorld) return null;
+  const body = physicsWorld.createRigidBody(RAPIER_MODULE.RigidBodyDesc.fixed());
+  const desc = RAPIER_MODULE.ColliderDesc.cuboid(hw, hh, hd)
+    .setTranslation(wx, wy, wz)
+    .setRotation({ x: 0, y: Math.sin(rotY / 2), z: 0, w: Math.cos(rotY / 2) });
+  return physicsWorld.createCollider(desc, body);
+}
+
 export function addFlatGroundCollider(sizeX = 512, sizeZ = 512) {
   if (!physicsReady || !physicsWorld) return;
   _removeTerrainCollider();

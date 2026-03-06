@@ -184,28 +184,97 @@ function _applyMaterial(scene, mesh, t) {
   if (!mesh) return;
   if (mesh.material) { try { mesh.material.dispose(); } catch(e) {} }
 
+  const hScale = t.heightScale ?? 50;
+  const env    = window._currentEnvColors;
+  const bands  = _buildHeightBands(env, hScale);
+
+  // Bake height-based colors into vertex color buffer
+  _stampVertexColors(mesh, bands, hScale);
+
+  // StandardMaterial with vertex colors — no custom shader needed
   const mat = new BABYLON.StandardMaterial('terrainMat', scene);
-  mat.specularColor = new BABYLON.Color3(0, 0, 0);
+  mat.specularColor   = new BABYLON.Color3(0, 0, 0);
+  mat.diffuseColor    = new BABYLON.Color3(1, 1, 1);  // white so vertex colors show through
+  mat.useVertexColors = true;
+  mat.backFaceCulling = true;
 
-  const env = window._currentEnvColors;
-  if (env && Object.keys(env).length > 0) {
-    const keys = Object.keys(env);
-    console.log('[terrain] Environment palette keys:', keys);
-    // Prefer ground-like keys, fall back to first entry
-    const groundKey = keys.find(k =>
-      /sand|dirt|clay|rock|soil|ground|earth|lime|stone|dune|desert/.test(k)
-    ) || keys[0];
-    const hex = env[groundKey];
-    console.log('[terrain] Using color key:', groundKey, '=', hex);
-    const rgb = _hexToRgb(hex);
-    mat.diffuseColor = new BABYLON.Color3(rgb.r, rgb.g, rgb.b);
-  } else {
-    mat.diffuseColor = new BABYLON.Color3(0.55, 0.48, 0.35); // neutral sandy fallback
-  }
-
-  mesh.material = mat;
+  mesh.material       = mat;
   mesh.receiveShadows = true;
   mesh.checkCollisions = false;
+
+  console.log('[terrain] Height bands:', bands.map(b => `${b.threshold.toFixed(0)}=${b.hex}`).join(' | '));
+}
+
+// Write per-vertex colors based on height, blending between palette bands
+function _stampVertexColors(mesh, bands, hScale) {
+  const positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+  if (!positions) return;
+  const vCount = positions.length / 3;
+  const colors = new Float32Array(vCount * 4);  // RGBA per vertex
+
+  for (let i = 0; i < vCount; i++) {
+    const h = positions[i * 3 + 1];  // Y = height
+
+    // Find which two bands to blend between
+    let r = bands[0].r, g = bands[0].g, b = bands[0].b;
+    for (let bi = 0; bi < bands.length - 1; bi++) {
+      const b0 = bands[bi];
+      const b1 = bands[bi + 1];
+      if (h >= b0.threshold && h <= b1.threshold) {
+        const range = b1.threshold - b0.threshold;
+        const t = range > 0 ? (h - b0.threshold) / range : 0;
+        // Smoothstep blend
+        const s = t * t * (3 - 2 * t);
+        r = b0.r + (b1.r - b0.r) * s;
+        g = b0.g + (b1.g - b0.g) * s;
+        b = b0.b + (b1.b - b0.b) * s;
+        break;
+      } else if (h > b1.threshold) {
+        r = b1.r; g = b1.g; b = b1.b;
+      }
+    }
+    colors[i * 4 + 0] = r;
+    colors[i * 4 + 1] = g;
+    colors[i * 4 + 2] = b;
+    colors[i * 4 + 3] = 1.0;
+  }
+
+  mesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors, false);
+}
+
+// Sort palette colors by brightness and assign evenly-spaced height thresholds
+function _buildHeightBands(env, hScale) {
+  const fallback = [
+    { r: 0.45, g: 0.38, b: 0.28, threshold: 0,            hex: '#fallback' },
+    { r: 0.55, g: 0.47, b: 0.35, threshold: hScale * 0.3, hex: '#fallback' },
+    { r: 0.65, g: 0.57, b: 0.42, threshold: hScale * 0.6, hex: '#fallback' },
+    { r: 0.80, g: 0.75, b: 0.65, threshold: hScale * 0.85, hex: '#fallback' },
+  ];
+
+  if (!env || Object.keys(env).length === 0) return fallback;
+
+  // Convert all palette colors to RGB + brightness
+  const entries = Object.entries(env).map(([key, hex]) => {
+    const c = _hexToRgb(hex);
+    const brightness = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+    return { ...c, hex, key, brightness };
+  });
+
+  // Sort darkest to lightest
+  entries.sort((a, b) => a.brightness - b.brightness);
+
+  // Assign thresholds: spread evenly 0 → hScale, with slight bias so
+  // lowlands get more range than peaks
+  const count = Math.min(entries.length, 6);
+  const selected = entries.slice(0, count);
+  selected.forEach((e, i) => {
+    // Quadratic bias: lower bands cover more area
+    const t = i / Math.max(count - 1, 1);
+    e.threshold = t * t * hScale;
+  });
+  selected[0].threshold = 0;  // always start at 0
+
+  return selected;
 }
 
 function _hexToRgb(hex) {

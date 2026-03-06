@@ -4,8 +4,59 @@ import { scene }           from './core.js';
 import { CONFIG }           from './config.js';
 import { getTerrainHeightAt } from './terrain/terrainMesh.js';
 import { getAllSpriteFrames, getRandomEnvColor } from './environment.js';
+import { addBoxCollider }   from './physics.js';
+import { spawnLadder }      from './ladders.js';
 
 let _instances = [];  // all disposable meshes/materials
+
+const SHELTER_SPRITES_URL = 'https://scottgrocott.github.io/mt-assets/shelters/sprites.json';
+let _shelterFrames  = null;  // loaded panel frames
+let _panelTexCache  = null;  // single shared texture for metal_panels sheet
+
+// Load and cache shelter panel sprite frames
+async function _loadShelterFrames() {
+  if (_shelterFrames) return _shelterFrames;
+  try {
+    const r = await fetch(SHELTER_SPRITES_URL);
+    const j = await r.json();
+    _shelterFrames = [];
+    for (const sheet of (j.spriteSheets || [])) {
+      const sheetW = sheet.columns * sheet.cellWidth;
+      const sheetH = sheet.rows    * sheet.cellHeight;
+      for (const frame of (sheet.frames || [])) {
+        _shelterFrames.push({ url: sheet.url, frame, sheetW, sheetH });
+      }
+    }
+    console.log('[scatter] Loaded', _shelterFrames.length, 'panel frames');
+  } catch(e) {
+    console.warn('[scatter] Could not load shelter sprites:', e);
+    _shelterFrames = [];
+  }
+  return _shelterFrames;
+}
+
+// Get or create the shared panel texture
+function _getPanelTex(url) {
+  if (_panelTexCache) return _panelTexCache;
+  _panelTexCache = new BABYLON.Texture(url, scene, false, true, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+  _panelTexCache.hasAlpha = false;
+  return _panelTexCache;
+}
+
+// Build a UV-clipped material for one panel frame
+function _makePanelMat(name, frameInfo) {
+  const { url, frame, sheetW, sheetH } = frameInfo;
+  const tex = _getPanelTex(url).clone();
+  tex.uOffset = frame.x / sheetW;
+  tex.vOffset = 1.0 - (frame.y + frame.h) / sheetH;
+  tex.uScale  = frame.w / sheetW;
+  tex.vScale  = frame.h / sheetH;
+  const mat = new BABYLON.StandardMaterial(name, scene);
+  mat.diffuseTexture  = tex;
+  mat.backFaceCulling = false;
+  mat.specularColor   = new BABYLON.Color3(0.1, 0.1, 0.1);
+  return mat;
+}
 
 // ─── Create one sprite billboard using UV clip ───────────────────────────────
 function _makeSpriteBillboard(name, wx, wy, wz, frameInfo, heightScale) {
@@ -84,7 +135,7 @@ async function _loadShelterDefs() {
   return _shelterDefs;
 }
 
-function _buildShelterMesh(def, wx, wy, wz, rotY) {
+function _buildShelterMesh(def, wx, wy, wz, rotY, panelFrames) {
   const PART_COLORS = {
     pole:  new BABYLON.Color3(0.40, 0.30, 0.20),
     beam:  new BABYLON.Color3(0.35, 0.28, 0.18),
@@ -92,37 +143,152 @@ function _buildShelterMesh(def, wx, wy, wz, rotY) {
     floor: new BABYLON.Color3(0.45, 0.38, 0.26),
   };
 
+  // Parent node at shelter world position
+  const root = new BABYLON.TransformNode(`shelter_${def.id}_${_instances.length}`, scene);
+  root.position.set(wx, wy, wz);
+  root.rotation.y = rotY;
+  _instances.push(root);
+
+  const cosR = Math.cos(rotY);
+  const sinR = Math.sin(rotY);
+
+  // Helper: rotate local XZ offset into world space
+  function toWorld(lx, lz) {
+    return { x: wx + lx * cosR - lz * sinR, z: wz + lx * sinR + lz * cosR };
+  }
+
+  let maxY   = 0;
+  let minX = 0, maxX = 0;  // actual +X and -X extents
+  let minZ = 0, maxZ = 0;  // actual +Z and -Z extents
+
   for (const part of def.parts) {
     const { type, offset, size } = part;
     const box = BABYLON.MeshBuilder.CreateBox(
-      `shelter_${def.id}_${type}_${_instances.length}`,
+      `${root.name}_${type}`,
       { width: size.w, height: size.h, depth: size.d },
       scene
     );
-
-    // Apply rotation offset
-    const cosR = Math.cos(rotY), sinR = Math.sin(rotY);
-    const ox = offset.x * cosR - offset.z * sinR;
-    const oz = offset.x * sinR + offset.z * cosR;
-
-    box.position.set(wx + ox, wy + offset.y + size.h / 2, wz + oz);
-    box.rotation.y = rotY;
+    box.position.set(offset.x, offset.y + size.h / 2, offset.z);
+    box.parent     = root;
     box.isPickable = false;
 
-    const mat = new BABYLON.StandardMaterial(`shelterMat_${_instances.length}`, scene);
+    const mat = new BABYLON.StandardMaterial(`${root.name}_mat_${_instances.length}`, scene);
     mat.diffuseColor = (PART_COLORS[type] || PART_COLORS.pole)
       .clone().scale(0.85 + Math.random() * 0.3);
     box.material = mat;
     _instances.push(box);
+
+    // Rapier collider — world-space position with rotation applied
+    const wPos  = toWorld(offset.x, offset.z);
+    const worldY = wy + offset.y + size.h / 2;
+    addBoxCollider(wPos.x, worldY, wPos.z, size.w / 2, size.h / 2, size.d / 2, rotY);
+
+    const topY = offset.y + size.h;
+    if (topY > maxY) maxY = topY;
+
+    // Track actual extents of each part
+    if (offset.x + size.w / 2 > maxX) maxX =  offset.x + size.w / 2;
+    if (offset.x - size.w / 2 < minX) minX =  offset.x - size.w / 2;
+    if (offset.z + size.d / 2 > maxZ) maxZ =  offset.z + size.d / 2;
+    if (offset.z - size.d / 2 < minZ) minZ =  offset.z - size.d / 2;
+  }
+
+  // Face positions = actual outer edges
+  const faceX = Math.max(Math.abs(minX), Math.abs(maxX));  // +X and -X face distance
+  const faceZ = Math.max(Math.abs(minZ), Math.abs(maxZ));  // +Z and -Z face distance
+  const footprintHalfW = faceX;
+  const footprintHalfD = faceZ;
+
+  // Ladder goes on the NARROWER face — panels take the wider faces
+  // ladderOnZ=true means ladder is on Z face (narrower = smaller halfD)
+  const ladderOnZ      = footprintHalfD <= footprintHalfW;
+  const ladderStandoff = 0.0;  // node placed exactly at face edge, ladder back is z=0
+  const ladderLocalX   = ladderOnZ ? 0 : (footprintHalfW + ladderStandoff);
+  const ladderLocalZ   = ladderOnZ ? (footprintHalfD + ladderStandoff) : 0;
+  const ladderWorld    = toWorld(ladderLocalX, ladderLocalZ);
+  const ladderRotY     = ladderOnZ ? rotY : rotY + Math.PI / 2;
+  spawnLadder({
+    position: { x: ladderWorld.x, y: wy, z: ladderWorld.z },
+    height:   maxY,
+    rotY:     ladderRotY,
+  });
+
+  // Panels — skip center column of ladder face to avoid overlap
+  if (panelFrames && panelFrames.length > 0) {
+    _addShelterPanels(root, maxY, footprintHalfW, footprintHalfD, ladderOnZ, panelFrames);
   }
 }
+
+// Tile corrugated panels on the wider shelter faces (ladder is on narrower face)
+function _addShelterPanels(root, maxY, halfW, halfD, ladderOnZFace, panelFrames) {
+  const PANEL_W     = 1.0;
+  const PANEL_H     = 2.0;
+  const PANEL_THICK = 0.04;
+  const PANEL_INSET = 0.01;  // sit right against the face
+
+  // ladderOnZFace=true  → ladder on Z face → panels on the two X faces
+  // ladderOnZFace=false → ladder on X face → panels on the two Z faces
+  // For Z-axis face: panel spans X (faceHalf=halfW), sits at z=±halfD (faceDepth=halfD)
+  // For X-axis face: panel spans Z (faceHalf=halfD), sits at x=±halfW (faceDepth=halfW)
+  const faces = ladderOnZFace
+    ? [
+        { axis: 'x', sign:  1, faceHalf: halfD, faceDepth: halfW },
+        { axis: 'x', sign: -1, faceHalf: halfD, faceDepth: halfW },
+      ]
+    : [
+        { axis: 'z', sign:  1, faceHalf: halfW, faceDepth: halfD },
+        { axis: 'z', sign: -1, faceHalf: halfW, faceDepth: halfD },
+      ];
+
+  for (const face of faces) {
+    const wallW      = face.faceHalf * 2;
+    const panelCount = Math.max(1, Math.floor(wallW / PANEL_W));
+    const startX     = -(panelCount * PANEL_W) / 2 + PANEL_W / 2;
+    const startY     = 0.3 + Math.random() * 0.3;
+    const rows       = Math.max(1, Math.floor((maxY - startY) / PANEL_H));
+    const facePos    = face.faceDepth + PANEL_INSET;
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < panelCount; col++) {
+        if (Math.random() < 0.2) continue;  // occasional gap for variety
+
+        const localU = startX + col * PANEL_W;
+        const localY = startY + row * PANEL_H + PANEL_H / 2;
+
+        const panel = BABYLON.MeshBuilder.CreateBox(
+          `${root.name}_panel_${face.axis}${face.sign}_${row}_${col}`,
+          {
+            width:  face.axis === 'z' ? PANEL_W     : PANEL_THICK,
+            height: PANEL_H,
+            depth:  face.axis === 'z' ? PANEL_THICK : PANEL_W,
+          },
+          scene
+        );
+        panel.position.set(
+          face.axis === 'z' ? localU             : face.sign * facePos,
+          localY,
+          face.axis === 'z' ? face.sign * facePos : localU
+        );
+        panel.parent     = root;
+        panel.isPickable = false;
+
+        const fi = panelFrames[Math.floor(Math.random() * panelFrames.length)];
+        panel.material = _makePanelMat(`${root.name}_pmat_${_instances.length}`, fi);
+        _instances.push(panel);
+      }
+    }
+  }
+}
+
 
 async function _scatterShelters(count, frames) {
   const defs = await _loadShelterDefs();
   if (!defs.length) return;
 
-  const size = CONFIG.terrain.size || 700;
-  const half = size / 2;
+  const panelFrames = await _loadShelterFrames();
+
+  const size   = CONFIG.terrain.size || 700;
+  const half   = size / 2;
   const margin = 30;
   _shelterPositions = [];
 
@@ -133,7 +299,7 @@ async function _scatterShelters(count, frames) {
     const wy   = getTerrainHeightAt(wx, wz);
     const rotY = Math.random() * Math.PI * 2;
 
-    _buildShelterMesh(def, wx, wy, wz, rotY);
+    _buildShelterMesh(def, wx, wy, wz, rotY, panelFrames);
     _shelterPositions.push({ wx, wz });
   }
 
