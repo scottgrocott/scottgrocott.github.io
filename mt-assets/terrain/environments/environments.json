@@ -7,8 +7,8 @@
         "colors": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/colors.json",
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/sounds.json",
         "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/sprites.json",
-        "node_mat_rocks": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_rocks.png",
-        "node_mat_dirt": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_dirt.png"
+        "node_mat_rocks": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_rocks.jpg",
+        "node_mat_dirt": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_dirt.jpg"
       }
     },
     {
@@ -18,8 +18,8 @@
         "colors": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/colors.json",
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/sounds.json",
         "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/sprites.json",
-        "node_mat_rocks": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_rocks.png",
-        "node_mat_dirt": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_dirt.png"
+        "node_mat_rocks": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_rocks.jpg",
+        "node_mat_dirt": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_dirt.jpg"
       }
     }
   ]
