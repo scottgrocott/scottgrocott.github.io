@@ -24,7 +24,7 @@
     "enabled": true,
     "mode": "FOGMODE_LINEAR",
     "color": { "r": 0.85, "g": 0.75, "b": 0.60 },
-    "density": 0.005,
+    "density": 0.5,
     "start": 150.0,
     "end": 600.0
   },

@@ -1,0 +1,134 @@
+# Metal Throne Engine — Session 4 Starter Prompt
+
+## Repos
+- Engine: https://scottgrocott.github.io/mt-engine/  (local: http://localhost:83/mt-engine/)
+- Games:  https://scottgrocott.github.io/mt-games/   (local: http://localhost:83/mt-games/)
+
+---
+
+## Current State: Working ✅
+
+- Engine fully deployed on GitHub Pages at scottgrocott.github.io/mt-engine/
+- Games deployed at scottgrocott.github.io/mt-games/test/
+- Local dev at localhost:83/mt-engine/ and localhost:83/mt-games/test/
+- index.html auto-detects local vs GitHub Pages and loads correct engine URL
+- ?level=N param loads level-N.json from the game directory
+- ?config=path param loads any config by path
+- Fallback chain: ?level → ?config → game-config.json → engine default
+- Config meta.title updates page title + loading screen title on load
+- Editor Export Game button downloads index.html + game-config.json
+- Exported index.html has auto-detect script for local/deployed engine
+- ENGINE_ROOT derived from main.js script src URL (works anywhere)
+- deploy_engine_url stored in localStorage, set via editor DEPLOY section
+
+## index.html Pattern (for all game deployments)
+```html
+<!-- Auto-detect engine: local dev vs GitHub Pages — only ONE script loads -->
+<script>
+  const engineSrc = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:83/mt-engine/main.js'
+    : 'https://scottgrocott.github.io/mt-engine/main.js';
+  const s = document.createElement('script');
+  s.type = 'module';
+  s.src = engineSrc;
+  document.head.appendChild(s);
+</script>
+```
+Do NOT use a plain `<script type="module" src="main.js">` — that breaks when game and engine are in different directories.
+
+## Level File Convention
+```
+mt-games/test/
+  index.html
+  game-config.json   ← default, loads if no ?level param
+  level-0.json       ← ?level=0
+  level-1.json       ← ?level=1
+  level-2.json       ← ?level=2
+```
+
+## Config JSON Shape
+```json
+{
+  "meta": {
+    "id": "level-1",
+    "title": "Drone Wars",
+    "subtitle": "Level 1",
+    "description": "Optional description"
+  },
+  "terrain": {
+    "type": "flat",
+    "size": 700,
+    "sizeX": 700,
+    "sizeZ": 700,
+    "subdivisions": 150,
+    "heightmap": null,
+    "heightScale": 80,
+    "heightmapUrl": null
+  },
+  "enemies": [
+    { "type": "drone",    "maxCount": 3, "health": 60,  "hitsToKill": 10 },
+    { "type": "car",      "maxCount": 2, "health": 100, "hitsToKill": 8  },
+    { "type": "forklift", "maxCount": 2, "health": 150, "hitsToKill": 12 }
+  ],
+  "weapons": [
+    { "id": "basic_gun", "bulletSpeed": 60, "bulletRadius": 0.12,
+      "range": 200, "hitsToKill": 10 }
+  ],
+  "scatterLayers": [
+    { "category": "vegetation", "density": 0.12 },
+    { "category": "rock",       "density": 0.04 }
+  ]
+}
+```
+
+---
+
+## Architecture Reminder
+
+### ENGINE_ROOT & Path Resolution
+- `ENGINE_ROOT` = derived from `main.js` script src URL via `new URL(script.src).href`
+- `_pageBase` = `window.location.origin + pathname` (handles trailing slashes correctly)
+- Level files fetched relative to `_pageBase` (the game directory)
+- Asset paths in config prefixed with `ENGINE_ROOT` if relative
+
+### Key Files Changed This Session
+- `main.js` — ENGINE_ROOT detection, _resolveStartConfig with ?level/?config params,
+               optional chaining on all getElementById, meta title updates page+loading screen,
+               _exportGame with auto-detect script in exported HTML
+- `index.html` (game) — auto-detect engine script only, no duplicate module tag
+- `editor/editor.js` — DEPLOY section: GitHub Pages URL input + Export button
+- `level-2.json` — fixed broken meta (duplicate keys, missing comma)
+
+---
+
+## Known Issues / Next Steps
+
+- [ ] **Health damage** — enemies push player but don't reduce player.health
+- [ ] **Level select screen** — game-config.json could be a menu page linking to ?level=1,2,3
+- [ ] **Next level trigger** — when all enemies killed, load next level automatically
+- [ ] **Shelter enhancements:**
+      - Auto-spawn ladder on perimeter at tallest point
+      - Side panels that blow off on explosion
+- [ ] **Terrain on minimap** — heightmap as greyscale background
+- [ ] **GLB model loading** for enemies (replace placeholder boxes)
+- [ ] **flatnav re-scan after heightmap load** — waypoints built before terrain applied
+- [ ] **Scatter sprite sheets** — replace placeholder colored quads
+
+## Deployment Workflow
+1. Edit config in engine editor (localhost:83/mt-engine)
+2. Set GitHub Pages engine URL in editor DEPLOY section (one-time)
+3. Click Export Game → downloads index.html + game-config.json
+4. Drop files into mt-games/[game-folder]/
+5. Add level-N.json files for each level
+6. Push to GitHub → live at scottgrocott.github.io/mt-games/[game-folder]/?level=N
+
+## Console Signatures (healthy boot)
+```
+[main] pageBase: https://scottgrocott.github.io/mt-games/test ENGINE_ROOT: https://scottgrocott.github.io/mt-engine
+[main] Level from URL param: https://scottgrocott.github.io/mt-games/test/level-1.json
+[sky] Sky and sun initialised
+[physics] Rapier world ready
+[terrain] Flat terrain 512 x 512
+[flatnav] 12 ground, 64 flight waypoints
+[player] Spawned at 0 3.8 0
+```

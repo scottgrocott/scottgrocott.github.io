@@ -1,0 +1,21 @@
+Session goal: vehicle terrain physics — cars and forklifts
+Current state:
+
+Cars and forklifts exist as enemies with YUKA pathfinding working
+They currently slide/glide over terrain with no suspension or physical presence
+Physics engine is Rapier (already integrated, trimesh terrain collider in place)
+Player has full Rapier rigid body with CCD
+
+Goals:
+
+Terrain-riding suspension — vehicles bounce and tilt on the terrain surface. Implement a simple spring/damper per wheel (4 wheels, raycast down from each corner). The chassis tilts to match terrain slope. No full rigid body vehicle — fake it with raycasts and lerped rotations for performance.
+Cliff physics — when a vehicle drives off a cliff (no raycast hit below), apply gravity, let it fall, play out the arc. On landing, apply an impact.
+Upside-down detection — if the vehicle's up vector dot world up < 0 (flipped), delete the mesh and remove from enemy registry after a short delay.
+Forklift = car driving backwards — forklift uses the same vehicle physics system, just reverses the forward direction so the forks lead.
+
+Key files: cars.js, forklifts.js, enemyBase.js, physics.js
+Key constraints:
+
+Vehicles are currently box meshes parented to YUKA entities
+getTerrainHeightAt(x, z) is available and fast (pixel lookup, no physics query needed)
+Keep YUKA steering — don't replace pathfinding, just layer physics on top of the movement

@@ -232,20 +232,28 @@ function _stampSlopeAlpha(mesh) {
 }
 
 // Node material: dirt texture on flat areas, rock texture on slopes
-// Vertex color RGB = palette bands, vertex alpha = slope mask
+// All config values baked into shader source as GLSL constants — avoids Babylon ShaderMaterial uniform API issues
 function _applyNodeMaterial(scene, mesh, nodeMats, hScale) {
-  const rocks = nodeMats.rocks;
-  const dirt  = nodeMats.dirt;
+  const rocks = nodeMats.rocks || {};
+  const dirt  = nodeMats.dirt  || {};
+  const hasRock = !!nodeMats.rocks;
+  const hasDirt = !!nodeMats.dirt;
 
-  // Build node material with slope-blended textures multiplied over vertex colors
-  const nm = new BABYLON.NodeMaterial('terrainNodeMat', scene, { emitComments: false });
-  nm.build(false);
+  // Bake all values as GLSL float literals
+  const rUS  = (rocks.uScale       ?? 2.0).toFixed(2);
+  const rVS  = (rocks.vScale       ?? 2.0).toFixed(2);
+  const rMin = (1.0 - (rocks.maxSlope    ?? 1.0)).toFixed(3);
+  const rFal = (rocks.slopeFalloff  ?? 0.1).toFixed(3);
 
-  // Fall back to a hand-built StandardMaterial using custom shader via ShaderMaterial
-  // (NodeMaterial API is complex to build programmatically — use shader approach)
-  if (mesh.material) { try { mesh.material.dispose(); } catch(e) {} }
+  const dUS  = (dirt.uScale        ?? 4.0).toFixed(2);
+  const dVS  = (dirt.vScale        ?? 4.0).toFixed(2);
+  const dMax = (1.0 - (dirt.minSlope     ?? 0.0)).toFixed(3);
+  const dFal = (dirt.slopeFalloff   ?? 0.1).toFixed(3);
 
-  BABYLON.Effect.ShadersStore['terrainNodeVertexShader'] = `
+  // Unique shader name per config to avoid stale cached shaders
+  const shaderKey = `tN_${rUS}_${dUS}`;
+
+  BABYLON.Effect.ShadersStore[shaderKey + 'VertexShader'] = `
     precision highp float;
     attribute vec3 position;
     attribute vec3 normal;
@@ -256,118 +264,65 @@ function _applyNodeMaterial(scene, mesh, nodeMats, hScale) {
     varying vec3 vNormal;
     varying vec2 vUV;
     varying vec4 vColor;
-    varying float vHeight;
     void main() {
-      vec4 wp = world * vec4(position, 1.0);
-      vHeight  = wp.y;
-      vNormal  = normalize(mat3(world) * normal);
-      vUV      = uv;
-      vColor   = color;
+      vNormal = normalize(mat3(world) * normal);
+      vUV     = uv;
+      vColor  = color;
       gl_Position = worldViewProjection * vec4(position, 1.0);
     }
   `;
 
-  // Fragment: sample dirt + rock textures, blend by slope (alpha channel), multiply by vertex color bands
-  BABYLON.Effect.ShadersStore['terrainNodeFragmentShader'] = `
+  BABYLON.Effect.ShadersStore[shaderKey + 'FragmentShader'] = `
     precision highp float;
     varying vec3 vNormal;
     varying vec2 vUV;
     varying vec4 vColor;
-    varying float vHeight;
     uniform sampler2D dirtTex;
     uniform sampler2D rockTex;
-    uniform float dirtUScale;
-    uniform float dirtVScale;
-    uniform float rockUScale;
-    uniform float rockVScale;
-    uniform float rockMinSlope;
-    uniform float rockMaxSlope;
-    uniform float rockFalloff;
-    uniform float dirtMinSlope;
-    uniform float dirtMaxSlope;
-    uniform float dirtFalloff;
-    uniform float hasDirt;
-    uniform float hasRock;
-    uniform vec3  lightDir;
 
     void main() {
-      float slope = vNormal.y;  // 1=flat, 0=vertical
+      float slope = clamp(vNormal.y, 0.0, 1.0);
 
-      // Rock weight: strong on steep slopes
-      float rockW = smoothstep(rockMinSlope - rockFalloff, rockMinSlope + rockFalloff, 1.0 - slope);
+      // Rock: steep slopes (slope near 0)
+      float rockW = 1.0 - smoothstep(${rMin} - ${rFal}, ${rMin} + ${rFal}, slope);
       rockW = clamp(rockW, 0.0, 1.0);
 
-      // Dirt weight: strong on flat areas
-      float dirtW = smoothstep(dirtMaxSlope + dirtFalloff, dirtMaxSlope - dirtFalloff, 1.0 - slope);
+      // Dirt: flat areas (slope near 1)
+      float dirtW = smoothstep(${dMax} - ${dFal}, ${dMax} + ${dFal}, slope);
       dirtW = clamp(dirtW, 0.0, 1.0);
 
-      // Sample textures
-      vec4 dirtCol = texture2D(dirtTex, vUV * vec2(dirtUScale, dirtVScale));
-      vec4 rockCol = texture2D(rockTex, vUV * vec2(rockUScale, rockVScale));
+      vec4 rockCol = ${hasRock} ? texture2D(rockTex, vUV * vec2(${rUS}, ${rVS})) : vec4(0.55, 0.48, 0.38, 1.0);
+      vec4 dirtCol = ${hasDirt} ? texture2D(dirtTex, vUV * vec2(${dUS}, ${dVS})) : vec4(0.62, 0.54, 0.40, 1.0);
 
-      // Blend textures by slope
-      vec4 texCol = vec4(0.5);
-      if (hasDirt > 0.5 && hasRock > 0.5) {
-        texCol = mix(dirtCol, rockCol, rockW);
-      } else if (hasRock > 0.5) {
-        texCol = mix(vec4(0.55, 0.48, 0.38, 1.0), rockCol, rockW);
-      } else if (hasDirt > 0.5) {
-        texCol = mix(dirtCol, vec4(0.55, 0.48, 0.38, 1.0), rockW);
-      }
+      // Blend: flat=dirt, steep=rock
+      vec4 texCol = mix(dirtCol, rockCol, rockW);
 
-      // Multiply texture by vertex color (palette height bands)
-      vec3 col = texCol.rgb * vColor.rgb * 1.6;
+      // Multiply by vertex color palette bands
+      vec3 col = texCol.rgb * vColor.rgb * 1.65;
 
-      // Simple diffuse lighting
-      float diff  = max(dot(vNormal, normalize(lightDir)), 0.0);
+      // Diffuse lighting from fixed sun direction
+      float diff  = max(dot(vNormal, normalize(vec3(0.4, 1.0, 0.6))), 0.0);
       float light = 0.45 + 0.55 * diff;
       gl_FragColor = vec4(col * light, 1.0);
     }
   `;
 
   const mat = new BABYLON.ShaderMaterial('terrainNodeMat', scene,
-    { vertex: 'terrainNode', fragment: 'terrainNode' },
+    { vertex: shaderKey, fragment: shaderKey },
     {
       attributes: ['position', 'normal', 'uv', 'color'],
-      uniforms:   ['worldViewProjection', 'world',
-                   'dirtUScale', 'dirtVScale', 'rockUScale', 'rockVScale',
-                   'rockMinSlope', 'rockMaxSlope', 'rockFalloff',
-                   'dirtMinSlope', 'dirtMaxSlope', 'dirtFalloff',
-                   'hasDirt', 'hasRock', 'lightDir'],
+      uniforms:   ['worldViewProjection', 'world'],
       samplers:   ['dirtTex', 'rockTex'],
     }
   );
 
-  // Rock uniforms
-  const r = rocks || {};
-  mat.setFloat('rockUScale',    r.uScale    ?? 2.0);
-  mat.setFloat('rockVScale',    r.vScale    ?? 2.0);
-  mat.setFloat('rockMinSlope',  1.0 - (r.maxSlope  ?? 1.0));
-  mat.setFloat('rockMaxSlope',  1.0 - (r.minSlope  ?? 0.4));
-  mat.setFloat('rockFalloff',   r.slopeFalloff ?? 0.1);
-  mat.setFloat('hasRock',       rocks ? 1.0 : 0.0);
-
-  // Dirt uniforms
-  const d = dirt || {};
-  mat.setFloat('dirtUScale',    d.uScale    ?? 4.0);
-  mat.setFloat('dirtVScale',    d.vScale    ?? 4.0);
-  mat.setFloat('dirtMinSlope',  1.0 - (d.maxSlope  ?? 0.5));
-  mat.setFloat('dirtMaxSlope',  1.0 - (d.minSlope  ?? 0.0));
-  mat.setFloat('dirtFalloff',   d.slopeFalloff ?? 0.1);
-  mat.setFloat('hasDirt',       dirt ? 1.0 : 0.0);
-
-  mat.setFloats('lightDir', [0.4, 1.0, 0.6]);
+  const greyPx = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  mat.setTexture('rockTex', new BABYLON.Texture(rocks.url || greyPx, scene));
+  mat.setTexture('dirtTex', new BABYLON.Texture(dirt.url  || greyPx, scene));
   mat.backFaceCulling = true;
 
-  // Load textures — use grey fallback texture if URL missing
-  const greyPx = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI6QAAAABJRU5ErkJggg==';
-  const rockTex = new BABYLON.Texture(rocks?.url || greyPx, scene);
-  const dirtTex = new BABYLON.Texture(dirt?.url  || greyPx, scene);
-  mat.setTexture('rockTex', rockTex);
-  mat.setTexture('dirtTex', dirtTex);
-
   mesh.material = mat;
-  console.log('[terrain] Node material applied | rock:', rocks?.url?.split('/').pop(), '| dirt:', dirt?.url?.split('/').pop());
+  console.log('[terrain] Node material applied | rock:', rocks.url?.split('/').pop(), '| dirt:', dirt.url?.split('/').pop());
 }
 
 

@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "id": "level-2",
+    "title": "Car Wars",
+    "subtitle": "Level 2",
+    "description": "Survive ground assault from armored cars"
+  },
+  "terrain": {
+    "type": "flat",
+    "size": 700,
+    "heightmap": null,
+    "heightScale": 80,
+    "groundTexture": null,
+    "shaderLayers": [
+      {
+        "minElevation": 0,
+        "maxElevation": 1,
+        "color": "#243020",
+        "texture": null,
+        "blend": "smooth"
+      }
+    ]
+  },
+  "enemies": [
+    {
+      "type": "car",
+      "module": "./enemies/cars.js",
+      "spawnPoint": { "x": 20, "y": 1, "z": 20 },
+      "maxCount": 2,
+      "placeholder": "box",
+      "glb": null,
+      "hitsToKill": 8
+    }
+  ],
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 70,
+      "bulletRadius": 0.12,
+      "range": 200,
+      "hitsToKill": 8
+    }
+  ],
+  "shelters": [],
+  "structures": [],
+  "scatterLayers": [
+    { "category": "vegetation", "density": 0.08, "minElevation": 0, "maxElevation": 0.5 },
+    { "category": "rock",       "density": 0.05, "minElevation": 0, "maxElevation": 1   }
+  ],
+  "ladders": [],
+  "waypoints": [],
+  "assets": [],
+  "audio": {
+    "outerZone": { "radius": 280, "track": "wind"      },
+    "midZone":   { "radius": 150, "track": "adventure" },
+    "innerZone": { "radius":  60, "track": "battle"    }
+  }
+}

@@ -1,0 +1,114 @@
+# Metal Throne Engine — Session 5 Starter Prompt
+
+## Repos
+- Engine: https://scottgrocott.github.io/mt-engine/  (local: http://localhost:83/mt-engine/)
+- Games:  https://scottgrocott.github.io/mt-games/   (local: http://localhost:83/mt-games/test/)
+
+---
+
+## State: Physics partially working, terrain fall-through being debugged
+
+### What works ✅
+- Flat terrain: player sits correctly at Y~1.2, physics solid
+- Heightfield collider: builds correctly (fixed rigid body), single collider after rebuild
+- Full physics rebuild on heightmap apply: clears bullets/enemies, resets world, re-adds collider, re-inits player
+- freeCam state preserved across terrain rebuild
+- basicGun.js: uses getEnemies(), guards stale body refs with try/catch
+- Engine deploys to GitHub Pages, ?level=N param works
+- Export Game downloads index.html + game-config.json
+
+### Problem being worked on 🔧
+**Player falls through heightfield terrain after applying heightmap in editor**
+
+Diagnosis so far:
+- Flat terrain collider works perfectly (player sits at Y=1.24)
+- Heightfield collider IS created correctly (verified via collider dump)
+- Player body IS disabled during freecam rebuild (verified via isEnabled())
+- After freecam exit, player gets snapped to terrainY+height+0.5 = ~14.2
+- Then falls through heightfield — heightfield doesn't stop the capsule
+
+Current approach: Y-floor rescue in _tickWalk — if player.y < terrainFloor + height*0.5, 
+snap back up. This is a safety net while the real heightfield collision bug is investigated.
+
+### Suspected root cause
+Rapier heightfield collision with capsule shape may require:
+1. CCD (Continuous Collision Detection) enabled on player body
+2. Different heightfield winding/orientation
+3. heightfield scale params may need total size not per-cell size
+
+### Key debug commands
+```js
+// Check all colliders
+_physicsWorld.colliders.forEach(c => console.log(c.handle, c.shapeType(), JSON.stringify(c.translation())))
+
+// Watch player Y
+setInterval(() => console.log(_player.rigidBody.translation().y.toFixed(2)), 500)
+
+// Shapeypes: 1=ball, 2=capsule, 7=heightfield, 8=cuboid
+```
+
+### Files modified this session (all in mt-engine/)
+- physics.js — addTerrainCollider/addFlatGroundCollider use RigidBodyDesc.fixed() parent body
+- player.js — initPlayer disposes old rig, _resnapPlayerToTerrain global, Y-floor rescue in _tickWalk
+- terrainMesh.js — complete rewrite: getTerrainHeightAt, getTerrainPixelData, vertex stamping, calls _fullTerrainPhysicsRebuild on apply
+- main.js — _fullTerrainPhysicsRebuild (clearEnemies+clearBullets, reset world, rebuild collider, re-init player, preserve freecam state), _rebuildTerrainCollider global
+- basicGun.js — getEnemies() instead of enemies, try/catch on stale body, enemy.mesh?.position
+
+### Physics architecture
+```
+Rapier world
+├── fixed body → heightfield/cuboid collider  (terrain)
+├── dynamic body → capsule collider           (player)  
+├── kinematic body → sphere collider          (enemies - drones)
+└── kinematic body → box collider             (enemies - cars/forklifts)
+```
+
+### Heightfield params
+- subdiv = 64 → 65x65 sample grid
+- scale = { x: sizeX/64, y: 1.0, z: sizeZ/64 }  (per-cell spacing)
+- For 700x700 terrain: scale.x = 700/64 = 10.9375
+- No translation (centered at origin matches Babylon ground mesh)
+- Heights: Float32Array, row-major, no V-flip
+
+### Next steps after fixing terrain physics
+1. Player health damage from enemy collision
+2. Level select / next level trigger when all enemies killed  
+3. Terrain on minimap (greyscale heightmap background)
+4. GLB model loading for enemies
+5. Enemy pathfinding quality improvements
+
+### Config JSON shape (reminder)
+```json
+{
+  "meta": { "id": "level-1", "title": "Desert Assault", "subtitle": "Level 1" },
+  "terrain": { "type": "flat", "size": 700, "sizeX": 700, "sizeZ": 700,
+    "subdivisions": 150, "heightScale": 80, "heightmapUrl": null },
+  "enemies": [
+    { "type": "drone", "maxCount": 3, "health": 60, "hitsToKill": 10 },
+    { "type": "car", "maxCount": 2, "health": 100, "hitsToKill": 8 }
+  ],
+  "weapons": [{ "id": "basic_gun", "bulletSpeed": 60, "bulletRadius": 0.12, "range": 200, "hitsToKill": 10 }]
+}
+```
+
+
+
+testing feedbadk:
+the dynamic height map works great.
+we are going to focus on terrain now.
+first stop the user from falling forever
+
+next steps:
+all terrains in mt-engine will have a "theme or environment type" 
+this will dictate the sprites, sounds and terrain colors of any height map.
+sprites are predefined in the file with grid clip coordinates
+sounds are predefined tonejs synths
+colors are predefined for the terrain colors on the height map
+
+first two defined in master file here:
+https://scottgrocott.github.io/mt-assets/terrain/environments/environments.json
+this is a permanent location for this file
+
+
+also, while we are dealing with scatter i have built a bunch of shelters that i want scattered randomly through the enviromment:
+https://scottgrocott.github.io/mt-assets/shelters/shelters.json
