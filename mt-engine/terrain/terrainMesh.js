@@ -179,15 +179,33 @@ function _logBounds(mesh) {
 }
 
 function _applyMaterial(scene, mesh, t) {
+  if (!mesh) return;
+  // Dispose old material
+  if (mesh.material) { try { mesh.material.dispose(); } catch(e) {} }
+
   const mat = new BABYLON.StandardMaterial('terrainMat', scene);
-  // Use shader layer colors if defined, otherwise default green
-  const baseColor = t.shaderLayers?.[0]?.color || '#3a5a2a';
-  const rgb = _hexToRgb(baseColor);
-  mat.diffuseColor  = new BABYLON.Color3(rgb.r, rgb.g, rgb.b);
   mat.specularColor = new BABYLON.Color3(0, 0, 0);
+
+  // Try environment colors first, then shaderLayers, then env-appropriate default
+  const env = window._currentEnvColors;
+  if (env) {
+    // Pick a mid-tone ground color from the palette
+    const keys = Object.keys(env);
+    // Prefer a "ground" key if it exists, otherwise use the 4th color (usually a mid-tone)
+    const groundKey = keys.find(k => k.includes('sand') || k.includes('dirt') || k.includes('clay') || k.includes('rock') || k.includes('limestone')) || keys[3] || keys[0];
+    const hex = env[groundKey];
+    const rgb = _hexToRgb(hex);
+    mat.diffuseColor = new BABYLON.Color3(rgb.r, rgb.g, rgb.b);
+  } else if (t.shaderLayers?.[0]?.color) {
+    const rgb = _hexToRgb(t.shaderLayers[0].color);
+    mat.diffuseColor = new BABYLON.Color3(rgb.r, rgb.g, rgb.b);
+  } else {
+    mat.diffuseColor = new BABYLON.Color3(0.55, 0.48, 0.35); // neutral sandy default
+  }
+
   mesh.material = mat;
   mesh.receiveShadows = true;
-  mesh.checkCollisions = false; // Rapier handles collisions
+  mesh.checkCollisions = false;
 }
 
 function _hexToRgb(hex) {

@@ -56,7 +56,7 @@ function _removeTerrainCollider() {
   _terrainCollider = null;
 }
 
-export function addTerrainCollider(imgData, sizeX, sizeZ, heightScale, subdiv = 64) {
+export function addTerrainCollider(imgData, sizeX, sizeZ, heightScale, subdiv = 128) {
   if (!physicsReady || !physicsWorld) return;
   _removeTerrainCollider();
 
@@ -64,12 +64,25 @@ export function addTerrainCollider(imgData, sizeX, sizeZ, heightScale, subdiv = 
   const cols = subdiv + 1;
   const heights = new Float32Array(rows * cols);
 
+  // Sample heights by converting row/col → world XZ → pixel,
+  // using the exact same formula as getTerrainHeightAt() in terrainMesh.js
+  // This guarantees the collider surface matches the visual mesh perfectly.
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      const u = col / subdiv;
-      const v = row / subdiv;
-      const px = Math.min(Math.floor(u * (imgData.width  - 1)), imgData.width  - 1);
-      const py = Math.min(Math.floor(v * (imgData.height - 1)), imgData.height - 1);
+      // Rapier heightfield: row 0 = -Z half, row N = +Z half
+      // Babylon CreateGround: row 0 = +Z half, row N = -Z half
+      // So flip row index when sampling to align collision with visual mesh
+      const flippedRow = subdiv - row;
+
+      const wx = -sizeX / 2 + (col        / subdiv) * sizeX;
+      const wz = -sizeZ / 2 + (flippedRow / subdiv) * sizeZ;
+
+      // Same UV formula as getTerrainHeightAt in terrainMesh.js
+      const u =        (wx + sizeX / 2) / sizeX;
+      const v = 1.0 - ((wz + sizeZ / 2) / sizeZ);
+
+      const px = Math.max(0, Math.min(imgData.width  - 1, Math.floor(u * (imgData.width  - 1))));
+      const py = Math.max(0, Math.min(imgData.height - 1, Math.floor(v * (imgData.height - 1))));
       heights[row * cols + col] = (imgData.data[(py * imgData.width + px) * 4] / 255) * heightScale;
     }
   }

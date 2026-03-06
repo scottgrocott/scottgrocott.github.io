@@ -40,6 +40,7 @@ export function initPlayer() {
     .setAngularDamping(100.0);
 
   player.rigidBody = physicsWorld.createRigidBody(rdesc);
+  player.rigidBody.enableCcd(true);  // prevent tunneling through terrain
 
   const cdesc = RAPIER.ColliderDesc.capsule(PLAYER.height / 2, PLAYER.radius)
     .setMass(PLAYER.mass)
@@ -120,17 +121,6 @@ function _tickWalk(dt) {
   const t = player.rigidBody.translation();
   const px = +t.x, py = +t.y, pz = +t.z;
   if (isNaN(px) || isNaN(py) || isNaN(pz)) return;
-
-  // Safety net — if player falls below terrain, snap back up
-  const terrainFloor = getTerrainHeightAt(px, pz);
-  const minY = terrainFloor + PLAYER.height * 0.5;
-  if (py < minY) {
-    const rescueY = terrainFloor + PLAYER.height + 1.0;
-    player.rigidBody.setTranslation({ x: px, y: rescueY, z: pz }, true);
-    player.rigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
-    playerRig.position.set(px, rescueY, pz);
-    return;
-  }
 
   // Sync rig with physics body
   playerRig.position.set(px, py, pz);

@@ -18,7 +18,6 @@ import { initLadders, tickLadders, clearLadders } from './ladders.js';
 import { initMinimap, tickMinimap } from './minimap.js';
 import { loadHeightmap } from './terrain/heightmap.js';
 import { buildTerrain, getTerrainMesh, getTerrainHeightAt, getTerrainPixelData } from './terrain/terrainMesh.js';
-import { buildTerrainMaterial, applyTerrainMaterial } from './terrain/terrainMaterial.js';
 import { computeTerrainBounds } from './terrain/terrainBounds.js';
 import { scanFlatAreas } from './flatnav.js';
 import { scatterProps, clearScatter } from './scatter.js';
@@ -39,6 +38,7 @@ import { pollGamepad, releaseGamepadAxes, registerGamepadShootCallback, register
 import { initEditor, tickEditor, onFreeCamEnter, onFreeCamExit, initEditorScene } from './editor/editor.js';
 import { camera } from './core.js';
 import { initSky } from './sky.js';
+import { loadEnvironment } from './environment.js';
 
 // ENGINE_ROOT: absolute URL base of the engine (where main.js lives).
 // Works regardless of where index.html is served from.
@@ -274,13 +274,16 @@ window._fullTerrainPhysicsRebuild = _fullTerrainPhysicsRebuild;
 
 function _rebuildTerrainCollider() {
   const pixelData = getTerrainPixelData();
+  const t = CONFIG.terrain || {};
+  const sizeX = t.sizeX ?? t.size ?? 512;
+  const sizeZ = t.sizeZ ?? t.size ?? 512;
+  const hScale = t.heightScale ?? 50;
+  // Match mesh subdivisions for accurate collision — coarser = walk-through on slopes
+  const subdiv = Math.min(t.subdivisions ?? 128, 128);
   if (pixelData) {
-    const t = CONFIG.terrain || {};
-    addTerrainCollider(pixelData, t.sizeX ?? t.size ?? 512, t.sizeZ ?? t.size ?? 512,
-                       t.heightScale ?? 50, 64);
+    addTerrainCollider(pixelData, sizeX, sizeZ, hScale, subdiv);
   } else {
-    const t = CONFIG.terrain || {};
-    addFlatGroundCollider(t.sizeX ?? t.size ?? 512, t.sizeZ ?? t.size ?? 512);
+    addFlatGroundCollider(sizeX, sizeZ);
   }
 }
 window._rebuildTerrainCollider = _rebuildTerrainCollider;
@@ -333,6 +336,11 @@ async function loadGameConfig(url) {
 
   setLoadStatus('Building terrain', 45);
 
+  // Load environment first — terrain material needs its colors
+  if (CONFIG.terrain?.environment) {
+    await loadEnvironment(CONFIG.terrain.environment);
+  }
+
   // Pick a random heightmap from the heightmaps array (if provided)
   const _hmaps = CONFIG.terrain.heightmaps;
   if (Array.isArray(_hmaps) && _hmaps.length > 0) {
@@ -348,12 +356,10 @@ async function loadGameConfig(url) {
   if (CONFIG.terrain.heightmapUrl && !CONFIG.terrain.heightmapUrl.startsWith('data:') && !CONFIG.terrain.heightmapUrl.startsWith('http') && ENGINE_ROOT) {
     CONFIG.terrain.heightmapUrl = _enginePath(CONFIG.terrain.heightmapUrl);
   }
-  await loadHeightmap(CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
+  await loadHeightmap(CONFIG.terrain.heightmapUrl || CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
   await buildTerrain(scene, CONFIG);
   _rebuildTerrainCollider();
   const terrainMesh = getTerrainMesh();
-  const mat = buildTerrainMaterial(CONFIG.terrain);
-  if (terrainMesh) applyTerrainMaterial([terrainMesh]);
 
   setLoadStatus('Scanning navigation', 55);
   scanFlatAreas();
@@ -372,7 +378,7 @@ async function loadGameConfig(url) {
   setPlayerRigRef(playerRig);
 
   setLoadStatus('Scattering environment', 80);
-  scatterProps();
+  await scatterProps();
 
   const bounds = computeTerrainBounds(CONFIG.terrain);
   initMinimap(bounds);

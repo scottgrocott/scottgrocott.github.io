@@ -1,7 +1,7 @@
 // hud.js — DOM HUD overlay
 
 import { player, playerRig } from './player.js';
-import { getEnemyCount } from './enemies/enemyRegistry.js';
+import { getEnemies } from './enemies/enemyRegistry.js';
 
 const elHealth  = document.getElementById('hud-health');
 const elAmmo    = document.getElementById('hud-ammo');
@@ -26,7 +26,8 @@ export function tickHUD() {
   elHealth.style.color = hp > 50 ? '#8aee8a' : hp > 25 ? '#eebb44' : '#ee4444';
 
   // Enemy count
-  elEnemies.textContent = getEnemyCount();
+  const alive = getEnemies().filter(e => !e.dead).length;
+  elEnemies.textContent = alive;
 
   // Position
   const p = playerRig.position;

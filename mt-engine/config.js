@@ -5,7 +5,9 @@ export let CONFIG = {
   terrain: {
     type: 'flat', size: 700, heightmap: null,
     heightScale: 80, groundTexture: null, shaderLayers: [],
-    heightmaps: []   // array of URLs — one picked randomly each load
+    heightmaps: [],      // array of URLs — one picked randomly each load
+    environment: null,   // env_id from mt-assets environments.json
+    shelterCount: 8,     // how many shelters to scatter
   },
   enemies: [],
   weapons: [{ id: 'basic_gun', module: './weapons/basicGun.js', bulletSpeed: 60, bulletRadius: 0.12, range: 200, hitsToKill: 10 }],
@@ -36,7 +38,7 @@ export function setConfig(newConfig) {
   // Deep merge new config over defaults
   CONFIG = Object.assign({}, CONFIG, newConfig);
   // Ensure nested objects exist
-  CONFIG.terrain  = Object.assign({ type:'flat', size:700, heightmap:null, heightScale:80, groundTexture:null, shaderLayers:[], heightmaps:[] }, newConfig.terrain || {});
+  CONFIG.terrain  = Object.assign({ type:'flat', size:700, heightmap:null, heightScale:80, groundTexture:null, shaderLayers:[], heightmaps:[], environment:null, shelterCount:8 }, newConfig.terrain || {});
   CONFIG.audio    = Object.assign({ outerZone:{radius:280,track:'wind'}, midZone:{radius:150,track:'adventure'}, innerZone:{radius:60,track:'battle'} }, newConfig.audio || {});
   CONFIG.enemies  = newConfig.enemies  || [];
   CONFIG.weapons  = newConfig.weapons  || CONFIG.weapons;

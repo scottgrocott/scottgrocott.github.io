@@ -12,10 +12,12 @@
     "sizeZ": 700,
     "subdivisions": 128,
     "heightScale": 80,
+    "environment": "env_desert",
+    "shelterCount": 10,
     "heightmaps": [
       "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png",
       "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png",
-	  "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map3.png"
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map3.png"
     ]
   },
   "enemies": [
@@ -27,8 +29,8 @@
     { "id": "basic_gun", "bulletSpeed": 60, "bulletRadius": 0.12, "range": 200, "hitsToKill": 10 }
   ],
   "scatterLayers": [
-    { "category": "vegetation", "density": 0.12 },
-    { "category": "rock",       "density": 0.06 }
+    { "category": "vegetation", "density": 0.10 },
+    { "category": "rock",       "density": 0.04 }
   ],
   "audio": {
     "outerZone": { "radius": 280, "track": "wind" },
