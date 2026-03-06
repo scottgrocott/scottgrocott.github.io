@@ -188,6 +188,7 @@ function _applyMaterial(scene, mesh, t) {
   const env      = window._currentEnvColors;
   const nodeMats = window._currentEnvNodeMats;  // { node_mat_rocks, node_mat_dirt } from environment.js
   const bands    = _buildHeightBands(env, hScale);
+  window._currentTerrainBands = { bands, hScale };  // minimap reads this
 
   // Bake height-based palette colors into vertex color buffer
   _stampVertexColors(mesh, bands, hScale);
