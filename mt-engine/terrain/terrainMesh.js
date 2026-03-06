@@ -30,8 +30,8 @@ export function getTerrainHeightAt(wx, wz) {
 
   const img = _lastImgData;
   // Map world XZ → UV [0,1]
-  const u =  (wx + _lastSizeX / 2) / _lastSizeX;
-  const v = 1.0 - ((wz + _lastSizeZ / 2) / _lastSizeZ);  // V-flip matches vertex stamping
+  const u =        (wx + _lastSizeX / 2) / _lastSizeX;
+  const v = 1.0 - ((wz + _lastSizeZ / 2) / _lastSizeZ);
 
   const px = Math.max(0, Math.min(img.width  - 1, Math.floor(u * (img.width  - 1))));
   const py = Math.max(0, Math.min(img.height - 1, Math.floor(v * (img.height - 1))));
@@ -140,24 +140,26 @@ function _stampMesh(scene, imgData, sizeX, sizeZ, subdiv, scale) {
 
 function _stampVertices(mesh, imgData, sizeX, sizeZ, subdiv, scale) {
   const positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
-  const vCount    = (subdiv + 1) * (subdiv + 1);
 
   let minH = Infinity, maxH = -Infinity;
 
-  for (let row = 0; row <= subdiv; row++) {
-    for (let col = 0; col <= subdiv; col++) {
-      const i = row * (subdiv + 1) + col;
-      // V-flip: row 0 = image bottom
-      const u =        col / subdiv;
-      const v = 1.0 - (row / subdiv);
-      const px = Math.min(Math.floor(u * (imgData.width  - 1)), imgData.width  - 1);
-      const py = Math.min(Math.floor(v * (imgData.height - 1)), imgData.height - 1);
-      const idx = (py * imgData.width + px) * 4;
-      const h = (imgData.data[idx] / 255) * scale;
-      positions[i * 3 + 1] = h;
-      if (h < minH) minH = h;
-      if (h > maxH) maxH = h;
-    }
+  // Read each vertex's actual X/Z world position and sample heightmap at that point.
+  // This avoids any assumption about Babylon's internal row/col → world layout.
+  for (let i = 0; i < positions.length / 3; i++) {
+    const wx = positions[i * 3 + 0];
+    const wz = positions[i * 3 + 2];
+
+    // Map world XZ → UV, then → pixel
+    const u =        (wx + sizeX / 2) / sizeX;
+    const v = 1.0 - ((wz + sizeZ / 2) / sizeZ);
+
+    const px = Math.max(0, Math.min(imgData.width  - 1, Math.floor(u * (imgData.width  - 1))));
+    const py = Math.max(0, Math.min(imgData.height - 1, Math.floor(v * (imgData.height - 1))));
+    const h  = (imgData.data[(py * imgData.width + px) * 4] / 255) * scale;
+
+    positions[i * 3 + 1] = h;
+    if (h < minH) minH = h;
+    if (h > maxH) maxH = h;
   }
 
   mesh.updateVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
@@ -168,7 +170,7 @@ function _stampVertices(mesh, imgData, sizeX, sizeZ, subdiv, scale) {
   );
   mesh.refreshBoundingInfo();
 
-  console.log(`[terrain] Heights stamped — scale:${scale} min:${minH.toFixed(1)} max:${maxH.toFixed(1)} verts:${subdiv+1}x${subdiv+1}`);
+  console.log(`[terrain] Heights stamped — scale:${scale} min:${minH.toFixed(1)} max:${maxH.toFixed(1)} verts:${positions.length / 3}`);
   _logBounds(mesh);
 }
 
@@ -180,27 +182,25 @@ function _logBounds(mesh) {
 
 function _applyMaterial(scene, mesh, t) {
   if (!mesh) return;
-  // Dispose old material
   if (mesh.material) { try { mesh.material.dispose(); } catch(e) {} }
 
   const mat = new BABYLON.StandardMaterial('terrainMat', scene);
   mat.specularColor = new BABYLON.Color3(0, 0, 0);
 
-  // Try environment colors first, then shaderLayers, then env-appropriate default
   const env = window._currentEnvColors;
-  if (env) {
-    // Pick a mid-tone ground color from the palette
+  if (env && Object.keys(env).length > 0) {
     const keys = Object.keys(env);
-    // Prefer a "ground" key if it exists, otherwise use the 4th color (usually a mid-tone)
-    const groundKey = keys.find(k => k.includes('sand') || k.includes('dirt') || k.includes('clay') || k.includes('rock') || k.includes('limestone')) || keys[3] || keys[0];
+    console.log('[terrain] Environment palette keys:', keys);
+    // Prefer ground-like keys, fall back to first entry
+    const groundKey = keys.find(k =>
+      /sand|dirt|clay|rock|soil|ground|earth|lime|stone|dune|desert/.test(k)
+    ) || keys[0];
     const hex = env[groundKey];
+    console.log('[terrain] Using color key:', groundKey, '=', hex);
     const rgb = _hexToRgb(hex);
     mat.diffuseColor = new BABYLON.Color3(rgb.r, rgb.g, rgb.b);
-  } else if (t.shaderLayers?.[0]?.color) {
-    const rgb = _hexToRgb(t.shaderLayers[0].color);
-    mat.diffuseColor = new BABYLON.Color3(rgb.r, rgb.g, rgb.b);
   } else {
-    mat.diffuseColor = new BABYLON.Color3(0.55, 0.48, 0.35); // neutral sandy default
+    mat.diffuseColor = new BABYLON.Color3(0.55, 0.48, 0.35); // neutral sandy fallback
   }
 
   mesh.material = mat;
@@ -209,8 +209,10 @@ function _applyMaterial(scene, mesh, t) {
 }
 
 function _hexToRgb(hex) {
-  const r = parseInt(hex.slice(1, 3), 16) / 255;
-  const g = parseInt(hex.slice(3, 5), 16) / 255;
-  const b = parseInt(hex.slice(5, 7), 16) / 255;
-  return { r, g, b };
+  if (!hex || typeof hex !== 'string') return { r: 0.55, g: 0.48, b: 0.35 };
+  const h = hex.replace('#', '').padEnd(6, '0');
+  const r = parseInt(h.slice(0, 2), 16) / 255;
+  const g = parseInt(h.slice(2, 4), 16) / 255;
+  const b = parseInt(h.slice(4, 6), 16) / 255;
+  return { r: isNaN(r) ? 0.55 : r, g: isNaN(g) ? 0.48 : g, b: isNaN(b) ? 0.35 : b };
 }

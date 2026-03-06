@@ -60,39 +60,49 @@ export function addTerrainCollider(imgData, sizeX, sizeZ, heightScale, subdiv = 
   if (!physicsReady || !physicsWorld) return;
   _removeTerrainCollider();
 
-  const rows = subdiv + 1;
-  const cols = subdiv + 1;
-  const heights = new Float32Array(rows * cols);
+  // Build a trimesh directly from the same pixel data used to stamp visual mesh vertices.
+  // This guarantees exact alignment - no coordinate system translation needed.
+  const verts = subdiv + 1;
+  const vertCount = verts * verts;
+  const vertices = new Float32Array(vertCount * 3);
+  const indices  = new Uint32Array(subdiv * subdiv * 6);
 
-  // Sample heights by converting row/col → world XZ → pixel,
-  // using the exact same formula as getTerrainHeightAt() in terrainMesh.js
-  // This guarantees the collider surface matches the visual mesh perfectly.
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      // Rapier heightfield: row 0 = -Z half, row N = +Z half
-      // Babylon CreateGround: row 0 = +Z half, row N = -Z half
-      // So flip row index when sampling to align collision with visual mesh
-      const flippedRow = subdiv - row;
-
-      const wx = -sizeX / 2 + (col        / subdiv) * sizeX;
-      const wz = -sizeZ / 2 + (flippedRow / subdiv) * sizeZ;
-
-      // Same UV formula as getTerrainHeightAt in terrainMesh.js
-      const u =        (wx + sizeX / 2) / sizeX;
-      const v = 1.0 - ((wz + sizeZ / 2) / sizeZ);
-
+  // Build vertex grid - same UV formula as getTerrainHeightAt and _stampVertices
+  for (let row = 0; row < verts; row++) {
+    for (let col = 0; col < verts; col++) {
+      const i = row * verts + col;
+      const wx = -sizeX / 2 + (col / subdiv) * sizeX;
+      const wz = -sizeZ / 2 + (row / subdiv) * sizeZ;
+      const u  =        (wx + sizeX / 2) / sizeX;
+      const v  = 1.0 - ((wz + sizeZ / 2) / sizeZ);
       const px = Math.max(0, Math.min(imgData.width  - 1, Math.floor(u * (imgData.width  - 1))));
       const py = Math.max(0, Math.min(imgData.height - 1, Math.floor(v * (imgData.height - 1))));
-      heights[row * cols + col] = (imgData.data[(py * imgData.width + px) * 4] / 255) * heightScale;
+      const h  = (imgData.data[(py * imgData.width + px) * 4] / 255) * heightScale;
+      vertices[i * 3 + 0] = wx;
+      vertices[i * 3 + 1] = h;
+      vertices[i * 3 + 2] = wz;
+    }
+  }
+
+  // Build index buffer - two triangles per quad cell
+  let idx = 0;
+  for (let row = 0; row < subdiv; row++) {
+    for (let col = 0; col < subdiv; col++) {
+      const a = row * verts + col;
+      const b = a + 1;
+      const c = a + verts;
+      const d = c + 1;
+      indices[idx++] = a; indices[idx++] = c; indices[idx++] = b;
+      indices[idx++] = b; indices[idx++] = c; indices[idx++] = d;
     }
   }
 
   _terrainBody = physicsWorld.createRigidBody(RAPIER_MODULE.RigidBodyDesc.fixed());
   _terrainCollider = physicsWorld.createCollider(
-    RAPIER_MODULE.ColliderDesc.heightfield(subdiv, subdiv, heights, { x: sizeX / subdiv, y: 1.0, z: sizeZ / subdiv }),
+    RAPIER_MODULE.ColliderDesc.trimesh(vertices, indices),
     _terrainBody
   );
-  console.log('[physics] Heightfield terrain collider added', rows, 'x', cols);
+  console.log('[physics] Terrain trimesh collider:', vertCount, 'verts |', indices.length / 3, 'tris');
 }
 
 export function addFlatGroundCollider(sizeX = 512, sizeZ = 512) {

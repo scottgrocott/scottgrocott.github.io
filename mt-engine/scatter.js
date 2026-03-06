@@ -149,7 +149,10 @@ function _scatterLayer(layer, frames) {
   const gridCells = 60;
   const cellSize  = size / gridCells;
 
-  const useFrames = frames.length > 0 ? frames : null;
+  // Filter to matching category, fall back to all frames if none match
+  let useFrames = frames.filter(f => f.category === category);
+  if (useFrames.length === 0) useFrames = frames;
+  if (useFrames.length === 0) useFrames = null;
 
   for (let xi = 0; xi < gridCells; xi++) {
     for (let zi = 0; zi < gridCells; zi++) {
@@ -221,8 +224,9 @@ export async function scatterProps() {
   }
 
   // 3. Vegetation clusters around each shelter
-  const vegFrames = frames;  // use all env frames for clustering
-  _scatterVegClusters(vegFrames);
+  const vegFrames = frames.filter(f => f.category === 'vegetation');
+  const clusterFrames = vegFrames.length > 0 ? vegFrames : frames;
+  _scatterVegClusters(clusterFrames);
 
   console.log('[scatter] Total instances:', _instances.length,
     '| shelters:', _shelterPositions.length);
