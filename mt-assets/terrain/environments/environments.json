@@ -42,7 +42,7 @@
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/sounds.json",
         "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/sprites.json",
         "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_rocks.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
@@ -107,7 +107,7 @@
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/sounds.json",
         "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/sprites.json",
         "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_rocks.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
@@ -174,7 +174,7 @@
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/sounds.json",
         "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/sprites.json",
         "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/node_mat_rocks.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
@@ -240,7 +240,7 @@
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/sounds.json",
         "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/sprites.json",
         "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/node_mat_rocks.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
@@ -299,7 +299,7 @@
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/sounds.json",
         "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/sprites.json",
         "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/node_mat_rocks.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
@@ -363,7 +363,7 @@
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/sounds.json",
         "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/sprites.json",
         "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/node_mat_rocks.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
@@ -426,7 +426,7 @@
         "sounds": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/sounds.json",
         "sprites": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/sprites.json",
         "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/node_mat_rocks.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",

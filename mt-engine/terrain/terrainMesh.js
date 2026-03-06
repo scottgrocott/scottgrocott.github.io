@@ -184,26 +184,192 @@ function _applyMaterial(scene, mesh, t) {
   if (!mesh) return;
   if (mesh.material) { try { mesh.material.dispose(); } catch(e) {} }
 
-  const hScale = t.heightScale ?? 50;
-  const env    = window._currentEnvColors;
-  const bands  = _buildHeightBands(env, hScale);
+  const hScale   = t.heightScale ?? 50;
+  const env      = window._currentEnvColors;
+  const nodeMats = window._currentEnvNodeMats;  // { node_mat_rocks, node_mat_dirt } from environment.js
+  const bands    = _buildHeightBands(env, hScale);
 
-  // Bake height-based colors into vertex color buffer
+  // Bake height-based palette colors into vertex color buffer
   _stampVertexColors(mesh, bands, hScale);
 
-  // StandardMaterial with vertex colors — no custom shader needed
-  const mat = new BABYLON.StandardMaterial('terrainMat', scene);
-  mat.specularColor   = new BABYLON.Color3(0, 0, 0);
-  mat.diffuseColor    = new BABYLON.Color3(1, 1, 1);  // white so vertex colors show through
-  mat.useVertexColors = true;
-  mat.backFaceCulling = true;
+  // Also bake slope into vertex alpha — used by node material shader to blend textures
+  if (nodeMats) {
+    _stampSlopeAlpha(mesh);
+  }
 
-  mesh.material       = mat;
-  mesh.receiveShadows = true;
+  if (nodeMats && (nodeMats.rocks || nodeMats.dirt)) {
+    _applyNodeMaterial(scene, mesh, nodeMats, hScale);
+  } else {
+    // Fallback: plain StandardMaterial with vertex colors
+    const mat = new BABYLON.StandardMaterial('terrainMat', scene);
+    mat.specularColor    = new BABYLON.Color3(0, 0, 0);
+    mat.diffuseColor     = new BABYLON.Color3(1, 1, 1);
+    mat.useVertexColors  = true;
+    mat.backFaceCulling  = true;
+    mesh.material        = mat;
+  }
+
+  mesh.receiveShadows  = true;
   mesh.checkCollisions = false;
-
   console.log('[terrain] Height bands:', bands.map(b => `${b.threshold.toFixed(0)}=${b.hex}`).join(' | '));
 }
+
+// Bake world-space slope (dot(normal, up)) into vertex alpha channel
+// alpha=1 → flat ground (dirt texture), alpha=0 → steep slope (rock texture)
+function _stampSlopeAlpha(mesh) {
+  const normals   = mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind);
+  const positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+  if (!normals || !positions) return;
+  const vCount = positions.length / 3;
+  const colors = mesh.getVerticesData(BABYLON.VertexBuffer.ColorKind) || new Float32Array(vCount * 4);
+
+  for (let i = 0; i < vCount; i++) {
+    const ny  = normals[i * 3 + 1];  // Y component of normal = dot with up
+    const slope = Math.max(0, Math.min(1, ny));  // 1=flat, 0=vertical
+    colors[i * 4 + 3] = slope;  // write into alpha
+  }
+  mesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors, false);
+}
+
+// Node material: dirt texture on flat areas, rock texture on slopes
+// Vertex color RGB = palette bands, vertex alpha = slope mask
+function _applyNodeMaterial(scene, mesh, nodeMats, hScale) {
+  const rocks = nodeMats.rocks;
+  const dirt  = nodeMats.dirt;
+
+  // Build node material with slope-blended textures multiplied over vertex colors
+  const nm = new BABYLON.NodeMaterial('terrainNodeMat', scene, { emitComments: false });
+  nm.build(false);
+
+  // Fall back to a hand-built StandardMaterial using custom shader via ShaderMaterial
+  // (NodeMaterial API is complex to build programmatically — use shader approach)
+  if (mesh.material) { try { mesh.material.dispose(); } catch(e) {} }
+
+  BABYLON.Effect.ShadersStore['terrainNodeVertexShader'] = `
+    precision highp float;
+    attribute vec3 position;
+    attribute vec3 normal;
+    attribute vec2 uv;
+    attribute vec4 color;
+    uniform mat4 worldViewProjection;
+    uniform mat4 world;
+    varying vec3 vNormal;
+    varying vec2 vUV;
+    varying vec4 vColor;
+    varying float vHeight;
+    void main() {
+      vec4 wp = world * vec4(position, 1.0);
+      vHeight  = wp.y;
+      vNormal  = normalize(mat3(world) * normal);
+      vUV      = uv;
+      vColor   = color;
+      gl_Position = worldViewProjection * vec4(position, 1.0);
+    }
+  `;
+
+  // Fragment: sample dirt + rock textures, blend by slope (alpha channel), multiply by vertex color bands
+  BABYLON.Effect.ShadersStore['terrainNodeFragmentShader'] = `
+    precision highp float;
+    varying vec3 vNormal;
+    varying vec2 vUV;
+    varying vec4 vColor;
+    varying float vHeight;
+    uniform sampler2D dirtTex;
+    uniform sampler2D rockTex;
+    uniform float dirtUScale;
+    uniform float dirtVScale;
+    uniform float rockUScale;
+    uniform float rockVScale;
+    uniform float rockMinSlope;
+    uniform float rockMaxSlope;
+    uniform float rockFalloff;
+    uniform float dirtMinSlope;
+    uniform float dirtMaxSlope;
+    uniform float dirtFalloff;
+    uniform float hasDirt;
+    uniform float hasRock;
+    uniform vec3  lightDir;
+
+    void main() {
+      float slope = vNormal.y;  // 1=flat, 0=vertical
+
+      // Rock weight: strong on steep slopes
+      float rockW = smoothstep(rockMinSlope - rockFalloff, rockMinSlope + rockFalloff, 1.0 - slope);
+      rockW = clamp(rockW, 0.0, 1.0);
+
+      // Dirt weight: strong on flat areas
+      float dirtW = smoothstep(dirtMaxSlope + dirtFalloff, dirtMaxSlope - dirtFalloff, 1.0 - slope);
+      dirtW = clamp(dirtW, 0.0, 1.0);
+
+      // Sample textures
+      vec4 dirtCol = texture2D(dirtTex, vUV * vec2(dirtUScale, dirtVScale));
+      vec4 rockCol = texture2D(rockTex, vUV * vec2(rockUScale, rockVScale));
+
+      // Blend textures by slope
+      vec4 texCol = vec4(0.5);
+      if (hasDirt > 0.5 && hasRock > 0.5) {
+        texCol = mix(dirtCol, rockCol, rockW);
+      } else if (hasRock > 0.5) {
+        texCol = mix(vec4(0.55, 0.48, 0.38, 1.0), rockCol, rockW);
+      } else if (hasDirt > 0.5) {
+        texCol = mix(dirtCol, vec4(0.55, 0.48, 0.38, 1.0), rockW);
+      }
+
+      // Multiply texture by vertex color (palette height bands)
+      vec3 col = texCol.rgb * vColor.rgb * 1.6;
+
+      // Simple diffuse lighting
+      float diff  = max(dot(vNormal, normalize(lightDir)), 0.0);
+      float light = 0.45 + 0.55 * diff;
+      gl_FragColor = vec4(col * light, 1.0);
+    }
+  `;
+
+  const mat = new BABYLON.ShaderMaterial('terrainNodeMat', scene,
+    { vertex: 'terrainNode', fragment: 'terrainNode' },
+    {
+      attributes: ['position', 'normal', 'uv', 'color'],
+      uniforms:   ['worldViewProjection', 'world',
+                   'dirtUScale', 'dirtVScale', 'rockUScale', 'rockVScale',
+                   'rockMinSlope', 'rockMaxSlope', 'rockFalloff',
+                   'dirtMinSlope', 'dirtMaxSlope', 'dirtFalloff',
+                   'hasDirt', 'hasRock', 'lightDir'],
+      samplers:   ['dirtTex', 'rockTex'],
+    }
+  );
+
+  // Rock uniforms
+  const r = rocks || {};
+  mat.setFloat('rockUScale',    r.uScale    ?? 2.0);
+  mat.setFloat('rockVScale',    r.vScale    ?? 2.0);
+  mat.setFloat('rockMinSlope',  1.0 - (r.maxSlope  ?? 1.0));
+  mat.setFloat('rockMaxSlope',  1.0 - (r.minSlope  ?? 0.4));
+  mat.setFloat('rockFalloff',   r.slopeFalloff ?? 0.1);
+  mat.setFloat('hasRock',       rocks ? 1.0 : 0.0);
+
+  // Dirt uniforms
+  const d = dirt || {};
+  mat.setFloat('dirtUScale',    d.uScale    ?? 4.0);
+  mat.setFloat('dirtVScale',    d.vScale    ?? 4.0);
+  mat.setFloat('dirtMinSlope',  1.0 - (d.maxSlope  ?? 0.5));
+  mat.setFloat('dirtMaxSlope',  1.0 - (d.minSlope  ?? 0.0));
+  mat.setFloat('dirtFalloff',   d.slopeFalloff ?? 0.1);
+  mat.setFloat('hasDirt',       dirt ? 1.0 : 0.0);
+
+  mat.setFloats('lightDir', [0.4, 1.0, 0.6]);
+  mat.backFaceCulling = true;
+
+  // Load textures — use grey fallback texture if URL missing
+  const greyPx = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI6QAAAABJRU5ErkJggg==';
+  const rockTex = new BABYLON.Texture(rocks?.url || greyPx, scene);
+  const dirtTex = new BABYLON.Texture(dirt?.url  || greyPx, scene);
+  mat.setTexture('rockTex', rockTex);
+  mat.setTexture('dirtTex', dirtTex);
+
+  mesh.material = mat;
+  console.log('[terrain] Node material applied | rock:', rocks?.url?.split('/').pop(), '| dirt:', dirt?.url?.split('/').pop());
+}
+
 
 // Write per-vertex colors based on height, blending between palette bands
 function _stampVertexColors(mesh, bands, hScale) {

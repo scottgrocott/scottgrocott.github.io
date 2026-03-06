@@ -39,6 +39,7 @@ import { initEditor, tickEditor, onFreeCamEnter, onFreeCamExit, initEditorScene 
 import { camera } from './core.js';
 import { initSky } from './sky.js';
 import { loadEnvironment } from './environment.js';
+import { initWater, clearWater } from './water.js';
 
 // ENGINE_ROOT: absolute URL base of the engine (where main.js lives).
 // Works regardless of where index.html is served from.
@@ -302,6 +303,7 @@ async function loadGameConfig(url) {
   clearBuildings();
   clearScatter();
   clearLadders();
+  clearWater();
   disposeSoundtrack();
   disposeCockpit();
 
@@ -360,6 +362,30 @@ async function loadGameConfig(url) {
   await buildTerrain(scene, CONFIG);
   _rebuildTerrainCollider();
   const terrainMesh = getTerrainMesh();
+
+  // Fog
+  if (CONFIG.fog?.enabled) {
+    const fog = CONFIG.fog;
+    const modeMap = {
+      'FOGMODE_LINEAR':      BABYLON.Scene.FOGMODE_LINEAR,
+      'FOGMODE_EXP':         BABYLON.Scene.FOGMODE_EXP,
+      'FOGMODE_EXP2':        BABYLON.Scene.FOGMODE_EXP2,
+    };
+    scene.fogMode    = modeMap[fog.mode] ?? BABYLON.Scene.FOGMODE_LINEAR;
+    scene.fogDensity = fog.density ?? 0.005;
+    scene.fogStart   = fog.start   ?? 150;
+    scene.fogEnd     = fog.end     ?? 600;
+    const fc = fog.color || { r: 0.85, g: 0.75, b: 0.60 };
+    scene.fogColor   = new BABYLON.Color3(fc.r, fc.g, fc.b);
+    console.log('[main] Fog enabled:', fog.mode, 'start:', scene.fogStart, 'end:', scene.fogEnd);
+  } else {
+    scene.fogMode = BABYLON.Scene.FOGMODE_NONE;
+  }
+
+  // Water
+  if (CONFIG.water?.enabled) {
+    initWater(CONFIG.water);
+  }
 
   setLoadStatus('Scanning navigation', 55);
   scanFlatAreas();

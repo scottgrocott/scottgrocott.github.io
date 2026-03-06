@@ -35,9 +35,17 @@ export async function loadEnvironment(envId) {
     _envId = envId;
     window._currentEnvColors = (colors && colors.colors) ? colors.colors : null;
 
+    // Expose node material configs for terrain shader
+    const assets = def.assets || {};
+    window._currentEnvNodeMats = {
+      rocks: assets.node_mat_rocks || null,
+      dirt:  assets.node_mat_dirt  || null,
+    };
+
     const sheetCount = (sprites && sprites.spriteSheets) ? sprites.spriteSheets.length : 0;
     const colorCount = window._currentEnvColors ? Object.keys(window._currentEnvColors).length : 0;
-    console.log('[env] Loaded environment:', def.name, '| sheets:', sheetCount, '| colors:', colorCount);
+    console.log('[env] Loaded environment:', def.name, '| sheets:', sheetCount, '| colors:', colorCount,
+      '| node mats:', Object.keys(window._currentEnvNodeMats).filter(k => window._currentEnvNodeMats[k]).join(', ') || 'none');
     return _envData;
   } catch(e) {
     console.error('[env] Failed to load environment:', envId, e);
