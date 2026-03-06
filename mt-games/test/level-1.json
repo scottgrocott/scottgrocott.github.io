@@ -11,7 +11,7 @@
     "sizeZ": 700,
     "subdivisions": 128,
     "heightScale": 80,
-    "environment": "env_desert",
+    "environment": "env_mediterranean",
     "shelterCount": 10,
     "heightmaps": [
       "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png",
