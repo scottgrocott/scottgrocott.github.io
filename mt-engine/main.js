@@ -332,6 +332,15 @@ async function loadGameConfig(url) {
   await initPhysics();
 
   setLoadStatus('Building terrain', 45);
+
+  // Pick a random heightmap from the heightmaps array (if provided)
+  const _hmaps = CONFIG.terrain.heightmaps;
+  if (Array.isArray(_hmaps) && _hmaps.length > 0) {
+    const _pick = _hmaps[Math.floor(Math.random() * _hmaps.length)];
+    CONFIG.terrain.heightmapUrl = _pick;
+    console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick) + 1) + '/' + _hmaps.length + ':', _pick);
+  }
+
   // Prefix relative asset paths with ENGINE_ROOT
   if (CONFIG.terrain.heightmap && !CONFIG.terrain.heightmap.startsWith('http') && !CONFIG.terrain.heightmap.startsWith('/') && ENGINE_ROOT) {
     CONFIG.terrain.heightmap = _enginePath(CONFIG.terrain.heightmap);

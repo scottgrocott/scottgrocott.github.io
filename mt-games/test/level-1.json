@@ -1,95 +1,37 @@
 {
   "meta": {
-  "id": "level-2",
-  "title": "Drone wars",
-  "subtitle": "Level 1"
+    "id": "level-1",
+    "title": "Desert Assault",
+    "subtitle": "Level 1",
+    "description": "Survive the assault across open terrain"
   },
   "terrain": {
-    "type": "flat",
+    "type": "heightmap",
     "size": 700,
-    "heightmap": null,
+    "sizeX": 700,
+    "sizeZ": 700,
+    "subdivisions": 128,
     "heightScale": 80,
-    "groundTexture": null,
-    "shaderLayers": [
-      {
-        "minElevation": 0,
-        "maxElevation": 0.35,
-        "color": "#1e3a10",
-        "texture": null,
-        "blend": "smooth"
-      },
-      {
-        "minElevation": 0.35,
-        "maxElevation": 0.65,
-        "color": "#4a3820",
-        "texture": null,
-        "blend": "smooth"
-      },
-      {
-        "minElevation": 0.65,
-        "maxElevation": 1,
-        "color": "#707068",
-        "texture": null,
-        "blend": "smooth"
-      }
+    "heightmaps": [
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png",
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png"
     ]
   },
   "enemies": [
-    {
-      "type": "drone",
-      "module": "./enemies/drones.js",
-      "spawnPoint": {
-        "x": -13,
-        "y": 2,
-        "z": 2.8
-      },
-      "maxCount": 3,
-      "placeholder": "box",
-      "glb": null,
-      "hitsToKill": 10
-    }
+    { "type": "drone",    "maxCount": 4, "health": 60,  "hitsToKill": 10 },
+    { "type": "car",      "maxCount": 3, "health": 100, "hitsToKill": 8  },
+    { "type": "forklift", "maxCount": 2, "health": 150, "hitsToKill": 12 }
   ],
   "weapons": [
-    {
-      "id": "basic_gun",
-      "module": "./weapons/basicGun.js",
-      "bulletSpeed": 60,
-      "bulletRadius": 0.12,
-      "range": 200,
-      "hitsToKill": 10
-    }
+    { "id": "basic_gun", "bulletSpeed": 60, "bulletRadius": 0.12, "range": 200, "hitsToKill": 10 }
   ],
-  "shelters": [],
-  "structures": [],
   "scatterLayers": [
-    {
-      "category": "vegetation",
-      "density": 0.1,
-      "minElevation": 0,
-      "maxElevation": 0.5
-    },
-    {
-      "category": "rock",
-      "density": 0.03,
-      "minElevation": 0,
-      "maxElevation": 0.8
-    }
+    { "category": "vegetation", "density": 0.12 },
+    { "category": "rock",       "density": 0.06 }
   ],
-  "ladders": [],
-  "waypoints": [],
-  "assets": [],
   "audio": {
-    "outerZone": {
-      "radius": 280,
-      "track": "wind"
-    },
-    "midZone": {
-      "radius": 150,
-      "track": "adventure"
-    },
-    "innerZone": {
-      "radius": 60,
-      "track": "battle"
-    }
+    "outerZone": { "radius": 280, "track": "wind" },
+    "midZone":   { "radius": 150, "track": "adventure" },
+    "innerZone": { "radius": 60,  "track": "battle" }
   }
 }
