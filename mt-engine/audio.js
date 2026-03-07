@@ -2,12 +2,8 @@
 
 export let toneReady = false;
 
-// Permanent CDN locations for enemy engine sounds
-const ENGINE_URLS = {
-  drone:    'https://scottgrocott.github.io/mt-assets/enemies/audio/drone_engine.ogg',
-  car:      'https://scottgrocott.github.io/mt-assets/enemies/audio/car_engine.ogg',
-  forklift: 'https://scottgrocott.github.io/mt-assets/enemies/audio/forklift_engine.ogg',
-};
+// Default engine audio used for all enemy types when no variant URL is specified
+const DEFAULT_ENGINE_URL = 'https://scottgrocott.github.io/mt-assets/enemies/engine.mp3';
 
 function _guard() { return window.Tone && Tone.context.state === 'running'; }
 
@@ -27,80 +23,41 @@ export async function initAudio() {
 // so Panner3D has a reference point for distance rolloff and L/R panning
 // ---------------------------------------------------------------------------
 export function updateAudioListener(pos, forwardX = 0, forwardZ = -1) {
-  if (!_guard()) return;
-  try {
-    const ctx = Tone.context.rawContext;
-    const L   = ctx.listener;
-    if (!L) return;
-
-    // Position
-    if (L.positionX) {
-      L.positionX.value = pos.x;
-      L.positionY.value = pos.y;
-      L.positionZ.value = pos.z;
-    } else {
-      L.setPosition(pos.x, pos.y, pos.z);
-    }
-
-    // Forward vector (which way the player is facing)
-    if (L.forwardX) {
-      L.forwardX.value = forwardX;
-      L.forwardY.value = 0;
-      L.forwardZ.value = forwardZ;
-      L.upX.value = 0;
-      L.upY.value = 1;
-      L.upZ.value = 0;
-    } else {
-      L.setOrientation(forwardX, 0, forwardZ, 0, 1, 0);
-    }
-  } catch(e) {}
+  window._audioListenerPos = pos;
 }
 
 // ---------------------------------------------------------------------------
-// Per-enemy engine audio — real ogg with synth fallback
+// Per-enemy engine audio — looping Player with distance-based volume
 // ---------------------------------------------------------------------------
 export function createEnemySynth(type, engineUrl) {
   if (!_guard()) return null;
   try {
-    const panner = new Tone.Panner3D({
-      panningModel:         'HRTF',
-      distanceModel:        'inverse',
-      refDistance:          1,
-      maxDistance:          80,
-      rolloffFactor:        2.0,
-      coneInnerAngle:       360,
-      coneOuterAngle:       360,
-      coneOuterGain:        0,
-    }).toDestination();
+    const url = engineUrl || DEFAULT_ENGINE_URL;
 
-    const url = engineUrl || ENGINE_URLS[type];
-    if (!url) return _startSynthFallback(type, panner);
+    // Simple volume node — we calculate distance attenuation manually each frame
+    const vol = new Tone.Volume(-6).toDestination();
 
-    // Construct player without passing url — load separately to avoid double-fetch
+    // Sentinel returned immediately — player populated once load completes
+    const handle = { player: null, vol, type, _loading: true };
+
     const player = new Tone.Player({
       loop:      true,
       autostart: false,
-      volume:    -4,
-    }).connect(panner);
-
-    const loadTimeout = setTimeout(() => {
-      console.warn(`[audio] Engine load timed out for ${type} — synth fallback`);
-      try { player.dispose(); } catch(e) {}
-      _startSynthFallback(type, panner);
-    }, 6000);
+    }).connect(vol);
 
     player.load(url).then(() => {
-      clearTimeout(loadTimeout);
+      handle.player = player;
+      handle._loading = false;
+      vol.volume.value = -6;  // audible default until first spatial update
       try { player.start(); } catch(e) {}
       console.log(`[audio] Engine playing for ${type}`);
     }).catch(err => {
-      clearTimeout(loadTimeout);
+      handle._loading = false;
       console.warn(`[audio] Engine load failed for ${type}:`, err);
       try { player.dispose(); } catch(e) {}
-      _startSynthFallback(type, panner);
     });
 
-    return { player, panner, type };
+    return handle;
 
   } catch(e) {
     console.warn('[audio] createEnemySynth failed:', e);
@@ -108,46 +65,29 @@ export function createEnemySynth(type, engineUrl) {
   }
 }
 
-function _startSynthFallback(type, panner) {
+// ---------------------------------------------------------------------------
+// Per-frame: update volume based on distance to player
+// pos = enemy world position {x,y,z}
+// listenerPos = player world position {x,y,z}  (passed in from tick)
+// ---------------------------------------------------------------------------
+export function updateEnemySpatial(synthObj, pos, listenerPos) {
+  if (!synthObj?.vol) return;
   try {
-    let synth;
-    if (type === 'drone') {
-      synth = new Tone.MembraneSynth({
-        pitchDecay: 0.05, octaves: 2,
-        envelope: { attack: 0.02, decay: 0.3, sustain: 0.4, release: 0.8 }
-      }).connect(panner);
-      synth.triggerAttack('C1');
-    } else if (type === 'car') {
-      synth = new Tone.FMSynth({
-        harmonicity: 3, modulationIndex: 10,
-        envelope: { attack: 0.01, decay: 0.1, sustain: 0.6, release: 0.5 },
-      }).connect(panner);
-      synth.triggerAttack('A0');
-    } else if (type === 'forklift') {
-      synth = new Tone.AMSynth({
-        harmonicity: 2.5,
-        envelope: { attack: 0.05, decay: 0.2, sustain: 0.5, release: 1.0 },
-      }).connect(panner);
-      synth.triggerAttack('E0');
+    // DEBUG — remove after confirming audio works
+    if (!synthObj._dbg) {
+      synthObj._dbg = true;
+      console.log('[audio] updateEnemySpatial FIRST CALL — vol:', synthObj.vol?.volume?.value, 'player state:', synthObj.player?.state, 'listenerPos:', window._audioListenerPos);
     }
-    return synth ? { synth, panner, type } : null;
-  } catch(e) {
-    console.warn('[audio] synth fallback failed:', e);
-    return null;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Per-frame: move enemy sound source to current world position
-// ---------------------------------------------------------------------------
-export function updateEnemySpatial(synthObj, pos) {
-  if (!synthObj?.panner) return;
-  try {
-    const px = +pos.x, py = +pos.y, pz = +pos.z;
-    if (isNaN(px)) return;
-    synthObj.panner.positionX.value = px;
-    synthObj.panner.positionY.value = py;
-    synthObj.panner.positionZ.value = pz;
+    const lp = listenerPos || window._audioListenerPos;
+    // If we have no listener position yet, play at medium volume rather than silence
+    const dist = lp
+      ? Math.sqrt((pos.x-lp.x)**2 + (pos.y-lp.y)**2 + (pos.z-lp.z)**2)
+      : 20;
+    // Full volume under 8 units, silent beyond 80
+    const MIN_DIST = 8, MAX_DIST = 80;
+    const clamped = Math.max(MIN_DIST, Math.min(MAX_DIST, dist));
+    const t = (clamped - MIN_DIST) / (MAX_DIST - MIN_DIST);
+    synthObj.vol.volume.value = -6 + (t * -40);
   } catch(e) {}
 }
 
@@ -155,8 +95,7 @@ export function disposeEnemySynth(synthObj) {
   if (!synthObj) return;
   try {
     if (synthObj.player) { try { synthObj.player.stop(); } catch(e) {} synthObj.player.dispose(); }
-    if (synthObj.synth)  { synthObj.synth.triggerRelease(); synthObj.synth.dispose(); }
-    if (synthObj.panner) synthObj.panner.dispose();
+    if (synthObj.vol)    synthObj.vol.dispose();
   } catch(e) {}
 }
 

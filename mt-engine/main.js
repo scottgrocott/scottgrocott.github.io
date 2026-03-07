@@ -185,13 +185,10 @@ async function boot() {
     syncPhysicsReads();
     pollGamepad(dt);
     tickPlayer(dt);
-    // Keep 3D audio listener in sync with player head position and facing direction
-    if (playerRig && toneReady) {
-      const fwd = camera ? Math.sin(camera.rotation.y) : 0;
-      const fwdZ = camera ? Math.cos(camera.rotation.y) : -1;
+    // Always keep listener position up to date — enemy audio needs it regardless of toneReady
+    if (playerRig) {
       updateAudioListener(
-        { x: playerRig.position.x, y: playerRig.position.y + 1.6, z: playerRig.position.z },
-        fwd, fwdZ
+        { x: playerRig.position.x, y: playerRig.position.y + 1.6, z: playerRig.position.z }
       );
     }
     tickLadders(dt);
@@ -214,6 +211,31 @@ async function boot() {
 }
 
 // ---- Config Load ----
+// Enemy type definitions fetched from CDN — keyed by type ('drone','car','forklift')
+const _enemyTypeDefs = {};
+const _ENEMY_DEF_URLS = {
+  drone:    'https://scottgrocott.github.io/mt-assets/enemies/drones.json',
+  car:      'https://scottgrocott.github.io/mt-assets/enemies/cars.json',
+  forklift: 'https://scottgrocott.github.io/mt-assets/enemies/forklifts.json',
+};
+
+async function _loadEnemyTypeDefs() {
+  for (const [type, url] of Object.entries(_ENEMY_DEF_URLS)) {
+    if (_enemyTypeDefs[type]) continue;  // already loaded
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const arr = await r.json();
+      // Index by id for quick lookup; also store array
+      _enemyTypeDefs[type] = { list: arr, byId: Object.fromEntries(arr.map(d => [d.id, d])) };
+      console.log(`[main] Enemy defs loaded: ${type} (${arr.length} variants)`);
+    } catch(e) {
+      console.warn(`[main] Could not load enemy defs for ${type}:`, e);
+      _enemyTypeDefs[type] = { list: [], byId: {} };
+    }
+  }
+}
+
 async function loadGameConfig(url) {
   if (_loading) return;
   _loading = true;
@@ -320,6 +342,7 @@ async function loadGameConfig(url) {
   initMinimap(bounds);
 
   setLoadStatus('Spawning enemies', 88);
+  await _loadEnemyTypeDefs();
   await _waitForYuka();
   _spawnEnemiesFromConfig();
 
@@ -335,9 +358,17 @@ async function loadGameConfig(url) {
 function _spawnEnemiesFromConfig() {
   const defs = CONFIG.enemies || [];
   for (const def of defs) {
-    if (def.type === 'drone')         spawnDrones(def);
-    else if (def.type === 'car')      spawnCars(def);
-    else if (def.type === 'forklift') spawnForklifts(def);
+    // Merge CDN type def (audio, model, movingParts) into level-JSON def.
+    // Level JSON picks the variant via def.variantId; falls back to first in list.
+    const typeDefs = _enemyTypeDefs[def.type];
+    const variantDef = typeDefs
+      ? (def.variantId ? typeDefs.byId[def.variantId] : typeDefs.list[0])
+      : null;
+    const merged = variantDef ? { ...variantDef, ...def } : def;
+
+    if (merged.type === 'drone')         spawnDrones(merged);
+    else if (merged.type === 'car')      spawnCars(merged);
+    else if (merged.type === 'forklift') spawnForklifts(merged);
   }
 }
 

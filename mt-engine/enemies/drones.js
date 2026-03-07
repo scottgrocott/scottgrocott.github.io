@@ -31,7 +31,7 @@ export function spawnDrones(def) {
       speed: PATROL_SPEED,
       health: def.health ?? 60,
       spawnPos,
-      // No YUKA path — drones use their own stateful tick below
+      noVehicle: true,  // drones use their own stateful tick, not YUKA
     });
 
     enemy.state = 'rising';

@@ -125,7 +125,7 @@ export class EnemyBase {
     this.body = this._createPhysicsBody(opts.spawnPos ?? new BABYLON.Vector3(0, 2, 0));
 
     // YUKA vehicle
-    this.vehicle = this._createVehicle(opts.spawnPos ?? new BABYLON.Vector3(0, 2, 0));
+    this.vehicle = opts.noVehicle ? null : this._createVehicle(opts.spawnPos ?? new BABYLON.Vector3(0, 2, 0));
 
     if (this.vehicle && this.waypoints.length) {
       assignPath(this.vehicle, this.waypoints);
