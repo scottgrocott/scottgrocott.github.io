@@ -5,10 +5,11 @@ import { physicsWorld, physicsReady, safeVec3 } from '../physics.js';
 import { EnemyBase, _ym, distToPlayer, getPlayerPos } from './enemyBase.js';
 import { getEnemies } from './enemyRegistry.js';
 import { getWaypoints } from '../flatnav.js';
+import { getHeightAt } from '../terrain/heightmap.js';
 import { CONFIG } from '../config.js';
 import { createEnemySynth, updateEnemySpatial, disposeEnemySynth, toneReady } from '../audio.js';
 
-const RISE_TARGET_Y   = 16;
+const FLIGHT_ABOVE_TERRAIN = 22;  // metres above terrain surface drones cruise at
 const RISE_SPEED      = 4;
 const PATROL_SPEED    = 5;
 const HUNT_SPEED      = 9;
@@ -20,9 +21,12 @@ export function spawnDrones(def) {
   const spawned = [];
   for (let i = 0; i < count; i++) {
     const wp = flightWaypoints[i % Math.max(1, flightWaypoints.length)];
-    const spawnPos = wp
-      ? new BABYLON.Vector3(wp.x, wp.y, wp.z)
-      : new BABYLON.Vector3((Math.random()-0.5)*60, RISE_TARGET_Y, (Math.random()-0.5)*60);
+    // Spawn well above terrain — use terrain height + FLIGHT_ABOVE_TERRAIN
+    // so drones never start underground regardless of map topology
+    const spawnX = wp ? wp.x : (Math.random()-0.5)*60;
+    const spawnZ = wp ? wp.z : (Math.random()-0.5)*60;
+    const groundY = getHeightAt(spawnX, spawnZ) ?? 0;
+    const spawnPos = new BABYLON.Vector3(spawnX, groundY + FLIGHT_ABOVE_TERRAIN, spawnZ);
 
     const enemy = new EnemyBase({
       scene,
@@ -85,9 +89,10 @@ function _buildDroneMesh(enemy) {
 
 function _setupDroneWaypoints(enemy, flightWaypoints) {
   if (!flightWaypoints || flightWaypoints.length === 0) {
+    const fy = (FLIGHT_ABOVE_TERRAIN);
     enemy._waypoints = [
-      {x:20,y:RISE_TARGET_Y,z:0},{x:0,y:RISE_TARGET_Y,z:20},
-      {x:-20,y:RISE_TARGET_Y,z:0},{x:0,y:RISE_TARGET_Y,z:-20}
+      {x:20,y:fy,z:0},{x:0,y:fy,z:20},
+      {x:-20,y:fy,z:0},{x:0,y:fy,z:-20}
     ];
   } else {
     const shuffled = [...flightWaypoints].sort(() => Math.random()-0.5);
@@ -131,8 +136,10 @@ function _tickDrone(enemy, dt) {
 
   switch (enemy.state) {
     case 'rising': {
-      targetY = RISE_TARGET_Y;
-      if (Math.abs(py - RISE_TARGET_Y) < 1.0) enemy.state = 'patrol';
+      const groundBelowY = getHeightAt(px, pz) ?? 0;
+      const riseTarget = groundBelowY + FLIGHT_ABOVE_TERRAIN;
+      targetY = riseTarget;
+      if (py >= riseTarget - 1.0) enemy.state = 'patrol';
       break;
     }
     case 'patrol':
@@ -144,14 +151,19 @@ function _tickDrone(enemy, dt) {
         if (Math.sqrt(dx*dx+dz*dz) < 3) {
           enemy._waypointIndex = (enemy._waypointIndex + 1) % enemy._waypoints.length;
         } else {
-          targetX = wp.x; targetY = wp.y; targetZ = wp.z;
+          // Keep drone at FLIGHT_ABOVE_TERRAIN above the terrain beneath its current pos
+            const groundY = getHeightAt(px, pz) ?? 0;
+            targetX = wp.x; targetY = Math.max(wp.y, groundY + FLIGHT_ABOVE_TERRAIN); targetZ = wp.z;
         }
       }
       break;
     }
     case 'hunting': {
       if (dPlayer > DETECT_RANGE * 1.5) { enemy.state = 'patrol'; break; }
-      targetX = playerPos.x; targetY = playerPos.y + 6; targetZ = playerPos.z;
+      const huntGroundY = getHeightAt(playerPos.x, playerPos.z) ?? 0;
+      targetX = playerPos.x;
+      targetY = Math.max(playerPos.y + 6, huntGroundY + FLIGHT_ABOVE_TERRAIN);
+      targetZ = playerPos.z;
       break;
     }
     case 'investigating': {

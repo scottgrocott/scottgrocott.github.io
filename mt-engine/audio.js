@@ -35,7 +35,7 @@ export function createEnemySynth(type, engineUrl) {
     const url = engineUrl || DEFAULT_ENGINE_URL;
 
     // Simple volume node — we calculate distance attenuation manually each frame
-    const vol = new Tone.Volume(-6).toDestination();
+    const vol = new Tone.Volume(6).toDestination();
 
     // Sentinel returned immediately — player populated once load completes
     const handle = { player: null, vol, type, _loading: true };
@@ -48,7 +48,7 @@ export function createEnemySynth(type, engineUrl) {
     player.load(url).then(() => {
       handle.player = player;
       handle._loading = false;
-      vol.volume.value = -6;  // audible default until first spatial update
+      vol.volume.value = 6;   // audible default until first spatial update
       try { player.start(); } catch(e) {}
       console.log(`[audio] Engine playing for ${type}`);
     }).catch(err => {
@@ -87,7 +87,7 @@ export function updateEnemySpatial(synthObj, pos, listenerPos) {
     const MIN_DIST = 8, MAX_DIST = 80;
     const clamped = Math.max(MIN_DIST, Math.min(MAX_DIST, dist));
     const t = (clamped - MIN_DIST) / (MAX_DIST - MIN_DIST);
-    synthObj.vol.volume.value = -6 + (t * -40);
+    synthObj.vol.volume.value = 6 + (t * -26);  // +6 dB close, -20 dB at 80 units
   } catch(e) {}
 }
 
