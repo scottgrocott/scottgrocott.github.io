@@ -6,7 +6,7 @@ import { EnemyBase, _ym, distToPlayer, getPlayerPos } from './enemyBase.js';
 import { getEnemies } from './enemyRegistry.js';
 import { getWaypoints } from '../flatnav.js';
 import { CONFIG } from '../config.js';
-import { createEnemySynth, updateEnemySpatial, disposeEnemySynth } from '../audio.js';
+import { createEnemySynth, updateEnemySpatial, disposeEnemySynth, toneReady } from '../audio.js';
 
 const RISE_TARGET_Y   = 16;
 const RISE_SPEED      = 4;
@@ -37,7 +37,8 @@ export function spawnDrones(def) {
     enemy.state = 'rising';
     _buildDroneMesh(enemy, scene);
     _setupDroneWaypoints(enemy, flightWaypoints);
-    enemy._synth = createEnemySynth('drone', def.audio?.engine);
+    enemy._audioType = 'drone';
+    enemy._audioUrl  = def.audio?.engine || null;  // lazy-init on first tick after toneReady
     spawned.push(enemy);
   }
   return spawned;
@@ -71,6 +72,15 @@ function _buildDroneMesh(enemy) {
     enemy._rotors.push(rotor);
   }
   enemy._waypointIndex = 0;
+
+  // Re-register YUKA render component to point at the new root.
+  // The old placeholder mesh was disposed above; without this YUKA
+  // keeps writing position to a dead object and the new root never moves.
+  if (enemy.vehicle) {
+    enemy.vehicle.setRenderComponent(root, (entity, rc) => {
+      rc.position.set(entity.position.x, entity.position.y, entity.position.z);
+    });
+  }
 }
 
 function _setupDroneWaypoints(enemy, flightWaypoints) {
@@ -99,11 +109,15 @@ function _tickDrone(enemy, dt) {
   const px = +t.x, py = +t.y, pz = +t.z;
   if (isNaN(px)||isNaN(py)||isNaN(pz)) return;
 
-  // Audio: update spatial position; dispose on death
-  if (enemy._synth) {
-    if (enemy.dead) { disposeEnemySynth(enemy._synth); enemy._synth = null; return; }
-    updateEnemySpatial(enemy._synth, {x:px, y:py, z:pz});
+  // Audio: lazy-init synth after toneReady, update spatial position, dispose on death
+  if (enemy.dead) {
+    if (enemy._synth) { disposeEnemySynth(enemy._synth); enemy._synth = null; }
+    return;
   }
+  if (!enemy._synth && enemy._audioType && toneReady) {
+    enemy._synth = createEnemySynth(enemy._audioType, enemy._audioUrl);
+  }
+  if (enemy._synth) updateEnemySpatial(enemy._synth, {x:px, y:py, z:pz});
 
   // Spin rotors
   if (enemy._rotors) {

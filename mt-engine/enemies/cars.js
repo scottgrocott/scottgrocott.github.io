@@ -6,7 +6,7 @@ import { EnemyBase, distToPlayer, getPlayerPos } from './enemyBase.js';
 import { getEnemies } from './enemyRegistry.js';
 import { getWaypoints } from '../flatnav.js';
 import { getTerrainHeightAt } from '../terrain/terrainMesh.js';
-import { createEnemySynth, updateEnemySpatial, disposeEnemySynth } from '../audio.js';
+import { createEnemySynth, updateEnemySpatial, disposeEnemySynth, toneReady } from '../audio.js';
 
 const PATROL_SPEED = 5;
 const CHASE_SPEED  = 9;
@@ -32,7 +32,8 @@ export function spawnCars(def) {
     enemy.state = 'patrol';
     enemy._waypointIndex = Math.floor(Math.random() * Math.max(1, groundWaypoints.length));
     _buildCarMesh(enemy);
-    enemy._synth = createEnemySynth('car', def.audio?.engine);
+    enemy._audioType = 'car';
+    enemy._audioUrl  = def.audio?.engine || null;  // lazy-init on first tick after toneReady
     spawned.push(enemy);
   }
   return spawned;
@@ -65,6 +66,13 @@ function _buildCarMesh(enemy) {
     enemy._wheels.push(wheel);
   }
   enemy._wheelSpin = 0;
+
+  // Re-register YUKA render component to point at the new root
+  if (enemy.vehicle) {
+    enemy.vehicle.setRenderComponent(root, (entity, rc) => {
+      rc.position.set(entity.position.x, entity.position.y, entity.position.z);
+    });
+  }
 }
 
 export function tickCars(dt) {
@@ -80,6 +88,15 @@ function _tickCar(enemy, dt, groundWaypoints) {
   const t = enemy.body.translation();
   const px = +t.x, py = +t.y, pz = +t.z;
   if (isNaN(px)||isNaN(py)||isNaN(pz)) return;
+  // Audio: lazy-init synth after toneReady, update spatial, dispose on death
+  if (enemy.dead) {
+    if (enemy._synth) { disposeEnemySynth(enemy._synth); enemy._synth = null; }
+    return;
+  }
+  if (!enemy._synth && enemy._audioType && toneReady) {
+    enemy._synth = createEnemySynth(enemy._audioType, enemy._audioUrl);
+  }
+  if (enemy._synth) updateEnemySpatial(enemy._synth, {x:px, y:py, z:pz});
 
   const playerPos = getPlayerPos();
   const dPlayer   = distToPlayer({x:px, y:py, z:pz});
