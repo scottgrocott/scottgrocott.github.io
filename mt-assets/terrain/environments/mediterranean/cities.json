@@ -1,0 +1,200 @@
+{
+  "cities":[
+    {
+      "name": "Gridiron Downtown",
+      "description": "Standard Manhattan-style perpendicular grid. Narrow streets, high density.",
+      "groundPlane": {
+        "options": { "width": 100, "height": 1, "depth": 100 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Skyscraper", "options": { "width": 12, "height": 80, "depth": 12 }, "position": { "x": -25, "y": 40.0, "z": 25 } },
+        { "type": "Office Building", "options": { "width": 15, "height": 30, "depth": 15 }, "position": { "x": -25, "y": 15.0, "z": -25 } },
+        { "type": "Skyscraper", "options": { "width": 16, "height": 110, "depth": 16 }, "position": { "x": 25, "y": 55.0, "z": -25 } },
+        { "type": "Gas Station", "options": { "width": 8, "height": 4, "depth": 8 }, "position": { "x": 25, "y": 2.0, "z": 25 } },
+        { "type": "Office Building", "options": { "width": 10, "height": 45, "depth": 12 }, "position": { "x": -25, "y": 22.5, "z": 0 } },
+        { "type": "Commercial", "options": { "width": 10, "height": 15, "depth": 10 }, "position": { "x": 25, "y": 7.5, "z": 0 } },
+        { "type": "Skyscraper", "options": { "width": 14, "height": 90, "depth": 14 }, "position": { "x": 0, "y": 45.0, "z": -25 } },
+        { "type": "Office Building", "options": { "width": 12, "height": 20, "depth": 12 }, "position": { "x": 0, "y": 10.0, "z": 25 } }
+      ]
+    },
+    {
+      "name": "The Grand Roundabout",
+      "description": "Parisian-style radial layout with a massive central circle and radiating streets.",
+      "groundPlane": {
+        "options": { "width": 150, "height": 1, "depth": 150 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Monumental Office", "options": { "width": 8, "height": 25, "depth": 8 }, "position": { "x": 22, "y": 12.5, "z": 0 } },
+        { "type": "Monumental Office", "options": { "width": 8, "height": 25, "depth": 8 }, "position": { "x": 15.5, "y": 12.5, "z": 15.5 } },
+        { "type": "Monumental Office", "options": { "width": 8, "height": 25, "depth": 8 }, "position": { "x": 0, "y": 12.5, "z": 22 } },
+        { "type": "Monumental Office", "options": { "width": 8, "height": 25, "depth": 8 }, "position": { "x": -15.5, "y": 12.5, "z": 15.5 } },
+        { "type": "Monumental Office", "options": { "width": 8, "height": 25, "depth": 8 }, "position": { "x": -22, "y": 12.5, "z": 0 } },
+        { "type": "Monumental Office", "options": { "width": 8, "height": 25, "depth": 8 }, "position": { "x": -15.5, "y": 12.5, "z": -15.5 } },
+        { "type": "Monumental Office", "options": { "width": 8, "height": 25, "depth": 8 }, "position": { "x": 0, "y": 12.5, "z": -22 } },
+        { "type": "Monumental Office", "options": { "width": 8, "height": 25, "depth": 8 }, "position": { "x": 15.5, "y": 12.5, "z": -15.5 } },
+        { "type": "Skyscraper", "options": { "width": 12, "height": 75, "depth": 12 }, "position": { "x": 45, "y": 37.5, "z": 0 } },
+        { "type": "Skyscraper", "options": { "width": 12, "height": 65, "depth": 12 }, "position": { "x": 32, "y": 32.5, "z": 32 } },
+        { "type": "Skyscraper", "options": { "width": 14, "height": 95, "depth": 14 }, "position": { "x": 0, "y": 47.5, "z": 45 } },
+        { "type": "Skyscraper", "options": { "width": 12, "height": 80, "depth": 12 }, "position": { "x": -32, "y": 40.0, "z": 32 } },
+        { "type": "Skyscraper", "options": { "width": 15, "height": 120, "depth": 15 }, "position": { "x": -45, "y": 60.0, "z": 0 } },
+        { "type": "Gas Station", "options": { "width": 5, "height": 3, "depth": 5 }, "position": { "x": -32, "y": 1.5, "z": -32 } }
+      ]
+    },
+    {
+      "name": "Diagonal Boulevard",
+      "description": "A standard grid severed by a massive diagonal avenue, leaving triangular city blocks.",
+      "groundPlane": {
+        "options": { "width": 120, "height": 1, "depth": 120 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Office Building", "options": { "width": 10, "height": 30, "depth": 10 }, "position": { "x": -25, "y": 15.0, "z": 10 } },
+        { "type": "Skyscraper", "options": { "width": 14, "height": 85, "depth": 14 }, "position": { "x": -40, "y": 42.5, "z": -5 } },
+        { "type": "Office Building", "options": { "width": 12, "height": 45, "depth": 12 }, "position": { "x": -15, "y": 22.5, "z": 35 } },
+        { "type": "Skyscraper", "options": { "width": 18, "height": 100, "depth": 18 }, "position": { "x": -35, "y": 50.0, "z": 35 } },
+        { "type": "Gas Station", "options": { "width": 6, "height": 4, "depth": 6 }, "position": { "x": 25, "y": 2.0, "z": -10 } },
+        { "type": "Office Building", "options": { "width": 15, "height": 25, "depth": 15 }, "position": { "x": 40, "y": 12.5, "z": 5 } },
+        { "type": "Skyscraper", "options": { "width": 12, "height": 70, "depth": 12 }, "position": { "x": 15, "y": 35.0, "z": -35 } },
+        { "type": "Office Building", "options": { "width": 20, "height": 40, "depth": 20 }, "position": { "x": 35, "y": 20.0, "z": -35 } }
+      ]
+    },
+    {
+      "name": "Central Park Square",
+      "description": "A completely empty massive central plaza surrounded by an impenetrable wall of skyscrapers.",
+      "groundPlane": {
+        "options": { "width": 140, "height": 1, "depth": 140 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Skyscraper", "options": { "width": 16, "height": 100, "depth": 16 }, "position": { "x": -30, "y": 50.0, "z": 30 } },
+        { "type": "Skyscraper", "options": { "width": 20, "height": 130, "depth": 15 }, "position": { "x": 0, "y": 65.0, "z": 30 } },
+        { "type": "Skyscraper", "options": { "width": 16, "height": 95, "depth": 16 }, "position": { "x": 30, "y": 47.5, "z": 30 } },
+        { "type": "Skyscraper", "options": { "width": 16, "height": 110, "depth": 16 }, "position": { "x": -30, "y": 55.0, "z": -30 } },
+        { "type": "Skyscraper", "options": { "width": 25, "height": 140, "depth": 15 }, "position": { "x": 0, "y": 70.0, "z": -30 } },
+        { "type": "Skyscraper", "options": { "width": 16, "height": 105, "depth": 16 }, "position": { "x": 30, "y": 52.5, "z": -30 } },
+        { "type": "Skyscraper", "options": { "width": 15, "height": 85, "depth": 20 }, "position": { "x": -30, "y": 42.5, "z": 0 } },
+        { "type": "Skyscraper", "options": { "width": 15, "height": 90, "depth": 20 }, "position": { "x": 30, "y": 45.0, "z": 0 } }
+      ]
+    },
+    {
+      "name": "Highway Commercial Strip",
+      "description": "A massive 6-lane highway dividing the town. Small retail lines the road, big-box stores sit behind.",
+      "groundPlane": {
+        "options": { "width": 160, "height": 1, "depth": 100 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Gas Station", "options": { "width": 8, "height": 4, "depth": 6 }, "position": { "x": -50, "y": 2.0, "z": 20 } },
+        { "type": "Fast Food", "options": { "width": 6, "height": 5, "depth": 6 }, "position": { "x": -15, "y": 2.5, "z": 20 } },
+        { "type": "Diner", "options": { "width": 10, "height": 4, "depth": 5 }, "position": { "x": 20, "y": 2.0, "z": 20 } },
+        { "type": "Auto Shop", "options": { "width": 12, "height": 6, "depth": 8 }, "position": { "x": 55, "y": 3.0, "z": 20 } },
+        { "type": "Gas Station", "options": { "width": 8, "height": 4, "depth": 6 }, "position": { "x": 30, "y": 2.0, "z": -20 } },
+        { "type": "Megastore", "options": { "width": 40, "height": 12, "depth": 25 }, "position": { "x": -40, "y": 6.0, "z": 45 } },
+        { "type": "Office Park", "options": { "width": 25, "height": 20, "depth": 15 }, "position": { "x": 35, "y": 10.0, "z": 45 } },
+        { "type": "Shopping Mall", "options": { "width": 50, "height": 10, "depth": 25 }, "position": { "x": -20, "y": 5.0, "z": -45 } },
+        { "type": "Motel", "options": { "width": 20, "height": 8, "depth": 10 }, "position": { "x": 45, "y": 4.0, "z": -40 } }
+      ]
+    },
+    {
+      "name": "Flatiron Y-Split",
+      "description": "A primary avenue splits into two diagonal routes, creating a sharp wedge-shaped city block in the center.",
+      "groundPlane": {
+        "options": { "width": 100, "height": 1, "depth": 120 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Flatiron Skyscraper", "options": { "width": 4, "height": 50, "depth": 18 }, "position": { "x": 0, "y": 25.0, "z": 5 } },
+        { "type": "Office Building", "options": { "width": 12, "height": 35, "depth": 12 }, "position": { "x": 0, "y": 17.5, "z": 25 } },
+        { "type": "Skyscraper", "options": { "width": 15, "height": 80, "depth": 15 }, "position": { "x": 0, "y": 40.0, "z": 45 } },
+        { "type": "Gas Station", "options": { "width": 6, "height": 4, "depth": 6 }, "position": { "x": -25, "y": 2.0, "z": -20 } },
+        { "type": "Office Building", "options": { "width": 12, "height": 25, "depth": 12 }, "position": { "x": -30, "y": 12.5, "z": 10 } },
+        { "type": "Skyscraper", "options": { "width": 14, "height": 65, "depth": 14 }, "position": { "x": -40, "y": 32.5, "z": 30 } },
+        { "type": "Commercial", "options": { "width": 10, "height": 15, "depth": 10 }, "position": { "x": 25, "y": 7.5, "z": -20 } },
+        { "type": "Office Building", "options": { "width": 12, "height": 30, "depth": 12 }, "position": { "x": 30, "y": 15.0, "z": 10 } },
+        { "type": "Skyscraper", "options": { "width": 14, "height": 70, "depth": 14 }, "position": { "x": 40, "y": 35.0, "z": 30 } }
+      ]
+    },
+    {
+      "name": "Waterfront Promenade",
+      "description": "Coastal city layout. Low-rise luxury apartments line the waterfront avenue, with towering skyline behind them.",
+      "groundPlane": {
+        "options": { "width": 120, "height": 1, "depth": 120 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Luxury Apartment", "options": { "width": 12, "height": 20, "depth": 15 }, "position": { "x": -20, "y": 10.0, "z": -40 } },
+        { "type": "Luxury Apartment", "options": { "width": 12, "height": 25, "depth": 15 }, "position": { "x": -20, "y": 12.5, "z": -15 } },
+        { "type": "Luxury Apartment", "options": { "width": 12, "height": 22, "depth": 15 }, "position": { "x": -20, "y": 11.0, "z": 10 } },
+        { "type": "Luxury Apartment", "options": { "width": 12, "height": 28, "depth": 15 }, "position": { "x": -20, "y": 14.0, "z": 35 } },
+        { "type": "Skyscraper", "options": { "width": 16, "height": 90, "depth": 16 }, "position": { "x": 10, "y": 45.0, "z": -35 } },
+        { "type": "Skyscraper", "options": { "width": 20, "height": 120, "depth": 16 }, "position": { "x": 10, "y": 60.0, "z": 0 } },
+        { "type": "Skyscraper", "options": { "width": 18, "height": 105, "depth": 16 }, "position": { "x": 10, "y": 52.5, "z": 35 } },
+        { "type": "Office Building", "options": { "width": 25, "height": 40, "depth": 25 }, "position": { "x": 40, "y": 20.0, "z": -20 } },
+        { "type": "Office Building", "options": { "width": 20, "height": 35, "depth": 30 }, "position": { "x": 40, "y": 17.5, "z": 25 } }
+      ]
+    },
+    {
+      "name": "Suburban Cul-de-sacs",
+      "description": "Low-density meandering roads with small residential and commercial boxes scattered randomly.",
+      "groundPlane": {
+        "options": { "width": 150, "height": 1, "depth": 150 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Gas Station", "options": { "width": 6, "height": 4, "depth": 6 }, "position": { "x": 0, "y": 2.0, "z": 0 } },
+        { "type": "Grocery Store", "options": { "width": 15, "height": 6, "depth": 12 }, "position": { "x": 18, "y": 3.0, "z": 5 } },
+        { "type": "House", "options": { "width": 4, "height": 5, "depth": 4 }, "position": { "x": -35, "y": 2.5, "z": 30 } },
+        { "type": "House", "options": { "width": 5, "height": 4, "depth": 5 }, "position": { "x": -25, "y": 2.0, "z": 38 } },
+        { "type": "House", "options": { "width": 4, "height": 5, "depth": 5 }, "position": { "x": -40, "y": 2.5, "z": 42 } },
+        { "type": "House", "options": { "width": 5, "height": 6, "depth": 4 }, "position": { "x": 45, "y": 3.0, "z": 40 } },
+        { "type": "House", "options": { "width": 4, "height": 4, "depth": 4 }, "position": { "x": 35, "y": 2.0, "z": 48 } },
+        { "type": "House", "options": { "width": 5, "height": 5, "depth": 5 }, "position": { "x": 52, "y": 2.5, "z": 50 } },
+        { "type": "House", "options": { "width": 6, "height": 5, "depth": 4 }, "position": { "x": -40, "y": 2.5, "z": -35 } },
+        { "type": "House", "options": { "width": 4, "height": 6, "depth": 5 }, "position": { "x": -32, "y": 3.0, "z": -45 } },
+        { "type": "House", "options": { "width": 5, "height": 4, "depth": 4 }, "position": { "x": -48, "y": 2.0, "z": -48 } },
+        { "type": "House", "options": { "width": 4, "height": 5, "depth": 5 }, "position": { "x": 35, "y": 2.5, "z": -30 } },
+        { "type": "House", "options": { "width": 5, "height": 6, "depth": 4 }, "position": { "x": 28, "y": 3.0, "z": -40 } },
+        { "type": "House", "options": { "width": 4, "height": 4, "depth": 5 }, "position": { "x": 42, "y": 2.0, "z": -38 } }
+      ]
+    },
+    {
+      "name": "Twin Peaks Nodes",
+      "description": "Two highly dense central hubs separated by a low-density gap representing a park or river boundary.",
+      "groundPlane": {
+        "options": { "width": 160, "height": 1, "depth": 100 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Mega Skyscraper", "options": { "width": 18, "height": 120, "depth": 18 }, "position": { "x": -45, "y": 60.0, "z": 0 } },
+        { "type": "Office Building", "options": { "width": 14, "height": 55, "depth": 14 }, "position": { "x": -45, "y": 27.5, "z": 22 } },
+        { "type": "Office Building", "options": { "width": 12, "height": 45, "depth": 12 }, "position": { "x": -45, "y": 22.5, "z": -22 } },
+        { "type": "Skyscraper", "options": { "width": 15, "height": 75, "depth": 15 }, "position": { "x": -25, "y": 37.5, "z": 0 } },
+        { "type": "Hotel Tower", "options": { "width": 16, "height": 65, "depth": 16 }, "position": { "x": -65, "y": 32.5, "z": 0 } },
+        { "type": "Mega Skyscraper", "options": { "width": 16, "height": 110, "depth": 16 }, "position": { "x": 45, "y": 55.0, "z": 0 } },
+        { "type": "Office Building", "options": { "width": 15, "height": 60, "depth": 15 }, "position": { "x": 45, "y": 30.0, "z": 25 } },
+        { "type": "Office Building", "options": { "width": 14, "height": 40, "depth": 14 }, "position": { "x": 45, "y": 20.0, "z": -25 } },
+        { "type": "Skyscraper", "options": { "width": 12, "height": 85, "depth": 12 }, "position": { "x": 25, "y": 42.5, "z": 0 } },
+        { "type": "Hotel Tower", "options": { "width": 18, "height": 55, "depth": 18 }, "position": { "x": 65, "y": 27.5, "z": 0 } },
+        { "type": "Gas Station", "options": { "width": 6, "height": 4, "depth": 6 }, "position": { "x": 0, "y": 2.0, "z": 0 } }
+      ]
+    },
+    {
+      "name": "Industrial Supergrid",
+      "description": "Massive wide streets built for heavy freight, with enormous footprint, low-height warehouses.",
+      "groundPlane": {
+        "options": { "width": 200, "height": 1, "depth": 200 },
+        "position": { "x": 0, "y": -0.5, "z": 0 }
+      },
+      "buildings":[
+        { "type": "Warehouse", "options": { "width": 50, "height": 12, "depth": 50 }, "position": { "x": -50, "y": 6.0, "z": 50 } },
+        { "type": "Assembly Factory", "options": { "width": 60, "height": 18, "depth": 40 }, "position": { "x": 55, "y": 9.0, "z": 50 } },
+        { "type": "Logistics Center", "options": { "width": 70, "height": 10, "depth": 50 }, "position": { "x": -50, "y": 5.0, "z": -55 } },
+        { "type": "Power Plant", "options": { "width": 40, "height": 30, "depth": 40 }, "position": { "x": 50, "y": 15.0, "z": -50 } },
+        { "type": "Plant Administration", "options": { "width": 15, "height": 8, "depth": 15 }, "position": { "x": 0, "y": 4.0, "z": -15 } },
+        { "type": "Truck Stop Diner", "options": { "width": 8, "height": 5, "depth": 8 }, "position": { "x": 0, "y": 2.5, "z": 15 } }
+      ]
+    }
+  ]
+}

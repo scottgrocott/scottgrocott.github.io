@@ -1,0 +1,472 @@
+{
+  "battle":[
+    {
+      "name": "Neon Skirmish",
+      "instruments":[
+        {
+          "id": "lead",
+          "type": "FMSynth",
+          "options": {
+            "harmonicity": 3.0,
+            "modulationIndex": 10,
+            "oscillator": { "type": "sawtooth" },
+            "envelope": { "attack": 0.01, "decay": 0.1, "sustain": 0.5, "release": 0.1 },
+            "modulation": { "type": "square" }
+          }
+        },
+        {
+          "id": "drums",
+          "type": "MembraneSynth",
+          "options": {
+            "pitchDecay": 0.05,
+            "octaves": 4,
+            "oscillator": { "type": "sine" },
+            "envelope": { "attack": 0.001, "decay": 0.4, "sustain": 0.01, "release": 1.4 }
+          }
+        }
+      ],
+      "sequences":[
+        {
+          "instrumentId": "lead",
+          "events":[
+            { "time": "0:0:0", "note": "C4", "duration": "16n" },
+            { "time": "0:0:1", "note": "Eb4", "duration": "16n" },
+            { "time": "0:0:2", "note": "C4", "duration": "16n" },
+            { "time": "0:0:3", "note": "G4", "duration": "16n" },
+            { "time": "0:1:0", "note": "C4", "duration": "16n" },
+            { "time": "0:1:1", "note": "Bb4", "duration": "16n" },
+            { "time": "0:1:2", "note": "C4", "duration": "16n" },
+            { "time": "0:1:3", "note": "F4", "duration": "16n" }
+          ]
+        },
+        {
+          "instrumentId": "drums",
+          "events":[
+            { "time": "0:0:0", "note": "C1", "duration": "8n" },
+            { "time": "0:1:0", "note": "C1", "duration": "8n" },
+            { "time": "0:2:0", "note": "C1", "duration": "8n" },
+            { "time": "0:3:0", "note": "C1", "duration": "8n" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Orc Warlord",
+      "instruments":[
+        {
+          "id": "brass",
+          "type": "Synth",
+          "options": {
+            "oscillator": { "type": "fatcustom", "partials":[1, 0.5, 0.3], "spread": 40 },
+            "envelope": { "attack": 0.05, "decay": 0.2, "sustain": 0.6, "release": 0.8 }
+          }
+        },
+        {
+          "id": "cymbals",
+          "type": "MetalSynth",
+          "options": {
+            "frequency": 200,
+            "envelope": { "attack": 0.001, "decay": 0.1, "release": 0.01 },
+            "harmonicity": 5.1,
+            "modulationIndex": 32,
+            "resonance": 4000,
+            "octaves": 1.5
+          }
+        }
+      ],
+      "sequences":[
+        {
+          "instrumentId": "brass",
+          "events":[
+            { "time": "0:0:0", "note": "D2", "duration": "8n" },
+            { "time": "0:0:2", "note": "D2", "duration": "16n" },
+            { "time": "0:0:3", "note": "D2", "duration": "16n" },
+            { "time": "0:1:0", "note": "F2", "duration": "8n" },
+            { "time": "0:1:2", "note": "D2", "duration": "8n" },
+            { "time": "0:2:0", "note": "G2", "duration": "4n" },
+            { "time": "0:3:0", "note": "D2", "duration": "8n" }
+          ]
+        },
+        {
+          "instrumentId": "cymbals",
+          "events":[
+            { "time": "0:0:0", "note": "C4", "duration": "16n" },
+            { "time": "0:0:2", "note": "C4", "duration": "16n" },
+            { "time": "0:1:0", "note": "C4", "duration": "16n" },
+            { "time": "0:1:2", "note": "C4", "duration": "16n" },
+            { "time": "0:2:0", "note": "C4", "duration": "16n" },
+            { "time": "0:2:2", "note": "C4", "duration": "16n" },
+            { "time": "0:3:0", "note": "C4", "duration": "16n" },
+            { "time": "0:3:2", "note": "C4", "duration": "16n" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shadow Duel",
+      "instruments":[
+        {
+          "id": "pluck",
+          "type": "AMSynth",
+          "options": {
+            "harmonicity": 1.5,
+            "oscillator": { "type": "triangle" },
+            "envelope": { "attack": 0.01, "decay": 0.3, "sustain": 0.1, "release": 0.5 },
+            "modulation": { "type": "sine" },
+            "modulationEnvelope": { "attack": 0.05, "decay": 0.2, "sustain": 0.2, "release": 0.4 }
+          }
+        },
+        {
+          "id": "bass",
+          "type": "Synth",
+          "options": {
+            "oscillator": { "type": "square" },
+            "envelope": { "attack": 0.02, "decay": 0.1, "sustain": 0.8, "release": 0.2 }
+          }
+        }
+      ],
+      "sequences":[
+        {
+          "instrumentId": "pluck",
+          "events":[
+            { "time": "0:0:0", "note": "A4", "duration": "16n" },
+            { "time": "0:0:2", "note": "B4", "duration": "16n" },
+            { "time": "0:1:0", "note": "C5", "duration": "8n" },
+            { "time": "0:1:2", "note": "A4", "duration": "16n" },
+            { "time": "0:2:0", "note": "E5", "duration": "4n" }
+          ]
+        },
+        {
+          "instrumentId": "bass",
+          "events":[
+            { "time": "0:0:0", "note": "A2", "duration": "16n" },
+            { "time": "0:0:1", "note": "A2", "duration": "16n" },
+            { "time": "0:0:2", "note": "A2", "duration": "16n" },
+            { "time": "0:1:0", "note": "F2", "duration": "16n" },
+            { "time": "0:1:1", "note": "F2", "duration": "16n" },
+            { "time": "0:1:2", "note": "F2", "duration": "16n" },
+            { "time": "0:2:0", "note": "G2", "duration": "8n" },
+            { "time": "0:3:0", "note": "A2", "duration": "8n" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Galactic Fleet",
+      "instruments":[
+        {
+          "id": "thickLead",
+          "type": "DuoSynth",
+          "options": {
+            "vibratoAmount": 0.5,
+            "vibratoRate": 5,
+            "voice0": {
+              "oscillator": { "type": "sawtooth" },
+              "envelope": { "attack": 0.01, "decay": 0.2, "sustain": 0.5, "release": 0.4 }
+            },
+            "voice1": {
+              "oscillator": { "type": "square" },
+              "envelope": { "attack": 0.01, "decay": 0.2, "sustain": 0.5, "release": 0.4 }
+            }
+          }
+        },
+        {
+          "id": "toms",
+          "type": "MembraneSynth",
+          "options": {
+            "pitchDecay": 0.1,
+            "octaves": 3,
+            "oscillator": { "type": "triangle" },
+            "envelope": { "attack": 0.01, "decay": 0.5, "sustain": 0.0, "release": 0.1 }
+          }
+        }
+      ],
+      "sequences": [
+        {
+          "instrumentId": "thickLead",
+          "events":[
+            { "time": "0:0:0", "note": "E4", "duration": "8n" },
+            { "time": "0:0:2", "note": "G4", "duration": "8n" },
+            { "time": "0:1:0", "note": "F#4", "duration": "16n" },
+            { "time": "0:1:1", "note": "D4", "duration": "16n" },
+            { "time": "0:1:2", "note": "E4", "duration": "4n" }
+          ]
+        },
+        {
+          "instrumentId": "toms",
+          "events":[
+            { "time": "0:0:0", "note": "E2", "duration": "8n" },
+            { "time": "0:0:2", "note": "B1", "duration": "8n" },
+            { "time": "0:1:0", "note": "E2", "duration": "8n" },
+            { "time": "0:1:2", "note": "B1", "duration": "8n" },
+            { "time": "0:2:0", "note": "G1", "duration": "4n" },
+            { "time": "0:3:0", "note": "E1", "duration": "4n" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Final Showdown",
+      "instruments":[
+        {
+          "id": "chordStabs",
+          "type": "PolySynth",
+          "options": {
+            "oscillator": { "type": "pwm", "modulationFrequency": 0.2 },
+            "envelope": { "attack": 0.02, "decay": 0.1, "sustain": 0.2, "release": 1.5 }
+          }
+        },
+        {
+          "id": "grittyBass",
+          "type": "FMSynth",
+          "options": {
+            "harmonicity": 0.5,
+            "modulationIndex": 20,
+            "oscillator": { "type": "sawtooth" },
+            "envelope": { "attack": 0.05, "decay": 0.3, "sustain": 0.4, "release": 0.5 },
+            "modulation": { "type": "triangle" }
+          }
+        }
+      ],
+      "sequences":[
+        {
+          "instrumentId": "chordStabs",
+          "events": [
+            { "time": "0:0:0", "note":["C4", "Eb4", "G4", "C5"], "duration": "8n" },
+            { "time": "0:1:2", "note":["C4", "Eb4", "G4", "C5"], "duration": "8n" },
+            { "time": "0:2:2", "note": ["Bb3", "D4", "F4", "Bb4"], "duration": "4n" }
+          ]
+        },
+        {
+          "instrumentId": "grittyBass",
+          "events":[
+            { "time": "0:0:0", "note": "C2", "duration": "16n" },
+            { "time": "0:0:1", "note": "C2", "duration": "16n" },
+            { "time": "0:0:2", "note": "C2", "duration": "16n" },
+            { "time": "0:0:3", "note": "C2", "duration": "16n" },
+            { "time": "0:1:0", "note": "C2", "duration": "16n" },
+            { "time": "0:1:1", "note": "C2", "duration": "16n" },
+            { "time": "0:2:0", "note": "Bb1", "duration": "8n" },
+            { "time": "0:3:0", "note": "G1", "duration": "8n" }
+          ]
+        }
+      ]
+    }
+  ],
+  "adventure":[
+    {
+      "name": "Morning Departure",
+      "instruments":[
+        {
+          "id": "flute",
+          "type": "Synth",
+          "options": {
+            "oscillator": { "type": "triangle" },
+            "envelope": { "attack": 0.2, "decay": 0.1, "sustain": 0.8, "release": 1.5 }
+          }
+        },
+        {
+          "id": "pads",
+          "type": "PolySynth",
+          "options": {
+            "oscillator": { "type": "sine" },
+            "envelope": { "attack": 0.5, "decay": 0.5, "sustain": 1.0, "release": 2.0 }
+          }
+        }
+      ],
+      "sequences":[
+        {
+          "instrumentId": "flute",
+          "events":[
+            { "time": "0:0:0", "note": "C5", "duration": "4n" },
+            { "time": "0:1:0", "note": "D5", "duration": "4n" },
+            { "time": "0:2:0", "note": "E5", "duration": "8n" },
+            { "time": "0:2:2", "note": "G5", "duration": "8n" },
+            { "time": "0:3:0", "note": "C6", "duration": "2n" }
+          ]
+        },
+        {
+          "instrumentId": "pads",
+          "events": [
+            { "time": "0:0:0", "note":["C4", "E4", "G4"], "duration": "2n" },
+            { "time": "0:2:0", "note": ["F3", "A3", "C4"], "duration": "2n" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Enchanted Woods",
+      "instruments":[
+        {
+          "id": "marimba",
+          "type": "AMSynth",
+          "options": {
+            "harmonicity": 3.2,
+            "oscillator": { "type": "sine" },
+            "envelope": { "attack": 0.01, "decay": 0.4, "sustain": 0.0, "release": 0.4 },
+            "modulation": { "type": "square" }
+          }
+        },
+        {
+          "id": "subBass",
+          "type": "Synth",
+          "options": {
+            "oscillator": { "type": "sine" },
+            "envelope": { "attack": 0.3, "decay": 0.2, "sustain": 0.8, "release": 2.0 }
+          }
+        }
+      ],
+      "sequences":[
+        {
+          "instrumentId": "marimba",
+          "events":[
+            { "time": "0:0:0", "note": "D4", "duration": "8n" },
+            { "time": "0:0:2", "note": "F4", "duration": "8n" },
+            { "time": "0:1:0", "note": "G4", "duration": "8n" },
+            { "time": "0:1:2", "note": "A4", "duration": "8n" },
+            { "time": "0:2:0", "note": "C5", "duration": "4n" },
+            { "time": "0:3:0", "note": "A4", "duration": "4n" }
+          ]
+        },
+        {
+          "instrumentId": "subBass",
+          "events":[
+            { "time": "0:0:0", "note": "D2", "duration": "1m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Desert Caravan",
+      "instruments":[
+        {
+          "id": "sitarPluck",
+          "type": "PluckSynth",
+          "options": {
+            "attackNoise": 1.5,
+            "dampening": 4000,
+            "resonance": 0.9
+          }
+        },
+        {
+          "id": "handDrums",
+          "type": "MembraneSynth",
+          "options": {
+            "pitchDecay": 0.2,
+            "octaves": 2,
+            "oscillator": { "type": "square" },
+            "envelope": { "attack": 0.005, "decay": 0.2, "sustain": 0.0, "release": 0.1 }
+          }
+        }
+      ],
+      "sequences":[
+        {
+          "instrumentId": "sitarPluck",
+          "events":[
+            { "time": "0:0:0", "note": "D4", "duration": "8n" },
+            { "time": "0:0:2", "note": "Eb4", "duration": "16n" },
+            { "time": "0:0:3", "note": "D4", "duration": "16n" },
+            { "time": "0:1:0", "note": "F#4", "duration": "4n" },
+            { "time": "0:2:0", "note": "G4", "duration": "8n" },
+            { "time": "0:2:2", "note": "A4", "duration": "4n" }
+          ]
+        },
+        {
+          "instrumentId": "handDrums",
+          "events":[
+            { "time": "0:0:0", "note": "D2", "duration": "8n" },
+            { "time": "0:1:2", "note": "A2", "duration": "8n" },
+            { "time": "0:2:0", "note": "D2", "duration": "8n" },
+            { "time": "0:3:2", "note": "A2", "duration": "8n" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "High Seas",
+      "instruments":[
+        {
+          "id": "accordionSynth",
+          "type": "Synth",
+          "options": {
+            "oscillator": { "type": "pwm", "modulationFrequency": 0.5 },
+            "envelope": { "attack": 0.1, "decay": 0.2, "sustain": 0.7, "release": 0.5 }
+          }
+        },
+        {
+          "id": "rollingBass",
+          "type": "Synth",
+          "options": {
+            "oscillator": { "type": "triangle" },
+            "envelope": { "attack": 0.05, "decay": 0.4, "sustain": 0.2, "release": 1.0 }
+          }
+        }
+      ],
+      "sequences":[
+        {
+          "instrumentId": "accordionSynth",
+          "events":[
+            { "time": "0:0:0", "note": "C4", "duration": "8n" },
+            { "time": "0:0:2", "note": "E4", "duration": "8n" },
+            { "time": "0:1:0", "note": "G4", "duration": "8n" },
+            { "time": "0:2:0", "note": "C5", "duration": "4n" },
+            { "time": "0:3:0", "note": "G4", "duration": "4n" }
+          ]
+        },
+        {
+          "instrumentId": "rollingBass",
+          "events":[
+            { "time": "0:0:0", "note": "C2", "duration": "4n" },
+            { "time": "0:1:0", "note": "G2", "duration": "8n" },
+            { "time": "0:2:0", "note": "C2", "duration": "4n" },
+            { "time": "0:3:0", "note": "E2", "duration": "8n" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mountain Peak",
+      "instruments":[
+        {
+          "id": "choirPad",
+          "type": "PolySynth",
+          "options": {
+            "oscillator": { "type": "square" },
+            "envelope": { "attack": 1.0, "decay": 0.5, "sustain": 0.8, "release": 3.0 },
+            "filter": { "Q": 2, "type": "lowpass", "rolloff": -24 }
+          }
+        },
+        {
+          "id": "chimes",
+          "type": "MetalSynth",
+          "options": {
+            "frequency": 800,
+            "envelope": { "attack": 0.001, "decay": 1.5, "release": 2.0 },
+            "harmonicity": 4.1,
+            "modulationIndex": 20,
+            "resonance": 6000,
+            "octaves": 1
+          }
+        }
+      ],
+      "sequences":[
+        {
+          "instrumentId": "choirPad",
+          "events":[
+            { "time": "0:0:0", "note": ["A3", "C#4", "E4"], "duration": "2n" },
+            { "time": "0:2:0", "note":["B3", "D#4", "F#4"], "duration": "2n" }
+          ]
+        },
+        {
+          "instrumentId": "chimes",
+          "events":[
+            { "time": "0:0:0", "note": "A5", "duration": "8n" },
+            { "time": "0:1:2", "note": "E6", "duration": "8n" },
+            { "time": "0:2:0", "note": "B5", "duration": "8n" },
+            { "time": "0:3:2", "note": "F#6", "duration": "8n" }
+          ]
+        }
+      ]
+    }
+  ]
+}
