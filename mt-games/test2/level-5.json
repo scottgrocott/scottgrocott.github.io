@@ -1,0 +1,221 @@
+{
+  "meta": {
+    "levels": [
+      {
+        "id": "level-5",
+        "title": "Battle Royal",
+        "subtitle": "Level 5 \u2014 Everything. All at once. Good luck."
+      }
+    ],
+    "total_levels": 5,
+    "splash_screen": "<div class='social-links'><a href='https://x.com/scott_grocott' target='_blank'>X (Twitter)</a> &nbsp; <a href='https://github.com/scottgrocott' target='_blank'>GitHub</a> &nbsp; <a href='https://www.instagram.com/scott_grocott/' target='_blank'>Instagram</a></div>"
+  },
+  "terrain": {
+    "type": "heightmap",
+    "size": 700,
+    "sizeX": 700,
+    "sizeZ": 700,
+    "subdivisions": 128,
+    "heightScale": 80,
+    "environment": [
+      "env_desert",
+      "env_wetland"
+    ],
+    "shelterCount": 10,
+    "heightmaps": [
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png",
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png",
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map3.png"
+    ]
+  },
+  "fog": {
+    "enabled": true,
+    "mode": "FOGMODE_LINEAR",
+    "color": {
+      "r": 0.85,
+      "g": 0.75,
+      "b": 0.6
+    },
+    "start": 150,
+    "end": 600
+  },
+  "water": {
+    "enabled": true,
+    "mesh": {
+      "width": 700,
+      "height": 700,
+      "subdivisions": 32,
+      "position": {
+        "x": 0,
+        "y": 15,
+        "z": 0
+      }
+    },
+    "material": {
+      "bumpTexture": "https://scottgrocott.github.io/mt-assets/terrain/environments/water.jpg",
+      "windForce": 5,
+      "windDirection": {
+        "x": 1,
+        "y": 0.5
+      },
+      "waveHeight": 0.4,
+      "bumpHeight": 0.1,
+      "waveLength": 0.1,
+      "waveSpeed": 20,
+      "waterColor": {
+        "r": 0.05,
+        "g": 0.3,
+        "b": 0.5
+      },
+      "colorBlendFactor": 0.2,
+      "waterColor2": {
+        "r": 0.1,
+        "g": 0.4,
+        "b": 0.6
+      },
+      "colorBlendFactor2": 0.2,
+      "disableClipPlane": false,
+      "renderTargetSize": 512
+    }
+  },
+  "enemies": [
+    {
+      "type": "drone",
+      "health": 60,
+      "hitsToKill": 10,
+      "maxCount": 5,
+      "spawnPoint": {
+        "x": -13,
+        "y": 2,
+        "z": 2.8
+      },
+      "module": "./enemies/drones.js"
+    },
+    {
+      "type": "car",
+      "health": 100,
+      "hitsToKill": 8,
+      "maxCount": 4
+    },
+    {
+      "type": "forklift",
+      "health": 150,
+      "hitsToKill": 12,
+      "maxCount": 3
+    }
+  ],
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 60,
+      "bulletRadius": 0.12,
+      "range": 200,
+      "hitsToKill": 10
+    }
+  ],
+  "structures": {
+    "fortresses": [
+      {
+        "name": "Standard Bastion",
+        "position": {
+          "x": 120,
+          "y": 0,
+          "z": -85
+        }
+      },
+      {
+        "name": "Deep Gorge Fort",
+        "position": {
+          "x": -200,
+          "y": 0,
+          "z": 150
+        }
+      },
+      {
+        "name": "Cliffhanger Stronghold",
+        "position": {
+          "x": 45,
+          "y": 0,
+          "z": 210
+        }
+      }
+    ],
+    "villages": [
+      {
+        "name": "Desert Caravan",
+        "position": {
+          "x": -50,
+          "y": 0,
+          "z": -120
+        }
+      },
+      {
+        "name": "Sunny Dale",
+        "position": {
+          "x": 180,
+          "y": 0,
+          "z": 60
+        }
+      },
+      {
+        "name": "Crossroads",
+        "position": {
+          "x": -110,
+          "y": 0,
+          "z": -15
+        }
+      }
+    ],
+    "cities": [
+      {
+        "name": "Gridiron Downtown",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 250
+        }
+      },
+      {
+        "name": "Industrial Supergrid",
+        "position": {
+          "x": 250,
+          "y": 0,
+          "z": -250
+        }
+      }
+    ]
+  },
+  "scatterLayers": [
+    {
+      "category": "vegetation",
+      "density": 0.12,
+      "minElevation": 0,
+      "maxElevation": 0.6
+    },
+    {
+      "category": "rock",
+      "density": 0.03,
+      "minElevation": 0.2,
+      "maxElevation": 1.0
+    }
+  ],
+  "shelters": [],
+  "ladders": [],
+  "waypoints": [],
+  "assets": [],
+  "audio": {
+    "outerZone": {
+      "radius": 300,
+      "track": "wind"
+    },
+    "midZone": {
+      "radius": 150,
+      "track": "adventure"
+    },
+    "innerZone": {
+      "radius": 60,
+      "track": "battle"
+    }
+  }
+}

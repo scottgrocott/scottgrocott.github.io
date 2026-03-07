@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "levels": [
+      {
+        "id": "level-2",
+        "title": "Dust & Gears",
+        "subtitle": "Level 2 \u2014 The machines wake up"
+      }
+    ],
+    "total_levels": 5,
+    "splash_screen": "<div class='social-links'><a href='https://x.com/scott_grocott' target='_blank'>X (Twitter)</a> &nbsp; <a href='https://github.com/scottgrocott' target='_blank'>GitHub</a> &nbsp; <a href='https://www.instagram.com/scott_grocott/' target='_blank'>Instagram</a></div>"
+  },
+  "terrain": {
+    "type": "heightmap",
+    "size": 700,
+    "sizeX": 700,
+    "sizeZ": 700,
+    "subdivisions": 128,
+    "heightScale": 70,
+    "environment": "env_savanna",
+    "shelterCount": 6,
+    "heightmaps": [
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png"
+    ]
+  },
+  "fog": {
+    "enabled": true,
+    "mode": "FOGMODE_LINEAR",
+    "color": {
+      "r": 0.88,
+      "g": 0.8,
+      "b": 0.58
+    },
+    "start": 180,
+    "end": 580
+  },
+  "water": {
+    "enabled": false
+  },
+  "enemies": [
+    {
+      "type": "drone",
+      "health": 50,
+      "hitsToKill": 6,
+      "maxCount": 2,
+      "spawnPoint": {
+        "x": 20,
+        "y": 4,
+        "z": -20
+      },
+      "module": "./enemies/drones.js"
+    },
+    {
+      "type": "car",
+      "health": 80,
+      "hitsToKill": 6,
+      "maxCount": 2
+    }
+  ],
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 60,
+      "bulletRadius": 0.12,
+      "range": 200,
+      "hitsToKill": 6
+    }
+  ],
+  "structures": {
+    "fortresses": [
+      {
+        "name": "Savanna Outpost",
+        "position": {
+          "x": 100,
+          "y": 0,
+          "z": 80
+        }
+      },
+      {
+        "name": "Dry Ridge Garrison",
+        "position": {
+          "x": -160,
+          "y": 0,
+          "z": -120
+        }
+      }
+    ],
+    "villages": [
+      {
+        "name": "Dry River Camp",
+        "position": {
+          "x": -80,
+          "y": 0,
+          "z": 60
+        }
+      },
+      {
+        "name": "Acacia Crossing",
+        "position": {
+          "x": 50,
+          "y": 0,
+          "z": -120
+        }
+      },
+      {
+        "name": "Thornbush Hamlet",
+        "position": {
+          "x": 170,
+          "y": 0,
+          "z": -60
+        }
+      }
+    ],
+    "cities": [
+      {
+        "name": "Savanna Junction",
+        "position": {
+          "x": -60,
+          "y": 0,
+          "z": 180
+        }
+      },
+      {
+        "name": "Dust Bowl Terminal",
+        "position": {
+          "x": 220,
+          "y": 0,
+          "z": 100
+        }
+      }
+    ]
+  },
+  "scatterLayers": [
+    {
+      "category": "vegetation",
+      "density": 0.12,
+      "minElevation": 0,
+      "maxElevation": 0.6
+    },
+    {
+      "category": "rock",
+      "density": 0.03,
+      "minElevation": 0.2,
+      "maxElevation": 1.0
+    }
+  ],
+  "shelters": [],
+  "ladders": [],
+  "waypoints": [],
+  "assets": [],
+  "audio": {
+    "outerZone": {
+      "radius": 300,
+      "track": "wind"
+    },
+    "midZone": {
+      "radius": 150,
+      "track": "adventure"
+    },
+    "innerZone": {
+      "radius": 60,
+      "track": "battle"
+    }
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "meta": {
+    "levels": [
+      {
+        "id": "level-1",
+        "title": "First Contact",
+        "subtitle": "Level 1 \u2014 A lone drone circles the ruins"
+      }
+    ],
+    "total_levels": 5,
+    "splash_screen": "<div class='social-links'><a href='https://x.com/scott_grocott' target='_blank'>X (Twitter)</a> &nbsp; <a href='https://github.com/scottgrocott' target='_blank'>GitHub</a> &nbsp; <a href='https://www.instagram.com/scott_grocott/' target='_blank'>Instagram</a></div>"
+  },
+  "terrain": {
+    "type": "heightmap",
+    "size": 700,
+    "sizeX": 700,
+    "sizeZ": 700,
+    "subdivisions": 128,
+    "heightScale": 60,
+    "environment": "env_mediterranean",
+    "shelterCount": 4,
+    "heightmaps": [
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png"
+    ]
+  },
+  "fog": {
+    "enabled": true,
+    "mode": "FOGMODE_LINEAR",
+    "color": {
+      "r": 0.78,
+      "g": 0.82,
+      "b": 0.72
+    },
+    "start": 200,
+    "end": 650
+  },
+  "water": {
+    "enabled": false
+  },
+  "enemies": [
+    {
+      "type": "drone",
+      "health": 40,
+      "hitsToKill": 5,
+      "maxCount": 1,
+      "spawnPoint": {
+        "x": 0,
+        "y": 4,
+        "z": 0
+      },
+      "module": "./enemies/drones.js"
+    }
+  ],
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 60,
+      "bulletRadius": 0.12,
+      "range": 200,
+      "hitsToKill": 5
+    }
+  ],
+  "structures": {
+    "fortresses": [
+      {
+        "name": "Hilltop Watch",
+        "position": {
+          "x": 100,
+          "y": 0,
+          "z": -80
+        }
+      }
+    ],
+    "villages": [
+      {
+        "name": "Olive Grove Hamlet",
+        "position": {
+          "x": 30,
+          "y": 0,
+          "z": 50
+        }
+      },
+      {
+        "name": "Hilltop Rest",
+        "position": {
+          "x": -60,
+          "y": 0,
+          "z": -30
+        }
+      },
+      {
+        "name": "Coastal Terrace",
+        "position": {
+          "x": -130,
+          "y": 0,
+          "z": 90
+        }
+      }
+    ],
+    "cities": [
+      {
+        "name": "Porto Ruins",
+        "position": {
+          "x": 180,
+          "y": 0,
+          "z": 130
+        }
+      }
+    ]
+  },
+  "scatterLayers": [
+    {
+      "category": "vegetation",
+      "density": 0.12,
+      "minElevation": 0,
+      "maxElevation": 0.6
+    },
+    {
+      "category": "rock",
+      "density": 0.03,
+      "minElevation": 0.2,
+      "maxElevation": 1.0
+    }
+  ],
+  "shelters": [],
+  "ladders": [],
+  "waypoints": [],
+  "assets": [],
+  "audio": {
+    "outerZone": {
+      "radius": 300,
+      "track": "wind"
+    },
+    "midZone": {
+      "radius": 150,
+      "track": "adventure"
+    },
+    "innerZone": {
+      "radius": 60,
+      "track": "battle"
+    }
+  }
+}
