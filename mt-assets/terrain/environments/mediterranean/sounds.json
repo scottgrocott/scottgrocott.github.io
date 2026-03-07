@@ -119,5 +119,106 @@
         }
       }
     ]
+  },
+    "water": {
+    "ambient": {
+      "description": "Continuous water movement noise adjustable from calm pond to heavy ocean surf.",
+      "toneClass": "NoiseSynth",
+      "parameters": {
+        "waveIntensity": {
+          "min": 0,
+          "max": 1,
+          "default": 0.4,
+          "description": "Controls wave size from gentle pond ripples (0) to large ocean waves (1)."
+        }
+      },
+      "synthConfig": {
+        "noise": {
+          "type": "pink"
+        },
+        "envelope": {
+          "attack": 2,
+          "decay": 1,
+          "sustain": 1,
+          "release": 3
+        }
+      },
+      "effects": {
+        "AutoFilter": {
+          "frequency": 0.1,
+          "type": "sine",
+          "depth": 0.8,
+          "baseFrequency": 200,
+          "octaves": 3,
+          "filter": {
+            "type": "lowpass",
+            "rolloff": -24,
+            "Q": 1
+          }
+        }
+      },
+      "behavior": {
+        "triggerType": "continuous",
+        "volume": -16
+      }
+    },
+    "splash": {
+      "description": "Short splash sound triggered when entering or exiting water.",
+      "toneClass": "NoiseSynth",
+      "synthConfig": {
+        "noise": {
+          "type": "white"
+        },
+        "envelope": {
+          "attack": 0.001,
+          "decay": 0.25,
+          "sustain": 0,
+          "release": 0.3
+        }
+      },
+      "effects": {
+        "Filter": {
+          "type": "highpass",
+          "frequency": 800,
+          "Q": 1
+        }
+      },
+      "behavior": {
+        "triggerType": "event",
+        "volume": -6
+      }
+    },
+    "submerged": {
+      "description": "Low, muffled underwater ambience when the listener is submerged.",
+      "toneClass": "NoiseSynth",
+      "synthConfig": {
+        "noise": {
+          "type": "brown"
+        },
+        "envelope": {
+          "attack": 1,
+          "decay": 1,
+          "sustain": 1,
+          "release": 2
+        }
+      },
+      "effects": {
+        "Filter": {
+          "type": "lowpass",
+          "frequency": 400,
+          "Q": 1.2
+        },
+        "Chorus": {
+          "frequency": 0.3,
+          "delayTime": 4,
+          "depth": 0.4,
+          "wet": 0.3
+        }
+      },
+      "behavior": {
+        "triggerType": "state",
+        "volume": -20
+      }
+    }
   }
 }
