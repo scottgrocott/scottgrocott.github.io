@@ -27,6 +27,7 @@ let   _accumulator = 0;
 // ---- Terrain body tracking ----
 let _terrainBody     = null;
 let _terrainCollider = null;
+const _boxBodies = [];  // tracked so clearBoxColliders() can remove them all
 
 export async function initPhysics() {
   await RAPIER_MODULE.init();
@@ -44,6 +45,7 @@ export function resetPhysics() {
   physicsReady     = false;
   _terrainBody     = null;
   _terrainCollider = null;
+  _boxBodies.length = 0;
   physCache.clear();
   _accumulator = 0;
 }
@@ -56,53 +58,33 @@ function _removeTerrainCollider() {
   _terrainCollider = null;
 }
 
-export function addTerrainCollider(imgData, sizeX, sizeZ, heightScale, subdiv = 128) {
+export function addTerrainCollider(positions, subdiv) {
+  // positions: Float32Array [x,y,z, x,y,z ...] taken directly from the visual mesh.
+  // This guarantees physics and visual terrain are pixel-perfect identical.
   if (!physicsReady || !physicsWorld) return;
   _removeTerrainCollider();
 
-  // Build a trimesh directly from the same pixel data used to stamp visual mesh vertices.
-  // This guarantees exact alignment - no coordinate system translation needed.
-  const verts = subdiv + 1;
+  const verts = subdiv + 1;  // vertices per side
   const vertCount = verts * verts;
-  const vertices = new Float32Array(vertCount * 3);
-  const indices  = new Uint32Array(subdiv * subdiv * 6);
 
-  // Build vertex grid - same UV formula as getTerrainHeightAt and _stampVertices
-  for (let row = 0; row < verts; row++) {
-    for (let col = 0; col < verts; col++) {
-      const i = row * verts + col;
-      const wx = -sizeX / 2 + (col / subdiv) * sizeX;
-      const wz = -sizeZ / 2 + (row / subdiv) * sizeZ;
-      const u  =        (wx + sizeX / 2) / sizeX;
-      const v  = 1.0 - ((wz + sizeZ / 2) / sizeZ);
-      const px = Math.max(0, Math.min(imgData.width  - 1, Math.floor(u * (imgData.width  - 1))));
-      const py = Math.max(0, Math.min(imgData.height - 1, Math.floor(v * (imgData.height - 1))));
-      const h  = (imgData.data[(py * imgData.width + px) * 4] / 255) * heightScale;
-      vertices[i * 3 + 0] = wx;
-      vertices[i * 3 + 1] = h;
-      vertices[i * 3 + 2] = wz;
-    }
-  }
-
-  // Build index buffer - two triangles per quad cell
-  let idx = 0;
+  // Build trimesh indices — two triangles per quad
+  const indices = new Uint32Array(subdiv * subdiv * 6);
+  let ii = 0;
   for (let row = 0; row < subdiv; row++) {
     for (let col = 0; col < subdiv; col++) {
       const a = row * verts + col;
       const b = a + 1;
       const c = a + verts;
       const d = c + 1;
-      indices[idx++] = a; indices[idx++] = c; indices[idx++] = b;
-      indices[idx++] = b; indices[idx++] = c; indices[idx++] = d;
+      indices[ii++] = a; indices[ii++] = c; indices[ii++] = b;
+      indices[ii++] = b; indices[ii++] = c; indices[ii++] = d;
     }
   }
 
   _terrainBody = physicsWorld.createRigidBody(RAPIER_MODULE.RigidBodyDesc.fixed());
-  _terrainCollider = physicsWorld.createCollider(
-    RAPIER_MODULE.ColliderDesc.trimesh(vertices, indices),
-    _terrainBody
-  );
-  console.log('[physics] Terrain trimesh collider:', vertCount, 'verts |', indices.length / 3, 'tris');
+  const tdesc = RAPIER_MODULE.ColliderDesc.trimesh(new Float32Array(positions), indices);
+  _terrainCollider = physicsWorld.createCollider(tdesc, _terrainBody);
+  console.log('[physics] Terrain trimesh from mesh verts:', vertCount, 'verts |', indices.length/3, 'tris');
 }
 
 // Add a static box collider at world position (wx, wy, wz) with half-extents (hw, hh, hd)
@@ -113,8 +95,23 @@ export function addBoxCollider(wx, wy, wz, hw, hh, hd, rotY = 0) {
   const desc = RAPIER_MODULE.ColliderDesc.cuboid(hw, hh, hd)
     .setTranslation(wx, wy, wz)
     .setRotation({ x: 0, y: Math.sin(rotY / 2), z: 0, w: Math.cos(rotY / 2) });
-  return physicsWorld.createCollider(desc, body);
+  const col = physicsWorld.createCollider(desc, body);
+  _boxBodies.push(body);
+  console.log(`[physics] addBoxCollider total=${_boxBodies.length} at (${wx.toFixed(1)},${wy.toFixed(1)},${wz.toFixed(1)})`);
+  console.trace('[physics] addBoxCollider caller');
+  return col;
 }
+
+export function clearBoxColliders() {
+  console.log(`[physics] clearBoxColliders — removing ${_boxBodies.length} bodies`);
+  if (!physicsWorld) { _boxBodies.length = 0; return; }
+  for (const body of _boxBodies) {
+    try { physicsWorld.removeRigidBody(body); } catch(e) { console.warn('[physics] removeRigidBody failed', e); }
+  }
+  _boxBodies.length = 0;
+}
+// Also expose globally so shelters.js / any non-importing module can call it
+window._clearBoxColliders = clearBoxColliders;
 
 export function addFlatGroundCollider(sizeX = 512, sizeZ = 512) {
   if (!physicsReady || !physicsWorld) return;

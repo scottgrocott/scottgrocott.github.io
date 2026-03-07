@@ -4,10 +4,11 @@ import { scene }           from './core.js';
 import { CONFIG }           from './config.js';
 import { getTerrainHeightAt } from './terrain/terrainMesh.js';
 import { getAllSpriteFrames, getRandomEnvColor } from './environment.js';
-import { addBoxCollider }   from './physics.js';
+import { addBoxCollider, clearBoxColliders } from './physics.js';
 import { spawnLadder }      from './ladders.js';
 
 let _instances = [];  // all disposable meshes/materials
+let _generation = 0;  // incremented on each clearScatter — cancels in-flight async scatter
 
 const SHELTER_SPRITES_URL = 'https://scottgrocott.github.io/mt-assets/shelters/sprites.json';
 let _shelterFrames  = null;  // loaded panel frames
@@ -180,7 +181,7 @@ function _buildShelterMesh(def, wx, wy, wz, rotY, panelFrames) {
 
     // Rapier collider — world-space position with rotation applied
     const wPos  = toWorld(offset.x, offset.z);
-    const worldY = wy + offset.y + size.h / 2;
+    const worldY = wy + offset.y + size.h / 2 - 0.05;  // sink slightly so base never floats above terrain
     addBoxCollider(wPos.x, worldY, wPos.z, size.w / 2, size.h / 2, size.d / 2, rotY);
 
     const topY = offset.y + size.h;
@@ -281,11 +282,12 @@ function _addShelterPanels(root, maxY, halfW, halfD, ladderOnZFace, panelFrames)
 }
 
 
-async function _scatterShelters(count, frames) {
+async function _scatterShelters(count, frames, gen) {
   const defs = await _loadShelterDefs();
-  if (!defs.length) return;
+  if (_generation !== gen || !defs.length) return;
 
   const panelFrames = await _loadShelterFrames();
+  if (_generation !== gen) return;
 
   const size   = CONFIG.terrain.size || 700;
   const half   = size / 2;
@@ -296,8 +298,18 @@ async function _scatterShelters(count, frames) {
     const def  = defs[Math.floor(Math.random() * defs.length)];
     const wx   = (Math.random() - 0.5) * (size - margin * 2);
     const wz   = (Math.random() - 0.5) * (size - margin * 2);
-    const wy   = getTerrainHeightAt(wx, wz);
     const rotY = Math.random() * Math.PI * 2;
+
+    // Sample terrain height at centre + 4 corners of ~6m footprint.
+    // Use the MAX so the shelter never sinks into a slope — sits on the high side.
+    const r = 3;
+    const wy = Math.max(
+      getTerrainHeightAt(wx, wz),
+      getTerrainHeightAt(wx - r, wz - r),
+      getTerrainHeightAt(wx + r, wz - r),
+      getTerrainHeightAt(wx - r, wz + r),
+      getTerrainHeightAt(wx + r, wz + r)
+    );
 
     _buildShelterMesh(def, wx, wy, wz, rotY, panelFrames);
     _shelterPositions.push({ wx, wz });
@@ -374,6 +386,7 @@ function _scatterVegClusters(frames) {
 // ─── Public API ──────────────────────────────────────────────────────────────
 export async function scatterProps() {
   clearScatter();
+  const myGen = _generation;  // snapshot — if clearScatter() runs again, myGen !== _generation
 
   const frames  = getAllSpriteFrames();  // empty array if no env loaded
   const layers  = CONFIG.scatterLayers?.length
@@ -382,7 +395,8 @@ export async function scatterProps() {
 
   // 1. Scatter shelters first so we have positions for clustering
   const shelterCount = CONFIG.terrain?.shelterCount ?? 8;
-  await _scatterShelters(shelterCount, frames);
+  await _scatterShelters(shelterCount, frames, myGen);
+  if (_generation !== myGen) return;  // level reloaded while we were fetching — abort
 
   // 2. Regular scatter layers
   for (const layer of layers) {
@@ -399,12 +413,14 @@ export async function scatterProps() {
 }
 
 export function clearScatter() {
+  _generation++;  // invalidate any in-flight scatterProps call
   for (const m of _instances) {
     try { if (m.material) m.material.dispose(); } catch(e) {}
     try { m.dispose(); } catch(e) {}
   }
   _instances = [];
   _shelterPositions = [];
+  clearBoxColliders();  // remove all Rapier box bodies — prevent phantom colliders on reload
 }
 
 export function rebuildScatterLayer() {

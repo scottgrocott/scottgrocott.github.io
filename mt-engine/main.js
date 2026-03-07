@@ -11,18 +11,21 @@ import {
 } from './input.js';
 import { tickInputGuard, suspendMouse, resumeMouse } from './inputGuard.js';
 import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider } from './physics.js';
-import { initPlayer, tickPlayer, toggleFreeCam, player, playerRig } from './player.js';
+import { initPlayer, initPlayerBody, tickPlayer, toggleFreeCam, player, playerRig } from './player.js';
 import { initCockpit, tickCockpit, disposeCockpit } from './cockpit.js';
 import { tickHUD, hudSetStatus } from './hud.js';
 import { initLadders, tickLadders, clearLadders } from './ladders.js';
 import { initMinimap, tickMinimap } from './minimap.js';
 import { loadHeightmap } from './terrain/heightmap.js';
-import { buildTerrain, getTerrainMesh, getTerrainHeightAt, getTerrainPixelData } from './terrain/terrainMesh.js';
+import { buildTerrain, getTerrainMesh, getTerrainHeightAt, getTerrainPixelData, getTerrainVertexData, getTerrainSubdiv } from './terrain/terrainMesh.js';
 import { computeTerrainBounds } from './terrain/terrainBounds.js';
 import { scanFlatAreas } from './flatnav.js';
 import { scatterProps, clearScatter } from './scatter.js';
 import { loadBuildings, clearBuildings } from './buildings.js';
-import { clearStructures, tickStructures } from './structures.js';
+import { clearStructures, spawnStructures } from './structures.js';
+import { initLevelManager, startLevelCheck, tickLevelManager } from './levelManager.js';
+import { loadEnvironment } from './environment.js';
+import { initWater, clearWater } from './water.js';
 import { dropOnStart } from './spawn.js';
 import { initWeapon, shootBullet, tickBullets, clearBullets } from './weapons/basicGun.js';
 import { tickYUKA, setPlayerRigRef } from './enemies/enemyBase.js';
@@ -38,8 +41,6 @@ import { pollGamepad, releaseGamepadAxes, registerGamepadShootCallback, register
 import { initEditor, tickEditor, onFreeCamEnter, onFreeCamExit, initEditorScene } from './editor/editor.js';
 import { camera } from './core.js';
 import { initSky } from './sky.js';
-import { loadEnvironment } from './environment.js';
-import { initWater, clearWater } from './water.js';
 
 // ENGINE_ROOT: absolute URL base of the engine (where main.js lives).
 // Works regardless of where index.html is served from.
@@ -55,60 +56,30 @@ function _enginePath(rel) { return `${ENGINE_ROOT}/${rel}`; }
 // Config loading:
 //   1. Try 'game-config.json' next to index.html (standalone deployment)
 //   2. Fall back to engine default
-// Base URL of the page (directory containing index.html), no trailing slash
-const _pagePath = window.location.pathname.endsWith('/')
-  ? window.location.pathname.slice(0, -1)
-  : window.location.pathname.replace(/\/[^\/]+$/, '');
-const _pageBase  = window.location.origin + _pagePath;
+const _pageBase = window.location.href.replace(/\/[^\/]*$/, '');
 const LOCAL_CONFIG   = `${_pageBase}/game-config.json`;
 const DEFAULT_CONFIG = _enginePath('assets/configs/test.json');
-
-console.log('[main] pageBase:', _pageBase, 'ENGINE_ROOT:', ENGINE_ROOT);
-
-// GitHub Pages deployment URL for the engine.
-// Set this in localStorage via the editor, or hardcode for your repo.
-// e.g. 'https://username.github.io/engine'
-// When set, exported index.html will reference this URL instead of the dev server.
-function getDeployEngineUrl() {
-  return localStorage.getItem('deploy_engine_url') || ENGINE_ROOT;
-}
-function setDeployEngineUrl(url) {
-  localStorage.setItem('deploy_engine_url', url.replace(/\/$/, ''));
-  console.log('[main] Deploy engine URL set to:', url);
-}
-window.setDeployEngineUrl = setDeployEngineUrl; // expose for editor panel
 
 // Notify index.html of ENGINE_ROOT so config-select can be populated
 window.dispatchEvent(new CustomEvent('engine-ready', { detail: { engineRoot: ENGINE_ROOT } }));
 
 async function _resolveStartConfig() {
+  // ?level=level-2.json  or  ?level=2  (shorthand → level-2.json)
   const params = new URLSearchParams(window.location.search);
-
-  // ?config=path/to/any.json  — explicit full path (relative to page or absolute)
-  const configParam = params.get('config');
-  if (configParam) {
-    const url = configParam.startsWith('http') ? configParam : `${_pageBase}/${configParam}`;
-    console.log('[main] Config from URL param:', url);
-    return url;
+  const lvlParam = params.get('level');
+  if (lvlParam) {
+    // Normalise: bare number → "level-N.json", bare name → "name.json"
+    let lvlFile = lvlParam;
+    if (/^\d+$/.test(lvlFile)) lvlFile = `level-${lvlFile}.json`;
+    if (!lvlFile.endsWith('.json')) lvlFile += '.json';
+    const lvlUrl = `${_pageBase}/${lvlFile}`;
+    console.log('[main] Level from URL param:', lvlUrl);
+    return lvlUrl;
   }
-
-  // ?level=N  — loads level-N.json next to index.html, e.g. level-1.json
-  const levelParam = params.get('level');
-  if (levelParam) {
-    const url = `${_pageBase}/level-${levelParam}.json`;
-    try {
-      const r = await fetch(url, { method: 'HEAD' });
-      if (r.ok) { console.log('[main] Level from URL param:', url); return url; }
-      console.warn('[main] Level file not found:', url, '— falling back');
-    } catch(e) {}
-  }
-
-  // Default: try game-config.json next to index.html
   try {
     const r = await fetch(LOCAL_CONFIG, { method: 'HEAD' });
     if (r.ok) { console.log('[main] Local game-config.json found'); return LOCAL_CONFIG; }
   } catch(e) {}
-
   console.log('[main] Using engine default config');
   return DEFAULT_CONFIG;
 }
@@ -131,6 +102,7 @@ function _waitForYuka(timeoutMs = 10000) {
 
 let _loading = false;
 let _audioStarted = false;
+let _playerReady   = false;
 
 // ---- Loading Screen ----
 function setLoadStatus(msg, pct) {
@@ -166,7 +138,7 @@ async function boot() {
   setLoadStatus('Loading config...', 15);
   await loadGameConfig(await _resolveStartConfig());
 
-  // Wire top-bar — all optional so exported minimal index.html works too
+  // Wire top-bar — guard each element since not all pages include the editor UI
   document.getElementById('config-select')?.addEventListener('change', async (e) => {
     await loadGameConfig(e.target.value);
   });
@@ -209,7 +181,7 @@ async function boot() {
     _lastTime = now;
 
     tickInputGuard();
-    stepPhysics(dt);
+    if (_playerReady) stepPhysics(dt);
     syncPhysicsReads();
     pollGamepad(dt);
     tickPlayer(dt);
@@ -222,7 +194,7 @@ async function boot() {
     tickExplosions(dt);
     tickSoundtrack();
     tickShelters(dt);
-    tickStructures(dt);
+    tickLevelManager(dt);
     tickCockpit(dt);
     tickMinimap();
     tickHUD();
@@ -232,63 +204,6 @@ async function boot() {
   });
 }
 
-// ---- Terrain collider rebuild ----
-// Full physics rebuild after editor applies new heightmap.
-// Destroys and recreates the Rapier world to guarantee zero stale colliders,
-// then re-adds terrain collider + player body. Enemies re-add themselves on next tick.
-async function _fullTerrainPhysicsRebuild() {
-  console.log('[main] Full terrain physics rebuild... wasInFreeCam:', player.freeCam, 'body enabled:', player.rigidBody?.isEnabled());
-
-  // Remember if player was in freecam so we restore it correctly
-  const wasInFreeCam = player.freeCam;
-
-  // Clear everything holding rigid body refs before destroying the world
-  clearEnemies();
-  clearBullets();
-
-  // Tear down physics world completely
-  resetPhysics();
-  await initPhysics();
-
-  // Re-add terrain collider
-  _rebuildTerrainCollider();
-
-  // Re-init player — initPlayer sets freeCam=false and body enabled
-  initPlayer();
-
-  // If we were in freecam before the rebuild, disable the new body
-  // so the player stays in fly mode without falling
-  if (wasInFreeCam) {
-    player.freeCam = true;
-    player.rigidBody.setEnabled(false);
-    console.log('[main] Body disabled for freecam, isEnabled now:', player.rigidBody.isEnabled(), 'handle:', player.rigidBody.handle);
-  } else {
-    window._resnapPlayerToTerrain?.();
-  }
-
-  // Re-spawn enemies from config
-  _spawnEnemiesFromConfig();
-
-  console.log('[main] Terrain physics rebuild complete');
-}
-window._fullTerrainPhysicsRebuild = _fullTerrainPhysicsRebuild;
-
-function _rebuildTerrainCollider() {
-  const pixelData = getTerrainPixelData();
-  const t = CONFIG.terrain || {};
-  const sizeX = t.sizeX ?? t.size ?? 512;
-  const sizeZ = t.sizeZ ?? t.size ?? 512;
-  const hScale = t.heightScale ?? 50;
-  // Match mesh subdivisions for accurate collision — coarser = walk-through on slopes
-  const subdiv = Math.min(t.subdivisions ?? 128, 128);
-  if (pixelData) {
-    addTerrainCollider(pixelData, sizeX, sizeZ, hScale, subdiv);
-  } else {
-    addFlatGroundCollider(sizeX, sizeZ);
-  }
-}
-window._rebuildTerrainCollider = _rebuildTerrainCollider;
-
 // ---- Config Load ----
 async function loadGameConfig(url) {
   if (_loading) return;
@@ -296,14 +211,15 @@ async function loadGameConfig(url) {
   setLoadStatus('Tearing down scene...', 10);
 
   // Full teardown
+  _playerReady = false;
   clearEnemies();
   clearBullets();
   clearShelters();
   clearStructures();
   clearBuildings();
+  clearWater();
   clearScatter();
   clearLadders();
-  clearWater();
   disposeSoundtrack();
   disposeCockpit();
 
@@ -323,32 +239,24 @@ async function loadGameConfig(url) {
   } catch(e) {
     console.error('[main] Failed to load config:', url, e);
     hudSetStatus('Config load failed: ' + url);
-    _loading = false;
+    initLevelManager(loadGameConfig);
+  startLevelCheck();
+  if (_audioStarted) initSoundtrack();
+  _loading = false;
     return;
   }
-
-  // Update title and loading screen as soon as config is known
-  const _title = CONFIG.meta?.title || 'Metal Throne';
-  document.title = _title;
-  const _loadTitle = document.querySelector('#loading-screen .load-title');
-  if (_loadTitle) _loadTitle.textContent = _title.toUpperCase();
 
   setLoadStatus('Initializing physics', 30);
   await initPhysics();
 
   setLoadStatus('Building terrain', 45);
 
-  // Load environment first — terrain material needs its colors
-  if (CONFIG.terrain?.environment) {
-    await loadEnvironment(CONFIG.terrain.environment);
-  }
-
-  // Pick a random heightmap from the heightmaps array (if provided)
+  // Pick a random heightmap from the heightmaps array if provided
   const _hmaps = CONFIG.terrain.heightmaps;
   if (Array.isArray(_hmaps) && _hmaps.length > 0) {
     const _pick = _hmaps[Math.floor(Math.random() * _hmaps.length)];
     CONFIG.terrain.heightmapUrl = _pick;
-    console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick) + 1) + '/' + _hmaps.length + ':', _pick);
+    console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick)+1) + '/' + _hmaps.length + ':', _pick);
   }
 
   // Prefix relative asset paths with ENGINE_ROOT
@@ -358,44 +266,37 @@ async function loadGameConfig(url) {
   if (CONFIG.terrain.heightmapUrl && !CONFIG.terrain.heightmapUrl.startsWith('data:') && !CONFIG.terrain.heightmapUrl.startsWith('http') && ENGINE_ROOT) {
     CONFIG.terrain.heightmapUrl = _enginePath(CONFIG.terrain.heightmapUrl);
   }
+
+  if (CONFIG.terrain?.environment) {
+    await loadEnvironment(CONFIG.terrain.environment);
+  }
+
   await loadHeightmap(CONFIG.terrain.heightmapUrl || CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
   await buildTerrain(scene, CONFIG);
-  _rebuildTerrainCollider();
   const terrainMesh = getTerrainMesh();
+  // Material applied inside buildTerrain → _applyMaterial (node mat or fallback)
 
-  // Fog
-  if (CONFIG.fog?.enabled) {
-    const fog = CONFIG.fog;
-    const modeMap = {
-      'FOGMODE_LINEAR':      BABYLON.Scene.FOGMODE_LINEAR,
-      'FOGMODE_EXP':         BABYLON.Scene.FOGMODE_EXP,
-      'FOGMODE_EXP2':        BABYLON.Scene.FOGMODE_EXP2,
-    };
-    scene.fogMode    = modeMap[fog.mode] ?? BABYLON.Scene.FOGMODE_LINEAR;
-    scene.fogDensity = fog.density ?? 0.005;
-    scene.fogStart   = fog.start   ?? 150;
-    scene.fogEnd     = fog.end     ?? 600;
-    const fc = fog.color || { r: 0.85, g: 0.75, b: 0.60 };
-    scene.fogColor   = new BABYLON.Color3(fc.r, fc.g, fc.b);
-    console.log('[main] Fog enabled:', fog.mode, 'start:', scene.fogStart, 'end:', scene.fogEnd);
-  } else {
-    scene.fogMode = BABYLON.Scene.FOGMODE_NONE;
+  // Build Rapier heightfield collider so player walks on terrain surface
+  const _pixelData = getTerrainPixelData();
+  const _verts = getTerrainVertexData();
+  if (_verts) {
+    addTerrainCollider(_verts, getTerrainSubdiv());
   }
 
-  // Water
-  if (CONFIG.water?.enabled) {
-    initWater(CONFIG.water);
-  }
+  if (CONFIG.water?.enabled) initWater(CONFIG.water);
 
   setLoadStatus('Scanning navigation', 55);
   scanFlatAreas();
 
   setLoadStatus('Loading buildings & structures', 60);
   await loadBuildings();
+  spawnStructures(CONFIG.structures);
 
   setLoadStatus('Spawning player', 70);
+  _playerReady = false;
   initPlayer();
   dropOnStart();
+  _playerReady = true;
   initLadders();
   initCockpit();
   initWeapon(CONFIG.weapons?.[0]);
@@ -413,21 +314,12 @@ async function loadGameConfig(url) {
   await _waitForYuka();
   _spawnEnemiesFromConfig();
 
-  const title = CONFIG.meta?.title || 'Metal Throne';
-  const subtitle = CONFIG.meta?.subtitle || '';
-
-  // Update page title
-  document.title = title;
-
-  // Update loading screen title (in case it's still visible during transition)
-  const loadTitle = document.querySelector('#loading-screen .load-title');
-  if (loadTitle) loadTitle.textContent = title.toUpperCase();
-  const loadSub = document.querySelector('#loading-screen .load-sub');
-  if (loadSub && subtitle) loadSub.textContent = subtitle.toUpperCase();
-
   setLoadStatus('Ready!', 100);
   hideLoadingScreen();
-  hudSetStatus(`${title}${subtitle ? ' — ' + subtitle : ''} loaded`);
+  hudSetStatus(`${CONFIG.meta?.title || 'Game'} loaded`);
+  initLevelManager(loadGameConfig);
+  startLevelCheck();
+  if (_audioStarted) initSoundtrack();
   _loading = false;
 }
 
@@ -480,20 +372,16 @@ async function _startAudio() {
 }
 
 // ---- Export Game ----
-function _dl(filename, blob) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-}
-
-window._exportGameFromEditor = function() { _exportGame(); };
 function _exportGame() {
-  // Build and save a standalone index.html that points back at the engine
-  const engineSrc = getDeployEngineUrl() + '/main.js';
+  // 1. Save game-config.json (the current config)
+  const cfgBlob = new Blob([JSON.stringify(CONFIG, null, 2)], { type: 'application/json' });
+  const cfgA = document.createElement('a');
+  cfgA.href = URL.createObjectURL(cfgBlob);
+  cfgA.download = 'game-config.json';
+  cfgA.click();
+
+  // 2. Build and save a standalone index.html that points back at the engine
+  const engineSrc = ENGINE_ROOT + '/main.js';
   const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -534,7 +422,7 @@ function _exportGame() {
 </head>
 <body>
   <div id="loading-screen">
-    <div class="load-title">${(CONFIG.meta?.title || 'METAL THRONE').toUpperCase()}</div>
+    <div class="load-title">${CONFIG.meta?.title || 'METAL THRONE'}</div>
     <div class="load-sub" id="load-status">INITIALIZING...</div>
     <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
   </div>
@@ -554,23 +442,18 @@ function _exportGame() {
     <div class="hud-row"><span id="hud-status"></span></div>
   </div>
   <canvas id="minimap-canvas" width="220" height="220"></canvas>
-  <!-- Auto-detect engine: local dev vs deployed — engineSrc baked in as fallback -->
-  <script>
-    const _local = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    const _src = _local ? 'http://localhost:83/mt-engine/main.js' : '${engineSrc}';
-    const _s = document.createElement('script');
-    _s.type = 'module'; _s.src = _src;
-    document.head.appendChild(_s);
-  <\/script>
+  <script type="module" src="${engineSrc}"><\/script>
 </body>
 </html>`;
 
-  // Download HTML first, then JSON after a short gap (browser blocks simultaneous downloads)
-  _dl('index.html', new Blob([html], { type: 'text/html' }));
   setTimeout(() => {
-    _dl('game-config.json', new Blob([JSON.stringify(CONFIG, null, 2)], { type: 'application/json' }));
-    hudSetStatus('📦 Exported! Drop index.html + game-config.json anywhere with a web server.');
-  }, 500);
+    const htmlBlob = new Blob([html], { type: 'text/html' });
+    const htmlA = document.createElement('a');
+    htmlA.href = URL.createObjectURL(htmlBlob);
+    htmlA.download = 'index.html';
+    htmlA.click();
+    if (typeof hudSetStatus === 'function') hudSetStatus('📦 Exported! Drop index.html + game-config.json anywhere.');
+  }, 300);
 }
 
 // Kick off

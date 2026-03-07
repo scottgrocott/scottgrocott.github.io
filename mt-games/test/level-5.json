@@ -95,23 +95,23 @@
       "type": "drone",
       "module": "./enemies/drones.js",
       "spawnPoint": { "x": -13, "y": 2, "z": 2.8 },
-      "maxCount": 4,
+      "maxCount": 1,
       "health": 60,
       "placeholder": "box",
       "glb": null,
-      "hitsToKill": 10
+      "hitsToKill": 1
     },
     {
       "type": "car",
-      "maxCount": 3,
+      "maxCount": 1,
       "health": 100,
-      "hitsToKill": 8
+      "hitsToKill": 1
     },
     {
       "type": "forklift",
-      "maxCount": 2,
+      "maxCount": 1,
       "health": 150,
-      "hitsToKill": 12
+      "hitsToKill": 1
     }
   ],
 

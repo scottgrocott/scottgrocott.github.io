@@ -8,6 +8,10 @@ let _envData = null;
 let _envId   = null;
 
 export async function loadEnvironment(envId) {
+  // envId may be an array (multiple environments defined) — pick one randomly
+  if (Array.isArray(envId)) {
+    envId = envId[Math.floor(Math.random() * envId.length)];
+  }
   if (!envId) { _envData = null; _envId = null; return null; }
   if (_envId === envId && _envData) return _envData;
 
@@ -20,18 +24,20 @@ export async function loadEnvironment(envId) {
       return null;
     }
 
-    const [colorsResp, spritesResp, soundsResp] = await Promise.all([
+    const [colorsResp, spritesResp, soundsResp, musicResp] = await Promise.all([
       fetch(def.assets.colors),
       fetch(def.assets.sprites),
       fetch(def.assets.sounds).catch(() => ({ json: async () => ({}) })),
+      fetch(def.assets.music).catch(() => ({ json: async () => ({}) })),
     ]);
-    const [colors, sprites, sounds] = await Promise.all([
+    const [colors, sprites, sounds, music] = await Promise.all([
       colorsResp.json(),
       spritesResp.json(),
       soundsResp.json(),
+      musicResp.json(),
     ]);
 
-    _envData = { id: envId, name: def.name, colors, sprites, sounds };
+    _envData = { id: envId, name: def.name, colors, sprites, sounds, music };
     _envId = envId;
     window._currentEnvColors = (colors && colors.colors) ? colors.colors : null;
 

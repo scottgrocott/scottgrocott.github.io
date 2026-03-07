@@ -42,17 +42,6 @@ export function getTerrainHeightAt(wx, wz) {
 /** Raw ImageData for physics heightfield collider — null for flat terrain */
 export function getTerrainPixelData() { return _lastImgData; }
 
-/** Returns flat Float32Array of vertex positions [x,y,z, x,y,z, ...] from the live mesh.
- *  Use this to build physics colliders — guaranteed to match the visual surface exactly. */
-export function getTerrainVertexData() {
-  if (!_mesh) return null;
-  return _mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
-}
-
-export function getTerrainSubdiv() { return _lastSubdiv; }
-export function getTerrainSizeX()  { return _lastSizeX; }
-export function getTerrainSizeZ()  { return _lastSizeZ; }
-
 /** Current mesh */
 export function getTerrainMesh() { return _mesh; }
 

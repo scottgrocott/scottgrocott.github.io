@@ -20,12 +20,10 @@ export function initLadders() {
 export function spawnLadder(def) {
   const px = +(def.position?.x||0), py = +(def.position?.y||0), pz = +(def.position?.z||0);
   const height = def.height || 5;
-  const rotY   = def.rotY   || 0;
 
   // Visual ladder
   const node = new BABYLON.TransformNode('ladder', scene);
   node.position.set(px, py, pz);
-  node.rotation.y = rotY;
 
   // Rails
   for (const ox of [-0.2, 0.2]) {
@@ -49,7 +47,7 @@ export function spawnLadder(def) {
     rung.material = mat;
   }
 
-  const ladder = { node, def, position: {x:px,y:py,z:pz}, height, rotY };
+  const ladder = { node, def, position: {x:px,y:py,z:pz}, height };
   _ladders.push(ladder);
   return ladder;
 }
@@ -64,9 +62,11 @@ export function tickLadders(dt) {
       const lp = ladder.position;
       const dx = pp.x - lp.x, dz = pp.z - lp.z;
       const dist = Math.sqrt(dx*dx + dz*dz);
-      if (dist < 0.8 && pp.y >= lp.y && pp.y <= lp.y + ladder.height + 0.5) {
-        if (keys.moveForward || keys.jump) {
+      // Must be within 0.9m horizontally, within ladder Y range, pressing forward
+      if (dist < 0.9 && pp.y >= lp.y - 0.3 && pp.y <= lp.y + ladder.height + 0.3) {
+        if (keys.moveForward) {
           _startClimbing(ladder);
+          break;
         }
       }
     }
@@ -80,7 +80,8 @@ export function tickLadders(dt) {
       playerRig.position.y -= LADDERS.climbSpeed * dt;
     }
 
-    // Detach at top or bottom
+    // Detach at top or bottom — return immediately after stop so we don't
+    // read _currentLadder.position after it has been set to null.
     const lp = _currentLadder.position;
     if (playerRig.position.y > lp.y + _currentLadder.height + LADDERS.detachThreshold) {
       _stopClimbing(); return;
@@ -89,11 +90,10 @@ export function tickLadders(dt) {
       _stopClimbing(); return;
     }
 
-    // Keep player snapped to ladder — offset in front of ladder face
-    const snapDist = 0.35;
-    const lRotY = _currentLadder.rotY || 0;
-    playerRig.position.x += (_currentLadder.position.x + Math.sin(lRotY) * snapDist - playerRig.position.x) * 0.3;
-    playerRig.position.z += (_currentLadder.position.z + Math.cos(lRotY) * snapDist - playerRig.position.z) * 0.3;
+    // Keep player on ladder X/Z
+    // Gentle lateral nudge toward ladder centre (reduced from 0.3 to 0.08)
+    playerRig.position.x += ((lp.x) - playerRig.position.x) * 0.08;
+    playerRig.position.z += (lp.z  - playerRig.position.z) * 0.08;
 
     if (player.rigidBody) {
       player.rigidBody.setLinvel({x:0,y:0,z:0}, true);
@@ -105,13 +105,22 @@ export function tickLadders(dt) {
 function _startClimbing(ladder) {
   _climbing = true;
   _currentLadder = ladder;
-  if (player.rigidBody) player.rigidBody.setEnabled(false);
+  // Suspend gravity instead of disabling body — setEnabled(false) then
+  // setEnabled(true) causes a collision-impulse launch bug.
+  if (player.rigidBody) {
+    player.rigidBody.setGravityScale(0.0, true);
+    player.rigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+  }
 }
 
 function _stopClimbing() {
   _climbing = false;
   _currentLadder = null;
-  if (player.rigidBody) player.rigidBody.setEnabled(!player.freeCam);
+  // Restore gravity — body was never disabled so no impulse spike.
+  if (player.rigidBody && !player.freeCam) {
+    player.rigidBody.setGravityScale(1.0, true);
+    player.rigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+  }
 }
 
 export function clearLadders() {
