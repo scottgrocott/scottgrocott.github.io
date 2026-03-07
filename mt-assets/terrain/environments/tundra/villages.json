@@ -362,7 +362,17 @@
           "options": { "width": 6, "height": 7, "depth": 6 },
           "position": { "x": 40.0, "y": 3.5, "z": -20.0 }
         }
-      ]
+      ],
+  "glb_models":[
+    {
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/structures/test/bungalow1.glb",
+      "scale": { "x": 1.0, "y": 1.0, "z": 1.0 }
+    },
+    {
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/structures/test/bungalow1.glb",
+      "scale": { "x": 1.5, "y": 1.5, "z": 1.5 }
+    }
+  ]
     }
   ]
 }

@@ -196,5 +196,15 @@
         { "type": "Truck Stop Diner", "options": { "width": 8, "height": 5, "depth": 8 }, "position": { "x": 0, "y": 2.5, "z": 15 } }
       ]
     }
+  ],
+  "glb_models":[
+    {
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/structures/test/bungalow1.glb",
+      "scale": { "x": 1.0, "y": 1.0, "z": 1.0 }
+    },
+    {
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/structures/test/bungalow1.glb",
+      "scale": { "x": 1.5, "y": 1.5, "z": 1.5 }
+    }
   ]
 }

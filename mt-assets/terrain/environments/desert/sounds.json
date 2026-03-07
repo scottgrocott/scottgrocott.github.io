@@ -231,6 +231,144 @@
           "volume": -14
         }
       }
-    ]
+    ],
+    "structure_collapse": [
+  {
+    "name": "structure_rumble",
+    "description": "Continuous low rumble representing the mass of the structure beginning to fail and fall.",
+    "toneClass": "NoiseSynth",
+    "synthConfig": {
+      "noise": { "type": "brown" },
+      "envelope": {
+        "attack": 0.5,
+        "decay": 2.0,
+        "sustain": 0.9,
+        "release": 3.5
+      }
+    },
+    "effects": {
+      "Filter": {
+        "type": "lowpass",
+        "frequency": 250,
+        "rolloff": -24,
+        "Q": 1.2
+      },
+      "AutoFilter": {
+        "frequency": 0.15,
+        "type": "sine",
+        "depth": 0.6,
+        "baseFrequency": 80,
+        "octaves": 2
+      },
+      "Distortion": {
+        "distortion": 0.4,
+        "wet": 0.5
+      }
+    },
+    "behavior": {
+      "triggerType": "continuous",
+      "parameters": {
+        "time": {
+          "min": 1,
+          "max": 10,
+          "default": 4,
+          "description": "Duration of collapse in seconds. Taller structures take longer to fall."
+        }
+      },
+      "volume": -8
+    }
+  },
+  {
+    "name": "debris_impacts",
+    "description": "Series of percussive impacts representing large chunks of debris striking the ground during collapse.",
+    "toneClass": "MembraneSynth",
+    "synthConfig": {
+      "pitchDecay": 0.08,
+      "octaves": 5,
+      "oscillator": { "type": "triangle" },
+      "envelope": {
+        "attack": 0.002,
+        "decay": 0.35,
+        "sustain": 0,
+        "release": 0.25
+      }
+    },
+    "effects": {
+      "Filter": {
+        "type": "lowpass",
+        "frequency": 1200,
+        "rolloff": -24
+      },
+      "Reverb": {
+        "decay": 2.5,
+        "wet": 0.4
+      }
+    },
+    "behavior": {
+      "triggerType": "burst_sequence",
+      "parameters": {
+        "numberOfPieces": {
+          "min": 3,
+          "max": 40,
+          "default": 12,
+          "description": "Number of large debris chunks hitting the ground."
+        },
+        "time": {
+          "min": 1,
+          "max": 10,
+          "default": 4,
+          "description": "Total collapse duration controlling spacing between impacts."
+        }
+      },
+      "volume": -6
+    }
+  },
+  {
+    "name": "falling_debris_scatter",
+    "description": "Rapid high-frequency fragments representing smaller debris and rubble scattering during collapse.",
+    "toneClass": "MetalSynth",
+    "synthConfig": {
+      "frequency": 200,
+      "envelope": {
+        "attack": 0.001,
+        "decay": 0.2,
+        "release": 0.15
+      },
+      "harmonicity": 5.1,
+      "modulationIndex": 18,
+      "resonance": 300,
+      "octaves": 1.5
+    },
+    "effects": {
+      "Highpass": {
+        "frequency": 1200
+      },
+      "Chorus": {
+        "frequency": 1.5,
+        "delayTime": 2.5,
+        "depth": 0.3,
+        "spread": 90
+      }
+    },
+    "behavior": {
+      "triggerType": "random_burst",
+      "parameters": {
+        "numberOfPieces": {
+          "min": 10,
+          "max": 120,
+          "default": 45,
+          "description": "Number of small debris fragments generated during collapse."
+        },
+        "time": {
+          "min": 1,
+          "max": 10,
+          "default": 4,
+          "description": "Total duration fragments fall and scatter."
+        }
+      },
+      "volume": -12
+    }
+  }
+]
   }
 }
