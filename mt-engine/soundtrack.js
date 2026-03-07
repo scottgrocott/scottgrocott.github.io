@@ -17,6 +17,11 @@ import { playerRig }      from './player.js';
 let _soundscapeNodes = [];
 let _reverb          = null;
 
+// Water & collapse
+let _waterNodes     = [];   // nodes from cfg.water
+let _collapseNodes  = [];   // nodes from cfg.structure_collapse — triggered on demand
+let _stateFlags     = {};   // name → bool  e.g. { player_submerged: true }
+
 // Music
 let _transport       = null;
 let _activeParts     = [];      // currently playing Tone.Part instances
@@ -60,6 +65,49 @@ export function tickSoundtrack(dt) {
   _tickMusicZone();
 }
 
+// ── Water / collapse public API ───────────────────────────────────────────────
+
+/**
+ * Set a named game state flag (e.g. 'player_submerged', 'player_enter_water').
+ * State-type nodes activate/deactivate; event-type nodes fire once.
+ */
+export function setSoundState(name, active) {
+  const wasActive = !!_stateFlags[name];
+  _stateFlags[name] = !!active;
+  if (wasActive === !!active) return;
+
+  // State nodes: start/stop based on activeWhen flag
+  const allNodes = [..._soundscapeNodes, ..._waterNodes];
+  for (const node of allNodes) {
+    const b = node.behavior;
+    if (b.triggerType === 'state' && b.activeWhen === name) {
+      if (active) _triggerSoundscape(node);
+      else        { try { node.synth.triggerRelease?.(); } catch(e) {} }
+    }
+  }
+
+  // Event nodes: fire once on activation
+  if (active) {
+    for (const node of allNodes) {
+      const b = node.behavior;
+      if (b.triggerType === 'event' && (b.eventNames || []).includes(name)) {
+        _triggerSoundscape(node);
+      }
+    }
+  }
+}
+
+/**
+ * Trigger a structure collapse sound sequence.
+ * @param {object} params  Optional: { numberOfPieces, time }
+ */
+export function triggerCollapse(params = {}) {
+  if (!_guard()) return;
+  for (const node of _collapseNodes) {
+    _triggerCollapseNode(node, params);
+  }
+}
+
 export function disposeSoundtrack() {
   // Stop transport and dispose parts
   _stopAllParts();
@@ -69,6 +117,11 @@ export function disposeSoundtrack() {
   // Dispose soundscape
   for (const node of _soundscapeNodes) _disposeNode(node);
   _soundscapeNodes = [];
+  for (const node of _waterNodes)    _disposeNode(node);
+  _waterNodes = [];
+  for (const node of _collapseNodes) _disposeNode(node);
+  _collapseNodes = [];
+  _stateFlags = {};
   if (_reverb) { try { _reverb.dispose(); } catch(e) {} _reverb = null; }
 
   _activeTheme  = null;
@@ -222,11 +275,27 @@ function _initSoundscape(soundsData) {
     if (node) _soundscapeNodes.push(node);
   }
 
-  console.log('[soundtrack] Soundscape |', _soundscapeNodes.length, 'nodes');
+  // Water nodes — continuous/state/event types near water plane
+  for (const def of (cfg.water || [])) {
+    const node = _buildSoundscapeNode(def);
+    if (node) _waterNodes.push(node);
+  }
+
+  // Structure collapse nodes — built now, triggered on demand via triggerCollapse()
+  for (const def of (cfg.structure_collapse || [])) {
+    const node = _buildSoundscapeNode(def);
+    if (node) _collapseNodes.push(node);
+  }
+
+  console.log('[soundtrack] Soundscape |', _soundscapeNodes.length, 'nodes |',
+    _waterNodes.length, 'water |', _collapseNodes.length, 'collapse');
 }
 
 function _tickSoundscape(dt) {
   for (const node of _soundscapeNodes) _tickNode(node, dt);
+  for (const node of _waterNodes)      _tickNode(node, dt);
+  // Collapse nodes only tick when a collapse is active
+  for (const node of _collapseNodes)   _tickNode(node, dt);
 }
 
 // ── Soundscape node builder ───────────────────────────────────────────────────
@@ -264,6 +333,8 @@ function _buildSoundscapeNode(def) {
     };
 
     if (behavior.triggerType === 'continuous') _triggerSoundscape(node);
+    // State nodes activate only when the matching flag is already set
+    if (behavior.triggerType === 'state' && _stateFlags[behavior.activeWhen]) _triggerSoundscape(node);
     return node;
   } catch(e) {
     console.warn('[soundtrack] Soundscape node failed:', def.name, e);
@@ -309,6 +380,9 @@ function _tickNode(node, dt) {
       }
     }
   }
+
+  // burst_sequence: driven externally by _triggerCollapseNode, no auto tick needed
+  // state / event: driven by setSoundState(), no tick needed
 }
 
 function _triggerSoundscape(node) {
@@ -320,11 +394,17 @@ function _triggerSoundscape(node) {
     const now   = Tone.now();
 
     if (type === 'NoiseSynth') {
-      if (b.triggerType === 'continuous') {
+      if (b.triggerType === 'continuous' || b.triggerType === 'state') {
         synth.triggerAttack(now);
       } else {
         synth.triggerAttackRelease('8n', now);
       }
+      return;
+    }
+
+    // MembraneSynth event (water_splash) — percussive one-shot
+    if (type === 'MembraneSynth') {
+      synth.triggerAttackRelease(b.basePitch || 'C2', '8n', now);
       return;
     }
 
@@ -349,6 +429,48 @@ function _triggerSoundscape(node) {
       }
     }
   } catch(e) {}
+}
+
+// ── Structure collapse sequencer ─────────────────────────────────────────────
+
+function _triggerCollapseNode(node, params) {
+  if (!_guard()) return;
+  const b    = node.behavior;
+  const type = node.toneClass;
+  const now  = Tone.now();
+
+  const p = b.parameters || {};
+  const collapseTime = params.time
+    ?? p.time?.default ?? 4;
+
+  if (b.triggerType === 'continuous') {
+    // structure_rumble — play for collapseTime then release
+    try {
+      node.synth.triggerAttack(now);
+      node.synth.triggerRelease(now + collapseTime);
+    } catch(e) {}
+    return;
+  }
+
+  if (b.triggerType === 'burst_sequence') {
+    // debris_impacts / falling_debris_scatter — schedule N hits over collapseTime
+    const pieces = params.numberOfPieces
+      ?? p.numberOfPieces?.default ?? 12;
+    const pitches = ['C1','D1','E1','C2','D2','A1','G1','F1'];
+    for (let i = 0; i < pieces; i++) {
+      // Bias toward later in collapse — debris accelerates as structure falls
+      const t = now + Math.pow(Math.random(), 0.6) * collapseTime;
+      try {
+        const pitch = pitches[Math.floor(Math.random() * pitches.length)];
+        if (type === 'MetalSynth') {
+          node.synth.triggerAttackRelease('16n', t);
+        } else {
+          node.synth.triggerAttackRelease(pitch, '16n', t);
+        }
+      } catch(e) {}
+    }
+    return;
+  }
 }
 
 // ── Synth factory ─────────────────────────────────────────────────────────────
@@ -391,6 +513,7 @@ function _makeEffects(map) {
         case 'Reverb':        fx = new Tone.Reverb(params);              break;
         case 'Chorus':        fx = new Tone.Chorus(params).start();      break;
         case 'Phaser':        fx = new Tone.Phaser(params).start();      break;
+        case 'Highpass':      fx = new Tone.Filter({ type: 'highpass', ...params }); break;
         default: console.warn('[soundtrack] Unknown effect:', name);
       }
       if (fx) chain.push(fx);

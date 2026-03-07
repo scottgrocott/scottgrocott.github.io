@@ -36,7 +36,7 @@ import { spawnForklifts, tickForklifts } from './enemies/forklifts.js';
 import { tickExplosions } from './explosions.js';
 import { clearShelters, tickShelters } from './shelters/shelters.js';
 import { initAudio, toneReady, updateAudioListener } from './audio.js';
-import { initSoundtrack, tickSoundtrack, disposeSoundtrack } from './soundtrack.js';
+import { initSoundtrack, tickSoundtrack, disposeSoundtrack, setSoundState } from './soundtrack.js';
 import { pollGamepad, releaseGamepadAxes, registerGamepadShootCallback, registerGamepadFreeCamCallback, registerGamepadSpawnEnemyCallback } from './gamepad.js';
 import { initEditor, tickEditor, onFreeCamEnter, onFreeCamExit, initEditorScene } from './editor/editor.js';
 import { camera } from './core.js';
@@ -101,6 +101,7 @@ function _waitForYuka(timeoutMs = 10000) {
 }
 
 let _loading = false;
+let _wasInWater = false;   // tracks water entry/exit for sound events
 let _audioStarted = false;
 let _playerReady   = false;
 
@@ -185,6 +186,21 @@ async function boot() {
     syncPhysicsReads();
     pollGamepad(dt);
     tickPlayer(dt);
+    // Water entry/exit detection — drives water sound states
+    if (playerRig) {
+      const waterY = CONFIG.water?.enabled ? (CONFIG.water?.mesh?.position?.y ?? null) : null;
+      if (waterY !== null) {
+        const inWater = playerRig.position.y < waterY;
+        const submerged = playerRig.position.y < waterY - 1.0;
+        if (inWater !== _wasInWater) {
+          _wasInWater = inWater;
+          setSoundState(inWater ? 'player_enter_water' : 'player_exit_water', true);
+          // Reset the event flag next frame so it can fire again
+          setTimeout(() => setSoundState(inWater ? 'player_enter_water' : 'player_exit_water', false), 100);
+        }
+        setSoundState('player_submerged', submerged);
+      }
+    }
     // Always keep listener position up to date — enemy audio needs it regardless of toneReady
     if (playerRig) {
       updateAudioListener(
