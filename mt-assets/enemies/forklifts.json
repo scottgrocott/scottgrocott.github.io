@@ -11,7 +11,7 @@
       "yOffset": 0.0
     },
     "audio": {
-      "engine": "https://scottgrocott.github.io/mt-assets/enemies/audio/forklift_engine.ogg",
+      "engine": "https://scottgrocott.github.io/mt-assets/enemies/engine.mp3",
       "weapon": "https://example.com/assets/audio/forklift_ram.ogg",
       "crash":  "https://example.com/assets/audio/forklift_crash.ogg"
     },
@@ -50,7 +50,7 @@
       "yOffset": 0.0
     },
     "audio": {
-      "engine": "https://scottgrocott.github.io/mt-assets/enemies/audio/forklift_engine.ogg",
+      "engine": "https://scottgrocott.github.io/mt-assets/enemies/engine.mp3",
       "weapon": "https://example.com/assets/audio/forklift_ram.ogg",
       "crash":  "https://example.com/assets/audio/forklift_crash.ogg"
     },
@@ -89,7 +89,7 @@
       "yOffset": 0.0
     },
     "audio": {
-      "engine": "https://scottgrocott.github.io/mt-assets/enemies/audio/forklift_engine.ogg",
+      "engine": "https://scottgrocott.github.io/mt-assets/enemies/engine.mp3",
       "weapon": "https://example.com/assets/audio/forklift_ram.ogg",
       "crash":  "https://example.com/assets/audio/forklift_crash.ogg"
     },

@@ -35,7 +35,7 @@ import { spawnCars, tickCars } from './enemies/cars.js';
 import { spawnForklifts, tickForklifts } from './enemies/forklifts.js';
 import { tickExplosions } from './explosions.js';
 import { clearShelters, tickShelters } from './shelters/shelters.js';
-import { initAudio } from './audio.js';
+import { initAudio, toneReady, updateAudioListener } from './audio.js';
 import { initSoundtrack, tickSoundtrack, disposeSoundtrack } from './soundtrack.js';
 import { pollGamepad, releaseGamepadAxes, registerGamepadShootCallback, registerGamepadFreeCamCallback, registerGamepadSpawnEnemyCallback } from './gamepad.js';
 import { initEditor, tickEditor, onFreeCamEnter, onFreeCamExit, initEditorScene } from './editor/editor.js';
@@ -185,6 +185,15 @@ async function boot() {
     syncPhysicsReads();
     pollGamepad(dt);
     tickPlayer(dt);
+    // Keep 3D audio listener in sync with player head position and facing direction
+    if (playerRig && toneReady) {
+      const fwd = camera ? Math.sin(camera.rotation.y) : 0;
+      const fwdZ = camera ? Math.cos(camera.rotation.y) : -1;
+      updateAudioListener(
+        { x: playerRig.position.x, y: playerRig.position.y + 1.6, z: playerRig.position.z },
+        fwd, fwdZ
+      );
+    }
     tickLadders(dt);
     tickYUKA();          // drives YUKA EntityManager — must be every frame
     tickDrones(dt);

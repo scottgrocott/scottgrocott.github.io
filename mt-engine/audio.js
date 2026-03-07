@@ -9,7 +9,6 @@ const ENGINE_URLS = {
   forklift: 'https://scottgrocott.github.io/mt-assets/enemies/audio/forklift_engine.ogg',
 };
 
-// Safely guard every audio call
 function _guard() { return window.Tone && Tone.context.state === 'running'; }
 
 export async function initAudio() {
@@ -23,45 +22,85 @@ export async function initAudio() {
   }
 }
 
-// Per-enemy engine audio factory — loads real ogg, falls back to synth if file missing
+// ---------------------------------------------------------------------------
+// Listener — call this every frame with the player/camera world position
+// so Panner3D has a reference point for distance rolloff and L/R panning
+// ---------------------------------------------------------------------------
+export function updateAudioListener(pos, forwardX = 0, forwardZ = -1) {
+  if (!_guard()) return;
+  try {
+    const ctx = Tone.context.rawContext;
+    const L   = ctx.listener;
+    if (!L) return;
+
+    // Position
+    if (L.positionX) {
+      L.positionX.value = pos.x;
+      L.positionY.value = pos.y;
+      L.positionZ.value = pos.z;
+    } else {
+      L.setPosition(pos.x, pos.y, pos.z);
+    }
+
+    // Forward vector (which way the player is facing)
+    if (L.forwardX) {
+      L.forwardX.value = forwardX;
+      L.forwardY.value = 0;
+      L.forwardZ.value = forwardZ;
+      L.upX.value = 0;
+      L.upY.value = 1;
+      L.upZ.value = 0;
+    } else {
+      L.setOrientation(forwardX, 0, forwardZ, 0, 1, 0);
+    }
+  } catch(e) {}
+}
+
+// ---------------------------------------------------------------------------
+// Per-enemy engine audio — real ogg with synth fallback
+// ---------------------------------------------------------------------------
 export function createEnemySynth(type, engineUrl) {
   if (!_guard()) return null;
   try {
-    const panner = new Tone.Panner3D({ panningModel: 'HRTF', rolloffFactor: 1.5 }).toDestination();
+    const panner = new Tone.Panner3D({
+      panningModel:         'HRTF',
+      distanceModel:        'inverse',
+      refDistance:          1,
+      maxDistance:          80,
+      rolloffFactor:        2.0,
+      coneInnerAngle:       360,
+      coneOuterAngle:       360,
+      coneOuterGain:        0,
+    }).toDestination();
+
     const url = engineUrl || ENGINE_URLS[type];
+    if (!url) return _startSynthFallback(type, panner);
 
-    if (url) {
-      // Real audio file — loop it as the engine sound
-      const player = new Tone.Player({
-        url,
-        loop: true,
-        autostart: false,
-        volume: -6,
-      }).connect(panner);
+    // Construct player without passing url — load separately to avoid double-fetch
+    const player = new Tone.Player({
+      loop:      true,
+      autostart: false,
+      volume:    -4,
+    }).connect(panner);
 
-      // Start once loaded; if the file 404s, onload never fires — synth fallback kicks in
-      const loadTimeout = setTimeout(() => {
-        console.warn(`[audio] Engine file timed out for ${type}, using synth fallback`);
-        player.dispose();
-        _startSynthFallback(type, panner);
-      }, 5000);
+    const loadTimeout = setTimeout(() => {
+      console.warn(`[audio] Engine load timed out for ${type} — synth fallback`);
+      try { player.dispose(); } catch(e) {}
+      _startSynthFallback(type, panner);
+    }, 6000);
 
-      player.load(url).then(() => {
-        clearTimeout(loadTimeout);
-        try { player.start(); } catch(e) {}
-        console.log(`[audio] Engine player started for ${type}`);
-      }).catch(() => {
-        clearTimeout(loadTimeout);
-        console.warn(`[audio] Engine file failed for ${type}, using synth fallback`);
-        player.dispose();
-        _startSynthFallback(type, panner);
-      });
+    player.load(url).then(() => {
+      clearTimeout(loadTimeout);
+      try { player.start(); } catch(e) {}
+      console.log(`[audio] Engine playing for ${type}`);
+    }).catch(err => {
+      clearTimeout(loadTimeout);
+      console.warn(`[audio] Engine load failed for ${type}:`, err);
+      try { player.dispose(); } catch(e) {}
+      _startSynthFallback(type, panner);
+    });
 
-      return { player, panner, type };
-    }
-
-    // No URL at all — go straight to synth
-    return _startSynthFallback(type, panner);
+    return { player, panner, type };
 
   } catch(e) {
     console.warn('[audio] createEnemySynth failed:', e);
@@ -69,7 +108,6 @@ export function createEnemySynth(type, engineUrl) {
   }
 }
 
-// Tone.js synth fallback — identical to the original behaviour
 function _startSynthFallback(type, panner) {
   try {
     let synth;
@@ -92,37 +130,40 @@ function _startSynthFallback(type, panner) {
       }).connect(panner);
       synth.triggerAttack('E0');
     }
-    return { synth, panner, type };
+    return synth ? { synth, panner, type } : null;
   } catch(e) {
     console.warn('[audio] synth fallback failed:', e);
     return null;
   }
 }
 
+// ---------------------------------------------------------------------------
+// Per-frame: move enemy sound source to current world position
+// ---------------------------------------------------------------------------
 export function updateEnemySpatial(synthObj, pos) {
-  if (!_guard() || !synthObj || !synthObj.panner) return;
+  if (!synthObj?.panner) return;
   try {
     const px = +pos.x, py = +pos.y, pz = +pos.z;
-    if (!isNaN(px)) {
-      synthObj.panner.positionX.value = px;
-      synthObj.panner.positionY.value = py;
-      synthObj.panner.positionZ.value = pz;
-    }
+    if (isNaN(px)) return;
+    synthObj.panner.positionX.value = px;
+    synthObj.panner.positionY.value = py;
+    synthObj.panner.positionZ.value = pz;
   } catch(e) {}
 }
 
 export function disposeEnemySynth(synthObj) {
   if (!synthObj) return;
   try {
-    // Real audio player path
     if (synthObj.player) { try { synthObj.player.stop(); } catch(e) {} synthObj.player.dispose(); }
-    // Synth fallback path
     if (synthObj.synth)  { synthObj.synth.triggerRelease(); synthObj.synth.dispose(); }
     if (synthObj.panner) synthObj.panner.dispose();
   } catch(e) {}
 }
 
-export function playExplosion(pos) {
+// ---------------------------------------------------------------------------
+// SFX
+// ---------------------------------------------------------------------------
+export function playExplosion() {
   if (!_guard()) return;
   try {
     const noise = new Tone.NoiseSynth({

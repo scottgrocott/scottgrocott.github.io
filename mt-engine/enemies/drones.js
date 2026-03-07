@@ -1,16 +1,18 @@
 // enemies/drones.js — aerial drone enemy
 
 import { scene, shadowGenerator } from '../core.js';
-import { physicsWorld, safeVec3 } from '../physics.js';
-import { EnemyBase, distToPlayer, getPlayerPos } from './enemyBase.js';
+import { physicsWorld, physicsReady, safeVec3 } from '../physics.js';
+import { EnemyBase, _ym, distToPlayer, getPlayerPos } from './enemyBase.js';
 import { getEnemies } from './enemyRegistry.js';
 import { getWaypoints } from '../flatnav.js';
-import { getTerrainHeightAt } from '../terrain/terrainMesh.js';
+import { CONFIG } from '../config.js';
+import { createEnemySynth, updateEnemySpatial, disposeEnemySynth } from '../audio.js';
 
-const FLIGHT_ABOVE_TERRAIN = 18;
-const PATROL_SPEED = 5;
-const HUNT_SPEED   = 9;
-const DETECT_RANGE = 45;
+const RISE_TARGET_Y   = 16;
+const RISE_SPEED      = 4;
+const PATROL_SPEED    = 5;
+const HUNT_SPEED      = 9;
+const DETECT_RANGE    = 45;
 
 export function spawnDrones(def) {
   const count = def.maxCount || 3;
@@ -18,28 +20,35 @@ export function spawnDrones(def) {
   const spawned = [];
   for (let i = 0; i < count; i++) {
     const wp = flightWaypoints[i % Math.max(1, flightWaypoints.length)];
-    const groundY = wp ? getTerrainHeightAt(wp.x, wp.z) : 0;
     const spawnPos = wp
-      ? new BABYLON.Vector3(wp.x, groundY + FLIGHT_ABOVE_TERRAIN, wp.z)
-      : new BABYLON.Vector3((Math.random()-0.5)*60, FLIGHT_ABOVE_TERRAIN, (Math.random()-0.5)*60);
+      ? new BABYLON.Vector3(wp.x, wp.y, wp.z)
+      : new BABYLON.Vector3((Math.random()-0.5)*60, RISE_TARGET_Y, (Math.random()-0.5)*60);
 
     const enemy = new EnemyBase({
-      scene, rapierWorld: physicsWorld,
-      type: 'drone', speed: PATROL_SPEED, health: def.health ?? 60, spawnPos,
+      scene,
+      rapierWorld: physicsWorld,
+      type: 'drone',
+      speed: PATROL_SPEED,
+      health: def.health ?? 60,
+      spawnPos,
+      // No YUKA path — drones use their own stateful tick below
     });
 
-    enemy.state = 'patrol';
-    _buildDroneMesh(enemy);
+    enemy.state = 'rising';
+    _buildDroneMesh(enemy, scene);
     _setupDroneWaypoints(enemy, flightWaypoints);
+    enemy._synth = createEnemySynth('drone', def.audio?.engine);
     spawned.push(enemy);
   }
   return spawned;
 }
 
 function _buildDroneMesh(enemy) {
+  // Replace the default placeholder box with a proper drone mesh
   if (enemy.mesh) enemy.mesh.dispose();
+
   const root = new BABYLON.TransformNode('droneRoot', scene);
-  enemy.mesh = root;
+  enemy.mesh = root;  // use root as the position anchor
 
   const body = BABYLON.MeshBuilder.CreateBox('droneBody', { width:0.8, height:0.25, depth:0.8 }, scene);
   body.parent = root;
@@ -50,7 +59,8 @@ function _buildDroneMesh(enemy) {
   if (shadowGenerator) shadowGenerator.addShadowCaster(body);
 
   enemy._rotors = [];
-  for (const off of [{x:0.5,z:0.5},{x:-0.5,z:0.5},{x:0.5,z:-0.5},{x:-0.5,z:-0.5}]) {
+  const rotorOffsets = [{x:0.5,z:0.5},{x:-0.5,z:0.5},{x:0.5,z:-0.5},{x:-0.5,z:-0.5}];
+  for (const off of rotorOffsets) {
     const rotor = BABYLON.MeshBuilder.CreateCylinder('rotor',
       { diameter:0.4, height:0.05, tessellation:6 }, scene);
     rotor.parent = root;
@@ -65,14 +75,13 @@ function _buildDroneMesh(enemy) {
 
 function _setupDroneWaypoints(enemy, flightWaypoints) {
   if (!flightWaypoints || flightWaypoints.length === 0) {
-    enemy._waypoints = [20,0,-20].flatMap(x => [0,20,-20].map(z => ({
-      x, y: getTerrainHeightAt(x, z) + FLIGHT_ABOVE_TERRAIN, z
-    })));
+    enemy._waypoints = [
+      {x:20,y:RISE_TARGET_Y,z:0},{x:0,y:RISE_TARGET_Y,z:20},
+      {x:-20,y:RISE_TARGET_Y,z:0},{x:0,y:RISE_TARGET_Y,z:-20}
+    ];
   } else {
     const shuffled = [...flightWaypoints].sort(() => Math.random()-0.5);
-    enemy._waypoints = shuffled.slice(0, Math.min(8, shuffled.length)).map(wp => ({
-      x: wp.x, y: getTerrainHeightAt(wp.x, wp.z) + FLIGHT_ABOVE_TERRAIN, z: wp.z,
-    }));
+    enemy._waypoints = shuffled.slice(0, Math.min(8, shuffled.length));
   }
   enemy._waypointIndex = 0;
 }
@@ -90,15 +99,28 @@ function _tickDrone(enemy, dt) {
   const px = +t.x, py = +t.y, pz = +t.z;
   if (isNaN(px)||isNaN(py)||isNaN(pz)) return;
 
-  if (enemy._rotors) for (const r of enemy._rotors) r.rotation.y += dt * 15;
+  // Audio: update spatial position; dispose on death
+  if (enemy._synth) {
+    if (enemy.dead) { disposeEnemySynth(enemy._synth); enemy._synth = null; return; }
+    updateEnemySpatial(enemy._synth, {x:px, y:py, z:pz});
+  }
+
+  // Spin rotors
+  if (enemy._rotors) {
+    for (const r of enemy._rotors) r.rotation.y += dt * 15;
+  }
 
   const playerPos = getPlayerPos();
   const dPlayer   = distToPlayer({x:px, y:py, z:pz});
-  const cruiseY   = getTerrainHeightAt(px, pz) + FLIGHT_ABOVE_TERRAIN;
 
-  let targetX = px, targetY = cruiseY, targetZ = pz;
+  let targetX = px, targetY = py, targetZ = pz;
 
   switch (enemy.state) {
+    case 'rising': {
+      targetY = RISE_TARGET_Y;
+      if (Math.abs(py - RISE_TARGET_Y) < 1.0) enemy.state = 'patrol';
+      break;
+    }
     case 'patrol':
     case 'skyPatrol': {
       if (dPlayer < DETECT_RANGE) { enemy.state = 'hunting'; break; }
@@ -108,18 +130,18 @@ function _tickDrone(enemy, dt) {
         if (Math.sqrt(dx*dx+dz*dz) < 3) {
           enemy._waypointIndex = (enemy._waypointIndex + 1) % enemy._waypoints.length;
         } else {
-          targetX = wp.x;
-          targetY = getTerrainHeightAt(wp.x, wp.z) + FLIGHT_ABOVE_TERRAIN;
-          targetZ = wp.z;
+          targetX = wp.x; targetY = wp.y; targetZ = wp.z;
         }
       }
       break;
     }
     case 'hunting': {
       if (dPlayer > DETECT_RANGE * 1.5) { enemy.state = 'patrol'; break; }
-      targetX = playerPos.x;
-      targetY = Math.max(playerPos.y + 6, cruiseY);
-      targetZ = playerPos.z;
+      targetX = playerPos.x; targetY = playerPos.y + 6; targetZ = playerPos.z;
+      break;
+    }
+    case 'investigating': {
+      if (dPlayer < 6) enemy.state = 'patrol';
       break;
     }
   }
@@ -132,6 +154,7 @@ function _tickDrone(enemy, dt) {
     const safe = safeVec3(px + nx*spd*dt, py + ny*spd*dt, pz + nz*spd*dt, 'drone tick');
     if (safe) {
       enemy.body.setNextKinematicTranslation(safe);
+      // Keep mesh in sync (YUKA not used for drones)
       if (enemy.mesh) enemy.mesh.position.set(safe.x, safe.y, safe.z);
     }
   }
