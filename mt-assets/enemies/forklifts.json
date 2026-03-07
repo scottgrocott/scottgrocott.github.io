@@ -1,0 +1,52 @@
+{
+  "type": "forklift",
+  "maxCount": 2,
+  "health": 150,
+
+  "model": {
+    "url": "https://example.com/assets/models/forklift.glb",
+    "scale": 1.0,
+    "yOffset": 0.0
+  },
+
+  "audio": {
+    "engine": "https://example.com/assets/audio/forklift_engine.ogg",
+    "weapon": "https://example.com/assets/audio/forklift_ram.ogg",
+    "crash":  "https://example.com/assets/audio/forklift_crash.ogg"
+  },
+
+  "movingParts": {
+    "wheels": [
+      { "name": "wheel_fl", "offset": { "x":  0.8, "y": 0.0, "z":  0.7 }, "spinAxis": "x", "steerable": false },
+      { "name": "wheel_fr", "offset": { "x": -0.8, "y": 0.0, "z":  0.7 }, "spinAxis": "x", "steerable": false },
+      { "name": "wheel_rl", "offset": { "x":  0.8, "y": 0.0, "z": -0.7 }, "spinAxis": "x", "steerable": true  },
+      { "name": "wheel_rr", "offset": { "x": -0.8, "y": 0.0, "z": -0.7 }, "spinAxis": "x", "steerable": true  }
+    ],
+    "forks": {
+      "name": "fork_node",
+      "offset": { "x": 0, "y": 0.3, "z": 1.1 },
+      "tines": [
+        { "name": "fork_left",  "offset": { "x":  0.3, "y": 0, "z": 0.6 } },
+        { "name": "fork_right", "offset": { "x": -0.3, "y": 0, "z": 0.6 } }
+      ],
+      "minY": 0.3,
+      "maxY": 1.8,
+      "raiseSpeed": 1.5,
+      "lowerSpeed": 0.8
+    },
+    "mast": {
+      "name": "mast",
+      "offset": { "x": 0, "y": 0.7, "z": 1.0 },
+      "tiltAxis": "x",
+      "maxTiltAngle": 0.15
+    }
+  },
+
+  "behaviour": {
+    "patrolSpeed": 2.5,
+    "chaseSpeed": 4,
+    "ramSpeed": 7,
+    "detectRange": 30,
+    "ramRange": 6
+  }
+}

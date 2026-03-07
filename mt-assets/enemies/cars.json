@@ -1,0 +1,38 @@
+{
+  "type": "car",
+  "maxCount": 2,
+  "health": 100,
+
+  "model": {
+    "url": "https://example.com/assets/models/car.glb",
+    "scale": 1.0,
+    "yOffset": 0.0
+  },
+
+  "audio": {
+    "engine": "https://example.com/assets/audio/car_engine.ogg",
+    "weapon": "https://example.com/assets/audio/car_shoot.ogg",
+    "crash":  "https://example.com/assets/audio/car_crash.ogg"
+  },
+
+  "movingParts": {
+    "wheels": [
+      { "name": "wheel_fl", "offset": { "x":  0.9, "y": 0.05, "z":  1.0 }, "spinAxis": "x", "steerable": true  },
+      { "name": "wheel_fr", "offset": { "x": -0.9, "y": 0.05, "z":  1.0 }, "spinAxis": "x", "steerable": true  },
+      { "name": "wheel_rl", "offset": { "x":  0.9, "y": 0.05, "z": -1.0 }, "spinAxis": "x", "steerable": false },
+      { "name": "wheel_rr", "offset": { "x": -0.9, "y": 0.05, "z": -1.0 }, "spinAxis": "x", "steerable": false }
+    ],
+    "body": {
+      "name": "car_body",
+      "offset": { "x": 0, "y": 0.35, "z": 0 }
+    }
+  },
+
+  "behaviour": {
+    "patrolSpeed": 5,
+    "chaseSpeed": 9,
+    "ramSpeed": 14,
+    "detectRange": 38,
+    "ramRange": 5
+  }
+}
