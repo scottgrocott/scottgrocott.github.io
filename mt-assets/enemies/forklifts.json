@@ -1,52 +1,119 @@
-{
-  "type": "forklift",
-  "maxCount": 2,
-  "health": 150,
-
-  "model": {
-    "url": "https://example.com/assets/models/forklift.glb",
-    "scale": 1.0,
-    "yOffset": 0.0
-  },
-
-  "audio": {
-    "engine": "https://example.com/assets/audio/forklift_engine.ogg",
-    "weapon": "https://example.com/assets/audio/forklift_ram.ogg",
-    "crash":  "https://example.com/assets/audio/forklift_crash.ogg"
-  },
-
-  "movingParts": {
-    "wheels": [
-      { "name": "wheel_fl", "offset": { "x":  0.8, "y": 0.0, "z":  0.7 }, "spinAxis": "x", "steerable": false },
-      { "name": "wheel_fr", "offset": { "x": -0.8, "y": 0.0, "z":  0.7 }, "spinAxis": "x", "steerable": false },
-      { "name": "wheel_rl", "offset": { "x":  0.8, "y": 0.0, "z": -0.7 }, "spinAxis": "x", "steerable": true  },
-      { "name": "wheel_rr", "offset": { "x": -0.8, "y": 0.0, "z": -0.7 }, "spinAxis": "x", "steerable": true  }
-    ],
-    "forks": {
-      "name": "fork_node",
-      "offset": { "x": 0, "y": 0.3, "z": 1.1 },
-      "tines": [
-        { "name": "fork_left",  "offset": { "x":  0.3, "y": 0, "z": 0.6 } },
-        { "name": "fork_right", "offset": { "x": -0.3, "y": 0, "z": 0.6 } }
-      ],
-      "minY": 0.3,
-      "maxY": 1.8,
-      "raiseSpeed": 1.5,
-      "lowerSpeed": 0.8
+[
+  {
+    "id": "standard_forklift",
+    "label": "Standard Forklift",
+    "type": "forklift",
+    "maxCount": 2,
+    "health": 150,
+    "model": {
+      "url": "https://example.com/assets/models/forklift.glb",
+      "scale": 1.0,
+      "yOffset": 0.0
     },
-    "mast": {
-      "name": "mast",
-      "offset": { "x": 0, "y": 0.7, "z": 1.0 },
-      "tiltAxis": "x",
-      "maxTiltAngle": 0.15
+    "audio": {
+      "engine": "https://scottgrocott.github.io/mt-assets/enemies/audio/forklift_engine.ogg",
+      "weapon": "https://example.com/assets/audio/forklift_ram.ogg",
+      "crash":  "https://example.com/assets/audio/forklift_crash.ogg"
+    },
+    "movingParts": {
+      "wheels": [
+        { "name": "wheel_fl", "offset": { "x":  0.8, "y": 0.0, "z":  0.7 }, "spinAxis": "x", "steerable": false },
+        { "name": "wheel_fr", "offset": { "x": -0.8, "y": 0.0, "z":  0.7 }, "spinAxis": "x", "steerable": false },
+        { "name": "wheel_rl", "offset": { "x":  0.8, "y": 0.0, "z": -0.7 }, "spinAxis": "x", "steerable": true  },
+        { "name": "wheel_rr", "offset": { "x": -0.8, "y": 0.0, "z": -0.7 }, "spinAxis": "x", "steerable": true  }
+      ],
+      "forks": {
+        "name": "fork_node",
+        "offset": { "x": 0, "y": 0.3, "z": 1.1 },
+        "tines": [
+          { "name": "fork_left",  "offset": { "x":  0.3, "y": 0, "z": 0.6 } },
+          { "name": "fork_right", "offset": { "x": -0.3, "y": 0, "z": 0.6 } }
+        ],
+        "minY": 0.3, "maxY": 1.8, "raiseSpeed": 1.5, "lowerSpeed": 0.8
+      },
+      "mast": { "name": "mast", "offset": { "x": 0, "y": 0.7, "z": 1.0 }, "tiltAxis": "x", "maxTiltAngle": 0.15 }
+    },
+    "behaviour": {
+      "patrolSpeed": 2.5, "chaseSpeed": 4, "ramSpeed": 7,
+      "detectRange": 30, "ramRange": 6
     }
   },
-
-  "behaviour": {
-    "patrolSpeed": 2.5,
-    "chaseSpeed": 4,
-    "ramSpeed": 7,
-    "detectRange": 30,
-    "ramRange": 6
+  {
+    "id": "heavy_forklift",
+    "label": "Heavy Forklift",
+    "type": "forklift",
+    "maxCount": 1,
+    "health": 300,
+    "model": {
+      "url": "https://example.com/assets/models/heavy_forklift.glb",
+      "scale": 1.4,
+      "yOffset": 0.0
+    },
+    "audio": {
+      "engine": "https://scottgrocott.github.io/mt-assets/enemies/audio/forklift_engine.ogg",
+      "weapon": "https://example.com/assets/audio/forklift_ram.ogg",
+      "crash":  "https://example.com/assets/audio/forklift_crash.ogg"
+    },
+    "movingParts": {
+      "wheels": [
+        { "name": "wheel_fl", "offset": { "x":  1.0, "y": 0.0, "z":  0.9 }, "spinAxis": "x", "steerable": false },
+        { "name": "wheel_fr", "offset": { "x": -1.0, "y": 0.0, "z":  0.9 }, "spinAxis": "x", "steerable": false },
+        { "name": "wheel_rl", "offset": { "x":  1.0, "y": 0.0, "z": -0.9 }, "spinAxis": "x", "steerable": true  },
+        { "name": "wheel_rr", "offset": { "x": -1.0, "y": 0.0, "z": -0.9 }, "spinAxis": "x", "steerable": true  }
+      ],
+      "forks": {
+        "name": "fork_node",
+        "offset": { "x": 0, "y": 0.4, "z": 1.4 },
+        "tines": [
+          { "name": "fork_left",  "offset": { "x":  0.4, "y": 0, "z": 0.8 } },
+          { "name": "fork_right", "offset": { "x": -0.4, "y": 0, "z": 0.8 } }
+        ],
+        "minY": 0.4, "maxY": 2.8, "raiseSpeed": 1.0, "lowerSpeed": 0.6
+      },
+      "mast": { "name": "mast", "offset": { "x": 0, "y": 1.0, "z": 1.2 }, "tiltAxis": "x", "maxTiltAngle": 0.1 }
+    },
+    "behaviour": {
+      "patrolSpeed": 1.8, "chaseSpeed": 3, "ramSpeed": 5.5,
+      "detectRange": 35, "ramRange": 8
+    }
+  },
+  {
+    "id": "mini_forklift",
+    "label": "Mini Forklift",
+    "type": "forklift",
+    "maxCount": 3,
+    "health": 80,
+    "model": {
+      "url": "https://example.com/assets/models/mini_forklift.glb",
+      "scale": 0.7,
+      "yOffset": 0.0
+    },
+    "audio": {
+      "engine": "https://scottgrocott.github.io/mt-assets/enemies/audio/forklift_engine.ogg",
+      "weapon": "https://example.com/assets/audio/forklift_ram.ogg",
+      "crash":  "https://example.com/assets/audio/forklift_crash.ogg"
+    },
+    "movingParts": {
+      "wheels": [
+        { "name": "wheel_fl", "offset": { "x":  0.55, "y": 0.0, "z":  0.5 }, "spinAxis": "x", "steerable": false },
+        { "name": "wheel_fr", "offset": { "x": -0.55, "y": 0.0, "z":  0.5 }, "spinAxis": "x", "steerable": false },
+        { "name": "wheel_rl", "offset": { "x":  0.55, "y": 0.0, "z": -0.5 }, "spinAxis": "x", "steerable": true  },
+        { "name": "wheel_rr", "offset": { "x": -0.55, "y": 0.0, "z": -0.5 }, "spinAxis": "x", "steerable": true  }
+      ],
+      "forks": {
+        "name": "fork_node",
+        "offset": { "x": 0, "y": 0.2, "z": 0.8 },
+        "tines": [
+          { "name": "fork_left",  "offset": { "x":  0.2, "y": 0, "z": 0.4 } },
+          { "name": "fork_right", "offset": { "x": -0.2, "y": 0, "z": 0.4 } }
+        ],
+        "minY": 0.2, "maxY": 1.2, "raiseSpeed": 2.0, "lowerSpeed": 1.2
+      },
+      "mast": { "name": "mast", "offset": { "x": 0, "y": 0.5, "z": 0.7 }, "tiltAxis": "x", "maxTiltAngle": 0.18 }
+    },
+    "behaviour": {
+      "patrolSpeed": 3.5, "chaseSpeed": 5.5, "ramSpeed": 9,
+      "detectRange": 25, "ramRange": 4
+    }
   }
-}
+]

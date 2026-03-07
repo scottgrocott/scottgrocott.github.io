@@ -1,6 +1,13 @@
-// audio.js — ToneJS init, enemy synths, spatial audio, SFX
+// audio.js — ToneJS init, enemy engine audio (real ogg files), spatial audio, SFX
 
 export let toneReady = false;
+
+// Permanent CDN locations for enemy engine sounds
+const ENGINE_URLS = {
+  drone:    'https://scottgrocott.github.io/mt-assets/enemies/audio/drone_engine.ogg',
+  car:      'https://scottgrocott.github.io/mt-assets/enemies/audio/car_engine.ogg',
+  forklift: 'https://scottgrocott.github.io/mt-assets/enemies/audio/forklift_engine.ogg',
+};
 
 // Safely guard every audio call
 function _guard() { return window.Tone && Tone.context.state === 'running'; }
@@ -16,13 +23,56 @@ export async function initAudio() {
   }
 }
 
-// Per-enemy synth factory
-export function createEnemySynth(type) {
+// Per-enemy engine audio factory — loads real ogg, falls back to synth if file missing
+export function createEnemySynth(type, engineUrl) {
   if (!_guard()) return null;
   try {
-    let synth, panner;
-    panner = new Tone.Panner3D({ panningModel: 'HRTF', rolloffFactor: 1.5 }).toDestination();
+    const panner = new Tone.Panner3D({ panningModel: 'HRTF', rolloffFactor: 1.5 }).toDestination();
+    const url = engineUrl || ENGINE_URLS[type];
 
+    if (url) {
+      // Real audio file — loop it as the engine sound
+      const player = new Tone.Player({
+        url,
+        loop: true,
+        autostart: false,
+        volume: -6,
+      }).connect(panner);
+
+      // Start once loaded; if the file 404s, onload never fires — synth fallback kicks in
+      const loadTimeout = setTimeout(() => {
+        console.warn(`[audio] Engine file timed out for ${type}, using synth fallback`);
+        player.dispose();
+        _startSynthFallback(type, panner);
+      }, 5000);
+
+      player.load(url).then(() => {
+        clearTimeout(loadTimeout);
+        try { player.start(); } catch(e) {}
+        console.log(`[audio] Engine player started for ${type}`);
+      }).catch(() => {
+        clearTimeout(loadTimeout);
+        console.warn(`[audio] Engine file failed for ${type}, using synth fallback`);
+        player.dispose();
+        _startSynthFallback(type, panner);
+      });
+
+      return { player, panner, type };
+    }
+
+    // No URL at all — go straight to synth
+    return _startSynthFallback(type, panner);
+
+  } catch(e) {
+    console.warn('[audio] createEnemySynth failed:', e);
+    return null;
+  }
+}
+
+// Tone.js synth fallback — identical to the original behaviour
+function _startSynthFallback(type, panner) {
+  try {
+    let synth;
     if (type === 'drone') {
       synth = new Tone.MembraneSynth({
         pitchDecay: 0.05, octaves: 2,
@@ -42,10 +92,9 @@ export function createEnemySynth(type) {
       }).connect(panner);
       synth.triggerAttack('E0');
     }
-
-    return { synth, panner };
+    return { synth, panner, type };
   } catch(e) {
-    console.warn('[audio] createEnemySynth failed:', e);
+    console.warn('[audio] synth fallback failed:', e);
     return null;
   }
 }
@@ -65,7 +114,10 @@ export function updateEnemySpatial(synthObj, pos) {
 export function disposeEnemySynth(synthObj) {
   if (!synthObj) return;
   try {
-    if (synthObj.synth) { synthObj.synth.triggerRelease(); synthObj.synth.dispose(); }
+    // Real audio player path
+    if (synthObj.player) { try { synthObj.player.stop(); } catch(e) {} synthObj.player.dispose(); }
+    // Synth fallback path
+    if (synthObj.synth)  { synthObj.synth.triggerRelease(); synthObj.synth.dispose(); }
     if (synthObj.panner) synthObj.panner.dispose();
   } catch(e) {}
 }
