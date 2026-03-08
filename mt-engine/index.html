@@ -2,55 +2,33 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Metal Throne Engine</title>
+  <title>Test / Sandbox</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
-    #top-bar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
-      height: 36px; background: rgba(8,12,8,0.92);
-      border-bottom: 1px solid #2a3a2a;
-      display: flex; align-items: center; gap: 12px; padding: 0 12px;
-    }
-    #top-bar select, #top-bar button {
-      background: #0e1e0e; border: 1px solid #3a6a3a; color: #8aee8a;
-      font-family: inherit; font-size: 11px; padding: 3px 8px;
-      cursor: pointer; border-radius: 2px;
-    }
-    #top-bar select:hover, #top-bar button:hover { background: #1a3a1a; }
-    #top-bar .title { color: #4a7a4a; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; }
-    #renderCanvas {
-      width: 100vw; height: 100vh; display: block; touch-action: none;
-    }
-    #hud {
-      position: fixed; top: 42px; left: 12px; z-index: 9000;
-      color: #8aee8a; font-size: 11px; pointer-events: none;
-      display: flex; flex-direction: column; gap: 4px;
-    }
-    #hud .hud-row { display: flex; gap: 10px; }
-    #hud .hud-label { color: #4a7a4a; }
-    #crosshair {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 16px; height: 16px; pointer-events: none; z-index: 9000;
-    }
-    #crosshair::before, #crosshair::after {
-      content: ''; position: absolute; background: rgba(138,238,138,0.8);
-    }
-    #crosshair::before { width: 2px; height: 16px; left: 7px; top: 0; }
-    #crosshair::after  { width: 16px; height: 2px; top: 7px; left: 0; }
-    #loading-screen {
-      position: fixed; inset: 0; background: #000d00; z-index: 99999;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: #8aee8a; font-family: 'Courier New', monospace;
-    }
-    #loading-screen .load-title { font-size: 22px; letter-spacing: 0.3em; margin-bottom: 18px; }
-    #loading-screen .load-sub   { font-size: 11px; color: #4a7a4a; letter-spacing: 0.15em; }
-    #loading-bar-wrap { width: 280px; height: 4px; background: #1a2a1a; border-radius: 2px; margin-top: 18px; }
-    #loading-bar      { height: 4px; background: #4aee4a; border-radius: 2px; width: 0%; transition: width 0.3s; }
-    #minimap-canvas {
-      position: fixed; bottom: 12px; right: 12px; z-index: 9000;
-      border: 1px solid #2a4a2a; border-radius: 2px;
-    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#000; overflow:hidden; font-family:'Courier New',monospace; }
+    #top-bar { position:fixed;top:0;left:0;right:0;z-index:10000;height:36px;
+      background:rgba(8,12,8,0.92);border-bottom:1px solid #2a3a2a;
+      display:flex;align-items:center;gap:12px;padding:0 12px; }
+    #top-bar button { background:#0e1e0e;border:1px solid #3a6a3a;color:#8aee8a;
+      font-family:inherit;font-size:11px;padding:3px 8px;cursor:pointer;border-radius:2px; }
+    #renderCanvas { width:100vw;height:100vh;display:block;touch-action:none; }
+    #hud { position:fixed;top:42px;left:12px;z-index:9000;color:#8aee8a;font-size:11px;
+      pointer-events:none;display:flex;flex-direction:column;gap:4px; }
+    #hud .hud-row { display:flex;gap:10px; }
+    #hud .hud-label { color:#4a7a4a; }
+    #crosshair { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:16px;height:16px;pointer-events:none;z-index:9000; }
+    #crosshair::before,#crosshair::after { content:'';position:absolute;background:rgba(138,238,138,0.8); }
+    #crosshair::before { width:2px;height:16px;left:7px;top:0; }
+    #crosshair::after  { width:16px;height:2px;top:7px;left:0; }
+    #loading-screen { position:fixed;inset:0;background:#000d00;z-index:99999;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      color:#8aee8a;font-family:'Courier New',monospace; }
+    #loading-screen .load-title { font-size:22px;letter-spacing:0.3em;margin-bottom:18px; }
+    #loading-screen .load-sub   { font-size:11px;color:#4a7a4a;letter-spacing:0.15em; }
+    #loading-bar-wrap { width:280px;height:4px;background:#1a2a1a;border-radius:2px;margin-top:18px; }
+    #loading-bar { height:4px;background:#4aee4a;border-radius:2px;width:0%;transition:width 0.3s; }
+    #minimap-canvas { position:fixed;bottom:12px;right:12px;z-index:9000;border:1px solid #2a4a2a;border-radius:2px; }
   </style>
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
@@ -58,75 +36,114 @@
   <script src="https://cdn.jsdelivr.net/npm/yuka@0.7.8/build/yuka.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 
-  <script>
-    // Populate config-select with engine-relative paths once main.js sets ENGINE_ROOT.
-    // main.js dispatches 'engine-ready' after it resolves ENGINE_ROOT.
-    // The select also always includes a "Local (game-config.json)" option.
-    window._ENGINE_CONFIGS = [
-      { label: 'Test / Sandbox',  file: 'test.json'           },
-      { label: 'Drone Wars',      file: 'drone_wars.json'     },
-      { label: 'Car Wars',        file: 'car_wars.json'       },
-      { label: 'Forklift Wars',   file: 'forklift_wars.json'  },
-      { label: 'Metal Throne',    file: 'metal_throne.json'   },
-    ];
+  <!-- Google Analytics — replace G-XXXXXXXXXX with your Measurement ID -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-    window.addEventListener('engine-ready', (e) => {
-      const root   = e.detail.engineRoot;
-      const select = document.getElementById('config-select');
-      select.innerHTML = '';
-
-      // Local config option first
-      const localOpt = document.createElement('option');
-      localOpt.value = 'game-config.json';
-      localOpt.textContent = '📦 Local (game-config.json)';
-      select.appendChild(localOpt);
-
-      for (const cfg of window._ENGINE_CONFIGS) {
-        const opt = document.createElement('option');
-        opt.value = `${root}/assets/configs/${cfg.file}`;
-        opt.textContent = cfg.label;
-        select.appendChild(opt);
-      }
-    });
-  </script>
+  gtag('config', 'G-EBGF4V165P');
+</script>
 </head>
 <body>
   <div id="loading-screen">
-    <div class="load-title">METAL THRONE ENGINE</div>
+    <div class="load-title" id="splash-title">Test / Sandbox</div>
     <div class="load-sub" id="load-status">INITIALIZING...</div>
     <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+    <!-- Splash page links — populated dynamically from level JSON splash_screen field -->
+    <div id="splash-links" style="margin-top:24px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center;"></div>
+    <!-- Play button — hidden until load completes -->
+    <button id="btn-play" style="display:none;margin-top:28px;padding:10px 36px;
+      background:#0e2a0e;border:1px solid #4aee4a;color:#8aee8a;
+      font-family:'Courier New',monospace;font-size:14px;letter-spacing:0.2em;
+      cursor:pointer;border-radius:3px;" onclick="window._splashPlay && window._splashPlay()">
+      ▶ PLAY
+    </button>
   </div>
-
   <div id="top-bar">
-    <span class="title">Metal Throne Engine</span>
-    <select id="config-select">
-      <option value="">Loading...</option>
-    </select>
-    <button id="btn-editor">⚙ Editor (F)</button>
     <button id="btn-audio">🔊 Audio</button>
-    <button id="btn-save">💾 Save JSON</button>
-    <button id="btn-deploy">📦 Export Game</button>
     <button id="btn-help">? Help</button>
   </div>
-
   <canvas id="renderCanvas"></canvas>
   <div id="crosshair"></div>
-
   <div id="hud">
     <div class="hud-row">
       <span class="hud-label">HP</span><span id="hud-health">100</span>
       <span class="hud-label">AMMO</span><span id="hud-ammo">∞</span>
       <span class="hud-label">ENEMIES</span><span id="hud-enemies">0</span>
     </div>
-    <div class="hud-row">
-      <span class="hud-label">POS</span><span id="hud-pos">0,0,0</span>
-    </div>
+    <div class="hud-row"><span class="hud-label">POS</span><span id="hud-pos">0,0,0</span></div>
     <div class="hud-row"><span id="hud-status"></span></div>
   </div>
-
   <canvas id="minimap-canvas" width="220" height="220"></canvas>
+  <script>
+  // Auto-detect engine location: local dev vs GitHub Pages
+  window._ENGINE_SRC = location.hostname === 'localhost'
+    ? 'http://localhost:83/mt-engine/main.js'
+    : 'https://scottgrocott.github.io/mt-engine/main.js';
+  const s = document.createElement('script');
+  s.type = 'module'; s.src = window._ENGINE_SRC;
+  document.currentScript.after(s);
+</script>
+  <script type="module" src="http://localhost:83/mt-engine/main.js"></script>
+  <script>
+  // ── Splash screen control ──────────────────────────────────────────────────
+  // Called by main.js (via engine-ready + load-complete events) to populate
+  // splash content and show the Play button once loading finishes.
 
-  <!-- src is relative to THIS index.html — works in any directory -->
-  <script type="module" src="main.js"></script>
+  // Release pointer lock whenever loading screen is visible
+  if (document.exitPointerLock) document.exitPointerLock();
+
+  // Populate splash title and links from level JSON splash data
+  window._setSplashContent = function(title, splashHtml) {
+    const titleEl = document.getElementById('splash-title');
+    const linksEl = document.getElementById('splash-links');
+    if (titleEl && title) titleEl.textContent = title;
+    if (linksEl && splashHtml) {
+      linksEl.innerHTML = splashHtml;
+      // Wire GA click events on all splash links
+      linksEl.querySelectorAll('a').forEach(function(a) {
+        a.addEventListener('click', function() {
+          const label = a.textContent.trim() || a.href;
+          if (typeof gtag === 'function') {
+            gtag('event', 'splash_link_click', {
+              event_category: 'splash',
+              event_label: label,
+              value: 1
+            });
+          }
+          console.log('[analytics] splash_link_click:', label);
+        });
+      });
+    }
+  };
+
+  // Show the Play button once engine signals load complete
+  window._splashShowPlay = function() {
+    const btn = document.getElementById('btn-play');
+    if (btn) btn.style.display = 'inline-block';
+    // Track load_complete
+    if (typeof gtag === 'function') gtag('event', 'level_loaded', { event_category: 'loading' });
+  };
+
+  // Play button handler — dismiss splash, init audio, lock pointer
+  window._splashPlay = function() {
+    if (typeof gtag === 'function') {
+      gtag('event', 'play_clicked', { event_category: 'splash', event_label: 'play_button' });
+    }
+    const ls = document.getElementById('loading-screen');
+    if (ls) {
+      ls.style.opacity = '0';
+      ls.style.transition = 'opacity 0.6s';
+      setTimeout(function() { ls.style.display = 'none'; }, 600);
+    }
+    // Trigger audio start + pointer lock via game engine
+    document.dispatchEvent(new CustomEvent('splash-dismissed'));
+    // Request pointer lock on canvas
+    const canvas = document.getElementById('renderCanvas');
+    if (canvas && canvas.requestPointerLock) canvas.requestPointerLock();
+  };
+  </script>
 </body>
 </html>

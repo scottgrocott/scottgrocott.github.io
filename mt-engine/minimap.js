@@ -79,6 +79,24 @@ function _buildStaticCache() {
     }
   }
   octx.putImageData(img, 0, 0);
+
+  // Draw water plane overlay using getTerrainHeightAt (same function as the rest of minimap)
+  const waterY = (window._CONFIG_water_y != null) ? window._CONFIG_water_y : null;
+  if (waterY !== null) {
+    octx.globalAlpha = 0.55;
+    octx.fillStyle = '#2a6fa8';
+    for (let py = 0; py < SIZE; py++) {
+      for (let px = 0; px < SIZE; px++) {
+        const wx = (px / SIZE) * _terrainSize - half;
+        const wz = (py / SIZE) * _terrainSize - half;
+        if (getTerrainHeightAt(wx, wz) < waterY) {
+          octx.fillRect(px, py, 1, 1);
+        }
+      }
+    }
+    octx.globalAlpha = 1.0;
+  }
+
   _staticCache = offscreen;
 }
 

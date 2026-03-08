@@ -114,12 +114,9 @@ function setLoadStatus(msg, pct) {
 }
 
 function hideLoadingScreen() {
-  const ls = document.getElementById('loading-screen');
-  if (ls) {
-    ls.style.opacity = '0';
-    ls.style.transition = 'opacity 0.6s';
-    setTimeout(() => { ls.style.display = 'none'; }, 600);
-  }
+  // Loading screen is now dismissed by the Play button in index.html
+  // so we just show the Play button rather than auto-hiding the screen
+  window._splashShowPlay?.();
 }
 
 // ---- Boot ----
@@ -165,12 +162,14 @@ async function boot() {
   } : { x:0, y:0, z:0 });
   initEditorScene(scene);
 
-  // Start audio on first user gesture
+  // Start audio on splash dismissal or first user gesture
   const _onGesture = async () => {
     if (!_audioStarted) { await _startAudio(); }
     document.removeEventListener('click', _onGesture);
     document.removeEventListener('keydown', _onGesture);
+    document.removeEventListener('splash-dismissed', _onGesture);
   };
+  document.addEventListener('splash-dismissed', _onGesture);
   document.addEventListener('click', _onGesture);
   document.addEventListener('keydown', _onGesture);
 
@@ -363,7 +362,14 @@ async function loadGameConfig(url) {
   _spawnEnemiesFromConfig();
 
   setLoadStatus('Ready!', 100);
-  hideLoadingScreen();
+  // Expose water level and heightScale for minimap water overlay
+  window._CONFIG_water_y    = CONFIG.water?.enabled ? (CONFIG.water?.mesh?.position?.y ?? null) : null;
+  window._CONFIG_heightScale = CONFIG.terrain?.heightScale ?? 80;
+
+  // Populate splash screen content from level JSON and show Play button
+  const _splashTitle = CONFIG.meta?.title || CONFIG.meta?.levels?.[0]?.title || 'Metal Throne';
+  window._setSplashContent?.(_splashTitle, CONFIG.splash_screen || '');
+  window._splashShowPlay?.();
   hudSetStatus(`${CONFIG.meta?.title || 'Game'} loaded`);
   initLevelManager(loadGameConfig);
   startLevelCheck();

@@ -53,16 +53,16 @@ export function initPlayerBody(x, y, z) {
   }
   const rdesc = RAPIER.RigidBodyDesc.dynamic()
     .setTranslation(x, y, z)
-    .setLinearDamping(8.0)
+    .setLinearDamping(4.0)
     .setAngularDamping(100.0);
   player.rigidBody = physicsWorld.createRigidBody(rdesc);
   player.rigidBody.enableCcd(true);
   player.rigidBody.lockRotations(true);
   const cdesc = RAPIER.ColliderDesc.capsule(PLAYER.height / 2, PLAYER.radius)
     .setMass(PLAYER.mass)
-    .setFriction(0.2)
+    .setFriction(0.1)
     .setRestitution(0.0);
-  if (typeof cdesc.setContactSkin === 'function') cdesc.setContactSkin(0.04);
+  if (typeof cdesc.setContactSkin === 'function') cdesc.setContactSkin(0.08);
   physicsWorld.createCollider(cdesc, player.rigidBody);
   if (playerRig) playerRig.position.set(x, y, z);
   window._resnapPlayerToTerrain = function() {
@@ -88,9 +88,12 @@ export function toggleFreeCam() {
   player.freeCam = !player.freeCam;
   if (player.rigidBody) {
     if (player.freeCam) {
+      // Entering freecam — freeze the physics body in place (gravity=0, no velocity)
+      player.rigidBody.setGravityScale(0.0, true);
       player.rigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
       player.rigidBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
     } else {
+      // Exiting freecam — snap body to current camera position, re-enable gravity
       const cx = +playerRig.position.x;
       const cz = +playerRig.position.z;
       const landY = getTerrainHeightAt(cx, cz) + PLAYER.height + 0.5;
@@ -98,6 +101,9 @@ export function toggleFreeCam() {
       player.rigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
       player.rigidBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
       playerRig.position.set(cx, landY, cz);
+      // CRITICAL: restore gravity and clear settle gate so walk tick runs immediately
+      player.rigidBody.setGravityScale(1.0, true);
+      player._spawnSettleFrames = 0;
     }
   }
   return player.freeCam;
@@ -130,17 +136,18 @@ function _tickWalk(dt) {
   let _rayHitToi = -1;
   if (physicsWorld) {
     const ray = new RAPIER.Ray({ x: px, y: py, z: pz }, { x: 0, y: -1, z: 0 });
-    const hit = physicsWorld.castRay(ray, CAPSULE_BOT + 0.5, true);
+    const hit = physicsWorld.castRay(ray, CAPSULE_BOT + 0.3, true);
     if (hit) {
       _rayHitToi = hit.timeOfImpact;
-      // Grounded if terrain is within 0.5m below capsule bottom
-      if (hit.timeOfImpact >= CAPSULE_BOT - 0.4) player.grounded = true;
+      // Grounded if the hit is within 0.3m of capsule bottom (tight = no false positives from walls)
+      if (hit.timeOfImpact >= CAPSULE_BOT - 0.3) player.grounded = true;
     }
   }
 
   // Build desired horizontal velocity
   const yaw = euler.y, sinY = Math.sin(yaw), cosY = Math.cos(yaw);
   let wx = 0, wz = 0;
+  const hasInput = keys.moveForward || keys.moveBack || keys.moveLeft || keys.moveRight;
   if (keys.moveForward) { wx += sinY; wz += cosY; }
   if (keys.moveBack)    { wx -= sinY; wz -= cosY; }
   if (keys.moveLeft)    { wx -= cosY; wz += sinY; }
@@ -152,24 +159,51 @@ function _tickWalk(dt) {
   const curVel = player.rigidBody.linvel();
   let vy = curVel.y;
 
-  if (player.grounded) {
-    if (vy > 2.0) vy = 2.0;        // cap contact ejection spikes
-    if (vy > 0 && vy < 0.5) vy = 0; // kill micro-creep
+  // Terrain height for ground confirmation and floor guard
+  const terrainY = getTerrainHeightAt(px, pz);
+  const capsuleBottom = py - CAPSULE_BOT;
+  const gapToTerrain = capsuleBottom - terrainY; // positive = above terrain
+
+  // Confirm grounded vs actual terrain (not just any Rapier collider).
+  const trulyOnTerrain = player.grounded && (gapToTerrain < 0.4);
+
+  if (trulyOnTerrain) {
+    // Only kill genuine ejection spikes (> walkSpeed).
+    // Smaller upward vy is normal slope-climbing contact response — don't zero it.
+    if (vy > PLAYER.walkSpeed) vy = 0;
+  } else if (gapToTerrain < 0.7) {
+    vy = Math.min(vy, -2.0);
   } else {
-    // Not grounded — ensure gravity can pull us down.
-    // If vy is near zero but we're not grounded, something is suppressing gravity.
-    // Don't override vy — let Rapier accumulate it naturally.
-    // But if ray hit exists nearby we may just be on a steep slope — nudge down.
-    if (_rayHitToi > 0 && _rayHitToi < CAPSULE_BOT + 0.5 && Math.abs(vy) < 0.5) {
-      vy = -1.0; // small downward nudge to re-engage terrain contact
-    }
+    vy = Math.max(vy, -50);
+  }
+
+  // Hard floor guard
+  if (gapToTerrain < -0.4) {
+    const snapY = terrainY + CAPSULE_BOT + 0.05;
+    player.rigidBody.setTranslation({ x: px, y: snapY, z: pz }, true);
+    vy = 0;
+  }
+
+  // Horizontal velocity:
+  // With input: snap directly to target. This fully overrides any contact-impulse
+  // residual from the previous frame (the root cause of getting stuck on steep slopes —
+  // a slow lerp takes 6+ frames to overcome a backward contact impulse, stalling movement).
+  // Without input: zero directly so damping can stop us cleanly, no wall oscillation.
+  if (hasInput) {
+    // Full override — don't preserve contact residuals
+    // wx/wz are already the correct world-space velocity for this frame
+  } else {
+    wx = 0;
+    wz = 0;
   }
 
   player.rigidBody.setLinvel({ x: wx, y: vy, z: wz }, true);
 
-  // Jump
-  if (keys.jump && player.grounded)
+  // Jump — zero Y first so slope-stick doesn't reduce jump height
+  if (keys.jump && player.grounded) {
+    player.rigidBody.setLinvel({ x: wx, y: 0, z: wz }, true);
     player.rigidBody.applyImpulse({ x: 0, y: PLAYER.jumpImpulse * PLAYER.mass, z: 0 }, true);
+  }
 
   const targetEye = keys.duck ? 0.2 : 0.7;
   camera.position.y += (targetEye - camera.position.y) * 0.15;
