@@ -1,21 +1,132 @@
-Session goal: vehicle terrain physics — cars and forklifts
-Current state:
+level-0.json + json parser:
+the sample file with 0 enenmies just keeps lanuching a ton of enemies. give me a on/off flag in the json config to turn each enemy type on and of in the config. the condition will be that the game wont finish if no enemies active. if ennemies = game loop
+i want a "everything and the kitchen sink" level-0 file with all the elements. make sure the engine can load a file with 0's set for enemeies and structures of all three types
+add rotation setting in config for each fortresse, village and city along with the existing position settings
+move the env_type, fortresses,villages and cities config to the map level of the level json file. give me a prepopulated arrays of each of the structures with a show/hide flag on the whole element so i can hide cites etc....as individual scene elements just like the enemies
+I want to load the config file and slowly and add elements as i test
 
-Cars and forklifts exist as enemies with YUKA pathfinding working
-They currently slide/glide over terrain with no suspension or physical presence
-Physics engine is Rapier (already integrated, trimesh terrain collider in place)
-Player has full Rapier rigid body with CCD
+boats:
+boats are still ducking under water
+make boats and subs start on the outside perimeter of the terrain out in the ocean at random points and move toward the terrain to engage and find all the canals. this wil be a permanent spawn config for boats and submarines
 
-Goals:
+drones:
+drones appear from under terrain
 
-Terrain-riding suspension — vehicles bounce and tilt on the terrain surface. Implement a simple spring/damper per wheel (4 wheels, raycast down from each corner). The chassis tilts to match terrain slope. No full rigid body vehicle — fake it with raycasts and lerped rotations for performance.
-Cliff physics — when a vehicle drives off a cliff (no raycast hit below), apply gravity, let it fall, play out the arc. On landing, apply an impact.
-Upside-down detection — if the vehicle's up vector dot world up < 0 (flipped), delete the mesh and remove from enemy registry after a short delay.
-Forklift = car driving backwards — forklift uses the same vehicle physics system, just reverses the forward direction so the forks lead.
+grass:
+grass is not showing make sure an give me that 1 or 2 draw call on a zillion tiny blades of grass that is cheap on perfomance. make the grass hug the water line, the shelter footprint and the structures footprint. make it pretty thick under water as well. I want there to be a visible change in grass under water
 
-Key files: cars.js, forklifts.js, enemyBase.js, physics.js
-Key constraints:
+water fog:
+top of water fog obj needs be moved align to match water height automatically. sprites are foggy (always have been) but the color the terrian underwater looks the same as above
+water fog needs to be deeper on the y its only a layer under water make it reach down. its dark blue make it a light blue
 
-Vehicles are currently box meshes parented to YUKA entities
-getTerrainHeightAt(x, z) is available and fast (pixel lookup, no physics query needed)
-Keep YUKA steering — don't replace pathfinding, just layer physics on top of the movement
+shelters:
+ make the water line the closest the shelters get to the water. no shelters in the water
+make panels nailed to one of the four posts left or right side and not floating in the air they are floating in the center of the posts. 
+wire them to fall with physics when shot randomly between 3 and 5 times with basicgun to make it easy to discover.pick a sound from the "structure_collapse" synth section of teh sound.json files for each env.pick an impact sound for the bullet and one for hitting the ground
+also add a placeholder for an explosion event to knock the whole shelter down and use the full sound obj
+finetune shelter placement for not "floating in the air"
+
+ladders:
+align ladders properly to non panel area of structure they are at an angle
+ladders.js:111 Uncaught TypeError: player.rigidBody.setGravityScale is not a function
+    at _startClimbing (ladders.js:111:22)
+    at tickLadders (ladders.js:68:11)
+    at main.js:241:5
+    at t._renderFrame (abstractEngine.ts:1015:60)
+    at t._processFrame (abstractEngine.ts:991:26)
+    at t._renderLoop (engine.ts:627:14)
+    at abstractEngine.ts:918:68
+
+util:
+rewrite utilites function to allow "mute/solo" of music,env_sounds,enemy_sounds independently of each other
+
+
+
+
+
+
+===============================================================================================
+Creating a "Boston Dynamics-style" robotic cow using Babylon.js, Havok, and YUKA is a fantastic and ambitious project. Because Boston Dynamics robots are famous for their uncanny, physically grounded, and highly responsive movements, you need a specific architecture to fake that complexity without tanking your game's performance or spending months tuning physics joints.
+
+Here is the best architectural approach for combining these three tools to achieve that robotic quadruped feel.
+
+The Core Architecture Concept
+
+Do not try to build the cow out of fully motorized physics joints. It is incredibly difficult to stabilize.
+Instead, use a hybrid approach:
+
+YUKA acts as the "brain," calculating where the cow wants to go.
+
+Havok handles the "root physics" (a floating capsule representing the body) and handles raycasting to the ground.
+
+Babylon.js handles the visual mesh and uses Inverse Kinematics (IK) to procedural snap the robotic legs to the ground, giving it that mechanical, reactive Boston Dynamics feel.
+
+Step-1: The Model & Rigging (Blender)
+
+The Model: Create your mechanical cow model.
+
+The Rig: Give it a standard quadruped skeleton (hips, shoulders, knees, hooves).
+
+Animations: You don't need highly detailed baked walk cycles. You only need basic poses (Idle, Leg Lift) because you will animate it procedurally with code to make it look robotic. Export as a .glb file.
+
+Step-2: The Physics Body (Havok + Babylon.js)
+
+You want the cow's main body to interact with the world, take impacts, and fall over if pushed too hard.
+
+The Root Collider: Create an invisible physics object (like a Box or Capsule) around the cow's torso using Babylon's PhysicsAggregate with the Havok plugin.
+
+Set it to PhysicsShapeType.BOX or CAPSULE and make its mass dynamic.
+
+Lock Rotations: You might want to lock the X and Z rotation axis slightly using constraints, or write a self-righting script so the cow tries to stay upright (like a real Spot robot).
+
+Step-3: The Brain & Steering (YUKA)
+
+YUKA will control the movement logic.
+
+Entity Setup: Create a Vehicle (a YUKA class) for the cow.
+
+Syncing: Create a sync script. On every frame, take the position/rotation from the Havok physics body, pass it to YUKA for calculation, and then let YUKA apply steering forces (Velocity) back to the Havok physics body.
+
+Steering Behaviors: Add YUKA's WanderBehavior, ObstacleAvoidanceBehavior, or SeekBehavior.
+
+State Machine: Use YUKA’s StateMachine. Create states like Idle, Trot, Investigate, and Recover (if it gets knocked over).
+
+Step-4: The "Boston Dynamics" Secret Sauce (Procedural IK)
+
+This is the most important step to make it look like a Boston Dynamics robot rather than a standard video game animal. You will use Babylon.js BoneIKControllers combined with Havok Raycasts.
+
+Raycasting: Every frame, shoot 4 Havok raycasts straight down from where the cow's shoulders and hips are.
+
+Ground Detection: Get the exact 3D coordinates where the ray hits the ground.
+
+Inverse Kinematics: Feed those hit coordinates into 4 Babylon.js BoneIKControllers (one for each leg). This forces the hooves to stick exactly to the terrain, steps, or rubble, bending the knees automatically.
+
+Stepping Logic: Write a small script to control the IK targets.
+
+If the left-front hoof gets too far behind the torso, lift it up and move it forward to a new raycast point.
+
+Move diagonal pairs of legs together (Front-Left + Back-Right, then Front-Right + Back-Left) to create a mechanical trot.
+
+Step-5: Polish & Robotic Behaviors
+
+To really sell the Boston Dynamics aesthetic:
+
+Micro-adjustments: Boston Dynamics robots constantly "step" in place to keep their balance. Even in YUKA's IdleState, randomly trigger leg shifts.
+
+Impact Reaction: If a heavy physics object hits the Havok collider, read the impulse. If it's a medium hit, make the YUKA state machine trigger a quick sidestep to catch its balance.
+
+Sensors: Put a rotating "Lidar" cylinder on the cow's head or back. Map its rotation to the YUKA ObstacleAvoidanceBehavior so it looks like it's scanning the environment before changing paths.
+
+Summary of the Data Flow
+
+YUKA decides: "I want to walk over to that grass." -> Calculates a steering velocity.
+
+Apply that velocity to the Havok physics capsule.
+
+The Havok capsule moves forward.
+
+Havok Raycasts shoot down to find the floor.
+
+Babylon.js IK snaps the robotic legs to the floor points.
+
+This setup keeps your physics lightweight (one single capsule per cow instead of 15 motorized joints), allows YUKA to navigate smoothly, and relies on Babylon's IK to create that creepy, perfect robotic footwork!

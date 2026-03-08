@@ -178,7 +178,7 @@ async function boot() {
 
 // ── Underwater fog ───────────────────────────────────────────────────────────
 let _wasSubmerged = false;
-let _savedFogMode, _savedFogColor, _savedFogDensity, _savedFogStart, _savedFogEnd;
+let _savedFogMode, _savedFogColor, _savedFogDensity, _savedFogStart, _savedFogEnd, _savedAmbient;
 
 function _tickUnderwaterFog(submerged) {
   if (submerged === _wasSubmerged) return;
@@ -189,17 +189,27 @@ function _tickUnderwaterFog(submerged) {
     _savedFogDensity = scene.fogDensity;
     _savedFogStart   = scene.fogStart;
     _savedFogEnd     = scene.fogEnd;
-    const uwCfg      = CONFIG.underwater_fog ?? {};
-    scene.fogMode    = BABYLON.Scene.FOGMODE_EXP2;
-    scene.fogDensity = uwCfg.density ?? 0.08;
-    scene.fogColor   = new BABYLON.Color3(uwCfg.r ?? 0.02, uwCfg.g ?? 0.15, uwCfg.b ?? 0.35);
-    console.log('[main] Underwater fog ON');
+    const uwCfg  = CONFIG.underwater_fog ?? {};
+    const uwR    = uwCfg.r     ?? 0.38;   // light tropical blue-teal
+    const uwG    = uwCfg.g     ?? 0.65;
+    const uwB    = uwCfg.b     ?? 0.82;
+    const uwDepth = uwCfg.depth ?? 18;    // metres to full fog — smaller=denser
+    // LINEAR start=0: terrain 1m away already tinted. fogEnd=18 = heavy blue column.
+    scene.fogMode    = BABYLON.Scene.FOGMODE_LINEAR;
+    scene.fogStart   = 0;
+    scene.fogEnd     = uwDepth;
+    scene.fogColor   = new BABYLON.Color3(uwR, uwG, uwB);
+    // Shift ambient so unlit / shadowed faces also read as underwater blue
+    _savedAmbient    = scene.ambientColor?.clone() ?? null;
+    scene.ambientColor = new BABYLON.Color3(uwR * 0.5, uwG * 0.5, uwB * 0.5);
+    console.log('[main] Underwater fog ON  start=0 end=' + uwDepth + ' color=(' + uwR.toFixed(2)+','+uwG.toFixed(2)+','+uwB.toFixed(2)+')');
   } else {
     scene.fogMode    = _savedFogMode    ?? BABYLON.Scene.FOGMODE_LINEAR;
     scene.fogColor   = _savedFogColor   ?? new BABYLON.Color3(0.7, 0.8, 0.9);
     scene.fogDensity = _savedFogDensity ?? 0.02;
     scene.fogStart   = _savedFogStart   ?? 100;
     scene.fogEnd     = _savedFogEnd     ?? 600;
+    if (_savedAmbient) scene.ambientColor = _savedAmbient;
     console.log('[main] Underwater fog OFF');
   }
 }
@@ -319,7 +329,16 @@ async function loadGameConfig(url) {
   } catch(e) {
     console.error('[main] Failed to load config:', url, e);
     hudSetStatus('Config load failed: ' + url);
+    // If no enemies are active (all disabled or maxCount=0), skip level completion loop
+  const _activeEnemyDefs = (CONFIG.enemies || []).filter(
+    e => e.enabled !== false && (e.maxCount ?? 1) > 0
+  );
+  if (_activeEnemyDefs.length > 0) {
     initLevelManager(loadGameConfig);
+  } else {
+    console.log('[main] No active enemies — level completion disabled');
+    window._levelComplete = false;  // never set, loop disabled
+  }
   startLevelCheck();
   if (_audioStarted) initSoundtrack();
   _loading = false;
@@ -331,15 +350,36 @@ async function loadGameConfig(url) {
 
   setLoadStatus('Building terrain', 45);
 
-  // Pick a random heightmap from the heightmaps array if provided
+  // ── Heightmap selection ──────────────────────────────────────────────────────
+  // heightmaps[] supports two formats:
+  //   Legacy:  ["url1.png", "url2.png"]
+  //   Rich:    [{ url, environment, structures, shaderLayers }, ...]
+  // When a rich entry is selected its environment/structures OVERRIDE the
+  // top-level config so each heightmap carries its own world content.
   const _hmaps = CONFIG.terrain.heightmaps;
   if (Array.isArray(_hmaps) && _hmaps.length > 0) {
-    const _pick = _hmaps[Math.floor(Math.random() * _hmaps.length)];
-    CONFIG.terrain.heightmapUrl = _pick;
-    console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick)+1) + '/' + _hmaps.length + ':', _pick);
+    const _entry = _hmaps[Math.floor(Math.random() * _hmaps.length)];
+    const _isRich = typeof _entry === 'object' && _entry !== null;
+    const _url    = _isRich ? _entry.url : _entry;
+    CONFIG.terrain.heightmapUrl = _url;
+    console.log('[main] Selected heightmap', (_hmaps.indexOf(_entry)+1) + '/' + _hmaps.length + ':', _url);
+
+    if (_isRich) {
+      // Merge heightmap-level overrides into CONFIG (heightmap wins over top-level)
+      if (_entry.environment)   CONFIG._mapEnvironment  = _entry.environment;
+      if (_entry.structures)    CONFIG._mapStructures   = _entry.structures;
+      if (_entry.shaderLayers)  CONFIG.terrain.shaderLayers = _entry.shaderLayers;
+      if (_entry.shelterCount != null) CONFIG.terrain.shelterCount = _entry.shelterCount;
+      console.log('[main] Rich heightmap — env:', _entry.environment?.types ?? 'inherited',
+        'structures:', !!_entry.structures);
+    }
   }
 
-  // Prefix relative asset paths with ENGINE_ROOT
+  // ── Resolve structures: heightmap-level wins, then top-level, then empty ─────
+  const _resolvedStructures = CONFIG._mapStructures ?? CONFIG.structures ?? {};
+  // (spawnStructures is called later with _resolvedStructures)
+
+  // ── Prefix relative asset paths ───────────────────────────────────────────
   if (CONFIG.terrain.heightmap && !CONFIG.terrain.heightmap.startsWith('http') && !CONFIG.terrain.heightmap.startsWith('/') && ENGINE_ROOT) {
     CONFIG.terrain.heightmap = _enginePath(CONFIG.terrain.heightmap);
   }
@@ -347,8 +387,10 @@ async function loadGameConfig(url) {
     CONFIG.terrain.heightmapUrl = _enginePath(CONFIG.terrain.heightmapUrl);
   }
 
-  if (CONFIG.terrain?.environment) {
-    await loadEnvironment(CONFIG.terrain.environment);
+  // ── Load environment — heightmap-level wins over terrain.environment ───────
+  const _envCfg = CONFIG._mapEnvironment ?? CONFIG.terrain?.environment ?? CONFIG.environment;
+  if (_envCfg) {
+    await loadEnvironment(Array.isArray(_envCfg) ? _envCfg : (_envCfg.types ?? _envCfg));
   }
 
   await loadHeightmap(CONFIG.terrain.heightmapUrl || CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
@@ -386,7 +428,7 @@ async function loadGameConfig(url) {
 
   setLoadStatus('Loading buildings & structures', 60);
   await loadBuildings();
-  spawnStructures(CONFIG.structures);
+  spawnStructures(CONFIG._mapStructures ?? CONFIG.structures);
 
   setLoadStatus('Spawning player', 70);
   _playerReady = false;
@@ -439,11 +481,15 @@ function _spawnEnemiesFromConfig() {
       : null;
     const merged = variantDef ? { ...variantDef, ...def } : def;
 
-    if (merged.type === 'drone')         spawnDrones(merged);
+    // Respect enabled flag and maxCount — skip if explicitly disabled
+    if (merged.enabled === false) continue;
+    if ((merged.maxCount ?? 1) === 0) continue;
+
+    if (merged.type === 'drone')          spawnDrones(merged);
     else if (merged.type === 'boat')      spawnBoats(merged);
     else if (merged.type === 'submarine') spawnSubmarines(merged);
     else if (merged.type === 'car')       spawnCars(merged);
-    else if (merged.type === 'forklift') spawnForklifts(merged);
+    else if (merged.type === 'forklift')  spawnForklifts(merged);
   }
 }
 

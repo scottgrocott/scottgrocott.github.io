@@ -7,6 +7,7 @@ import { getEnemies } from './enemyRegistry.js';
 import { getWaypoints } from '../flatnav.js';
 import { CONFIG } from '../config.js';
 import { getWaterY } from '../water.js';
+import { getTerrainHeightAt } from '../terrain/terrainMesh.js';
 
 const RISE_TARGET_Y   = 16;
 const RISE_SPEED      = 4;
@@ -20,8 +21,9 @@ export function spawnDrones(def) {
   const spawned = [];
   for (let i = 0; i < count; i++) {
     const wp = flightWaypoints[i % Math.max(1, flightWaypoints.length)];
+    // Always spawn at RISE_TARGET_Y regardless of waypoint — prevents spawning inside terrain
     const spawnPos = wp
-      ? new BABYLON.Vector3(wp.x, wp.y, wp.z)
+      ? new BABYLON.Vector3(wp.x, RISE_TARGET_Y, wp.z)
       : new BABYLON.Vector3((Math.random()-0.5)*60, RISE_TARGET_Y, (Math.random()-0.5)*60);
 
     const enemy = new EnemyBase({
@@ -45,9 +47,12 @@ export function spawnDrones(def) {
 
 function _buildDroneMesh(enemy) {
   // Replace the default placeholder box with a proper drone mesh
+  // Preserve spawn position before disposing the placeholder
+  const _savedPos = enemy.mesh?.position?.clone() ?? new BABYLON.Vector3(0, 16, 0);
   if (enemy.mesh) enemy.mesh.dispose();
 
   const root = new BABYLON.TransformNode('droneRoot', scene);
+  root.position.copyFrom(_savedPos);   // ← critical: start at spawn Y, not world origin
   enemy.mesh = root;  // use root as the position anchor
 
   const body = BABYLON.MeshBuilder.CreateBox('droneBody', { width:0.8, height:0.25, depth:0.8 }, scene);
@@ -124,7 +129,11 @@ function _tickDrone(enemy, dt) {
         if (Math.sqrt(dx*dx+dz*dz) < 3) {
           enemy._waypointIndex = (enemy._waypointIndex + 1) % enemy._waypoints.length;
         } else {
-          targetX = wp.x; targetY = wp.y; targetZ = wp.z;
+          targetX = wp.x;
+          // Clamp waypoint Y above terrain at the waypoint's XZ too
+          const _wpTerrain = getTerrainHeightAt(wp.x, wp.z);
+          targetY = Math.max(wp.y ?? RISE_TARGET_Y, _wpTerrain + 5.0);
+          targetZ = wp.z;
         }
       }
       break;
@@ -140,11 +149,17 @@ function _tickDrone(enemy, dt) {
     }
   }
 
-  // Water avoidance — keep drones at least 2m above water surface
+  // Hard floor: terrain surface + clearance — drone NEVER goes below this
+  const _terrainFloor = getTerrainHeightAt(px, pz);
+  const TERRAIN_CLEARANCE = 5.0;   // minimum metres above terrain
+  if (targetY < _terrainFloor + TERRAIN_CLEARANCE) {
+    targetY = _terrainFloor + TERRAIN_CLEARANCE;
+  }
+
+  // Water floor: also stay above water surface
   const _wy = getWaterY();
-  if (_wy !== null) {
-    const minFlyY = _wy + 2.0;
-    if (targetY < minFlyY) targetY = minFlyY;
+  if (_wy !== null && targetY < _wy + 2.0) {
+    targetY = _wy + 2.0;
   }
 
   const spd = enemy.state === 'hunting' ? HUNT_SPEED : PATROL_SPEED;

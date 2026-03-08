@@ -13,6 +13,7 @@ import { getEnemies }              from './enemyRegistry.js';
 import { getWaypoints }            from '../flatnav.js';
 import { getTerrainHeightAt }      from '../terrain/terrainMesh.js';
 import { getWaterY }               from '../water.js';
+import { CONFIG }                   from '../config.js';
 
 const SUBMERGED_DEPTH = 5.5;
 const PERISCOPE_DEPTH = 0.6;
@@ -20,8 +21,8 @@ const SURFACED_HEIGHT = 0.4;
 const TERRAIN_FLOOR   = 1.5;
 const PATROL_SPEED    = 3;
 const SURFACE_SPEED   = 6;
-const SCAN_INTERVAL   = 7.0;
-const SCAN_DURATION   = 5.0;
+const SCAN_INTERVAL   = 4.0;   // surface sooner
+const SCAN_DURATION   = 3.5;
 const DETECT_RANGE    = 38;
 const ORBIT_RADIUS    = 20;
 const PROBE_DIST      = 8;
@@ -73,12 +74,26 @@ export function spawnSubmarines(def) {
   const wps   = getWaypoints('ground');
   const spawned = [];
 
+  const TERRAIN_HALF = (CONFIG?.terrain?.size ?? 700) / 2;
+  const PERIMETER_R  = TERRAIN_HALF * 0.82;
+
   for (let i = 0; i < count; i++) {
-    const wp = wps[i % Math.max(1, wps.length)];
-    let spawnX = wp ? wp.x : (Math.random()-0.5)*100;
-    let spawnZ = wp ? wp.z : (Math.random()-0.5)*100;
-    for (let a = 0; a < 20 && !_isWater(spawnX, spawnZ, waterY); a++) {
-      spawnX *= 0.75; spawnZ *= 0.75;
+    // Offset half a slot from boats so they don't stack
+    let baseAngle = (i / count) * Math.PI * 2 + (Math.PI / count);
+    let spawnX = 0, spawnZ = 0, found = false;
+    for (let attempt = 0; attempt < 36; attempt++) {
+      const tryAngle = baseAngle + (attempt * Math.PI / 18) + (Math.random() - 0.5) * 0.3;
+      const tx = Math.cos(tryAngle) * PERIMETER_R;
+      const tz = Math.sin(tryAngle) * PERIMETER_R;
+      if (_isWater(tx, tz, waterY)) { spawnX = tx; spawnZ = tz; found = true; break; }
+    }
+    if (!found) {
+      let r = PERIMETER_R;
+      spawnX = Math.cos(baseAngle) * r;
+      spawnZ = Math.sin(baseAngle) * r;
+      while (r > 20 && !_isWater(spawnX, spawnZ, waterY)) {
+        r -= 10; spawnX = Math.cos(baseAngle) * r; spawnZ = Math.sin(baseAngle) * r;
+      }
     }
 
     const enemy = new EnemyBase({
@@ -105,8 +120,10 @@ export function spawnSubmarines(def) {
 // ── Mesh ──────────────────────────────────────────────────────────────────────
 
 function _buildSubMesh(enemy) {
+  const _savedPos = enemy.mesh?.position?.clone() ?? new BABYLON.Vector3(0, 0, 0);
   if (enemy.mesh) enemy.mesh.dispose();
   const root = new BABYLON.TransformNode('subRoot', scene);
+  root.position.copyFrom(_savedPos);  // preserve spawn position
   enemy.mesh = root;
 
   const hull = BABYLON.MeshBuilder.CreateCylinder('subHull',
@@ -238,8 +255,8 @@ function _tickSub(enemy, dt, waterY) {
 
       // Detect player: horizontal range check (periscope can't see through terrain)
       const hDist = Math.sqrt((px-playerPos.x)**2 + (pz-playerPos.z)**2);
-      if (hDist < DETECT_RANGE && playerPos.y > waterY - 3) {
-        // Player is visible (above or near water)
+      // Detect player regardless of their Y — subs surface if player is overhead too
+      if (hDist < DETECT_RANGE) {
         enemy.state = 'surfaced';
         break;
       }

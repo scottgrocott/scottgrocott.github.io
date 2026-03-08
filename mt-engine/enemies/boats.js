@@ -10,13 +10,14 @@ import { getEnemies }              from './enemyRegistry.js';
 import { getWaypoints }            from '../flatnav.js';
 import { getTerrainHeightAt }      from '../terrain/terrainMesh.js';
 import { getWaterY }               from '../water.js';
+import { CONFIG }                   from '../config.js';
 
 const PATROL_SPEED  = 4;
 const BEACH_SPEED   = 1.5;
 const DETECT_RANGE  = 50;
 const BEACH_RANGE   = 20;
-const SINK_SPEED    = 1.2;
-const SINK_ROLL     = 1.4;
+const SINK_SPEED    = 0.6;   // slow roll
+const SINK_ROLL     = 0.8;   // gentle heel
 const PROBE_DIST    = 6;     // how far ahead to probe for land
 const STEER_ANGLE   = 0.8;   // radians to deflect when land detected
 
@@ -86,14 +87,28 @@ export function spawnBoats(def) {
   const waypoints = getWaypoints('ground');
   const spawned = [];
 
+  // Spawn on the deep ocean perimeter — evenly distributed, guaranteed water
+  const TERRAIN_HALF = (CONFIG?.terrain?.size ?? 700) / 2;
+  const PERIMETER_R  = TERRAIN_HALF * 0.82;  // ~574m radius on 700 map, deep water ring
+
   for (let i = 0; i < count; i++) {
-    const wp = waypoints[i % Math.max(1, waypoints.length)];
-    // Find a spawn that is actually in water
-    let spawnX = wp ? wp.x : (Math.random()-0.5)*120;
-    let spawnZ = wp ? wp.z : (Math.random()-0.5)*120;
-    // Nudge spawn toward centre if on land
-    for (let attempt = 0; attempt < 20 && !_isWater(spawnX, spawnZ, waterY); attempt++) {
-      spawnX *= 0.8; spawnZ *= 0.8;
+    // Start evenly spaced then try random angles until a water cell is found
+    let baseAngle = (i / count) * Math.PI * 2;
+    let spawnX = 0, spawnZ = 0, found = false;
+    for (let attempt = 0; attempt < 36; attempt++) {
+      const tryAngle = baseAngle + (attempt * Math.PI / 18) + (Math.random() - 0.5) * 0.3;
+      const tx = Math.cos(tryAngle) * PERIMETER_R;
+      const tz = Math.sin(tryAngle) * PERIMETER_R;
+      if (_isWater(tx, tz, waterY)) { spawnX = tx; spawnZ = tz; found = true; break; }
+    }
+    // Last resort: walk inward from base angle
+    if (!found) {
+      let r = PERIMETER_R;
+      spawnX = Math.cos(baseAngle) * r;
+      spawnZ = Math.sin(baseAngle) * r;
+      while (r > 20 && !_isWater(spawnX, spawnZ, waterY)) {
+        r -= 10; spawnX = Math.cos(baseAngle) * r; spawnZ = Math.sin(baseAngle) * r;
+      }
     }
 
     const enemy = new EnemyBase({
@@ -101,7 +116,7 @@ export function spawnBoats(def) {
       type:        'boat',
       speed:       PATROL_SPEED,
       health:      def.health ?? 80,
-      spawnPos:    new BABYLON.Vector3(spawnX, waterY + 0.3, spawnZ),
+      spawnPos:    new BABYLON.Vector3(spawnX, waterY + 0.55, spawnZ),  // matches BOAT_DRAFT
       noVehicle:   true,
       respawnTime: 12,
     });
@@ -175,7 +190,7 @@ function _tickBoat(enemy, dt, waterY) {
     enemy.mesh.position.set(px, wY - enemy._sinkY, pz);
     enemy.mesh.rotation.z += SINK_ROLL * dt;
     enemy.mesh.rotation.x += SINK_ROLL * 0.4 * dt;
-    if (enemy._sinkY > 8) {
+    if (enemy._sinkY > 0.8) {   // disappear after sinking only ~0.8m (10%)
       enemy.dead = true;
       enemy.mesh.setEnabled(false);
       setTimeout(() => {
@@ -191,13 +206,18 @@ function _tickBoat(enemy, dt, waterY) {
     return;
   }
 
-  // ── Float height — stay at water surface, rise over submerged terrain ──────
-  const terrainH = getTerrainHeightAt(px, pz);
-  // Always float at water surface — Y is always wY+0.3, period.
-  // Terrain clearance is irrelevant: _waterSteer prevents land cells entirely.
-  const floatY = wY + 0.3;
-  enemy._bobPhase = (enemy._bobPhase || 0) + dt * 1.2;
-  const bobY = floatY + Math.sin(enemy._bobPhase) * 0.05;
+  // ── Float height — HARD clamp to water surface, never below ──────────────
+  // Do NOT use terrain height here — _waterSteer already keeps us in water.
+  // Simple bob above wY, hard-floored so sin can never dip us below surface.
+  // Hull height=0.5 → half=0.25. Root at wY+0.25 puts hull bottom at water surface.
+  // Extra 0.12 makes it ride slightly proud so it never clips under.
+  // Hull centre at wY + BOAT_DRAFT. Hull bottom = wY + BOAT_DRAFT - HULL_HALF.
+  // Target: hull bottom sits 0.30m proud of surface at lowest bob point.
+  const HULL_HALF  = 0.25;
+  const BOAT_DRAFT = HULL_HALF + 0.30;   // = 0.55 → hull bottom 0.30m above wY
+  enemy._bobPhase  = (enemy._bobPhase || 0) + dt * 0.9;
+  // Bob amplitude 0.08m, always positive — low point is exactly BOAT_DRAFT
+  const bobY = wY + BOAT_DRAFT + Math.abs(Math.sin(enemy._bobPhase) * 0.08);
 
   const playerPos = getPlayerPos();
   const dPlayer   = distToPlayer({ x:px, y:py, z:pz });

@@ -62,11 +62,9 @@ export function tickLadders(dt) {
       const lp = ladder.position;
       const dx = pp.x - lp.x, dz = pp.z - lp.z;
       const dist = Math.sqrt(dx*dx + dz*dz);
-      // Must be within 0.9m horizontally, within ladder Y range, pressing forward
-      if (dist < 0.9 && pp.y >= lp.y - 0.3 && pp.y <= lp.y + ladder.height + 0.3) {
-        if (keys.moveForward) {
+      if (dist < 0.8 && pp.y >= lp.y && pp.y <= lp.y + ladder.height + 0.5) {
+        if (keys.moveForward || keys.jump) {
           _startClimbing(ladder);
-          break;
         }
       }
     }
@@ -80,24 +78,30 @@ export function tickLadders(dt) {
       playerRig.position.y -= LADDERS.climbSpeed * dt;
     }
 
-    // Detach at top or bottom — return immediately after stop so we don't
-    // read _currentLadder.position after it has been set to null.
+    // Detach at top or bottom
     const lp = _currentLadder.position;
     if (playerRig.position.y > lp.y + _currentLadder.height + LADDERS.detachThreshold) {
-      _stopClimbing(); return;
+      _stopClimbing();
     }
     if (playerRig.position.y < lp.y - LADDERS.detachThreshold) {
-      _stopClimbing(); return;
+      _stopClimbing();
     }
 
-    // Keep player on ladder X/Z
-    // Gentle lateral nudge toward ladder centre (reduced from 0.3 to 0.08)
-    playerRig.position.x += ((lp.x) - playerRig.position.x) * 0.08;
-    playerRig.position.z += (lp.z  - playerRig.position.z) * 0.08;
+    // Keep player aligned to ladder
+    playerRig.position.x += (_currentLadder.position.x - playerRig.position.x) * 0.3;
+    playerRig.position.z += (_currentLadder.position.z - playerRig.position.z) * 0.3;
 
-    if (player.rigidBody) {
-      player.rigidBody.setLinvel({x:0,y:0,z:0}, true);
-      player.rigidBody.setTranslation({x:playerRig.position.x, y:playerRig.position.y, z:playerRig.position.z}, true);
+    // Sync Havok body to ladder position
+    const _clBody = player.aggregate?.body ?? player.rigidBody;
+    if (_clBody) {
+      try {
+        _clBody.setLinearVelocity(BABYLON.Vector3.Zero());
+        _clBody.setAngularVelocity(BABYLON.Vector3.Zero());
+      } catch(e) {}
+    }
+    // Sync capsule mesh position
+    if (player._capsuleMesh) {
+      player._capsuleMesh.position.set(playerRig.position.x, playerRig.position.y, playerRig.position.z);
     }
   }
 }
@@ -105,21 +109,28 @@ export function tickLadders(dt) {
 function _startClimbing(ladder) {
   _climbing = true;
   _currentLadder = ladder;
-  // Suspend gravity instead of disabling body — setEnabled(false) then
-  // setEnabled(true) causes a collision-impulse launch bug.
-  if (player.rigidBody) {
-    player.rigidBody.setGravityScale(0.0, true);
-    player.rigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+  // Havok: zero velocity and lock via massProps (no setGravityScale in BabylonJS Havok)
+  const body = player.aggregate?.body ?? player.rigidBody;
+  if (body) {
+    try { body.setLinearVelocity(new BABYLON.Vector3(0, 0, 0)); } catch(e) {}
+    try {
+      // Freeze gravity while climbing by setting inertia and gravity factor
+      body.setGravityFactor(0);
+    } catch(e) {
+      // Fallback: lock mass (older Havok builds)
+      try { body.setMassProperties({ mass: 0, inertia: BABYLON.Vector3.Zero() }); } catch(e2) {}
+    }
   }
 }
 
 function _stopClimbing() {
   _climbing = false;
   _currentLadder = null;
-  // Restore gravity — body was never disabled so no impulse spike.
-  if (player.rigidBody && !player.freeCam) {
-    player.rigidBody.setGravityScale(1.0, true);
-    player.rigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+  const body = player.aggregate?.body ?? player.rigidBody;
+  if (body) {
+    try { body.setGravityFactor(1); } catch(e) {
+      try { body.setMassProperties({ mass: 75, inertia: new BABYLON.Vector3(0, 1, 0) }); } catch(e2) {}
+    }
   }
 }
 

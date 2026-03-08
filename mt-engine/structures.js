@@ -23,14 +23,17 @@ export function spawnStructures(structuresCfg) {
   let count = 0;
 
   for (const def of fortresses) {
+    if (def.enabled === false) continue;
     _spawnFortress(def);
     count++;
   }
   for (const def of villages) {
+    if (def.enabled === false) continue;
     _spawnVillage(def);
     count++;
   }
   for (const def of cities) {
+    if (def.enabled === false) continue;
     _spawnCity(def);
     count++;
   }
@@ -40,10 +43,11 @@ export function spawnStructures(structuresCfg) {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function _pos(def) {
-  const x = def.position?.x ?? 0;
-  const z = def.position?.z ?? 0;
-  const y = def.position?.y ?? getTerrainHeightAt(x, z);
-  return { x, y, z };
+  const x   = def.position?.x ?? 0;
+  const z   = def.position?.z ?? 0;
+  const y   = def.position?.y ?? getTerrainHeightAt(x, z);
+  const rot = ((def.rotation ?? 0) * Math.PI) / 180;   // degrees → radians
+  return { x, y, z, rot };
 }
 
 function _pick(arr) {
@@ -81,15 +85,16 @@ const FORTRESS_TEMPLATES = [
 ];
 
 function _spawnFortress(def) {
-  const { x, y, z } = _pos(def);
+  const { x, y, z, rot } = _pos(def);
   const template = _pick(FORTRESS_TEMPLATES);
-  template(x, y, z, def.name);
+  template(x, y, z, def.name, rot);
 }
 
 // Template A — square perimeter wall with corner towers
-function _buildFortressA(ox, oy, oz, label) {
+function _buildFortressA(ox, oy, oz, label, rot = 0) {
   const root = new BABYLON.TransformNode(`fortress_${label}`, scene);
   root.position.set(ox, oy, oz);
+  root.rotation.y = rot;
 
   const wallMat  = _mat('fortWallA',  0.45, 0.40, 0.32, scene);
   const towerMat = _mat('fortTowerA', 0.38, 0.34, 0.28, scene);
@@ -143,9 +148,10 @@ function _buildFortressA(ox, oy, oz, label) {
 }
 
 // Template B — irregular rocky fort, two towers, open courtyard
-function _buildFortressB(ox, oy, oz, label) {
+function _buildFortressB(ox, oy, oz, label, rot = 0) {
   const root = new BABYLON.TransformNode(`fortress_${label}`, scene);
   root.position.set(ox, oy, oz);
+  root.rotation.y = rot;
 
   const stoneMat = _mat('fortStoneB', 0.50, 0.44, 0.36, scene);
   const darkMat  = _mat('fortDarkB',  0.30, 0.26, 0.22, scene);
@@ -179,9 +185,10 @@ function _buildFortressB(ox, oy, oz, label) {
 }
 
 // Template C — circular fort with radial walls
-function _buildFortressC(ox, oy, oz, label) {
+function _buildFortressC(ox, oy, oz, label, rot = 0) {
   const root = new BABYLON.TransformNode(`fortress_${label}`, scene);
   root.position.set(ox, oy, oz);
+  root.rotation.y = rot;
 
   const brickMat  = _mat('fortBrickC', 0.52, 0.42, 0.30, scene);
   const stoneMat  = _mat('fortStoneC', 0.40, 0.35, 0.28, scene);
@@ -218,14 +225,15 @@ const VILLAGE_TEMPLATES = [
 ];
 
 function _spawnVillage(def) {
-  const { x, y, z } = _pos(def);
-  _pick(VILLAGE_TEMPLATES)(x, y, z, def.name);
+  const { x, y, z, rot } = _pos(def);
+  _pick(VILLAGE_TEMPLATES)(x, y, z, def.name, rot);
 }
 
 // Template A — cluster of small huts with a central well
-function _buildVillageA(ox, oy, oz, label) {
+function _buildVillageA(ox, oy, oz, label, rot = 0) {
   const root = new BABYLON.TransformNode(`village_${label}`, scene);
   root.position.set(ox, oy, oz);
+  root.rotation.y = rot;
 
   const wallMat = _mat('vilWallA', 0.78, 0.68, 0.52, scene);
   const roofMat = _mat('vilRoofA', 0.60, 0.32, 0.20, scene);
@@ -263,9 +271,10 @@ function _buildVillageA(ox, oy, oz, label) {
 }
 
 // Template B — linear desert settlement, walled compound
-function _buildVillageB(ox, oy, oz, label) {
+function _buildVillageB(ox, oy, oz, label, rot = 0) {
   const root = new BABYLON.TransformNode(`village_${label}`, scene);
   root.position.set(ox, oy, oz);
+  root.rotation.y = rot;
 
   const wallMat    = _mat('vilWallB',    0.85, 0.72, 0.50, scene);
   const roofMat    = _mat('vilRoofB',    0.55, 0.38, 0.22, scene);
@@ -310,14 +319,15 @@ const CITY_TEMPLATES = [
 ];
 
 function _spawnCity(def) {
-  const { x, y, z } = _pos(def);
-  _pick(CITY_TEMPLATES)(x, y, z, def.name);
+  const { x, y, z, rot } = _pos(def);
+  _pick(CITY_TEMPLATES)(x, y, z, def.name, rot);
 }
 
 // Template A — grid of varied height towers (downtown core)
-function _buildCityA(ox, oy, oz, label) {
+function _buildCityA(ox, oy, oz, label, rot = 0) {
   const root = new BABYLON.TransformNode(`city_${label}`, scene);
   root.position.set(ox, oy, oz);
+  root.rotation.y = rot;
 
   const concMat  = _mat('cityConcA',  0.55, 0.54, 0.52, scene);
   const glassMat = _mat('cityGlassA', 0.36, 0.44, 0.55, scene);
@@ -357,9 +367,10 @@ function _buildCityA(ox, oy, oz, label) {
 }
 
 // Template B — industrial supergrid (warehouses, silos, pipes)
-function _buildCityB(ox, oy, oz, label) {
+function _buildCityB(ox, oy, oz, label, rot = 0) {
   const root = new BABYLON.TransformNode(`city_${label}`, scene);
   root.position.set(ox, oy, oz);
+  root.rotation.y = rot;
 
   const metalMat  = _mat('cityMetalB', 0.45, 0.44, 0.42, scene);
   const rustMat   = _mat('cityRustB',  0.55, 0.32, 0.18, scene);

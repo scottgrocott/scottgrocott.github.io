@@ -385,102 +385,123 @@ function _scatterVegClusters(frames) {
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
-// ── Grass — SolidParticleSystem (single draw call) ───────────────────────────
-// All grass blades (water edge + structure edge) are merged into ONE SPS mesh.
-// This means 1 draw call total regardless of blade count.
+// ── Grass — ThinInstances (1 draw call per grass type) ───────────────────────
+// Two meshes: land grass (above waterY) and underwater grass (below waterY).
+// ThinInstances = 1 draw call each, no SPS quirks, works perfectly in BJS 8.
+// Each "blade" is a crossed-quad (2 planes at 90°) for visible volume from all angles.
 
-let _grassSPS  = null;   // the SPS instance
-let _grassMat  = null;   // shared material
+let _grassLandMesh  = null;
+let _grassWaterMesh = null;
 
-function _getGrassMat() {
-  if (_grassMat) return _grassMat;
-  _grassMat = new BABYLON.StandardMaterial('_grassMat', scene);
-  _grassMat.diffuseColor    = new BABYLON.Color3(0.20, 0.55, 0.14);
-  _grassMat.emissiveColor   = new BABYLON.Color3(0.04, 0.14, 0.02);
-  _grassMat.backFaceCulling = false;
-  _grassMat.freeze();
-  return _grassMat;
+// Crossed-quad blade: two planes rotated 90° around Y, merged into one mesh.
+// This gives visible grass from every approach angle with just one quad draw.
+function _createBladeMesh(name) {
+  const p1 = BABYLON.MeshBuilder.CreatePlane(name + '_a', { width: 0.7, height: 0.6 }, scene);
+  const p2 = BABYLON.MeshBuilder.CreatePlane(name + '_b', { width: 0.7, height: 0.6 }, scene);
+  p2.rotation.y = Math.PI / 2;
+  p2.bakeCurrentTransformIntoVertices();
+  const merged = BABYLON.Mesh.MergeMeshes([p1, p2], true, true, undefined, false, true);
+  merged.name = name;
+  return merged;
 }
 
-// Build a grass SPS from a collected array of {x, z, h} positions.
-// One particle per clump. Material has backFaceCulling=false so both sides render.
-// Random Y rotation gives enough visual variety from all angles.
-function _buildGrassSPS(clumps, tag) {
-  if (!clumps.length) return null;
+function _buildGrassThinInstances(positions, tag, mat) {
+  if (!positions.length) { console.log(`[scatter] Grass "${tag}": 0 blades`); return null; }
 
-  const template = BABYLON.MeshBuilder.CreatePlane('_gt_' + tag, {
-    width: 0.07, height: 0.65,
-  }, scene);
-  template.isVisible = false;
+  const base = _createBladeMesh('_grassBase_' + tag);
+  base.material   = mat;
+  base.isPickable = false;
+  base.alwaysSelectAsActiveMesh = true;
 
-  const sps = new BABYLON.SolidParticleSystem('grassSPS_' + tag, scene, { updatable: false });
-  sps.addShape(template, clumps.length);
-  template.dispose();
+  // Build a flat Float32Array of 4×4 matrices (16 floats per instance)
+  const matrices = new Float32Array(positions.length * 16);
+  const tmp = new BABYLON.Matrix();
 
-  const mesh = sps.buildMesh();
-  mesh.material   = _getGrassMat();
-  mesh.isPickable = false;
-  // Do NOT freezeWorldMatrix — that locks the bbox at origin and causes frustum culling
-  // to discard the entire grass mesh. Use alwaysSelectAsActiveMesh as the perf substitute.
-  mesh.alwaysSelectAsActiveMesh = true;
+  for (let i = 0; i < positions.length; i++) {
+    const { x, z, h, scaleY = 1.0 } = positions[i];
+    const rotY  = Math.random() * Math.PI * 2;
+    const scale = (0.7 + Math.random() * 0.6) * scaleY;
+    // Compose TRS: translate to x, h + half-height*scale, z; rotate Y; scale
+    BABYLON.Matrix.ComposeToRef(
+      new BABYLON.Vector3(scale, scale * (0.8 + Math.random() * 0.4), scale),
+      BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, rotY),
+      new BABYLON.Vector3(x, h + 0.3 * scale, z),
+      tmp
+    );
+    tmp.copyToArray(matrices, i * 16);
+  }
 
-  // Safe iteration — use actual sps.particles.length, not clumps.length
-  sps.initParticles = () => {
-    const total = sps.particles.length;
-    for (let i = 0; i < total; i++) {
-      const c = clumps[i];
-      if (!c) break;
-      const p = sps.particles[i];
-      if (!p) break;
-      p.position.set(c.x, c.h + 0.325, c.z);
-      p.rotation.y = Math.random() * Math.PI;
-    }
-  };
-  sps.initParticles();
-  sps.setParticles();
-  sps.refreshVisibleSize();  // compute real bounding box from all particle positions
+  base.thinInstanceSetBuffer('matrix', matrices, 16, false);
+  base.thinInstanceCount = positions.length;
 
-  _instances.push(mesh);
-  console.log('[scatter] Grass SPS "' + tag + '": ' + sps.particles.length + ' blades — 1 draw call');
-  return sps;
+  _instances.push(base);
+  console.log(`[scatter] Grass "${tag}": ${positions.length} blades — 1 draw call`);
+  return base;
 }
 
-// Collect water-edge positions
+// Land grass material — bright green, slight emissive to avoid full darkness in shadow
+function _getLandGrassMat() {
+  const m = new BABYLON.StandardMaterial('_grassLandMat', scene);
+  m.diffuseColor  = new BABYLON.Color3(0.18, 0.60, 0.14);
+  m.emissiveColor = new BABYLON.Color3(0.03, 0.12, 0.02);
+  m.backFaceCulling = false;
+  m.freeze();
+  return m;
+}
+
+// Underwater grass material — teal-green, denser and taller than land grass.
+// The colour shift makes underwater growth immediately visually distinct.
+function _getUnderwaterGrassMat() {
+  const m = new BABYLON.StandardMaterial('_grassWaterMat', scene);
+  m.diffuseColor  = new BABYLON.Color3(0.08, 0.42, 0.38);  // blue-green seagrass
+  m.emissiveColor = new BABYLON.Color3(0.02, 0.10, 0.08);
+  m.backFaceCulling = false;
+  m.alpha = 0.88;  // slightly translucent underwater
+  m.freeze();
+  return m;
+}
+
+// ── Collection helpers ────────────────────────────────────────────────────────
+
 function _collectWaterEdgeGrass(waterY) {
-  const size   = CONFIG.terrain?.size || 700;
-  const half   = size / 2;
-  // Step matches heightmap resolution: 700/128 ≈ 5.5 units per pixel.
-  // Use 4.0 so we sample denser than the pixel grid and never skip a shoreline.
-  const STEP   = 4.0;
-  // Band: from 1 unit BELOW waterline up to 8 units above.
-  // Wide enough to always catch the shore on coarse heightmaps (5.5u/pixel).
-  // Submerged lower edge catches the exact waterline junction.
-  const BAND_LO = waterY - 1.0;
-  const BAND_HI = waterY + 8.0;
-  const JITTER  = 2.0;
-  const MAX     = 5000;
-  const out     = [];
+  const size    = CONFIG.terrain?.size || 700;
+  const half    = size / 2;
+  const STEP    = 3.5;       // dense enough to never miss a shoreline pixel
+  const ABOVE_LO = waterY + 0.1;
+  const ABOVE_HI = waterY + 10.0;  // land band above waterline
+  const BELOW_LO = waterY - 14.0;  // underwater band (thick!)
+  const BELOW_HI = waterY - 0.1;
+  const JITTER  = 1.8;
+  const MAX_LAND  = 8000;
+  const MAX_WATER = 6000;
+  const land  = [];
+  const under = [];
 
-  for (let wx = -half; wx < half && out.length < MAX; wx += STEP) {
-    for (let wz = -half; wz < half && out.length < MAX; wz += STEP) {
+  for (let wx = -half; wx < half; wx += STEP) {
+    for (let wz = -half; wz < half; wz += STEP) {
       const h = getTerrainHeightAt(wx, wz);
-      if (h < BAND_LO || h > BAND_HI) continue;
-      const ox = wx + (Math.random() - 0.5) * JITTER;
-      const oz = wz + (Math.random() - 0.5) * JITTER;
-      const oh = getTerrainHeightAt(ox, oz);
-      if (oh < BAND_LO || oh > BAND_HI) continue;
-      out.push({ x: ox, z: oz, h: Math.max(oh, waterY) });
+      const jx = wx + (Math.random() - 0.5) * JITTER;
+      const jz = wz + (Math.random() - 0.5) * JITTER;
+      const jh = getTerrainHeightAt(jx, jz);
+
+      if (h >= ABOVE_LO && h <= ABOVE_HI && land.length < MAX_LAND) {
+        // Shore grass — sits on terrain surface
+        land.push({ x: jx, z: jz, h: jh });
+      } else if (h >= BELOW_LO && h <= BELOW_HI && under.length < MAX_WATER) {
+        // Underwater grass — taller blades, placed on submerged terrain
+        under.push({ x: jx, z: jz, h: jh, scaleY: 1.6 });
+      }
     }
   }
-  console.log('[scatter] Water grass candidates: ' + out.length + ' (waterY=' + waterY + ' band ' + BAND_LO.toFixed(1) + '-' + BAND_HI.toFixed(1) + ')');
-  return out;
+
+  console.log(`[scatter] Water grass — land: ${land.length}, underwater: ${under.length} (waterY=${waterY})`);
+  return { land, under };
 }
 
-// Collect structure-edge positions
 function _collectStructureEdgeGrass(positions) {
-  const RING_INNER = 2.0;
-  const RING_OUTER = 7.0;
-  const PER_STRUCT = 40;
+  const RING_INNER = 1.0;
+  const RING_OUTER = 8.0;
+  const PER_STRUCT = 60;
   const out = [];
   for (const { wx, wz } of positions) {
     for (let i = 0; i < PER_STRUCT; i++) {
@@ -489,86 +510,78 @@ function _collectStructureEdgeGrass(positions) {
       const ox = wx + Math.cos(angle) * dist;
       const oz = wz + Math.sin(angle) * dist;
       const oh = getTerrainHeightAt(ox, oz);
-      if (oh <= 0) continue;
+      if (oh <= 0.05) continue;
       out.push({ x: ox, z: oz, h: oh });
     }
   }
   return out;
 }
 
-// Public entry points — called from scatterProps
-function _scatterWaterEdgeGrass(waterY, myGen) {
-  if (_generation !== myGen) return;
-  const clumps = _collectWaterEdgeGrass(waterY);
-  _grassSPS = _buildGrassSPS(clumps, 'water');
-}
+// ── Spawn ─────────────────────────────────────────────────────────────────────
 
-function _scatterStructureEdgeGrass(positions, myGen) {
-  if (_generation !== myGen) return;
-  // Water grass SPS already built — build a second SPS for structures
-  // (keeps them separate so water grass can exist without structures and vice versa)
-  const clumps = _collectStructureEdgeGrass(positions);
-  if (clumps.length) _buildGrassSPS(clumps, 'struct');
+function _spawnGrass(waterY, structurePositions) {
+  // Water-edge + underwater grass
+  if (waterY !== null) {
+    const { land, under } = _collectWaterEdgeGrass(waterY);
+    if (land.length)  _grassLandMesh  = _buildGrassThinInstances(land,  'shore', _getLandGrassMat());
+    if (under.length) _grassWaterMesh = _buildGrassThinInstances(under, 'under', _getUnderwaterGrassMat());
+  }
+  // Structure + shelter footprint grass
+  if (structurePositions.length) {
+    const clumps = _collectStructureEdgeGrass(structurePositions);
+    if (clumps.length) _buildGrassThinInstances(clumps, 'struct', _getLandGrassMat());
+  }
 }
 
 export async function scatterProps() {
   clearScatter();
-  const myGen = _generation;  // snapshot — if clearScatter() runs again, myGen !== _generation
+  const myGen = _generation;
 
-  const frames  = getAllSpriteFrames();  // empty array if no env loaded
-  const layers  = CONFIG.scatterLayers?.length
+  const frames = getAllSpriteFrames();
+  const layers = CONFIG.scatterLayers?.length
     ? CONFIG.scatterLayers
     : [{ category: 'vegetation', density: 0.12 }, { category: 'rock', density: 0.04 }];
 
-  // 1. Scatter shelters first so we have positions for clustering
+  // 1. Shelters first — positions needed for grass + clustering
   const shelterCount = CONFIG.terrain?.shelterCount ?? 8;
   await _scatterShelters(shelterCount, frames, myGen);
-  if (_generation !== myGen) return;  // level reloaded while we were fetching — abort
+  if (_generation !== myGen) return;
 
   // 2. Regular scatter layers
   for (const layer of layers) {
     _scatterLayer(layer, frames);
   }
 
-  // 3. Vegetation clusters around each shelter
+  // 3. Veg clusters around shelters
   const vegFrames = frames.filter(f => f.category === 'vegetation');
-  const clusterFrames = vegFrames.length > 0 ? vegFrames : frames;
-  _scatterVegClusters(clusterFrames);
+  _scatterVegClusters(vegFrames.length > 0 ? vegFrames : frames);
 
-  // 4. Grass — water edge + structure edge
-  const waterY = CONFIG.water?.enabled ? (CONFIG.water?.mesh?.position?.y ?? null) : null;
-  if (waterY !== null) _scatterWaterEdgeGrass(waterY, myGen);
-  // Combine shelter positions with structure positions from level config
-  const _allStructurePositions = [..._shelterPositions];
-  const _structs = CONFIG.structures || {};
-  for (const group of ['fortresses','villages','cities']) {
-    for (const s of (_structs[group] || [])) {
-      if (s.position) _allStructurePositions.push({ wx: s.position.x, wz: s.position.z });
+  // 4. Grass — water shore + underwater + structure footprints
+  const waterY = CONFIG.water?.enabled ? (CONFIG.water?.waterY ?? CONFIG.water?.mesh?.position?.y ?? null) : null;
+  const allStructPos = [..._shelterPositions];
+  const structs = CONFIG.structures || {};
+  for (const group of ['fortresses', 'villages', 'cities']) {
+    for (const s of (structs[group] || [])) {
+      if (s.position) allStructPos.push({ wx: s.position.x, wz: s.position.z });
     }
   }
-  _scatterStructureEdgeGrass(_allStructurePositions, myGen);
+  _spawnGrass(waterY, allStructPos);
 
-  console.log('[scatter] Total instances:', _instances.length,
-    '| shelters:', _shelterPositions.length);
+  console.log('[scatter] Total instances:', _instances.length, '| shelters:', _shelterPositions.length);
 }
 
 export function clearScatter() {
-  _generation++;  // invalidate any in-flight scatterProps call
+  _generation++;
   for (const m of _instances) {
-    try { if (m.material && m.material !== _grassMat) m.material.dispose(); } catch(e) {}
+    try { if (m.material) m.material.dispose(); } catch(e) {}
     try { m.dispose(); } catch(e) {}
   }
-  _instances = [];
+  _instances      = [];
   _shelterPositions = [];
-  if (_grassSPS)  { try { _grassSPS.dispose();  } catch(e) {} _grassSPS  = null; }
-  if (_grassMat)  { try { _grassMat.dispose();  } catch(e) {} _grassMat  = null; }
-  clearBoxColliders();  // remove all Rapier box bodies — prevent phantom colliders on reload
+  _grassLandMesh  = null;
+  _grassWaterMesh = null;
+  clearBoxColliders();
 }
 
-export function rebuildScatterLayer() {
-  scatterProps();
-}
-
-export function tickBillboards() {
-  // BabylonJS BILLBOARDMODE_Y handles rotation automatically
-}
+export function rebuildScatterLayer() { scatterProps(); }
+export function tickBillboards() {}
