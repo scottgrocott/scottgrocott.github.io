@@ -1,170 +1,162 @@
-// physics.js — Rapier physics world, fixed-step, sync, query
-import * as RAPIER_MODULE from 'https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.19.3/+esm';
+// physics.js — Havok physics via BabylonJS HavokPlugin
+// Drop-in replacement for the Rapier physics.js.
+// The same exports are preserved so callers (player.js, shelters.js,
+// basicGun.js, cars.js, drones.js, forklifts.js, spawn.js) need only
+// minor adaptations — each file's changes are described in its header.
+//
+// CDN REQUIREMENT — add to index.html BEFORE the <script type="module"> tag:
+//   <script src="https://cdn.babylonjs.com/havok/HavokPhysics.es.js"></script>
 
-window.RAPIER = RAPIER_MODULE;
+import { scene } from './core.js';
 
-export let physicsWorld   = null;
-export let physicsReady   = false;
+export let hkPlugin      = null;   // BABYLON.HavokPlugin instance
+export let physicsReady  = false;
+export let physicsWorld  = null;   // alias for hkPlugin (kept for compat)
+export const physCache   = new Map();
 
-const _raycastMeshSet = new Set();
-export const raycastMeshes = {
-  add(m)      { _raycastMeshSet.add(m); },
-  push(m)     { _raycastMeshSet.add(m); },
-  delete(m)   { _raycastMeshSet.delete(m); },
-  includes(m) { return _raycastMeshSet.has(m); },
-  has(m)      { return _raycastMeshSet.has(m); },
-  forEach(fn) { _raycastMeshSet.forEach(fn); },
-  get size()  { return _raycastMeshSet.size; },
-  [Symbol.iterator]() { return _raycastMeshSet[Symbol.iterator](); },
-};
+const FIXED_DT = 1 / 60;
 
-export const physCache = new Map();
-export const rayQueryResults = [];
-
-const FIXED_DT   = 1 / 60;
-let   _accumulator = 0;
-
-// ---- Terrain body tracking ----
-let _terrainBody     = null;
-let _terrainCollider = null;
-const _boxBodies = [];  // tracked so clearBoxColliders() can remove them all
-
+// ─── Init ─────────────────────────────────────────────────────────────────────
 export async function initPhysics() {
-  await RAPIER_MODULE.init();
-  physicsWorld = new RAPIER_MODULE.World({ x: 0.0, y: -20.0, z: 0.0 });
+  // window.HK is pre-initialized in index.html via: window.HK = HavokPhysics();
+  // We just await that promise here.
+  if (!window.HK) {
+    throw new Error('[physics] window.HK not found — ensure HavokPhysics_umd.js is loaded and window.HK = HavokPhysics() is called in index.html before the engine module');
+  }
+  const havok = await window.HK;
+  hkPlugin     = new BABYLON.HavokPlugin(true, havok);
+  scene.enablePhysics(new BABYLON.Vector3(0, -20, 0), hkPlugin);
+  physicsWorld = hkPlugin;
   physicsReady = true;
-  window._physicsWorld = physicsWorld;
-  console.log('[physics] Rapier world ready');
+  console.log('[physics] Havok world ready');
 }
 
 export function resetPhysics() {
-  if (physicsWorld) {
-    try { physicsWorld.free(); } catch(e) {}
+  if (hkPlugin) {
+    try { scene.disablePhysicsEngine(); } catch(e) {}
+    hkPlugin     = null;
     physicsWorld = null;
   }
-  physicsReady     = false;
-  _terrainBody     = null;
-  _terrainCollider = null;
-  _boxBodies.length = 0;
+  physicsReady = false;
   physCache.clear();
-  _accumulator = 0;
 }
 
-function _removeTerrainCollider() {
-  if (_terrainBody && physicsWorld) {
-    try { physicsWorld.removeRigidBody(_terrainBody); } catch(e) {}
-  }
-  _terrainBody     = null;
-  _terrainCollider = null;
-}
+// BabylonJS auto-steps Havok each frame; stepPhysics is a no-op kept for compat.
+export function stepPhysics() {}
+export function syncPhysicsReads() {}
 
-export function addTerrainCollider(positions, subdiv) {
-  // positions: Float32Array [x,y,z, x,y,z ...] taken directly from the visual mesh.
-  // This guarantees physics and visual terrain are pixel-perfect identical.
-  if (!physicsReady || !physicsWorld) return;
-  _removeTerrainCollider();
-
-  const verts = subdiv + 1;  // vertices per side
-  const vertCount = verts * verts;
-
-  // Build trimesh indices — two triangles per quad
-  const indices = new Uint32Array(subdiv * subdiv * 6);
-  let ii = 0;
-  for (let row = 0; row < subdiv; row++) {
-    for (let col = 0; col < subdiv; col++) {
-      const a = row * verts + col;
-      const b = a + 1;
-      const c = a + verts;
-      const d = c + 1;
-      indices[ii++] = a; indices[ii++] = c; indices[ii++] = b;
-      indices[ii++] = b; indices[ii++] = c; indices[ii++] = d;
-    }
-  }
-
-  _terrainBody = physicsWorld.createRigidBody(RAPIER_MODULE.RigidBodyDesc.fixed());
-  const tdesc = RAPIER_MODULE.ColliderDesc.trimesh(new Float32Array(positions), indices);
-  _terrainCollider = physicsWorld.createCollider(tdesc, _terrainBody);
-  console.log('[physics] Terrain trimesh from mesh verts:', vertCount, 'verts |', indices.length/3, 'tris');
-}
-
-// Add a static box collider at world position (wx, wy, wz) with half-extents (hw, hh, hd)
-// rotY is Y-axis rotation in radians
-export function addBoxCollider(wx, wy, wz, hw, hh, hd, rotY = 0) {
-  if (!physicsReady || !physicsWorld) return null;
-  const body = physicsWorld.createRigidBody(RAPIER_MODULE.RigidBodyDesc.fixed());
-  const desc = RAPIER_MODULE.ColliderDesc.cuboid(hw, hh, hd)
-    .setTranslation(wx, wy, wz)
-    .setRotation({ x: 0, y: Math.sin(rotY / 2), z: 0, w: Math.cos(rotY / 2) });
-  const col = physicsWorld.createCollider(desc, body);
-  _boxBodies.push(body);
-  console.log(`[physics] addBoxCollider total=${_boxBodies.length} at (${wx.toFixed(1)},${wy.toFixed(1)},${wz.toFixed(1)})`);
-  console.trace('[physics] addBoxCollider caller');
-  return col;
-}
-
-export function clearBoxColliders() {
-  console.log(`[physics] clearBoxColliders — removing ${_boxBodies.length} bodies`);
-  if (!physicsWorld) { _boxBodies.length = 0; return; }
-  for (const body of _boxBodies) {
-    try { physicsWorld.removeRigidBody(body); } catch(e) { console.warn('[physics] removeRigidBody failed', e); }
-  }
-  _boxBodies.length = 0;
-}
-// Also expose globally so shelters.js / any non-importing module can call it
-window._clearBoxColliders = clearBoxColliders;
-
-export function addFlatGroundCollider(sizeX = 512, sizeZ = 512) {
-  if (!physicsReady || !physicsWorld) return;
-  _removeTerrainCollider();
-
-  _terrainBody = physicsWorld.createRigidBody(RAPIER_MODULE.RigidBodyDesc.fixed());
-  _terrainCollider = physicsWorld.createCollider(
-    RAPIER_MODULE.ColliderDesc.cuboid(sizeX / 2, 0.5, sizeZ / 2).setTranslation(0, -0.5, 0),
-    _terrainBody
-  );
-  console.log('[physics] Flat ground collider added', sizeX, 'x', sizeZ);
-}
-
-export function stepPhysics(dt) {
-  if (!physicsReady || !physicsWorld) return;
-  _accumulator += dt;
-  while (_accumulator >= FIXED_DT) {
-    physicsWorld.step();
-    _accumulator -= FIXED_DT;
-  }
-}
-
-export function syncPhysicsReads() {
-  if (!physicsReady || !physicsWorld) return;
-  physicsWorld.bodies.forEach(body => {
-    const t = body.translation();
-    physCache.set(body.handle, { x: t.x, y: t.y, z: t.z });
-  });
-}
-
+// ─── Raycasts (wall-avoidance) ────────────────────────────────────────────────
 export function queryPhysics(origin, radius) {
   if (!physicsReady) return [];
   const results = [];
   const dirs = [
-    {x:1,y:0,z:0},{x:-1,y:0,z:0},{x:0,y:0,z:1},{x:0,y:0,z:-1},
-    {x:0.707,y:0,z:0.707},{x:-0.707,y:0,z:0.707},
-    {x:0.707,y:0,z:-0.707},{x:-0.707,y:0,z:-0.707},
+    { x:  1, y: 0, z:  0 }, { x: -1, y: 0, z:  0 },
+    { x:  0, y: 0, z:  1 }, { x:  0, y: 0, z: -1 },
+    { x:  0.707, y: 0, z:  0.707 }, { x: -0.707, y: 0, z:  0.707 },
+    { x:  0.707, y: 0, z: -0.707 }, { x: -0.707, y: 0, z: -0.707 },
   ];
-  const ray = new RAPIER_MODULE.Ray(origin, {x:1,y:0,z:0});
+  const eng = scene.getPhysicsEngine();
+  if (!eng) return results;
   for (const d of dirs) {
-    ray.origin = origin;
-    ray.dir    = d;
-    const hit = physicsWorld.castRay(ray, radius * 3, true);
-    if (hit) results.push({ dir: d, toi: hit.timeOfImpact });
+    const from = new BABYLON.Vector3(origin.x, origin.y, origin.z);
+    const to   = new BABYLON.Vector3(
+      origin.x + d.x * radius * 3,
+      origin.y,
+      origin.z + d.z * radius * 3,
+    );
+    const hit = eng.raycast(from, to);
+    if (hit?.hasHit) {
+      const dist = BABYLON.Vector3.Distance(from, hit.hitPointWorld);
+      results.push({ dir: d, toi: dist / (radius * 3) });
+    }
   }
   return results;
 }
 
+// ─── NaN guard ────────────────────────────────────────────────────────────────
 export function safeVec3(x, y, z, label) {
   const px = +x, py = +y, pz = +z;
   if (isNaN(px) || isNaN(py) || isNaN(pz)) {
-    console.error('[physics] NaN at:', label, x, y, z);
+    console.error(`[physics] NaN at: ${label}`, x, y, z);
     return null;
   }
   return { x: px, y: py, z: pz };
+}
+
+// ─── Terrain collider ─────────────────────────────────────────────────────────
+let _terrainAggregate = null;
+
+export function addTerrainCollider(_vertexData, _subdiv) {
+  if (!physicsReady) return;
+  const mesh = scene.getMeshByName('terrain');
+  if (!mesh) { console.warn('[physics] addTerrainCollider: no mesh "terrain"'); return; }
+  if (_terrainAggregate) { try { _terrainAggregate.dispose(); } catch(e) {} }
+  _terrainAggregate = new BABYLON.PhysicsAggregate(
+    mesh,
+    BABYLON.PhysicsShapeType.MESH,
+    { mass: 0, restitution: 0.0, friction: 0.6 },
+    scene,
+  );
+  console.log('[physics] Terrain collider attached (Havok trimesh)');
+}
+
+export function addFlatGroundCollider() {
+  addTerrainCollider();
+}
+
+// ─── Box collider helpers ─────────────────────────────────────────────────────
+// Two call signatures are supported:
+//   addBoxCollider(mesh, opts)           — attach to an existing mesh
+//   addBoxCollider(x, y, z, hw, hh, hd, rotY) — old Rapier-style positional call
+//     creates an invisible box mesh internally and tracks it for clearBoxColliders()
+
+const _boxAggregates = [];
+
+export function addBoxCollider(meshOrX, optsOrY, _z, hw, hh, hd, rotY) {
+  if (!physicsReady) return null;
+
+  // Positional call: addBoxCollider(x, y, z, hw, hh, hd, rotY)
+  if (typeof meshOrX === 'number') {
+    const x = meshOrX, y = optsOrY, z = _z;
+    if (isNaN(x) || isNaN(y) || isNaN(z) || !hw || !hh || !hd) return null;
+
+    const box = BABYLON.MeshBuilder.CreateBox('_bCollider', {
+      width:  hw * 2,
+      height: hh * 2,
+      depth:  hd * 2,
+    }, scene);
+    box.position.set(x, y, z);
+    if (rotY) box.rotation.y = rotY;
+    box.isVisible  = false;
+    box.isPickable = false;
+
+    const agg = new BABYLON.PhysicsAggregate(
+      box,
+      BABYLON.PhysicsShapeType.BOX,
+      { mass: 0, restitution: 0.0, friction: 0.6 },
+      scene,
+    );
+    _boxAggregates.push({ agg, mesh: box });
+    return agg;
+  }
+
+  // Mesh call: addBoxCollider(mesh, opts)
+  const mesh = meshOrX, opts = optsOrY ?? {};
+  if (!mesh) return null;
+  const agg = new BABYLON.PhysicsAggregate(
+    mesh,
+    BABYLON.PhysicsShapeType.BOX,
+    { mass: opts.mass ?? 0, restitution: opts.restitution ?? 0.1, friction: opts.friction ?? 0.6 },
+    scene,
+  );
+  _boxAggregates.push({ agg, mesh: null });
+  return agg;
+}
+
+export function clearBoxColliders() {
+  for (const { agg, mesh } of _boxAggregates) {
+    try { agg?.dispose(); } catch(e) {}
+    try { if (mesh) mesh.dispose(); } catch(e) {}
+  }
+  _boxAggregates.length = 0;
 }

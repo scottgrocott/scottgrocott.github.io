@@ -13,10 +13,11 @@ let _onLoadLevel   = null;  // callback: fn(url) — provided by main.js
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export function initLevelManager(onLoadLevelFn) {
-  _onLoadLevel = onLoadLevelFn;
-  _active      = false;
-  _completed   = false;
-  _checkTimer  = 0;
+  _onLoadLevel           = onLoadLevelFn;
+  _active                = false;
+  _completed             = false;
+  _checkTimer            = 0;
+  window._levelComplete  = false;   // allow respawns on fresh level
   _hideSplash();
   console.log('[levelManager] Ready');
 }
@@ -41,10 +42,24 @@ export function tickLevelManager(dt) {
   const enemies = getEnemies();
   if (enemies.length === 0) return;  // nothing spawned yet
 
-  const allDead = enemies.every(e => e.dead);
-  if (allDead) {
-    _completed = true;
-    _active    = false;
+  // An enemy counts as "down" if dead AND either destroyed (no respawn)
+  // or all others are also dead (whole wave wiped simultaneously).
+  // Simplest reliable rule: all enemies currently have dead===true.
+  // To prevent respawns blocking this, levelManager sets window._levelComplete=true
+  // which stops all pending respawn timeouts from reviving enemies.
+  const allDown = enemies.every(e => e.dead);
+  if (allDown) {
+    _completed             = true;
+    _active                = false;
+    window._levelComplete  = true;   // blocks respawn timeouts in takeDamage
+
+    // GA: all_enemies_dead (before splash shown)
+    const urlParam2   = new URLSearchParams(window.location.search).get('level');
+    const currentId2  = urlParam2 ? `level-${urlParam2}` : ((CONFIG.meta?.levels||[])[0]?.id || 'level-1');
+    window._gaEvent?.('all_enemies_dead', {
+      level_id: currentId2,
+      game_title: CONFIG.meta?.title || 'Metal Throne',
+    });
     _showSplash();
   }
 }
@@ -53,6 +68,8 @@ export function tickLevelManager(dt) {
 
 function _showSplash() {
   _hideSplash();
+  // Release pointer lock so the player can interact with the splash UI
+  try { document.exitPointerLock(); } catch(e) {}
 
   const meta        = CONFIG.meta || {};
   const levels      = meta.levels || [];
@@ -137,6 +154,14 @@ function _showSplash() {
   _splashEl = el;
 
   document.getElementById('splash-next-btn').addEventListener('click', () => {
+    // GA: level_complete event with level info
+    window._gaEvent?.('level_complete', {
+      level_id:    currentId,
+      level_num:   currentNum,
+      level_title: title,
+      is_last:     isLast,
+      next_level:  isLast ? 1 : nextNum,
+    });
     _hideSplash();
     _loadNextLevel(nextUrl);
   });

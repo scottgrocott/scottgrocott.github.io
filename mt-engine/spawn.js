@@ -1,32 +1,56 @@
 // spawn.js — drop player on a suitable start location
 
-import { initPlayerBody } from './player.js';
-import { getTerrainHeightAt } from './terrain/terrainMesh.js';
-import { CONFIG, PLAYER } from './config.js';
+import { playerRig, player } from './player.js';
+import { getHeightAt } from './terrain/heightmap.js';
+import { CONFIG } from './config.js';
 import { safeVec3 } from './physics.js';
 
 export function dropOnStart() {
-  // Always drop at flat centre for heightmap terrain
-  // Find a low flat spot near centre
-  const size = (CONFIG.terrain?.size || 700) * 0.25;
-  let bestX = 0, bestZ = 0, bestScore = Infinity;
-
-  for (let i = 0; i < 60; i++) {
-    const tx = (Math.random() - 0.5) * size;
-    const tz = (Math.random() - 0.5) * size;
-    const h  = getTerrainHeightAt(tx, tz);
-    const d  = 4;
-    const slope = Math.abs(getTerrainHeightAt(tx, tz+d) - getTerrainHeightAt(tx, tz-d))
-                + Math.abs(getTerrainHeightAt(tx+d, tz) - getTerrainHeightAt(tx-d, tz));
-    const score = slope * 3 + h * 0.2;
-    if (score < bestScore) { bestScore = score; bestX = tx; bestZ = tz; }
+  const type = CONFIG.terrain.type || 'flat';
+  if (type === 'flat') {
+    _dropOnFlat();
+  } else {
+    _dropOnRandomPeak();
   }
+}
 
-  const groundY = getTerrainHeightAt(bestX, bestZ);
-  const spawnY  = groundY + PLAYER.height + 2.0;
-  const pos     = safeVec3(bestX, spawnY, bestZ, 'dropOnStart');
-  if (!pos) return;
+function _dropOnFlat() {
+  if (!playerRig) return;
+  const y    = getHeightAt(0, 0) + 3;
+  const safe = safeVec3(0, y, 0, 'dropOnFlat');
+  if (!safe) return;
+  _teleport(safe.x, safe.y, safe.z);
+}
 
-  console.log('[spawn] Dropping player at', bestX.toFixed(1), spawnY.toFixed(1), bestZ.toFixed(1), '| ground:', groundY.toFixed(1));
-  initPlayerBody(pos.x, pos.y, pos.z);
+function _dropOnRandomPeak() {
+  if (!playerRig) return;
+  const size = CONFIG.terrain.size || 700;
+  let bestX = 0, bestZ = 0, bestH = 0;
+  for (let i = 0; i < 50; i++) {
+    const tx = (Math.random() - 0.5) * size * 0.6;
+    const tz = (Math.random() - 0.5) * size * 0.6;
+    const h  = getHeightAt(tx, tz);
+    if (h > bestH) { bestH = h; bestX = tx; bestZ = tz; }
+  }
+  const y    = bestH + 3;
+  const safe = safeVec3(bestX, y, bestZ, 'dropOnPeak');
+  if (!safe) return;
+  _teleport(safe.x, safe.y, safe.z);
+}
+
+function _teleport(x, y, z) {
+  playerRig.position.set(x, y, z);
+
+  // Sync the physics capsule mesh and zero velocity
+  if (player._capsuleMesh) {
+    player._capsuleMesh.position.set(x, y, z);
+  }
+  const body = player.aggregate?.body;
+  if (body) {
+    body.setLinearVelocity(BABYLON.Vector3.Zero());
+    body.setAngularVelocity(BABYLON.Vector3.Zero());
+    // Teleport the physics body to the new position
+    player._capsuleMesh.position.set(x, y, z);
+    body.disablePreStep = false;   // force Havok to re-read the transform node
+  }
 }

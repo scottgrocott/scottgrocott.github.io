@@ -29,9 +29,12 @@ import { initWater, clearWater } from './water.js';
 import { dropOnStart } from './spawn.js';
 import { initWeapon, shootBullet, tickBullets, clearBullets } from './weapons/basicGun.js';
 import { tickYUKA, setPlayerRigRef } from './enemies/enemyBase.js';
+import { initYUKA } from './yuka/yukaManager.js';
 import { clearEnemies } from './enemies/enemyRegistry.js';
 import { spawnDrones, tickDrones } from './enemies/drones.js';
 import { spawnCars, tickCars } from './enemies/cars.js';
+import { spawnBoats, tickBoats } from './enemies/boats.js';
+import { spawnSubmarines, tickSubmarines } from './enemies/submarines.js';
 import { spawnForklifts, tickForklifts } from './enemies/forklifts.js';
 import { tickExplosions } from './explosions.js';
 import { clearShelters, tickShelters } from './shelters/shelters.js';
@@ -173,6 +176,34 @@ async function boot() {
   document.addEventListener('click', _onGesture);
   document.addEventListener('keydown', _onGesture);
 
+// ── Underwater fog ───────────────────────────────────────────────────────────
+let _wasSubmerged = false;
+let _savedFogMode, _savedFogColor, _savedFogDensity, _savedFogStart, _savedFogEnd;
+
+function _tickUnderwaterFog(submerged) {
+  if (submerged === _wasSubmerged) return;
+  _wasSubmerged = submerged;
+  if (submerged) {
+    _savedFogMode    = scene.fogMode;
+    _savedFogColor   = scene.fogColor?.clone();
+    _savedFogDensity = scene.fogDensity;
+    _savedFogStart   = scene.fogStart;
+    _savedFogEnd     = scene.fogEnd;
+    const uwCfg      = CONFIG.underwater_fog ?? {};
+    scene.fogMode    = BABYLON.Scene.FOGMODE_EXP2;
+    scene.fogDensity = uwCfg.density ?? 0.08;
+    scene.fogColor   = new BABYLON.Color3(uwCfg.r ?? 0.02, uwCfg.g ?? 0.15, uwCfg.b ?? 0.35);
+    console.log('[main] Underwater fog ON');
+  } else {
+    scene.fogMode    = _savedFogMode    ?? BABYLON.Scene.FOGMODE_LINEAR;
+    scene.fogColor   = _savedFogColor   ?? new BABYLON.Color3(0.7, 0.8, 0.9);
+    scene.fogDensity = _savedFogDensity ?? 0.02;
+    scene.fogStart   = _savedFogStart   ?? 100;
+    scene.fogEnd     = _savedFogEnd     ?? 600;
+    console.log('[main] Underwater fog OFF');
+  }
+}
+
   // Start render loop
   let _lastTime = performance.now();
   engine.runRenderLoop(() => {
@@ -190,7 +221,7 @@ async function boot() {
       const waterY = CONFIG.water?.enabled ? (CONFIG.water?.mesh?.position?.y ?? null) : null;
       if (waterY !== null) {
         const inWater = playerRig.position.y < waterY;
-        const submerged = playerRig.position.y < waterY - 1.0;
+        const submerged = playerRig.position.y < waterY + 0.2;  // trigger just above surface
         if (inWater !== _wasInWater) {
           _wasInWater = inWater;
           setSoundState(inWater ? 'player_enter_water' : 'player_exit_water', true);
@@ -198,6 +229,7 @@ async function boot() {
           setTimeout(() => setSoundState(inWater ? 'player_enter_water' : 'player_exit_water', false), 100);
         }
         setSoundState('player_submerged', submerged);
+        _tickUnderwaterFog(submerged);
       }
     }
     // Always keep listener position up to date — enemy audio needs it regardless of toneReady
@@ -209,6 +241,8 @@ async function boot() {
     tickLadders(dt);
     tickYUKA();          // drives YUKA EntityManager — must be every frame
     tickDrones(dt);
+    tickBoats(dt);
+    tickSubmarines(dt);
     tickCars(dt);
     tickForklifts(dt);
     tickBullets(dt);
@@ -331,6 +365,22 @@ async function loadGameConfig(url) {
 
   if (CONFIG.water?.enabled) initWater(CONFIG.water);
 
+  // Apply level fog to scene — without this scene.fogMode stays NONE
+  // and terrain ignores fog entirely
+  if (CONFIG.fog?.enabled) {
+    const fc = CONFIG.fog;
+    const modeStr = fc.mode ?? 'FOGMODE_LINEAR';
+    scene.fogMode    = BABYLON.Scene[modeStr] ?? BABYLON.Scene.FOGMODE_LINEAR;
+    const c          = fc.color ?? { r:0.7, g:0.8, b:0.9 };
+    scene.fogColor   = new BABYLON.Color3(c.r, c.g, c.b);
+    scene.fogDensity = fc.density ?? 0.02;
+    scene.fogStart   = fc.start   ?? 100;
+    scene.fogEnd     = fc.end     ?? 600;
+    console.log('[main] Scene fog applied:', modeStr, 'start='+scene.fogStart, 'end='+scene.fogEnd);
+  } else {
+    scene.fogMode = BABYLON.Scene.FOGMODE_NONE;
+  }
+
   setLoadStatus('Scanning navigation', 55);
   scanFlatAreas();
 
@@ -359,6 +409,7 @@ async function loadGameConfig(url) {
   setLoadStatus('Spawning enemies', 88);
   await _loadEnemyTypeDefs();
   await _waitForYuka();
+  initYUKA();             // create EntityManager now that YUKA global is ready
   _spawnEnemiesFromConfig();
 
   setLoadStatus('Ready!', 100);
@@ -389,7 +440,9 @@ function _spawnEnemiesFromConfig() {
     const merged = variantDef ? { ...variantDef, ...def } : def;
 
     if (merged.type === 'drone')         spawnDrones(merged);
-    else if (merged.type === 'car')      spawnCars(merged);
+    else if (merged.type === 'boat')      spawnBoats(merged);
+    else if (merged.type === 'submarine') spawnSubmarines(merged);
+    else if (merged.type === 'car')       spawnCars(merged);
     else if (merged.type === 'forklift') spawnForklifts(merged);
   }
 }
@@ -421,7 +474,9 @@ function _spawnEnemy() {
   }
   const def = CONFIG.enemies[Math.floor(Math.random() * CONFIG.enemies.length)];
   if (def.type === 'drone')         spawnDrones({ ...def, maxCount: 1 });
-  else if (def.type === 'car')      spawnCars({ ...def, maxCount: 1 });
+  else if (def.type === 'boat')      spawnBoats({ ...def, maxCount: 1 });
+  else if (def.type === 'submarine') spawnSubmarines({ ...def, maxCount: 1 });
+  else if (def.type === 'car')       spawnCars({ ...def, maxCount: 1 });
   else if (def.type === 'forklift') spawnForklifts({ ...def, maxCount: 1 });
   hudSetStatus('Enemy spawned');
 }

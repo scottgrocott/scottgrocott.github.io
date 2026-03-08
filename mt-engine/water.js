@@ -29,6 +29,28 @@ export function initWater(cfg) {
   // Explicitly exclude from any physics picking
   _waterMesh.metadata = { noPhysics: true, isWater: true };
 
+  // Underside plane — visible only when camera is below water surface.
+  // WaterMaterial has backFaceCulling forced on internally, so we add a
+  // separate upward-facing plane just below the surface for the submerged view.
+  const _undersideMesh = BABYLON.MeshBuilder.CreateGround('waterUnderside', {
+    width: WATER_SIZE, height: WATER_SIZE, subdivisions: 1,
+  }, scene);
+  _undersideMesh.position.y     = y - 0.05;
+  _undersideMesh.isPickable     = false;
+  _undersideMesh.checkCollisions = false;
+  _undersideMesh.metadata       = { noPhysics: true, isWater: true };
+  // Flip normals downward so it's visible from below
+  _undersideMesh.rotation.x     = Math.PI;
+  const _underMat = new BABYLON.StandardMaterial('waterUnderMat', scene);
+  const wcu = matCfg.waterColor || { r: 0.05, g: 0.3, b: 0.5 };
+  _underMat.diffuseColor  = new BABYLON.Color3(wcu.r * 0.6, wcu.g * 0.8, wcu.b);
+  _underMat.emissiveColor = new BABYLON.Color3(wcu.r * 0.2, wcu.g * 0.3, wcu.b * 0.4);
+  _underMat.alpha         = 0.82;
+  _underMat.backFaceCulling = false;
+  _undersideMesh.material = _underMat;
+  // Store ref so clearWater() can dispose it
+  _waterMesh._underside = _undersideMesh;
+
   // WaterMaterial — requires the CDN extension to be loaded
   let mat;
   try {
@@ -43,11 +65,14 @@ export function initWater(cfg) {
     const wc = matCfg.waterColor || { r: 0.05, g: 0.3, b: 0.5 };
     fallback.diffuseColor = new BABYLON.Color3(wc.r, wc.g, wc.b);
     fallback.alpha = 0.75;
-    fallback.backFaceCulling = true;
+    fallback.backFaceCulling = false;  // visible from below when submerged
     _waterMesh.material = fallback;
     console.log('[water] Fallback water plane at y=' + y);
     return;
   }
+
+  // Visible from below (submerged player should see water surface above them)
+  mat.backFaceCulling = false;
 
   // Bump texture
   if (matCfg.bumpTexture) {
@@ -103,6 +128,8 @@ export function initWater(cfg) {
 
 export function clearWater() {
   if (_waterMesh) {
+    try { _waterMesh._underside?.material?.dispose(); } catch(e) {}
+    try { _waterMesh._underside?.dispose(); } catch(e) {}
     try { _waterMesh.material?.dispose(); } catch(e) {}
     try { _waterMesh.dispose(); } catch(e) {}
     _waterMesh = null;
@@ -110,3 +137,4 @@ export function clearWater() {
 }
 
 export function getWaterMesh() { return _waterMesh; }
+export function getWaterY()    { return _waterMesh ? _waterMesh.position.y : null; }

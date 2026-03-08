@@ -1,0 +1,162 @@
+{
+  "meta": {
+    "id": "level-4",
+    "title": "STORM FRONT",
+    "subtitle": "Level 4 of 5",
+    "description": "Visibility zero. The fleet is everywhere.",
+    "total_levels": 5,
+    "levels": [
+      {
+        "id": "level-1",
+        "title": "COASTAL PATROL",
+        "subtitle": "Level 1 of 5"
+      },
+      {
+        "id": "level-2",
+        "title": "THE DEEP",
+        "subtitle": "Level 2 of 5"
+      },
+      {
+        "id": "level-3",
+        "title": "BLOCKADE",
+        "subtitle": "Level 3 of 5"
+      },
+      {
+        "id": "level-4",
+        "title": "STORM FRONT",
+        "subtitle": "Level 4 of 5"
+      },
+      {
+        "id": "level-5",
+        "title": "LEVIATHAN",
+        "subtitle": "Level 5 of 5 \u2014 FINAL"
+      }
+    ]
+  },
+  "splash_screen": "<div class='social-links'><a href='https://x.com/scott_grocott' target='_blank'>X (Twitter)</a> <a href='https://github.com/scottgrocott' target='_blank'>GitHub</a> <a href='https://www.instagram.com/scott_grocott/' target='_blank'>Instagram</a> <a href='https://www.linkedin.com/in/scott-grocott/' target='_blank'>LinkedIn</a></div>",
+  "terrain": {
+    "type": "heightmap",
+    "size": 700,
+    "sizeX": 700,
+    "sizeZ": 700,
+    "subdivisions": 128,
+    "heightScale": 65,
+    "environment": [
+      "env_wetland"
+    ],
+    "shelterCount": 10,
+    "heightmaps": [
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png",
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png",
+      "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map3.png"
+    ]
+  },
+  "fog": {
+    "enabled": true,
+    "mode": "FOGMODE_LINEAR",
+    "color": {
+      "r": 0.45,
+      "g": 0.5,
+      "b": 0.58
+    },
+    "density": 0.6,
+    "start": 100,
+    "end": 360
+  },
+  "water": {
+    "enabled": true,
+    "mesh": {
+      "width": 700,
+      "height": 700,
+      "subdivisions": 32,
+      "position": {
+        "x": 0,
+        "y": 22,
+        "z": 0
+      }
+    },
+    "material": {
+      "bumpTexture": "https://scottgrocott.github.io/mt-assets/terrain/environments/water.jpg",
+      "windForce": 10,
+      "windDirection": {
+        "x": 1,
+        "y": 0.5
+      },
+      "waveHeight": 0.75,
+      "bumpHeight": 0.12,
+      "waveLength": 0.09,
+      "waveSpeed": 24,
+      "waterColor": {
+        "r": 0.04,
+        "g": 0.28,
+        "b": 0.48
+      },
+      "colorBlendFactor": 0.22,
+      "waterColor2": {
+        "r": 0.08,
+        "g": 0.38,
+        "b": 0.58
+      },
+      "colorBlendFactor2": 0.22,
+      "disableClipPlane": false,
+      "renderTargetSize": 512
+    }
+  },
+  "enemies": [
+    {
+      "type": "boat",
+      "maxCount": 4,
+      "health": 90,
+      "hitsToKill": 9
+    },
+    {
+      "type": "submarine",
+      "maxCount": 3,
+      "health": 130,
+      "hitsToKill": 13
+    }
+  ],
+  "weapons": [
+    {
+      "id": "basic_gun",
+      "module": "./weapons/basicGun.js",
+      "bulletSpeed": 72,
+      "bulletRadius": 0.12,
+      "range": 200,
+      "hitsToKill": 9
+    }
+  ],
+  "scatterLayers": [
+    {
+      "category": "vegetation",
+      "density": 0.05,
+      "minElevation": 0,
+      "maxElevation": 0.5
+    },
+    {
+      "category": "rock",
+      "density": 0.03,
+      "minElevation": 0,
+      "maxElevation": 0.8
+    }
+  ],
+  "shelters": [],
+  "structures": [],
+  "ladders": [],
+  "waypoints": [],
+  "assets": [],
+  "audio": {
+    "outerZone": {
+      "radius": 300,
+      "track": "wind"
+    },
+    "midZone": {
+      "radius": 160,
+      "track": "adventure"
+    },
+    "innerZone": {
+      "radius": 65,
+      "track": "battle"
+    }
+  }
+}

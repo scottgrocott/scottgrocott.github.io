@@ -1,97 +1,112 @@
-// terrain/heightmap.js — heightmap loader, getHeightAt, Rapier heightfield
+// terrain/heightmap.js — load heightmap image, expose getHeightAt / heightGrid
+// No physics here. Terrain collider is built in physics.js from the BabylonJS mesh.
 
-import { physicsWorld, physicsReady, safeVec3 } from '../physics.js';
+import { CONFIG } from '../config.js';
 
-export let heightmapReady = false;
-export let heightGrid     = null; // Float32Array [row * cols + col]
+// Public: flat Float32Array of height values, row-major, used by minimap
+export let heightGrid = null;
+export let heightGridSize = 0;   // N where grid is NxN
 
-let _gridRows = 0;
-let _gridCols = 0;
-let _terrainSize  = 700;
-let _heightScale  = 80;
-let _heightCollider = null;
+// Internal pixel data kept for getHeightAt sampling
+let _imgData    = null;
+let _imgWidth   = 0;
+let _imgHeight  = 0;
+let _worldSize  = 512;
+let _heightScale = 80;
 
-export async function loadHeightmap(url, terrainSize, heightScale) {
-  _terrainSize = terrainSize || 700;
-  _heightScale = heightScale || 80;
+/**
+ * Load a heightmap image URL and cache its pixel data.
+ * @param {string} url          — remote URL or data: URI
+ * @param {number} worldSize    — terrain world width/depth
+ * @param {number} heightScale  — max terrain height
+ */
+export function loadHeightmap(url, worldSize, heightScale) {
+  _worldSize   = worldSize   ?? CONFIG?.terrain?.size        ?? 512;
+  _heightScale = heightScale ?? CONFIG?.terrain?.heightScale ?? 80;
 
   if (!url) {
-    // Flat plane
-    _generateFlat();
-    return;
+    // Flat terrain — zero grid
+    _buildFlatGrid();
+    return Promise.resolve();
   }
 
-  try {
-    await _loadFromURL(url);
-  } catch (e) {
-    console.warn('[heightmap] Failed to load PNG, using flat:', e);
-    _generateFlat();
-  }
-}
-
-function _generateFlat() {
-  const N = 64;
-  _gridRows = N; _gridCols = N;
-  heightGrid = new Float32Array(N * N).fill(0);
-  heightmapReady = true;
-  _createRapierHeightfield();
-}
-
-async function _loadFromURL(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
+
     img.onload = () => {
-      const N = Math.min(img.width, img.height, 256);
-      const cnv = document.createElement('canvas');
-      cnv.width = cnv.height = N;
-      const ctx = cnv.getContext('2d');
-      ctx.drawImage(img, 0, 0, N, N);
-      const data = ctx.getImageData(0, 0, N, N).data;
-      _gridRows = N; _gridCols = N;
-      heightGrid = new Float32Array(N * N);
-      for (let i = 0; i < N * N; i++) {
-        heightGrid[i] = (data[i * 4] / 255) * _heightScale;
+      const canvas = document.createElement('canvas');
+      canvas.width  = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      try {
+        _imgData   = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        _imgWidth  = canvas.width;
+        _imgHeight = canvas.height;
+      } catch(e) {
+        // CORS-blocked canvas — fall back to flat
+        console.warn('[heightmap] getImageData blocked (CORS?), using flat terrain:', e);
+        _buildFlatGrid();
+        resolve();
+        return;
       }
-      heightmapReady = true;
-      _createRapierHeightfield();
+
+      _buildHeightGrid();
+      console.log(`[heightmap] Loaded ${_imgWidth}x${_imgHeight}, world=${_worldSize}, scale=${_heightScale}`);
       resolve();
     };
-    img.onerror = reject;
+
+    img.onerror = (e) => {
+      console.warn('[heightmap] Image load failed, using flat terrain:', url, e);
+      _buildFlatGrid();
+      resolve();   // resolve (not reject) so boot continues
+    };
+
     img.src = url;
   });
 }
 
-function _createRapierHeightfield() {
-  if (!physicsReady || !physicsWorld) return;
-  if (_heightCollider) {
-    try { physicsWorld.removeCollider(_heightCollider, true); } catch(e) {}
-  }
-  const rows = _gridRows, cols = _gridCols;
-  const scale = { x: _terrainSize, y: 1.0, z: _terrainSize };
+/**
+ * Sample terrain height at world position (wx, wz).
+ * Matches the UV formula in terrainMesh.js.
+ */
+export function getHeightAt(wx, wz) {
+  if (!_imgData) return 0;
 
-  const bodyDesc = RAPIER.RigidBodyDesc.fixed();
-  const body = physicsWorld.createRigidBody(bodyDesc);
+  const u  = (wx + _worldSize / 2) / _worldSize;
+  const v  = 1 - (wz + _worldSize / 2) / _worldSize;
+  const px = Math.min(Math.max(Math.floor(u * _imgWidth),  0), _imgWidth  - 1);
+  const py = Math.min(Math.max(Math.floor(v * _imgHeight), 0), _imgHeight - 1);
 
-  const cdesc = RAPIER.ColliderDesc.heightfield(rows - 1, cols - 1, heightGrid, scale);
-  _heightCollider = physicsWorld.createCollider(cdesc, body);
+  const grey = _imgData.data[(py * _imgWidth + px) * 4] / 255;
+  return grey * _heightScale;
 }
 
-// Bilinear interpolation of height at world position
-export function getHeightAt(worldX, worldZ) {
-  if (!heightmapReady || !heightGrid) return 0;
-  const half = _terrainSize / 2;
-  const normX = (worldX + half) / _terrainSize; // 0..1
-  const normZ = (worldZ + half) / _terrainSize;
-  const u = Math.max(0, Math.min(1, normX)) * (_gridCols - 1);
-  const v = Math.max(0, Math.min(1, normZ)) * (_gridRows - 1);
-  const c0 = Math.floor(u), r0 = Math.floor(v);
-  const c1 = Math.min(c0 + 1, _gridCols - 1);
-  const r1 = Math.min(r0 + 1, _gridRows - 1);
-  const fu = u - c0, fv = v - r0;
-  const h00 = heightGrid[r0 * _gridCols + c0];
-  const h10 = heightGrid[r0 * _gridCols + c1];
-  const h01 = heightGrid[r1 * _gridCols + c0];
-  const h11 = heightGrid[r1 * _gridCols + c1];
-  return h00 * (1-fu)*(1-fv) + h10 * fu*(1-fv) + h01 * (1-fu)*fv + h11 * fu*fv;
+// ── Internal ──────────────────────────────────────────────────────────────────
+
+function _buildHeightGrid() {
+  const N = 128;   // minimap resolution
+  heightGridSize = N;
+  heightGrid = new Float32Array(N * N);
+  for (let row = 0; row < N; row++) {
+    for (let col = 0; col < N; col++) {
+      const u  = col / (N - 1);
+      const v  = 1 - row / (N - 1);
+      const px = Math.min(Math.floor(u * _imgWidth),  _imgWidth  - 1);
+      const py = Math.min(Math.floor(v * _imgHeight), _imgHeight - 1);
+      const grey = _imgData.data[(py * _imgWidth + px) * 4] / 255;
+      heightGrid[row * N + col] = grey * _heightScale;
+    }
+  }
+}
+
+function _buildFlatGrid() {
+  _imgData   = null;
+  _imgWidth  = 0;
+  _imgHeight = 0;
+  const N = 128;
+  heightGridSize = N;
+  heightGrid = new Float32Array(N * N);  // all zeros
 }

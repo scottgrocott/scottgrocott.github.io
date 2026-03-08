@@ -67,7 +67,7 @@ function _buildStaticCache() {
   for (let py = 0; py < SIZE; py++) {
     for (let px = 0; px < SIZE; px++) {
       const wx = (px / SIZE) * _terrainSize - half;
-      const wz = (py / SIZE) * _terrainSize - half;
+      const wz = ((SIZE - py) / SIZE) * _terrainSize - half;   // flipped to match worldToMap
       const h  = getTerrainHeightAt(wx, wz);
       const [r, g, b] = _paletteAt(h, bands, hScale);
 
@@ -88,7 +88,7 @@ function _buildStaticCache() {
     for (let py = 0; py < SIZE; py++) {
       for (let px = 0; px < SIZE; px++) {
         const wx = (px / SIZE) * _terrainSize - half;
-        const wz = (py / SIZE) * _terrainSize - half;
+        const wz = ((SIZE - py) / SIZE) * _terrainSize - half;   // flipped to match worldToMap
         if (getTerrainHeightAt(wx, wz) < waterY) {
           octx.fillRect(px, py, 1, 1);
         }
@@ -120,10 +120,12 @@ export function tickMinimap() {
   const half = _terrainSize / 2;
 
   // World → minimap pixel
+  // X is flipped (SIZE - ...) to match the camera's view orientation —
+  // BabylonJS +X is world-right but appears as left from the default camera perspective.
   function worldToMap(wx, wz) {
     return {
       x: ((wx + half) / _terrainSize) * SIZE,
-      y: ((wz + half) / _terrainSize) * SIZE,
+      y: SIZE - ((wz + half) / _terrainSize) * SIZE,   // flip Z so north=up
     };
   }
 
@@ -156,7 +158,7 @@ export function tickMinimap() {
   // Player direction
   ctx.beginPath();
   ctx.moveTo(pp.x, pp.y);
-  ctx.lineTo(pp.x + Math.sin(euler.y)*9, pp.y + Math.cos(euler.y)*9);
+  ctx.lineTo(pp.x + Math.sin(euler.y)*9, pp.y - Math.cos(euler.y)*9);  // negate Y to match flipped Z axis
   ctx.strokeStyle = '#aaffee';
   ctx.lineWidth = 2;
   ctx.stroke();
