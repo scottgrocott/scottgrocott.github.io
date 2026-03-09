@@ -46,8 +46,12 @@ export const MOUSE_SENSITIVITY = 0.002;
 // ---- Pointer lock ----
 const canvas = document.getElementById('renderCanvas');
 
+// Only lock pointer after play button pressed — not on the play button click itself
+let _splashDismissed = false;
+document.addEventListener('splash-dismissed', () => { _splashDismissed = true; });
+
 canvas.addEventListener('click', () => {
-  if (!_inFreeCam) canvas.requestPointerLock();
+  if (_splashDismissed && !_inFreeCam) canvas.requestPointerLock();
 });
 
 document.addEventListener('pointerlockchange', () => {
@@ -66,7 +70,7 @@ document.addEventListener('mousemove', (e) => {
 // ---- Mouse click → shoot ----
 document.addEventListener('mousedown', (e) => {
   if (e.button !== 0) return;
-  if (!pointerLock.locked && !_inFreeCam) return;
+  if (!pointerLock.locked && !_inFreeCam) return;   // require lock to shoot with mouse
   _shootCallbacks.forEach(fn => fn());
 });
 

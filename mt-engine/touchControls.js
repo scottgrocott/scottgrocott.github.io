@@ -1,4 +1,5 @@
 // touchControls.js — mobile / tablet touch overlay
+import { applyLookDelta } from './look.js';
 //
 // Writes directly into the engine's existing `keys` and `euler` objects so
 // zero changes are needed in player.js, look.js, or input.js.
@@ -38,7 +39,7 @@ export function initTouchControls(keys, euler, shootFn) {
   if (!isTouchDevice()) return;
   if (_active) return;
   _keys    = keys;
-  _euler   = euler;
+  // euler not used directly — applyLookDelta from look.js handles euler + camera
   _shootFn = shootFn;
   _active  = true;
   _buildOverlay();
@@ -168,6 +169,8 @@ function _attachEvents() {
 
   fireEl.addEventListener('touchstart', e => {
     e.preventDefault();
+    // Belt-and-suspenders audio unlock — iOS sometimes needs the gesture on the first in-game touch
+    if (window.Tone?.context?.state !== 'running' && window.Tone?.start) window.Tone.start();
     _fire.active = true;
     fireEl.classList.add('on');
     if (_shootFn) _shootFn();
@@ -280,10 +283,8 @@ function _lookMove(e) {
     const ddy = t.clientY - _look.ly;
     _look.lx = t.clientX;
     _look.ly = t.clientY;
-    if (_euler) {
-      _euler.y += ddx * _look.sensitivity;
-      _euler.x  = Math.max(-1.4, Math.min(1.4, _euler.x + ddy * _look.sensitivity));
-    }
+    // applyLookDelta is the single source of truth — updates euler + camera.rotationQuaternion
+    applyLookDelta(ddx * _look.sensitivity, ddy * _look.sensitivity);
   }
 }
 

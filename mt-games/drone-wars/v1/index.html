@@ -195,9 +195,11 @@
     const screen = document.getElementById('loading-screen');
     if (!screen || screen.style.display === 'none') return;
     screen.style.display = 'none';
+    // iOS requires Tone.start() called synchronously inside a user gesture handler
+    if (window.Tone?.start) window.Tone.start();
     // Fire splash-dismissed so main.js starts audio
     document.dispatchEvent(new CustomEvent('splash-dismissed'));
-    // Request pointer lock on desktop
+    // Request pointer lock on desktop only
     const canvas = document.getElementById('renderCanvas');
     if (canvas && !('ontouchstart' in window)) {
       canvas.requestPointerLock?.();
@@ -205,18 +207,22 @@
   }
 
   const _playBtn = document.getElementById('btn-play');
-  _playBtn.addEventListener('click',      _dismissSplash);
+  _playBtn.addEventListener('click', _dismissSplash);
   _playBtn.addEventListener('touchstart', function(e) {
-    e.preventDefault();   // prevent ghost click + scroll
+    e.preventDefault();
+    // iOS: must call Tone.start() synchronously in the SAME touchstart handler
+    if (window.Tone?.start) window.Tone.start();
     _dismissSplash();
   }, { passive: false });
   </script>
 
   <script>
   // Auto-detect engine location: local dev vs GitHub Pages
+  // ?v= busts the ES module cache — increment when deploying changed modules
+  const _v = '2025.b';
   window._ENGINE_SRC = location.hostname === 'localhost'
-    ? 'http://localhost:83/mt-engine/main.js'
-    : 'https://scottgrocott.github.io/mt-engine/main.js';
+    ? 'http://localhost:83/mt-engine/main.js?v=' + _v
+    : 'https://scottgrocott.github.io/mt-engine/main.js?v=' + _v;
   const s = document.createElement('script');
   s.type = 'module'; s.src = window._ENGINE_SRC;
   document.currentScript.after(s);

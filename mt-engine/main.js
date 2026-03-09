@@ -126,7 +126,7 @@ function hideLoadingScreen() {
 async function boot() {
   initSky();
   setLoadStatus('Setting up look & camera', 5);
-  setLookCamera(camera);
+  setLookCamera(camera);   // always — clears BJS built-in inputs on all devices
 
   setLoadStatus('Registering callbacks', 10);
   registerShootCallback(_shoot);
@@ -183,8 +183,9 @@ async function boot() {
     document.removeEventListener('splash-dismissed', _onGesture);
   };
   document.addEventListener('splash-dismissed', _onGesture);
-  document.addEventListener('click', _onGesture);
-  document.addEventListener('keydown', _onGesture);
+  document.addEventListener('click',      _onGesture);
+  document.addEventListener('keydown',    _onGesture);
+  document.addEventListener('touchstart', _onGesture, { once: true, passive: true });
 
 // ── Underwater fog ───────────────────────────────────────────────────────────
 let _wasSubmerged = false;
@@ -348,9 +349,8 @@ async function loadGameConfig(url) {
       CONFIG.terrain.heightmapUrl = _pick;
     } else {
       CONFIG.terrain.heightmapUrl = _pick.url;
-      // Merge rich overrides into CONFIG so environment/structures/shelterCount take effect
-      if (_pick.environment)   CONFIG.terrain.environment   = _pick.environment;
-      if (_pick.structures)    CONFIG.structures             = Object.assign(CONFIG.structures || {}, _pick.structures);
+      // Only merge shelterCount — environment ids come from CONFIG.terrain.environment already
+      // _pick.environment is shader/scatter metadata, not a loadEnvironment id
       if (_pick.shelterCount != null) CONFIG.terrain.shelterCount = _pick.shelterCount;
     }
     console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick)+1) + '/' + _hmaps.length + ':', _pick);
@@ -365,13 +365,33 @@ async function loadGameConfig(url) {
   }
 
   if (CONFIG.terrain?.environment) {
-    await loadEnvironment(CONFIG.terrain.environment);
+    // environment may be a string id, array of ids, or rich object {types:[...], shaderLayers:[...]}
+    let _envId = CONFIG.terrain.environment;
+    if (Array.isArray(_envId))          _envId = _envId[0];          // ['env_wetland'] → 'env_wetland'
+    if (typeof _envId === 'object')     _envId = _envId?.types?.[0] ?? _envId?.ids?.[0] ?? null;
+    if (_envId && typeof _envId === 'string') await loadEnvironment(_envId);
   }
 
   await loadHeightmap(CONFIG.terrain.heightmapUrl || CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
   await buildTerrain(scene, CONFIG);
   const terrainMesh = getTerrainMesh();
   // Material applied inside buildTerrain → _applyMaterial (node mat or fallback)
+  // Mobile fallback: node material snippet fetch can fail on mobile (CORS / no internet access to snippet API)
+  // Check after 4s — if mesh is still unshaded (no textures ready), swap to StandardMaterial
+  if (terrainMesh) {
+    setTimeout(() => {
+      const mat = terrainMesh.material;
+      const failed = !mat
+        || (mat.getClassName?.() === 'NodeMaterial' && !mat.isReady(terrainMesh));
+      if (failed) {
+        console.warn('[main] Terrain node material not ready — applying mobile fallback');
+        const fb = new BABYLON.StandardMaterial('terrainFallback', scene);
+        fb.diffuseColor = new BABYLON.Color3(0.35, 0.50, 0.22);
+        fb.specularColor = new BABYLON.Color3(0, 0, 0);
+        terrainMesh.material = fb;
+      }
+    }, 4000);
+  }
 
   // Build Rapier heightfield collider so player walks on terrain surface
   const _pixelData = getTerrainPixelData();

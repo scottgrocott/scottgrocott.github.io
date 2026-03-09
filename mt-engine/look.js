@@ -8,6 +8,9 @@ let _camera = null;
 
 export function setLookCamera(cam) {
   _camera = cam;
+  // Detach BabylonJS built-in camera inputs — they override rotationQuaternion every frame.
+  // We drive rotation manually via applyLookDelta.
+  try { cam.inputs?.clear(); } catch(e) {}
 }
 
 const _quat = new BABYLON.Quaternion();

@@ -82,7 +82,12 @@ export function getChannelStates() {
 export async function initAudio() {
   if (!window.Tone) return;
   try {
-    await Tone.start();
+    // Tone.start() must be called synchronously in a user gesture BEFORE initAudio().
+    // index.html calls window.Tone.start() on the play button touchstart/click.
+    // We still call it here as a fallback for desktop (gesture context usually still valid).
+    if (Tone.context.state !== 'running') {
+      await Tone.start();
+    }
 
     // Create channel gain nodes
     _musicGain  = new Tone.Gain(Tone.dbToGain(_channels.music.volume)).toDestination();
