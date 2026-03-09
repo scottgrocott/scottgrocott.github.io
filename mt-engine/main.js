@@ -67,8 +67,17 @@ const DEFAULT_CONFIG = _enginePath('assets/configs/test.json');
 window.dispatchEvent(new CustomEvent('engine-ready', { detail: { engineRoot: ENGINE_ROOT } }));
 
 async function _resolveStartConfig() {
-  // ?level=level-2.json  or  ?level=2  (shorthand → level-2.json)
   const params = new URLSearchParams(window.location.search);
+
+  // ?config=<full-url-or-path>  — direct config URL, e.g:
+  //   http://localhost:83/mt-engine/?config=https://scottgrocott.github.io/mt-games/drone-wars/v1/level-1.json
+  const cfgParam = params.get('config');
+  if (cfgParam) {
+    console.log('[main] Config from URL param:', cfgParam);
+    return cfgParam;
+  }
+
+  // ?level=level-2.json  or  ?level=2  (shorthand → level-2.json, relative to page)
   const lvlParam = params.get('level');
   if (lvlParam) {
     // Normalise: bare number → "level-N.json", bare name → "name.json"
@@ -460,6 +469,22 @@ async function loadGameConfig(url) {
   setLoadStatus('Ready!', 100);
   // Expose loadGameConfig for level nav buttons in index.html
   window._loadGameConfig = loadGameConfig;
+
+  // Live scene apply hooks for editor
+  window._applyFog = () => {
+    const f = CONFIG.fog; if (!f) return;
+    scene.fogEnabled = f.enabled !== false;
+    scene.fogMode    = BABYLON.Scene.FOGMODE_LINEAR;
+    scene.fogStart   = f.start   ?? 160;
+    scene.fogEnd     = f.end     ?? 520;
+    scene.fogDensity = f.density ?? 0.4;
+    if (f.color) scene.fogColor = new BABYLON.Color3(f.color.r ?? 0.7, f.color.g ?? 0.8, f.color.b ?? 0.9);
+  };
+  window._applyWaterY = () => {
+    const wm = scene.getMeshByName?.('waterPlane') ?? scene.getMeshByName?.('water');
+    if (wm) wm.position.y = CONFIG.water?.mesh?.position?.y ?? 5;
+  };
+  window._enemyCount = () => { try { return parseInt(document.getElementById('hud-enemies')?.textContent) || 0; } catch(e){ return 0; } };
   // Expose terrain boundary for player.js clamp (10 units inside edge to give buffer)
   const _th = CONFIG.terrain;
   window._CONFIG_terrainHalf = Math.min(_th.sizeX || _th.size || 700, _th.sizeZ || _th.size || 700) / 2 - 10;

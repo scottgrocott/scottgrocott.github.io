@@ -11,6 +11,7 @@
 import { getEnvironment } from './environment.js';
 import { CONFIG }         from './config.js';
 import { playerRig }      from './player.js';
+import { getGainNode }    from './audio.js';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -168,7 +169,8 @@ function _initMusic(musicData) {
     _adventureTheme = adventurePool.length ? _pick(adventurePool) : null;
 
     // Shared master volume for music (separate from soundscape)
-    _masterVol = new Tone.Volume(-6).toDestination();
+    _masterVol = new Tone.Volume(-6);
+    { const _mg = getGainNode('music'); if (_mg) _masterVol.connect(_mg); else _masterVol.toDestination(); }
 
     _musicReady = true;
     console.log('[soundtrack] Music ready |',
@@ -263,7 +265,8 @@ function _initSoundscape(soundsData) {
     _reverb = new Tone.Reverb({
       decay:    rv.decay    ?? 3.0,
       preDelay: rv.preDelay ?? 0.03,
-    }).toDestination();
+    });
+    { const _eg = getGainNode('env'); if (_eg) _reverb.connect(_eg); else _reverb.toDestination(); }
     _reverb.wet.value = rv.wet ?? 0.4;
     _reverb.generate();
   } catch(e) {
@@ -308,7 +311,8 @@ function _buildSoundscapeNode(def) {
 
     const fxChain = _makeEffects(def.effects || {});
     const behavior = def.behavior || {};
-    const volNode  = new Tone.Volume(behavior.volume ?? -12).toDestination();
+    const volNode  = new Tone.Volume(behavior.volume ?? -12);
+    { const _eg2 = getGainNode('env'); if (_eg2) volNode.connect(_eg2); else volNode.toDestination(); }
 
     // chain: synth → fx → vol → dest
     if (fxChain.length > 0) {
