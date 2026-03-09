@@ -103,6 +103,18 @@ function _tickWalk(dt) {
   if (isNaN(cp.x)) return;
   playerRig.position.copyFrom(cp);
 
+  // ── Hard boundary clamp — keep player inside terrain ─────────────────────
+  const _bound = (window._CONFIG_terrainHalf ?? 340);  // set by main.js after load
+  let _clamped = false;
+  if (cp.x >  _bound) { cp.x =  _bound; _clamped = true; }
+  if (cp.x < -_bound) { cp.x = -_bound; _clamped = true; }
+  if (cp.z >  _bound) { cp.z =  _bound; _clamped = true; }
+  if (cp.z < -_bound) { cp.z = -_bound; _clamped = true; }
+  if (_clamped) {
+    player.aggregate.body.setLinearVelocity(BABYLON.Vector3.Zero());
+    playerRig.position.copyFrom(cp);
+  }
+
   // ── Ground check (downward raycast) ──────────────────────────────────────
   const eng = scene.getPhysicsEngine();
   if (eng) {

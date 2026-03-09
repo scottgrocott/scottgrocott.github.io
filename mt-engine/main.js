@@ -128,15 +128,18 @@ function _buildTerrainBarriers(cfg) {
   if (!physicsReady) return;
   const hx = (cfg.sizeX || cfg.size || 700) / 2;
   const hz = (cfg.sizeZ || cfg.size || 700) / 2;
-  const wallH = 60;    // tall enough to block any jump
-  const wallT = 4;     // thickness (half = 2)
-  const wallY = wallH / 2;
+  const wallH  = 120;   // total height — extends 40 below ground so falling player hits wall
+  const wallHH = wallH / 2;
+  const wallCY = wallHH - 40;   // centre shifted down: bottom at y=-40, top at y=wallH-40
+  const wallHD = 8;    // half-depth — thick enough to catch a fast-moving player
+  // Inset 2 units so wall overlaps terrain edge, preventing slip-under at the lip
+  const inset  = 2;
 
   // addBoxCollider(cx, cy, cz,  half-width, half-height, half-depth)
-  addBoxCollider(  0,          wallY,  hz + 2,   hx,     wallH/2,  2 );  // +Z
-  addBoxCollider(  0,          wallY, -hz - 2,   hx,     wallH/2,  2 );  // -Z
-  addBoxCollider(  hx + 2,     wallY,  0,         2,     wallH/2,  hz);  // +X
-  addBoxCollider( -hx - 2,     wallY,  0,         2,     wallH/2,  hz);  // -X
+  addBoxCollider(  0,           wallCY,  hz - inset,   hx + wallHD, wallHH, wallHD);  // +Z
+  addBoxCollider(  0,           wallCY, -hz + inset,   hx + wallHD, wallHH, wallHD);  // -Z
+  addBoxCollider(  hx - inset,  wallCY,  0,            wallHD,      wallHH, hz + wallHD);  // +X
+  addBoxCollider( -hx + inset,  wallCY,  0,            wallHD,      wallHH, hz + wallHD);  // -X
   console.log('[main] Terrain barriers built (Havok) — half:', hx, hz);
 }
 
@@ -457,6 +460,9 @@ async function loadGameConfig(url) {
   setLoadStatus('Ready!', 100);
   // Expose loadGameConfig for level nav buttons in index.html
   window._loadGameConfig = loadGameConfig;
+  // Expose terrain boundary for player.js clamp (10 units inside edge to give buffer)
+  const _th = CONFIG.terrain;
+  window._CONFIG_terrainHalf = Math.min(_th.sizeX || _th.size || 700, _th.sizeZ || _th.size || 700) / 2 - 10;
 
   // Expose water level and heightScale for minimap water overlay
   window._CONFIG_water_y    = CONFIG.water?.enabled ? (CONFIG.water?.mesh?.position?.y ?? null) : null;
