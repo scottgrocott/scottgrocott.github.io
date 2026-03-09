@@ -149,17 +149,35 @@ function _tickDrone(enemy, dt) {
     }
   }
 
-  // Hard floor: terrain surface + clearance — drone NEVER goes below this
-  const _terrainFloor = getTerrainHeightAt(px, pz);
-  const TERRAIN_CLEARANCE = 5.0;   // minimum metres above terrain
-  if (targetY < _terrainFloor + TERRAIN_CLEARANCE) {
-    targetY = _terrainFloor + TERRAIN_CLEARANCE;
-  }
+  const TERRAIN_CLEARANCE = 6.0;   // minimum metres above terrain
 
-  // Water floor: also stay above water surface
+  // Sample terrain at BOTH current position AND target position — use the higher value
+  const _floorCurrent = getTerrainHeightAt(px, pz);
+  const _floorTarget  = getTerrainHeightAt(targetX, targetZ);
+  const _terrainFloor = Math.max(_floorCurrent, _floorTarget);
+  const _minY = _terrainFloor + TERRAIN_CLEARANCE;
+
+  // Clamp target
+  if (targetY < _minY) targetY = _minY;
+
+  // Water floor
   const _wy = getWaterY();
-  if (_wy !== null && targetY < _wy + 2.0) {
-    targetY = _wy + 2.0;
+  const _waterFloor = (_wy !== null) ? _wy + 2.0 : -Infinity;
+  if (targetY < _waterFloor) targetY = _waterFloor;
+
+  // Hard-correct current position if drone is already below floor this frame
+  // (catches cases where physics nudged it down or it spawned wrong)
+  const _hardFloor = Math.max(_floorCurrent + TERRAIN_CLEARANCE, _waterFloor);
+  let corrX = px, corrY = py, corrZ = pz;
+  if (py < _hardFloor) {
+    corrY = _hardFloor;
+    // Teleport up immediately — don't lerp, just correct
+    const snapSafe = safeVec3(px, corrY, pz, 'drone floor snap');
+    if (snapSafe) {
+      enemy.body.setNextKinematicTranslation(snapSafe);
+      if (enemy.mesh) enemy.mesh.position.set(snapSafe.x, snapSafe.y, snapSafe.z);
+    }
+    return; // skip normal movement this frame so snap takes effect cleanly
   }
 
   const spd = enemy.state === 'hunting' ? HUNT_SPEED : PATROL_SPEED;
