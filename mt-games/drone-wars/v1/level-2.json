@@ -281,6 +281,130 @@
           ]
         }
       },
+	       {
+        "_name": "Inner Sanctum",
+        "url": "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map5.png",
+        "shelterCount": 8,
+        "environment": {
+          "types": [
+            "env_wetland",
+            "env_desert",
+			"env_mediterranean",
+			"env_savanna",
+			"env_temperate_forest",
+			"env_tropical_rainforest",
+			"env_tundra"
+          ],
+          "shaderLayers": [
+            {
+              "minElevation": 0,
+              "maxElevation": 0.3,
+              "color": "#1e3a10",
+              "blend": "smooth"
+            },
+            {
+              "minElevation": 0.3,
+              "maxElevation": 0.65,
+              "color": "#3a5c20",
+              "blend": "smooth"
+            },
+            {
+              "minElevation": 0.65,
+              "maxElevation": 1,
+              "color": "#606850",
+              "blend": "smooth"
+            }
+          ]
+        },
+        "structures": {
+          "fortresses": [
+            {
+              "enabled": false,
+              "name": "Northern Bastion",
+              "position": {
+                "x": 120,
+                "y": 25,
+                "z": -85
+              },
+              "rotation": 0
+            },
+            {
+              "enabled": false,
+              "name": "Marsh Fort",
+              "position": {
+                "x": -80,
+                "y": 20,
+                "z": 120
+              },
+              "rotation": 90
+            },
+            {
+              "enabled": false,
+              "name": "Wetland Redoubt",
+              "position": {
+                "x": 50,
+                "y": 30,
+                "z": 180
+              },
+              "rotation": 180
+            }
+          ],
+          "villages": [
+            {
+              "enabled": false,
+              "name": "Reed Village",
+              "position": {
+                "x": -50,
+                "y": 18,
+                "z": -100
+              },
+              "rotation": 0
+            },
+            {
+              "enabled": false,
+              "name": "Fen Crossing",
+              "position": {
+                "x": 100,
+                "y": 19,
+                "z": 60
+              },
+              "rotation": 45
+            },
+            {
+              "enabled": false,
+              "name": "Bogside",
+              "position": {
+                "x": -90,
+                "y": 16,
+                "z": 30
+              },
+              "rotation": 135
+            }
+          ],
+          "cities": [
+            {
+              "enabled": false,
+              "name": "Delta Port",
+              "position": {
+                "x": 0,
+                "y": 15,
+                "z": 220
+              },
+              "rotation": 0
+            },
+            {
+              "enabled": false,
+              "name": "Marshgate",
+              "position": {
+                "x": 200,
+                "y": 15,
+                "z": -180
+              },
+              "rotation": 90
+            }
+          ]
+        }
+      },
       {
         "_name": "Mixed Highland",
         "url": "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map3.png",
