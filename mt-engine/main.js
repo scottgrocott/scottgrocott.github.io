@@ -349,9 +349,11 @@ async function loadGameConfig(url) {
       CONFIG.terrain.heightmapUrl = _pick;
     } else {
       CONFIG.terrain.heightmapUrl = _pick.url;
-      // Only merge shelterCount — environment ids come from CONFIG.terrain.environment already
-      // _pick.environment is shader/scatter metadata, not a loadEnvironment id
       if (_pick.shelterCount != null) CONFIG.terrain.shelterCount = _pick.shelterCount;
+      // Copy shaderLayers and environment types into CONFIG.terrain so terrainMesh can use them
+      if (_pick.environment?.shaderLayers) CONFIG.terrain.shaderLayers = _pick.environment.shaderLayers;
+      if (_pick.environment?.types?.length) CONFIG.terrain.environment = _pick.environment.types;
+      if (_pick.structures) CONFIG.structures = Object.assign({}, CONFIG.structures || {}, _pick.structures);
     }
     console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick)+1) + '/' + _hmaps.length + ':', _pick);
   }
@@ -451,6 +453,9 @@ async function loadGameConfig(url) {
 function _spawnEnemiesFromConfig() {
   const defs = CONFIG.enemies || [];
   for (const def of defs) {
+    // Skip disabled enemies or those with zero count
+    if (def.enabled === false || def.maxCount === 0) continue;
+
     // Merge CDN type def (audio, model, movingParts) into level-JSON def.
     // Level JSON picks the variant via def.variantId; falls back to first in list.
     const typeDefs = _enemyTypeDefs[def.type];
@@ -462,6 +467,7 @@ function _spawnEnemiesFromConfig() {
     if (merged.type === 'drone')         spawnDrones(merged);
     else if (merged.type === 'car')      spawnCars(merged);
     else if (merged.type === 'forklift') spawnForklifts(merged);
+    else console.warn(`[main] Unknown enemy type: ${merged.type}`);
   }
 }
 
