@@ -430,7 +430,7 @@
     "mesh": {
       "width": 700,
       "height": 700,
-      "subdivisions": 32,
+      "subdivisions": 3,
       "position": {
         "x": 0,
         "y": 25,
@@ -467,15 +467,15 @@
   "enemies": [
     {
       "type": "boat",
-      "enabled": false,
-      "maxCount": 0,
+      "enabled": true,
+      "maxCount": 1,
       "health": 80,
       "hitsToKill": 8
     },
     {
       "type": "submarine",
-      "enabled": false,
-      "maxCount": 0,
+      "enabled": true,
+      "maxCount": 1,
       "health": 120,
       "hitsToKill": 12
     },

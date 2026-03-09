@@ -1,53 +1,60 @@
 // ladders.js — ladder zones, climb detection, tick
+// Fix: _currentLadder null-guard after _stopClimbing
+// Fix: rotation support so ladders face the correct shelter side
 
 import { scene } from './core.js';
 import { playerRig, player } from './player.js';
 import { keys } from './input.js';
 import { LADDERS, CONFIG } from './config.js';
 
-let _ladders = [];
-let _climbing = false;
+let _ladders       = [];
+let _climbing      = false;
 let _currentLadder = null;
 
 export function initLadders() {
   clearLadders();
-  const ladderDefs = CONFIG.ladders || [];
-  for (const def of ladderDefs) {
-    spawnLadder(def);
-  }
+  for (const def of (CONFIG.ladders || [])) spawnLadder(def);
 }
 
 export function spawnLadder(def) {
-  const px = +(def.position?.x||0), py = +(def.position?.y||0), pz = +(def.position?.z||0);
+  const px  = +(def.position?.x || 0);
+  const py  = +(def.position?.y || 0);
+  const pz  = +(def.position?.z || 0);
   const height = def.height || 5;
+  // rotY: ladder faces in this direction (rungs face away from shelter)
+  const rotY   = def.rotY ?? def.rotation ?? 0;
 
-  // Visual ladder
   const node = new BABYLON.TransformNode('ladder', scene);
   node.position.set(px, py, pz);
+  node.rotation.y = rotY;
 
-  // Rails
+  const RAIL_COLOR = new BABYLON.Color3(0.55, 0.38, 0.18);
+  const RUNG_COLOR = new BABYLON.Color3(0.46, 0.32, 0.14);
+
+  const railMat = new BABYLON.StandardMaterial('ladderMat', scene);
+  railMat.diffuseColor = RAIL_COLOR;
+  const rungMat = new BABYLON.StandardMaterial('rungMat', scene);
+  rungMat.diffuseColor = RUNG_COLOR;
+
+  // Rails: placed at local ±0.2 on X, centred vertically
   for (const ox of [-0.2, 0.2]) {
-    const rail = BABYLON.MeshBuilder.CreateCylinder(`rail`, { diameter: 0.06, height }, scene);
+    const rail = BABYLON.MeshBuilder.CreateCylinder('rail', { diameter: 0.06, height }, scene);
     rail.parent = node;
-    rail.position.set(ox, height/2, 0);
-    const mat = new BABYLON.StandardMaterial('ladderMat', scene);
-    mat.diffuseColor = new BABYLON.Color3(0.6, 0.4, 0.2);
-    rail.material = mat;
+    rail.position.set(ox, height / 2, 0);
+    rail.material = railMat;
   }
 
-  // Rungs
+  // Rungs: span X, step up every 0.4m
   const rungCount = Math.floor(height / 0.4);
   for (let i = 0; i < rungCount; i++) {
     const rung = BABYLON.MeshBuilder.CreateCylinder('rung', { diameter: 0.04, height: 0.45 }, scene);
     rung.parent = node;
     rung.position.set(0, i * 0.4 + 0.2, 0);
     rung.rotation.z = Math.PI / 2;
-    const mat = new BABYLON.StandardMaterial('rungMat', scene);
-    mat.diffuseColor = new BABYLON.Color3(0.5, 0.35, 0.15);
-    rung.material = mat;
+    rung.material = rungMat;
   }
 
-  const ladder = { node, def, position: {x:px,y:py,z:pz}, height };
+  const ladder = { node, def, position: { x: px, y: py, z: pz }, height, rotY };
   _ladders.push(ladder);
   return ladder;
 }
@@ -57,74 +64,82 @@ export function tickLadders(dt) {
   const pp = playerRig.position;
 
   if (!_climbing) {
-    // Check if player is near a ladder
     for (const ladder of _ladders) {
-      const lp = ladder.position;
-      const dx = pp.x - lp.x, dz = pp.z - lp.z;
-      const dist = Math.sqrt(dx*dx + dz*dz);
-      if (dist < 0.8 && pp.y >= lp.y && pp.y <= lp.y + ladder.height + 0.5) {
+      const lp  = ladder.position;
+      const dx  = pp.x - lp.x;
+      const dz  = pp.z - lp.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      if (dist < 0.9 && pp.y >= lp.y - 0.2 && pp.y <= lp.y + ladder.height + 0.5) {
         if (keys.moveForward || keys.jump) {
           _startClimbing(ladder);
+          break;
         }
       }
     }
-  } else {
-    // Climbing
-    if (!keys.moveForward && !keys.jump && !keys.moveBack) return;
+    return;
+  }
 
-    if (keys.moveForward || keys.jump) {
-      playerRig.position.y += LADDERS.climbSpeed * dt;
-    } else if (keys.moveBack) {
-      playerRig.position.y -= LADDERS.climbSpeed * dt;
-    }
+  // ── Climbing ─────────────────────────────────────────────────────────────
+  // Cache current ladder reference BEFORE any _stopClimbing call
+  const activeLadder = _currentLadder;
+  if (!activeLadder) { _stopClimbing(); return; }
 
-    // Detach at top or bottom
-    const lp = _currentLadder.position;
-    if (playerRig.position.y > lp.y + _currentLadder.height + LADDERS.detachThreshold) {
-      _stopClimbing();
-    }
-    if (playerRig.position.y < lp.y - LADDERS.detachThreshold) {
-      _stopClimbing();
-    }
+  if (keys.moveForward || keys.jump) {
+    playerRig.position.y += LADDERS.climbSpeed * dt;
+  } else if (keys.moveBack) {
+    playerRig.position.y -= LADDERS.climbSpeed * dt;
+  }
 
-    // Keep player aligned to ladder
-    playerRig.position.x += (_currentLadder.position.x - playerRig.position.x) * 0.3;
-    playerRig.position.z += (_currentLadder.position.z - playerRig.position.z) * 0.3;
+  const lp = activeLadder.position;
 
-    // Sync Havok body to ladder position
-    const _clBody = player.aggregate?.body ?? player.rigidBody;
-    if (_clBody) {
-      try {
-        _clBody.setLinearVelocity(BABYLON.Vector3.Zero());
-        _clBody.setAngularVelocity(BABYLON.Vector3.Zero());
-      } catch(e) {}
-    }
-    // Sync capsule mesh position
-    if (player._capsuleMesh) {
-      player._capsuleMesh.position.set(playerRig.position.x, playerRig.position.y, playerRig.position.z);
-    }
+  // Detach checks — MUST use activeLadder snapshot, not _currentLadder
+  if (playerRig.position.y > lp.y + activeLadder.height + LADDERS.detachThreshold) {
+    _stopClimbing();
+    return;   // <-- return immediately; _currentLadder is now null
+  }
+  if (playerRig.position.y < lp.y - LADDERS.detachThreshold) {
+    _stopClimbing();
+    return;
+  }
+
+  // Align player to ladder centre (still safe — using activeLadder snapshot)
+  playerRig.position.x += (lp.x - playerRig.position.x) * 0.3;
+  playerRig.position.z += (lp.z - playerRig.position.z) * 0.3;
+
+  // Zero physics velocity so gravity doesn't fight us
+  const body = player.aggregate?.body ?? player.rigidBody;
+  if (body) {
+    try {
+      body.setLinearVelocity(BABYLON.Vector3.Zero());
+      body.setAngularVelocity(BABYLON.Vector3.Zero());
+    } catch(e) {}
+  }
+
+  if (player._capsuleMesh) {
+    player._capsuleMesh.position.set(
+      playerRig.position.x,
+      playerRig.position.y,
+      playerRig.position.z,
+    );
   }
 }
 
 function _startClimbing(ladder) {
-  _climbing = true;
+  _climbing      = true;
   _currentLadder = ladder;
-  // Havok: zero velocity and lock via massProps (no setGravityScale in BabylonJS Havok)
   const body = player.aggregate?.body ?? player.rigidBody;
   if (body) {
-    try { body.setLinearVelocity(new BABYLON.Vector3(0, 0, 0)); } catch(e) {}
+    try { body.setLinearVelocity(BABYLON.Vector3.Zero()); } catch(e) {}
     try {
-      // Freeze gravity while climbing by setting inertia and gravity factor
       body.setGravityFactor(0);
     } catch(e) {
-      // Fallback: lock mass (older Havok builds)
       try { body.setMassProperties({ mass: 0, inertia: BABYLON.Vector3.Zero() }); } catch(e2) {}
     }
   }
 }
 
 function _stopClimbing() {
-  _climbing = false;
+  _climbing      = false;
   _currentLadder = null;
   const body = player.aggregate?.body ?? player.rigidBody;
   if (body) {
@@ -136,10 +151,11 @@ function _stopClimbing() {
 
 export function clearLadders() {
   for (const l of _ladders) {
+    try { l.node.getChildMeshes().forEach(m => m.dispose()); } catch(e) {}
     try { l.node.dispose(); } catch(e) {}
   }
-  _ladders = [];
-  _climbing = false;
+  _ladders       = [];
+  _climbing      = false;
   _currentLadder = null;
 }
 

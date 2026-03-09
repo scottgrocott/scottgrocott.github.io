@@ -1,5 +1,4 @@
 <?php
-// Define the target JSON file
 $filename = 'level-0.json';
 
 // ==========================================
@@ -8,13 +7,9 @@ $filename = 'level-0.json';
 if (isset($_GET['api'])) {
     header('Content-Type: application/json');
 
-    // Handle Saving (POST)
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $input = file_get_contents('php://input');
-        
-        // Validate that the input is actually valid JSON
         if (json_decode($input) !== null) {
-            // Write to file (Make sure PHP has write permissions to this file/folder)
             $success = file_put_contents($filename, $input);
             if ($success !== false) {
                 echo json_encode(['status' => 'success', 'message' => 'File saved successfully!']);
@@ -29,12 +24,10 @@ if (isset($_GET['api'])) {
         exit;
     }
 
-    // Handle Loading (GET)
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (file_exists($filename)) {
             echo file_get_contents($filename);
         } else {
-            // Return an empty object if the file doesn't exist yet
             echo json_encode(new stdClass());
         }
         exit;
@@ -52,7 +45,6 @@ if (isset($_GET['api'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Level Editor (level-0.json)</title>
     
-    <!-- Include JSONEditor CSS and JS from CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.css" rel="stylesheet" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.js"></script>
 
@@ -68,14 +60,27 @@ if (isset($_GET['api'])) {
             box-sizing: border-box;
         }
         header {
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        .instructions {
+            background: #e9ecef;
+            padding: 10px 25px;
+            font-size: 14px;
+            color: #495057;
+            border-radius: 0 0 8px 8px;
             margin-bottom: 15px;
-            background: #fff;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 20px;
+        }
+        .instructions kbd {
+            background: #fff; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-size: 12px;
         }
         h1 { margin: 0; font-size: 20px; color: #333; }
         .controls { display: flex; align-items: center; gap: 15px; }
@@ -102,8 +107,9 @@ if (isset($_GET['api'])) {
         .success { color: #28a745; }
         .error { color: #dc3545; }
         
-        /* Custom tweaks for the editor */
-        .jsoneditor-menu { background-color: #343a40; border-bottom: none; }
+        /* Highlight the action menu button on hover so it's easy to find */
+        .jsoneditor-contextmenu-button { background-color: #f0f0f0; border-radius: 4px; }
+        .jsoneditor-contextmenu-button:hover { background-color: #dcdcdc; }
     </style>
 </head>
 <body>
@@ -115,52 +121,95 @@ if (isset($_GET['api'])) {
             <button id="saveBtn">💾 Save Changes</button>
         </div>
     </header>
+    
+    <div class="instructions">
+        <span><strong>To Duplicate:</strong> Click the <kbd>⋮</kbd> button on the left of any item and click <strong>Duplicate</strong>.</span>
+        <span><strong>To Add New:</strong> Click the <kbd>⋮</kbd> button on an array (like <em>heightmaps</em> or <em>fortresses</em>), click <strong>Append</strong>, and select your custom template!</span>
+    </div>
 
     <!-- Container for the visual editor -->
     <div id="jsoneditor"></div>
 
     <script>
-        // Initialize the JSON Editor
         const container = document.getElementById("jsoneditor");
         const options = {
-            mode: 'tree', // Default mode
-            modes: ['tree', 'code', 'form', 'view'], // Allows switching to raw text code view
+            mode: 'tree',
+            modes:['tree', 'code', 'form', 'view'],
             name: 'levelConfig',
             search: true,
             indentation: 2,
+            
+            // ==============================================================
+            // CUSTOM TEMPLATES FOR RAPID ARRAY ADDITIONS
+            // ==============================================================
+            templates:[
+                {
+                    text: '⭐ New Heightmap',
+                    title: 'Insert a fully structured blank heightmap',
+                    field: 'heightmap',
+                    value: {
+                        "_name": "New Region",
+                        "url": "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map-new.png",
+                        "shelterCount": 5,
+                        "environment": {
+                            "types": ["env_wetland"],
+                            "shaderLayers":[
+                                { "minElevation": 0.0, "maxElevation": 0.5, "color": "#1e3a10", "blend": "smooth" },
+                                { "minElevation": 0.5, "maxElevation": 1.0, "color": "#606850", "blend": "smooth" }
+                            ]
+                        },
+                        "structures": {
+                            "fortresses": [],
+                            "villages": [],
+                            "cities":[]
+                        }
+                    }
+                },
+                {
+                    text: '🏰 New Fortress',
+                    title: 'Insert a new fortress object',
+                    field: 'fortress',
+                    value: { "enabled": true, "name": "New Fortress", "position": { "x": 0, "y": 20.0, "z": 0 }, "rotation": 0 }
+                },
+                {
+                    text: '🏕️ New Village',
+                    title: 'Insert a new village object',
+                    field: 'village',
+                    value: { "enabled": true, "name": "New Village", "position": { "x": 0, "y": 20.0, "z": 0 }, "rotation": 0 }
+                },
+                {
+                    text: '🏙️ New City',
+                    title: 'Insert a new city object',
+                    field: 'city',
+                    value: { "enabled": true, "name": "New City", "position": { "x": 0, "y": 20.0, "z": 0 }, "rotation": 0 }
+                }
+            ],
             onError: function (err) {
                 showStatus(err.toString(), true);
             }
         };
         const editor = new JSONEditor(container, options);
 
-        // Fetch the file contents when the page loads
         fetch('?api=1')
             .then(response => response.json())
             .then(data => {
                 editor.set(data);
-                // Expand the first few levels automatically
-                editor.expand({ path: ['meta'] });
-                editor.expand({ path: ['terrain'] });
+                // Expand commonly edited paths by default
+                editor.expand({ path:['terrain'] });
+                editor.expand({ path: ['terrain', 'heightmaps'] });
             })
             .catch(err => {
-                console.error("Failed to load JSON", err);
-                showStatus("Error loading level-0.json. Does it exist?", true);
+                showStatus("Error loading level-0.json", true);
             });
 
-        // Save data back to the server
         document.getElementById('saveBtn').addEventListener('click', () => {
             try {
-                // Get the updated JSON from the editor
                 const updatedJson = editor.get(); 
-                
-                // Show saving state
                 showStatus("Saving...", false);
 
                 fetch('?api=1', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // Stringify with formatting to keep the file pretty
                     body: JSON.stringify(updatedJson, null, 2) 
                 })
                 .then(response => response.json())
@@ -175,18 +224,15 @@ if (isset($_GET['api'])) {
                     showStatus("❌ Network error while saving.", true);
                 });
             } catch (err) {
-                // Catches syntax errors if the user is in "code" mode and left a trailing comma
-                showStatus("❌ Invalid JSON format! Fix errors before saving.", true);
+                showStatus("❌ Invalid JSON format!", true);
             }
         });
 
-        // Utility to show temporary status messages
         let timeout;
         function showStatus(msg, isError = false) {
             const statusEl = document.getElementById('statusMessage');
             statusEl.textContent = msg;
             statusEl.className = 'status ' + (isError ? 'error' : 'success');
-            
             clearTimeout(timeout);
             timeout = setTimeout(() => { statusEl.textContent = ''; }, 4000);
         }

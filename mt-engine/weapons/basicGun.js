@@ -9,6 +9,7 @@ import { euler }      from '../look.js';
 import { physicsReady } from '../physics.js';
 import { getEnemies, hitEnemy } from '../enemies/enemyRegistry.js';
 import { onBoatHit } from '../enemies/boats.js';
+import { onShelterHit, panelMeshes } from '../shelterBridge.js';
 import { createWeaponBase } from './weaponBase.js';
 import { CONFIG }     from '../config.js';
 import { hudSetAmmo } from '../hud.js';
@@ -96,8 +97,6 @@ export function tickBullets(dt) {
       if (!ep) continue;
       const dx = bx - ep.x, dy = by - ep.y, dz = bz - ep.z;
       if (Math.sqrt(dx * dx + dy * dy + dz * dz) < 1.4) {
-        // Boats: onBoatHit handles health+sinking+dead in one shot
-        // All others: standard hitEnemy → takeDamage
         if (enemy.type === 'boat') {
           onBoatHit(enemy);
         } else {
@@ -106,6 +105,23 @@ export function tickBullets(dt) {
         _killBullet(b);
         b.dead = true;
         break;
+      }
+    }
+    if (b.dead) continue;
+
+    // Shelter / panel hit — distance check against all panel meshes (same pattern as enemies)
+    if (!b.dead) {
+      const dir = new BABYLON.Vector3(b.vx, b.vy, b.vz).normalize();
+      for (const pm of panelMeshes) {
+        if (pm.isDisposed() || !pm.isEnabled()) continue;
+        const pp = pm.position;
+        const dx = bx - pp.x, dy = by - pp.y, dz = bz - pp.z;
+        if (Math.sqrt(dx*dx + dy*dy + dz*dz) < 0.6) {
+          onShelterHit(pm, b.mesh.position.clone(), dir);
+          _killBullet(b);
+          b.dead = true;
+          break;
+        }
       }
     }
   }
