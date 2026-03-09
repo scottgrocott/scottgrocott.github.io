@@ -18,7 +18,7 @@
     "heightmaps": [
       {
         "_name": "Wetland Valley",
-        "url": "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map1.png",
+        "url": "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map4.png",
         "shelterCount": 8,
         "environment": {
           "types": [
@@ -433,7 +433,7 @@
       "subdivisions": 32,
       "position": {
         "x": 0,
-        "y": 15,
+        "y": 25,
         "z": 0
       }
     },
