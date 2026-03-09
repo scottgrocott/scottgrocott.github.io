@@ -1,25 +1,25 @@
 {
   "meta": {
     "id": "level-1",
-    "title": "Drone Wars Level 1",
+    "title": "Metal Throne: Drone Wars Level 1",
     "subtitle": "Level 1 of 3",
     "description": "Two patrol boats guard the inlet. Take them down.",
     "total_levels": 3,
     "levels": [
       {
         "id": "level-1",
-        "title": "UNO",
-        "subtitle": "Level 1 of 5"
+        "title": "First Level",
+        "subtitle": "Level 1 of 3"
       },
       {
         "id": "level-2",
-        "title": "DOS",
-        "subtitle": "Level 2 of 5"
+        "title": "Second Level",
+        "subtitle": "Level 2 of 3"
       },
       {
         "id": "level-3",
-        "title": "BAttle Royal",
-        "subtitle": "Level 3 of 5"
+        "title": "Third Level",
+        "subtitle": "Level 3 of 3"
       }
     ]
   },
