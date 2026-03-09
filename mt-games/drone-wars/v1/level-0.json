@@ -433,7 +433,7 @@
       "subdivisions": 3,
       "position": {
         "x": 0,
-        "y": 25,
+        "y": 5,
         "z": 0
       }
     },
@@ -481,8 +481,8 @@
     },
     {
       "type": "drone",
-      "enabled": false,
-      "maxCount": 0,
+      "enabled": true,
+      "maxCount": 2,
       "health": 60,
       "hitsToKill": 6
     },
