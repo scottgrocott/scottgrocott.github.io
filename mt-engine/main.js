@@ -13,7 +13,7 @@ import {
   setFreeCamActive,
 } from './input.js';
 import { tickInputGuard, suspendMouse, resumeMouse } from './inputGuard.js';
-import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider } from './physics.js';
+import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider, addBoxCollider, clearBoxColliders } from './physics.js';
 import { initPlayer, initPlayerBody, tickPlayer, toggleFreeCam, player, playerRig } from './player.js';
 import { initCockpit, tickCockpit, disposeCockpit } from './cockpit.js';
 import { tickHUD, hudSetStatus } from './hud.js';
@@ -119,7 +119,25 @@ function setLoadStatus(msg, pct) {
 function hideLoadingScreen() {
   // Loading screen is now dismissed by the Play button in index.html
   // so we just show the Play button rather than auto-hiding the screen
-  window._splashShowPlay?.();
+  window._splashShowPlay?.(CONFIG.meta?.levels || []);
+}
+
+
+// ── Terrain boundary walls ────────────────────────────────────────────────────
+function _buildTerrainBarriers(cfg) {
+  if (!physicsReady) return;
+  const hx = (cfg.sizeX || cfg.size || 700) / 2;
+  const hz = (cfg.sizeZ || cfg.size || 700) / 2;
+  const wallH = 60;    // tall enough to block any jump
+  const wallT = 4;     // thickness (half = 2)
+  const wallY = wallH / 2;
+
+  // addBoxCollider(cx, cy, cz,  half-width, half-height, half-depth)
+  addBoxCollider(  0,          wallY,  hz + 2,   hx,     wallH/2,  2 );  // +Z
+  addBoxCollider(  0,          wallY, -hz - 2,   hx,     wallH/2,  2 );  // -Z
+  addBoxCollider(  hx + 2,     wallY,  0,         2,     wallH/2,  hz);  // +X
+  addBoxCollider( -hx - 2,     wallY,  0,         2,     wallH/2,  hz);  // -X
+  console.log('[main] Terrain barriers built (Havok) — half:', hx, hz);
 }
 
 // ---- Boot ----
@@ -316,6 +334,7 @@ async function loadGameConfig(url) {
   const oldMesh = getTerrainMesh();
   if (oldMesh) { try { oldMesh.dispose(); } catch(e) {} }
 
+  clearBoxColliders();   // dispose barrier meshes before physics reset
   resetPhysics();
 
   // Fetch config JSON
@@ -376,6 +395,7 @@ async function loadGameConfig(url) {
 
   await loadHeightmap(CONFIG.terrain.heightmapUrl || CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
   await buildTerrain(scene, CONFIG);
+  _buildTerrainBarriers(CONFIG.terrain);
   const terrainMesh = getTerrainMesh();
   // Material applied inside buildTerrain → _applyMaterial (node mat or fallback)
   // Mobile fallback: node material snippet fetch can fail on mobile (CORS / no internet access to snippet API)
@@ -435,6 +455,9 @@ async function loadGameConfig(url) {
   _spawnEnemiesFromConfig();
 
   setLoadStatus('Ready!', 100);
+  // Expose loadGameConfig for level nav buttons in index.html
+  window._loadGameConfig = loadGameConfig;
+
   // Expose water level and heightScale for minimap water overlay
   window._CONFIG_water_y    = CONFIG.water?.enabled ? (CONFIG.water?.mesh?.position?.y ?? null) : null;
   window._CONFIG_heightScale = CONFIG.terrain?.heightScale ?? 80;
