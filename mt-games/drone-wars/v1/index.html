@@ -2,77 +2,157 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Test / Sandbox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Metal Throne</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body { background:#000; overflow:hidden; font-family:'Courier New',monospace; }
+
     #top-bar { position:fixed;top:0;left:0;right:0;z-index:10000;height:36px;
       background:rgba(8,12,8,0.92);border-bottom:1px solid #2a3a2a;
       display:flex;align-items:center;gap:12px;padding:0 12px; }
     #top-bar button { background:#0e1e0e;border:1px solid #3a6a3a;color:#8aee8a;
       font-family:inherit;font-size:11px;padding:3px 8px;cursor:pointer;border-radius:2px; }
+
     #renderCanvas { width:100vw;height:100vh;display:block;touch-action:none; }
+
     #hud { position:fixed;top:42px;left:12px;z-index:9000;color:#8aee8a;font-size:11px;
       pointer-events:none;display:flex;flex-direction:column;gap:4px; }
     #hud .hud-row { display:flex;gap:10px; }
     #hud .hud-label { color:#4a7a4a; }
+
     #crosshair { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
       width:16px;height:16px;pointer-events:none;z-index:9000; }
     #crosshair::before,#crosshair::after { content:'';position:absolute;background:rgba(138,238,138,0.8); }
     #crosshair::before { width:2px;height:16px;left:7px;top:0; }
     #crosshair::after  { width:16px;height:2px;top:7px;left:0; }
-    #loading-screen { position:fixed;inset:0;background:#000d00;z-index:99999;
+
+    #minimap-canvas { position:fixed;bottom:12px;right:12px;z-index:9000;
+      border:1px solid #2a4a2a;border-radius:2px; }
+
+    /* ── Loading / splash screen ─────────────────────────────────────── */
+    #loading-screen {
+      position:fixed;inset:0;background:#000d00;z-index:99999;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
-      color:#8aee8a;font-family:'Courier New',monospace; }
-    #loading-screen .load-title { font-size:22px;letter-spacing:0.3em;margin-bottom:18px; }
-    #loading-screen .load-sub   { font-size:11px;color:#4a7a4a;letter-spacing:0.15em; }
-    #loading-bar-wrap { width:280px;height:4px;background:#1a2a1a;border-radius:2px;margin-top:18px; }
-    #loading-bar { height:4px;background:#4aee4a;border-radius:2px;width:0%;transition:width 0.3s; }
-    #minimap-canvas { position:fixed;bottom:12px;right:12px;z-index:9000;border:1px solid #2a4a2a;border-radius:2px; }
+      color:#8aee8a;font-family:'Courier New',monospace;
+      padding:24px;
+    }
+
+    /* scanline overlay */
+    #loading-screen::before {
+      content:'';position:absolute;inset:0;pointer-events:none;
+      background:repeating-linear-gradient(to bottom,
+        transparent 0,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px);
+    }
+
+    #splash-title {
+      font-size:clamp(18px,5vw,32px);
+      letter-spacing:0.3em;
+      margin-bottom:10px;
+      text-align:center;
+      text-shadow:0 0 20px rgba(138,238,138,0.5);
+    }
+
+    #load-status {
+      font-size:11px;color:#4a7a4a;
+      letter-spacing:0.15em;
+      min-height:16px;
+      text-align:center;
+    }
+
+    #loading-bar-wrap {
+      width:min(280px,80vw);height:4px;
+      background:#1a2a1a;border-radius:2px;margin-top:14px;
+    }
+    #loading-bar {
+      height:4px;background:#4aee4a;border-radius:2px;
+      width:0%;transition:width 0.3s;
+    }
+
+    /* splash body — rendered HTML from level JSON */
+    #splash-body {
+      max-width:min(480px,90vw);
+      margin-top:20px;
+      font-size:clamp(11px,2.5vw,13px);
+      color:#6ab46a;
+      line-height:1.7;
+      text-align:center;
+      display:none;
+    }
+    #splash-body p  { margin-bottom:8px; }
+    #splash-body h2 { color:#8aee8a;letter-spacing:0.1em;margin-bottom:10px; }
+    #splash-body ul { list-style:none;padding:0; }
+    #splash-body li::before { content:'› ';color:#4aee4a; }
+
+    /* play button — hidden until engine calls _splashShowPlay() */
+    #btn-play {
+      display:none;
+      margin-top:28px;
+      padding:14px 48px;
+      font-family:'Courier New',monospace;
+      font-size:clamp(13px,3vw,15px);
+      font-weight:bold;
+      letter-spacing:0.3em;
+      color:#000d00;
+      background:#4aee4a;
+      border:none;
+      border-radius:2px;
+      cursor:pointer;
+      box-shadow:0 0 28px rgba(74,238,74,0.55);
+      transition:box-shadow 0.15s,transform 0.1s;
+      -webkit-tap-highlight-color:transparent;
+      /* large touch target */
+      min-width:180px;
+      min-height:52px;
+    }
+    #btn-play:hover  { box-shadow:0 0 42px rgba(138,238,138,0.8); }
+    #btn-play:active { transform:scale(0.97); }
+    #btn-play.visible { display:block; }
+
+    /* corner bracket decoration */
+    #splash-brackets {
+      position:absolute;
+      width:min(340px,88vw);height:min(260px,60vh);
+      pointer-events:none;opacity:0.18;
+    }
+    #splash-brackets::before,#splash-brackets::after {
+      content:'';position:absolute;width:28px;height:28px;
+      border-color:#8aee8a;border-style:solid;
+    }
+    #splash-brackets::before { top:0;left:0;border-width:2px 0 0 2px; }
+    #splash-brackets::after  { bottom:0;right:0;border-width:0 2px 2px 0; }
   </style>
+
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
   <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
   <script src="https://cdn.babylonjs.com/havok/HavokPhysics_umd.js"></script>
-  <script>
-    // Expose the HavokPhysics Promise as window.HK.
-    // physics.js does: const havok = await window.HK — so HK must be the Promise, not the resolved value.
-    window.HK = HavokPhysics();
-  </script>
+  <script>window.HK = HavokPhysics();</script>
   <script src="https://cdn.jsdelivr.net/npm/yuka@0.7.8/build/yuka.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-  <!-- Google Analytics GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX', { send_page_view: true });
-    // Track top-bar button clicks as page_view events
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('#top-bar button').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          gtag('event', 'page_view', {
-            page_title: btn.textContent.trim(),
-            page_location: window.location.href + '#' + (btn.id || btn.textContent.trim()),
-          });
-        });
-      });
-    });
-  </script>
 </head>
 <body>
+
   <div id="loading-screen">
-    <div class="load-title">Test / Sandbox</div>
-    <div class="load-sub" id="load-status">INITIALIZING...</div>
+    <div id="splash-brackets"></div>
+    <div id="splash-title">METAL THRONE</div>
+    <div id="load-status">INITIALIZING...</div>
     <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+    <div id="splash-body"></div>
+    <button id="btn-play">▶ &nbsp;PLAY</button>
   </div>
+
   <div id="top-bar">
     <button id="btn-audio">🔊 Audio</button>
     <button id="btn-help">? Help</button>
   </div>
+
   <canvas id="renderCanvas"></canvas>
   <div id="crosshair"></div>
+
   <div id="hud">
     <div class="hud-row">
       <span class="hud-label">HP</span><span id="hud-health">100</span>
@@ -82,7 +162,56 @@
     <div class="hud-row"><span class="hud-label">POS</span><span id="hud-pos">0,0,0</span></div>
     <div class="hud-row"><span id="hud-status"></span></div>
   </div>
+
   <canvas id="minimap-canvas" width="220" height="220"></canvas>
+
+  <script>
+  // ── Splash screen API — called by main.js after level load ────────────────
+  window._setSplashContent = function(title, body) {
+    const t = document.getElementById('splash-title');
+    const b = document.getElementById('splash-body');
+    if (t) t.textContent = title || 'METAL THRONE';
+    if (b) {
+      if (body && body.trim()) {
+        b.innerHTML = body;   // body is HTML from level JSON — render it
+        b.style.display = 'block';
+      } else {
+        b.style.display = 'none';
+      }
+    }
+  };
+
+  window._splashShowPlay = function() {
+    const btn = document.getElementById('btn-play');
+    const bar = document.getElementById('loading-bar-wrap');
+    const status = document.getElementById('load-status');
+    if (btn)    btn.classList.add('visible');
+    if (bar)    bar.style.display = 'none';
+    if (status) status.style.display = 'none';
+  };
+
+  // ── Play button ───────────────────────────────────────────────────────────
+  function _dismissSplash() {
+    const screen = document.getElementById('loading-screen');
+    if (!screen || screen.style.display === 'none') return;
+    screen.style.display = 'none';
+    // Fire splash-dismissed so main.js starts audio
+    document.dispatchEvent(new CustomEvent('splash-dismissed'));
+    // Request pointer lock on desktop
+    const canvas = document.getElementById('renderCanvas');
+    if (canvas && !('ontouchstart' in window)) {
+      canvas.requestPointerLock?.();
+    }
+  }
+
+  const _playBtn = document.getElementById('btn-play');
+  _playBtn.addEventListener('click',      _dismissSplash);
+  _playBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();   // prevent ghost click + scroll
+    _dismissSplash();
+  }, { passive: false });
+  </script>
+
   <script>
   // Auto-detect engine location: local dev vs GitHub Pages
   window._ENGINE_SRC = location.hostname === 'localhost'
@@ -91,53 +220,7 @@
   const s = document.createElement('script');
   s.type = 'module'; s.src = window._ENGINE_SRC;
   document.currentScript.after(s);
-</script>
-  <script type="module" src="http://localhost:83/mt-engine/main.js"></script>
-
-  <!-- ── Splash / Play screen ────────────────────────────────────────────── -->
-  <div id="splash-overlay" style="
-      display:none; position:fixed; inset:0; z-index:100000;
-      background:rgba(0,8,0,0.92);
-      flex-direction:column; align-items:center; justify-content:center;
-      font-family:'Courier New',monospace; color:#8aee8a;">
-    <div id="splash-title" style="font-size:28px;letter-spacing:0.35em;margin-bottom:10px;text-transform:uppercase;">METAL THRONE</div>
-    <div id="splash-body" style="font-size:12px;color:#4a8a4a;max-width:480px;text-align:center;line-height:1.7;margin-bottom:32px;letter-spacing:0.08em;white-space:pre-wrap;"></div>
-    <button id="splash-play-btn" style="
-        background:#0e2a0e; border:1px solid #4aee4a; color:#8aee8a;
-        font-family:'Courier New',monospace; font-size:14px; letter-spacing:0.25em;
-        padding:10px 40px; cursor:pointer; border-radius:2px;">
-      ▶  PLAY
-    </button>
-  </div>
-
-  <script>
-    // Called by main.js after level config is ready
-    window._setSplashContent = function(title, body) {
-      document.getElementById('splash-title').textContent = title || 'METAL THRONE';
-      document.getElementById('splash-body').textContent  = body  || '';
-    };
-
-    // Called by main.js when loading is complete — show the Play button
-    window._splashShowPlay = function() {
-      const overlay = document.getElementById('splash-overlay');
-      if (overlay) {
-        overlay.style.display = 'flex';
-        // Hide the loading bar screen first
-        const ls = document.getElementById('loading-screen');
-        if (ls) ls.style.display = 'none';
-      }
-    };
-
-    // Play button dismisses splash and fires splash-dismissed event (triggers audio)
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('splash-play-btn')?.addEventListener('click', function() {
-        const overlay = document.getElementById('splash-overlay');
-        if (overlay) overlay.style.display = 'none';
-        document.dispatchEvent(new Event('splash-dismissed'));
-        // Lock pointer for FPS controls
-        document.getElementById('renderCanvas')?.requestPointerLock?.();
-      });
-    });
   </script>
+
 </body>
 </html>

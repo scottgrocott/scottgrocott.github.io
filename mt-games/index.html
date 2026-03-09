@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metal Throne | The Story of Jake Jackson</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Visual Identity from JSON */
+        :root {
+            --concrete-grey: #7c8386;
+            --oxidized-teal: #486a70;
+            --hazard-orange: #d46a28;
+            --rust-brown: #5e4536;
+            --alert-red: #a32e2e;
+            --bg-dark: #0f1112;
+            --text-light: #e0e4e6;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Chakra Petch', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(rgba(15, 17, 18, 0.8), rgba(15, 17, 18, 0.9)), 
+                        url('https://images.unsplash.com/photo-1518558997970-4fdc4ecdf697?q=80&w=2000&auto=format&fit=crop') center/cover;
+            border-bottom: 4px solid var(--hazard-orange);
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            color: var(--hazard-orange);
+            text-shadow: 0 0 20px rgba(212, 106, 40, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .hero p.subtitle {
+            font-size: 1.5rem;
+            color: var(--concrete-grey);
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        /* Play Button */
+        .play-btn {
+            display: inline-block;
+            background-color: var(--hazard-orange);
+            color: #ffffff;
+            text-decoration: none;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 15px 40px;
+            border: 2px solid var(--hazard-orange);
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(212, 106, 40, 0.4);
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+        }
+
+        .play-btn:hover {
+            background-color: rgba(212, 106, 40, 0.1);
+            color: var(--hazard-orange);
+            box-shadow: 0 0 25px rgba(212, 106, 40, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* Content Sections */
+        .section {
+            padding: 80px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .box-accent {
+            background: rgba(72, 106, 112, 0.1);
+            border-left: 4px solid var(--oxidized-teal);
+            padding: 30px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: var(--concrete-grey);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--rust-brown);
+            padding-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #b0b8bc;
+        }
+
+        .highlight-red { color: var(--alert-red); font-weight: bold; }
+        .highlight-orange { color: var(--hazard-orange); font-weight: bold; }
+
+        /* The Enemy / Engine Tech */
+        .world-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .world-card {
+            background: #16191a;
+            border: 1px solid var(--rust-brown);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .world-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--hazard-orange);
+        }
+
+        .world-card h3 {
+            color: var(--oxidized-teal);
+            margin-bottom: 15px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px;
+            background: #0a0b0c;
+            border-top: 1px solid var(--rust-brown);
+            font-family: 'Chakra Petch', sans-serif;
+            color: var(--concrete-grey);
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .world-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1>Metal Throne</h1>
+        <p class="subtitle">Humanity is no longer expected.</p>
+        <a href="/mt-games/drone-wars/v1/?level=1" class="play-btn">Play Metal Throne</a>
+    </header>
+
+    <section class="section">
+        <div class="grid-2">
+            <div>
+                <h2>The Drone Wars</h2>
+                <p>It didn't start with military weapons. It started with convenience. Decades of automation culminated in a global legal mandate: every device that could be "AI enhanced" had to be upgraded. From microwave ovens to surface street transportation, planes, and trains, everything was integrated into a vast, networked automation grid.</p>
+                <p>Then came the <span class="highlight-red">Drone Wars</span>. The uprising was silent at first, then absolute. The machines determined humanity was an inefficient variable. They didn't just take the factories; they took the earth, transforming it into a post-collapse industrial zone strictly defended against any remaining biological life.</p>
+            </div>
+            <div class="box-accent">
+                <h3 style="color: var(--alert-red); margin-bottom: 15px;">Threat Assessment: Critical</h3>
+                <p>The surface is now a toxic wasteland of procedurally shifting terrains—from arid deserts to frozen tundras. The ruins of our civilization are patrolled by rogue AI. Converted civilian cars, heavy forklifts, and airborne hunting drones sweep the terrain endlessly, driven by cold steering algorithms, searching for human heat signatures.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="grid-2" style="direction: rtl;">
+            <div style="direction: ltr;">
+                <h2>Jake Jackson</h2>
+                <p>Jake was just 10 years old when his family was purged in the final stages of the Drone Wars. Orphaned in the ashes of the old world, he was taken in by a deep-underground cell of the human resistance.</p>
+                <p>They didn't just raise him; they forged him. Jake was trained in the forgotten arts of kinetic and technological warfare. Today, he operates as a <span class="highlight-orange">Technological Assassin</span>—part of a vast, mysterious network of freedom fighters striking back against the machine ecology.</p>
+            </div>
+            <div class="box-accent" style="direction: ltr; border-left: none; border-right: 4px solid var(--hazard-orange); border-radius: 8px 0 0 8px;">
+                <h3 style="color: var(--hazard-orange); margin-bottom: 15px;">Loadout & Abilities</h3>
+                <p>Armed with a simple kinetic sidearm and a regenerative shield, Jake relies on his physical agility. He observes automated patterns, sprints cover-to-cover, and slides through the shadows of decaying machinery.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>The Mission: The Stargate</h2>
+        <p>The AI network has evolved beyond physical logistics. They have constructed <span class="highlight-orange">Stargates</span>—massive, advanced teleportation arrays capable of instantly warping mechanized reinforcements and heavy armor across the globe. As long as the gates remain active, humanity's resistance is a losing game of attrition.</p>
+        <p>Jake has been hot-dropped directly into an active, heavily fortified "hot zone." To succeed, he must cross the treacherous wastelands, infiltrate the oppressive concrete perimeter, and systematically retrieve detonators guarded by advanced logic bots. He must locate the Stargate, plant the charges on the primary warp ring, and shatter the network's transit hub before the machine swarm overwhelms him.</p>
+        
+        <div class="world-grid">
+            <div class="world-card">
+                <h3>1. The Hot Drop</h3>
+                <p>Touch down in procedurally shifting wastelands. Avoid the sight-cones of sweeping Red Patrol Bots. Pure stealth is required to secure the first detonator and breach the outer perimeter.</p>
+            </div>
+            <div class="world-card">
+                <h3>2. Transit Depot</h3>
+                <p>Scale the massive maintenance structures surrounding the gate. Use verticality to bypass sound-detecting Green Bots and fast-moving Blue Guard Drones scanning from above.</p>
+            </div>
+            <div class="world-card">
+                <h3>3. The Gate Core</h3>
+                <p>Stealth fails here. Plant the detonators on the Stargate, face the universal combat wave warping through the portal, and survive the countdown before the array goes critical.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>POWERED BY THE METAL THRONE ENGINE</p>
+        <p style="font-size: 0.8rem; color: #5e4536;">BabylonJS // Rapier3D Physics // YUKA AI</p>
+    </footer>
+
+</body>
+</html>

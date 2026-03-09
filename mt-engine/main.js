@@ -3,6 +3,9 @@
 import { engine, scene } from './core.js';
 import { CONFIG, setConfig } from './config.js';
 import { setLookCamera } from './look.js';
+import { euler } from './look.js';
+import { keys } from './input.js';
+import { initTouchControls, isTouchDevice } from './touchControls.js';
 import {
   registerShootCallback,
   registerFreeCamCallback,
@@ -29,12 +32,9 @@ import { initWater, clearWater } from './water.js';
 import { dropOnStart } from './spawn.js';
 import { initWeapon, shootBullet, tickBullets, clearBullets } from './weapons/basicGun.js';
 import { tickYUKA, setPlayerRigRef } from './enemies/enemyBase.js';
-import { initYUKA } from './yuka/yukaManager.js';
 import { clearEnemies } from './enemies/enemyRegistry.js';
 import { spawnDrones, tickDrones } from './enemies/drones.js';
 import { spawnCars, tickCars } from './enemies/cars.js';
-import { spawnBoats, tickBoats } from './enemies/boats.js';
-import { spawnSubmarines, tickSubmarines } from './enemies/submarines.js';
 import { spawnForklifts, tickForklifts } from './enemies/forklifts.js';
 import { tickExplosions } from './explosions.js';
 import { clearShelters, tickShelters } from './shelters/shelters.js';
@@ -130,6 +130,16 @@ async function boot() {
 
   setLoadStatus('Registering callbacks', 10);
   registerShootCallback(_shoot);
+
+  // Mobile / tablet touch controls
+  if (isTouchDevice()) {
+    initTouchControls(keys, euler, _shoot);
+    // Hide top-bar on phone to maximise viewport
+    if (window.innerWidth < 768) {
+      const bar = document.getElementById('top-bar');
+      if (bar) bar.style.display = 'none';
+    }
+  }
   registerFreeCamCallback(_freecam);
   registerSpawnEnemyCallback(_spawnEnemy);
   registerGamepadShootCallback(_shoot);
@@ -178,7 +188,7 @@ async function boot() {
 
 // ── Underwater fog ───────────────────────────────────────────────────────────
 let _wasSubmerged = false;
-let _savedFogMode, _savedFogColor, _savedFogDensity, _savedFogStart, _savedFogEnd, _savedAmbient;
+let _savedFogMode, _savedFogColor, _savedFogDensity, _savedFogStart, _savedFogEnd;
 
 function _tickUnderwaterFog(submerged) {
   if (submerged === _wasSubmerged) return;
@@ -189,27 +199,17 @@ function _tickUnderwaterFog(submerged) {
     _savedFogDensity = scene.fogDensity;
     _savedFogStart   = scene.fogStart;
     _savedFogEnd     = scene.fogEnd;
-    const uwCfg  = CONFIG.underwater_fog ?? {};
-    const uwR    = uwCfg.r     ?? 0.38;   // light tropical blue-teal
-    const uwG    = uwCfg.g     ?? 0.65;
-    const uwB    = uwCfg.b     ?? 0.82;
-    const uwDepth = uwCfg.depth ?? 18;    // metres to full fog — smaller=denser
-    // LINEAR start=0: terrain 1m away already tinted. fogEnd=18 = heavy blue column.
-    scene.fogMode    = BABYLON.Scene.FOGMODE_LINEAR;
-    scene.fogStart   = 0;
-    scene.fogEnd     = uwDepth;
-    scene.fogColor   = new BABYLON.Color3(uwR, uwG, uwB);
-    // Shift ambient so unlit / shadowed faces also read as underwater blue
-    _savedAmbient    = scene.ambientColor?.clone() ?? null;
-    scene.ambientColor = new BABYLON.Color3(uwR * 0.5, uwG * 0.5, uwB * 0.5);
-    console.log('[main] Underwater fog ON  start=0 end=' + uwDepth + ' color=(' + uwR.toFixed(2)+','+uwG.toFixed(2)+','+uwB.toFixed(2)+')');
+    const uwCfg      = CONFIG.underwater_fog ?? {};
+    scene.fogMode    = BABYLON.Scene.FOGMODE_EXP2;
+    scene.fogDensity = uwCfg.density ?? 0.08;
+    scene.fogColor   = new BABYLON.Color3(uwCfg.r ?? 0.02, uwCfg.g ?? 0.15, uwCfg.b ?? 0.35);
+    console.log('[main] Underwater fog ON');
   } else {
     scene.fogMode    = _savedFogMode    ?? BABYLON.Scene.FOGMODE_LINEAR;
     scene.fogColor   = _savedFogColor   ?? new BABYLON.Color3(0.7, 0.8, 0.9);
     scene.fogDensity = _savedFogDensity ?? 0.02;
     scene.fogStart   = _savedFogStart   ?? 100;
     scene.fogEnd     = _savedFogEnd     ?? 600;
-    if (_savedAmbient) scene.ambientColor = _savedAmbient;
     console.log('[main] Underwater fog OFF');
   }
 }
@@ -231,7 +231,7 @@ function _tickUnderwaterFog(submerged) {
       const waterY = CONFIG.water?.enabled ? (CONFIG.water?.mesh?.position?.y ?? null) : null;
       if (waterY !== null) {
         const inWater = playerRig.position.y < waterY;
-        const submerged = playerRig.position.y < waterY + 0.2;  // trigger just above surface
+        const submerged = playerRig.position.y < waterY - 1.0;
         if (inWater !== _wasInWater) {
           _wasInWater = inWater;
           setSoundState(inWater ? 'player_enter_water' : 'player_exit_water', true);
@@ -251,8 +251,6 @@ function _tickUnderwaterFog(submerged) {
     tickLadders(dt);
     tickYUKA();          // drives YUKA EntityManager — must be every frame
     tickDrones(dt);
-    tickBoats(dt);
-    tickSubmarines(dt);
     tickCars(dt);
     tickForklifts(dt);
     tickBullets(dt);
@@ -329,16 +327,7 @@ async function loadGameConfig(url) {
   } catch(e) {
     console.error('[main] Failed to load config:', url, e);
     hudSetStatus('Config load failed: ' + url);
-    // If no enemies are active (all disabled or maxCount=0), skip level completion loop
-  const _activeEnemyDefs = (CONFIG.enemies || []).filter(
-    e => e.enabled !== false && (e.maxCount ?? 1) > 0
-  );
-  if (_activeEnemyDefs.length > 0) {
     initLevelManager(loadGameConfig);
-  } else {
-    console.log('[main] No active enemies — level completion disabled');
-    window._levelComplete = false;  // never set, loop disabled
-  }
   startLevelCheck();
   if (_audioStarted) initSoundtrack();
   _loading = false;
@@ -350,36 +339,24 @@ async function loadGameConfig(url) {
 
   setLoadStatus('Building terrain', 45);
 
-  // ── Heightmap selection ──────────────────────────────────────────────────────
-  // heightmaps[] supports two formats:
-  //   Legacy:  ["url1.png", "url2.png"]
-  //   Rich:    [{ url, environment, structures, shaderLayers }, ...]
-  // When a rich entry is selected its environment/structures OVERRIDE the
-  // top-level config so each heightmap carries its own world content.
+  // Pick a random heightmap from the heightmaps array if provided
   const _hmaps = CONFIG.terrain.heightmaps;
   if (Array.isArray(_hmaps) && _hmaps.length > 0) {
-    const _entry = _hmaps[Math.floor(Math.random() * _hmaps.length)];
-    const _isRich = typeof _entry === 'object' && _entry !== null;
-    const _url    = _isRich ? _entry.url : _entry;
-    CONFIG.terrain.heightmapUrl = _url;
-    console.log('[main] Selected heightmap', (_hmaps.indexOf(_entry)+1) + '/' + _hmaps.length + ':', _url);
-
-    if (_isRich) {
-      // Merge heightmap-level overrides into CONFIG (heightmap wins over top-level)
-      if (_entry.environment)   CONFIG._mapEnvironment  = _entry.environment;
-      if (_entry.structures)    CONFIG._mapStructures   = _entry.structures;
-      if (_entry.shaderLayers)  CONFIG.terrain.shaderLayers = _entry.shaderLayers;
-      if (_entry.shelterCount != null) CONFIG.terrain.shelterCount = _entry.shelterCount;
-      console.log('[main] Rich heightmap — env:', _entry.environment?.types ?? 'inherited',
-        'structures:', !!_entry.structures);
+    const _pick = _hmaps[Math.floor(Math.random() * _hmaps.length)];
+    // _pick may be a plain URL string or a rich object {url, environment, structures, ...}
+    if (typeof _pick === 'string') {
+      CONFIG.terrain.heightmapUrl = _pick;
+    } else {
+      CONFIG.terrain.heightmapUrl = _pick.url;
+      // Merge rich overrides into CONFIG so environment/structures/shelterCount take effect
+      if (_pick.environment)   CONFIG.terrain.environment   = _pick.environment;
+      if (_pick.structures)    CONFIG.structures             = Object.assign(CONFIG.structures || {}, _pick.structures);
+      if (_pick.shelterCount != null) CONFIG.terrain.shelterCount = _pick.shelterCount;
     }
+    console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick)+1) + '/' + _hmaps.length + ':', _pick);
   }
 
-  // ── Resolve structures: heightmap-level wins, then top-level, then empty ─────
-  const _resolvedStructures = CONFIG._mapStructures ?? CONFIG.structures ?? {};
-  // (spawnStructures is called later with _resolvedStructures)
-
-  // ── Prefix relative asset paths ───────────────────────────────────────────
+  // Prefix relative asset paths with ENGINE_ROOT
   if (CONFIG.terrain.heightmap && !CONFIG.terrain.heightmap.startsWith('http') && !CONFIG.terrain.heightmap.startsWith('/') && ENGINE_ROOT) {
     CONFIG.terrain.heightmap = _enginePath(CONFIG.terrain.heightmap);
   }
@@ -387,10 +364,8 @@ async function loadGameConfig(url) {
     CONFIG.terrain.heightmapUrl = _enginePath(CONFIG.terrain.heightmapUrl);
   }
 
-  // ── Load environment — heightmap-level wins over terrain.environment ───────
-  const _envCfg = CONFIG._mapEnvironment ?? CONFIG.terrain?.environment ?? CONFIG.environment;
-  if (_envCfg) {
-    await loadEnvironment(Array.isArray(_envCfg) ? _envCfg : (_envCfg.types ?? _envCfg));
+  if (CONFIG.terrain?.environment) {
+    await loadEnvironment(CONFIG.terrain.environment);
   }
 
   await loadHeightmap(CONFIG.terrain.heightmapUrl || CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
@@ -407,28 +382,12 @@ async function loadGameConfig(url) {
 
   if (CONFIG.water?.enabled) initWater(CONFIG.water);
 
-  // Apply level fog to scene — without this scene.fogMode stays NONE
-  // and terrain ignores fog entirely
-  if (CONFIG.fog?.enabled) {
-    const fc = CONFIG.fog;
-    const modeStr = fc.mode ?? 'FOGMODE_LINEAR';
-    scene.fogMode    = BABYLON.Scene[modeStr] ?? BABYLON.Scene.FOGMODE_LINEAR;
-    const c          = fc.color ?? { r:0.7, g:0.8, b:0.9 };
-    scene.fogColor   = new BABYLON.Color3(c.r, c.g, c.b);
-    scene.fogDensity = fc.density ?? 0.02;
-    scene.fogStart   = fc.start   ?? 100;
-    scene.fogEnd     = fc.end     ?? 600;
-    console.log('[main] Scene fog applied:', modeStr, 'start='+scene.fogStart, 'end='+scene.fogEnd);
-  } else {
-    scene.fogMode = BABYLON.Scene.FOGMODE_NONE;
-  }
-
   setLoadStatus('Scanning navigation', 55);
   scanFlatAreas();
 
   setLoadStatus('Loading buildings & structures', 60);
   await loadBuildings();
-  spawnStructures(CONFIG._mapStructures ?? CONFIG.structures);
+  spawnStructures(CONFIG.structures);
 
   setLoadStatus('Spawning player', 70);
   _playerReady = false;
@@ -451,7 +410,6 @@ async function loadGameConfig(url) {
   setLoadStatus('Spawning enemies', 88);
   await _loadEnemyTypeDefs();
   await _waitForYuka();
-  initYUKA();             // create EntityManager now that YUKA global is ready
   _spawnEnemiesFromConfig();
 
   setLoadStatus('Ready!', 100);
@@ -481,15 +439,9 @@ function _spawnEnemiesFromConfig() {
       : null;
     const merged = variantDef ? { ...variantDef, ...def } : def;
 
-    // Respect enabled flag and maxCount — skip if explicitly disabled
-    if (merged.enabled === false) continue;
-    if ((merged.maxCount ?? 1) === 0) continue;
-
-    if (merged.type === 'drone')          spawnDrones(merged);
-    else if (merged.type === 'boat')      spawnBoats(merged);
-    else if (merged.type === 'submarine') spawnSubmarines(merged);
-    else if (merged.type === 'car')       spawnCars(merged);
-    else if (merged.type === 'forklift')  spawnForklifts(merged);
+    if (merged.type === 'drone')         spawnDrones(merged);
+    else if (merged.type === 'car')      spawnCars(merged);
+    else if (merged.type === 'forklift') spawnForklifts(merged);
   }
 }
 
@@ -520,9 +472,7 @@ function _spawnEnemy() {
   }
   const def = CONFIG.enemies[Math.floor(Math.random() * CONFIG.enemies.length)];
   if (def.type === 'drone')         spawnDrones({ ...def, maxCount: 1 });
-  else if (def.type === 'boat')      spawnBoats({ ...def, maxCount: 1 });
-  else if (def.type === 'submarine') spawnSubmarines({ ...def, maxCount: 1 });
-  else if (def.type === 'car')       spawnCars({ ...def, maxCount: 1 });
+  else if (def.type === 'car')      spawnCars({ ...def, maxCount: 1 });
   else if (def.type === 'forklift') spawnForklifts({ ...def, maxCount: 1 });
   hudSetStatus('Enemy spawned');
 }
