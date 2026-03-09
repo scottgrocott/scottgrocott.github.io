@@ -50,7 +50,7 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){ dataLayer.push(arguments); }
     gtag('js', new Date());
-    gtag('config', 'G-EBGF4V165P', { debug_mode: true });
+    gtag('config', 'G-EBGF4V165P', { debug_mode: false });
 
     // Helper — fire a GA4 event
     window._gaEvent = function(name, params) {
@@ -140,8 +140,9 @@
       const rb = document.createElement('button');
       rb.textContent = '↺ Restart Game';
       rb.addEventListener('click', function() {
+        // Delay reload so GA has time to flush the event hit
         window._gaEvent?.('restart_game', { page_location: location.href });
-        location.reload();
+        setTimeout(() => location.reload(), 300);
       });
       nav.appendChild(rb);
       nav.style.display = 'flex';
