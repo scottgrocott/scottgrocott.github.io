@@ -201,9 +201,38 @@
   "enemies": [
     {
       "type": "boat",
+      "enabled": true,
+      "maxCount": 1,
+      "health": 80,
+      "hitsToKill": 8
+    },
+    {
+      "type": "submarine",
+      "enabled": true,
+      "maxCount": 1,
+      "health": 120,
+      "hitsToKill": 12
+    },
+    {
+      "type": "drone",
+      "enabled": true,
       "maxCount": 2,
       "health": 60,
       "hitsToKill": 6
+    },
+    {
+      "type": "car",
+      "enabled": false,
+      "maxCount": 0,
+      "health": 100,
+      "hitsToKill": 8
+    },
+    {
+      "type": "forklift",
+      "enabled": false,
+      "maxCount": 0,
+      "health": 150,
+      "hitsToKill": 12
     }
   ],
   "weapons": [

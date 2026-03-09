@@ -5,6 +5,7 @@ import { CONFIG }           from './config.js';
 import { getTerrainHeightAt } from './terrain/terrainMesh.js';
 import { getAllSpriteFrames, getRandomEnvColor } from './environment.js';
 import { addBoxCollider, clearBoxColliders } from './physics.js';
+import { registerPanelMesh, clearPanelMeshes } from './shelterBridge.js';
 import { spawnLadder }      from './ladders.js';
 
 let _instances    = [];  // all disposable meshes/materials
@@ -272,11 +273,12 @@ function _addShelterPanels(root, maxY, halfW, halfD, ladderOnZFace, panelFrames)
           face.axis === 'z' ? face.sign * facePos : localU
         );
         panel.parent     = root;
-        panel.isPickable = false;
+        panel.isPickable = true;
 
         const fi = panelFrames[Math.floor(Math.random() * panelFrames.length)];
         panel.material = _makePanelMat(`${root.name}_pmat_${_instances.length}`, fi);
         _instances.push(panel);
+        registerPanelMesh(panel);
       }
     }
   }
@@ -670,6 +672,7 @@ export function clearScatter() {
   _instances      = [];
   _shelterPositions = [];
   _grassMeshes    = [];
+  clearPanelMeshes();
   clearBoxColliders();
 }
 

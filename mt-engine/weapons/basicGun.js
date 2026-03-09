@@ -114,9 +114,9 @@ export function tickBullets(dt) {
       const dir = new BABYLON.Vector3(b.vx, b.vy, b.vz).normalize();
       for (const pm of panelMeshes) {
         if (pm.isDisposed() || !pm.isEnabled()) continue;
-        const pp = pm.position;
+        const pp = pm.getAbsolutePosition();  // panel.parent = root so position is local
         const dx = bx - pp.x, dy = by - pp.y, dz = bz - pp.z;
-        if (Math.sqrt(dx*dx + dy*dy + dz*dz) < 0.6) {
+        if (Math.sqrt(dx*dx + dy*dy + dz*dz) < 0.8) {
           onShelterHit(pm, b.mesh.position.clone(), dir);
           _killBullet(b);
           b.dead = true;
