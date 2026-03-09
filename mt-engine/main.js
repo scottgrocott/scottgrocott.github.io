@@ -503,6 +503,8 @@ async function _startAudio() {
   await initAudio();
   initSoundtrack();
 }
+// Expose for touchControls fire button — iOS needs audio init called from a touch gesture
+window._mtStartAudio = _startAudio;
 
 // ---- Export Game ----
 function _exportGame() {

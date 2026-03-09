@@ -127,6 +127,15 @@ function _buildOverlay() {
     #tc-overlay::after{content:'';position:absolute;inset:0;pointer-events:none;
       background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,
       rgba(0,0,0,0.025) 3px,rgba(0,0,0,0.025) 4px);}
+
+    /* Mobile minimap — shrink 50% and move to top-right away from fire button */
+    #minimap-canvas{
+      width:110px !important;
+      height:110px !important;
+      bottom:auto !important;
+      top:48px !important;
+      right:8px !important;
+    }
   `;
   document.head.appendChild(style);
 
@@ -169,8 +178,11 @@ function _attachEvents() {
 
   fireEl.addEventListener('touchstart', e => {
     e.preventDefault();
-    // Belt-and-suspenders audio unlock — iOS sometimes needs the gesture on the first in-game touch
-    if (window.Tone?.context?.state !== 'running' && window.Tone?.start) window.Tone.start();
+    // iOS audio unlock: must call Tone.start() synchronously inside touchstart
+    if (window.Tone?.context?.state !== 'running') {
+      window.Tone?.start?.();
+      window._mtStartAudio?.();   // init gain nodes + soundtrack
+    }
     _fire.active = true;
     fireEl.classList.add('on');
     if (_shootFn) _shootFn();
