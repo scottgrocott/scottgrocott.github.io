@@ -128,13 +128,15 @@ function _buildOverlay() {
       background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,
       rgba(0,0,0,0.025) 3px,rgba(0,0,0,0.025) 4px);}
 
-    /* Mobile minimap — shrink 50% and move to top-right away from fire button */
+    /* Mobile minimap — shrink and pin to top-right */
     #minimap-canvas{
       width:110px !important;
       height:110px !important;
-      bottom:auto !important;
-      top:48px !important;
+      position:fixed !important;
+      top:8px !important;
       right:8px !important;
+      bottom:auto !important;
+      left:auto !important;
     }
   `;
   document.head.appendChild(style);
