@@ -1,0 +1,314 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "MetalThrone gen_gltf.py"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "forklift_body",
+      "mesh": 0,
+      "translation": [
+        0,
+        0.7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "forklift_fork_L",
+      "mesh": 1,
+      "translation": [
+        0.3,
+        0.3,
+        1.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "forklift_fork_R",
+      "mesh": 2,
+      "translation": [
+        -0.3,
+        0.3,
+        1.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "name": "forklift_body",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          },
+          "indices": 2,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "forklift_fork_L",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 3,
+            "NORMAL": 4
+          },
+          "indices": 5,
+          "material": 1,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "forklift_fork_R",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 6,
+            "NORMAL": 7
+          },
+          "indices": 8,
+          "material": 2,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "forklift_body_mat",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.95,
+          0.75,
+          0.05,
+          1.0
+        ],
+        "metallicFactor": 0.1,
+        "roughnessFactor": 0.8
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "forklift_fork_L_mat",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.5,
+          0.5,
+          0.5,
+          1.0
+        ],
+        "metallicFactor": 0.1,
+        "roughnessFactor": 0.8
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "forklift_fork_R_mat",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.5,
+          0.5,
+          0.5,
+          1.0
+        ],
+        "metallicFactor": 0.1,
+        "roughnessFactor": 0.8
+      },
+      "doubleSided": false
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        -0.7,
+        -0.6,
+        -1.0
+      ],
+      "max": [
+        0.7,
+        0.6,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 36,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        -0.06,
+        -0.04,
+        -0.6
+      ],
+      "max": [
+        0.06,
+        0.04,
+        0.6
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 36,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        -0.06,
+        -0.04,
+        -0.6
+      ],
+      "max": [
+        0.06,
+        0.04,
+        0.6
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 8,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 36,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 288
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 288,
+      "byteLength": 288
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 72
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 648,
+      "byteLength": 288
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 936,
+      "byteLength": 288
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1224,
+      "byteLength": 72
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1296,
+      "byteLength": 288
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1584,
+      "byteLength": 288
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1872,
+      "byteLength": 72
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 1944,
+      "uri": "data:application/octet-stream;base64,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"
+    }
+  ]
+}
