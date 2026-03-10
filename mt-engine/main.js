@@ -422,8 +422,11 @@ async function loadGameConfig(url) {
 function _spawnEnemiesFromConfig() {
   const defs = CONFIG.enemies || [];
   for (const def of defs) {
+    // Skip explicitly disabled or zero-count enemy types
+    if (def.enabled === false) continue;
+    if ((def.maxCount ?? 1) <= 0) continue;
+
     // Merge CDN type def (audio, model, movingParts) into level-JSON def.
-    // Level JSON picks the variant via def.variantId; falls back to first in list.
     const typeDefs = _enemyTypeDefs[def.type];
     const variantDef = typeDefs
       ? (def.variantId ? typeDefs.byId[def.variantId] : typeDefs.list[0])
@@ -461,7 +464,9 @@ function _spawnEnemy() {
     hudSetStatus('No enemies in config');
     return;
   }
-  const def = CONFIG.enemies[Math.floor(Math.random() * CONFIG.enemies.length)];
+  const _enabledEnemies = CONFIG.enemies.filter(e => e.enabled !== false && (e.maxCount ?? 1) > 0);
+  if (!_enabledEnemies.length) { hudSetStatus('No enabled enemies in config'); return; }
+  const def = _enabledEnemies[Math.floor(Math.random() * _enabledEnemies.length)];
   if (def.type === 'drone')         spawnDrones({ ...def, maxCount: 1 });
   else if (def.type === 'car')      spawnCars({ ...def, maxCount: 1 });
   else if (def.type === 'forklift') spawnForklifts({ ...def, maxCount: 1 });
