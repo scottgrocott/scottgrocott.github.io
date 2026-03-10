@@ -3,9 +3,6 @@
 import { engine, scene } from './core.js';
 import { CONFIG, setConfig } from './config.js';
 import { setLookCamera } from './look.js';
-import { euler } from './look.js';
-import { keys } from './input.js';
-import { initTouchControls, isTouchDevice } from './touchControls.js';
 import {
   registerShootCallback,
   registerFreeCamCallback,
@@ -13,9 +10,8 @@ import {
   setFreeCamActive,
 } from './input.js';
 import { tickInputGuard, suspendMouse, resumeMouse } from './inputGuard.js';
-import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider, addBoxCollider, clearBoxColliders } from './physics.js';
+import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider } from './physics.js';
 import { initPlayer, initPlayerBody, tickPlayer, toggleFreeCam, player, playerRig } from './player.js';
-import { tickGamepad } from './input.js';
 import { initCockpit, tickCockpit, disposeCockpit } from './cockpit.js';
 import { tickHUD, hudSetStatus } from './hud.js';
 import { initLadders, tickLadders, clearLadders } from './ladders.js';
@@ -68,17 +64,8 @@ const DEFAULT_CONFIG = _enginePath('assets/configs/test.json');
 window.dispatchEvent(new CustomEvent('engine-ready', { detail: { engineRoot: ENGINE_ROOT } }));
 
 async function _resolveStartConfig() {
+  // ?level=level-2.json  or  ?level=2  (shorthand → level-2.json)
   const params = new URLSearchParams(window.location.search);
-
-  // ?config=<full-url-or-path>  — direct config URL, e.g:
-  //   http://localhost:83/mt-engine/?config=https://scottgrocott.github.io/mt-games/drone-wars/v1/level-1.json
-  const cfgParam = params.get('config');
-  if (cfgParam) {
-    console.log('[main] Config from URL param:', cfgParam);
-    return cfgParam;
-  }
-
-  // ?level=level-2.json  or  ?level=2  (shorthand → level-2.json, relative to page)
   const lvlParam = params.get('level');
   if (lvlParam) {
     // Normalise: bare number → "level-N.json", bare name → "name.json"
@@ -129,48 +116,17 @@ function setLoadStatus(msg, pct) {
 function hideLoadingScreen() {
   // Loading screen is now dismissed by the Play button in index.html
   // so we just show the Play button rather than auto-hiding the screen
-  window._splashShowPlay?.(CONFIG.meta?.levels || []);
-}
-
-
-// ── Terrain boundary walls ────────────────────────────────────────────────────
-function _buildTerrainBarriers(cfg) {
-  if (!physicsReady) return;
-  const hx = (cfg.sizeX || cfg.size || 700) / 2;
-  const hz = (cfg.sizeZ || cfg.size || 700) / 2;
-  const wallH  = 120;   // total height — extends 40 below ground so falling player hits wall
-  const wallHH = wallH / 2;
-  const wallCY = wallHH - 40;   // centre shifted down: bottom at y=-40, top at y=wallH-40
-  const wallHD = 8;    // half-depth — thick enough to catch a fast-moving player
-  // Inset 2 units so wall overlaps terrain edge, preventing slip-under at the lip
-  const inset  = 2;
-
-  // addBoxCollider(cx, cy, cz,  half-width, half-height, half-depth)
-  addBoxCollider(  0,           wallCY,  hz - inset,   hx + wallHD, wallHH, wallHD);  // +Z
-  addBoxCollider(  0,           wallCY, -hz + inset,   hx + wallHD, wallHH, wallHD);  // -Z
-  addBoxCollider(  hx - inset,  wallCY,  0,            wallHD,      wallHH, hz + wallHD);  // +X
-  addBoxCollider( -hx + inset,  wallCY,  0,            wallHD,      wallHH, hz + wallHD);  // -X
-  console.log('[main] Terrain barriers built (Havok) — half:', hx, hz);
+  window._splashShowPlay?.();
 }
 
 // ---- Boot ----
 async function boot() {
   initSky();
   setLoadStatus('Setting up look & camera', 5);
-  setLookCamera(camera);   // always — clears BJS built-in inputs on all devices
+  setLookCamera(camera);
 
   setLoadStatus('Registering callbacks', 10);
   registerShootCallback(_shoot);
-
-  // Mobile / tablet touch controls
-  if (isTouchDevice()) {
-    initTouchControls(keys, euler, _shoot);
-    // Hide top-bar on phone to maximise viewport
-    if (window.innerWidth < 768) {
-      const bar = document.getElementById('top-bar');
-      if (bar) bar.style.display = 'none';
-    }
-  }
   registerFreeCamCallback(_freecam);
   registerSpawnEnemyCallback(_spawnEnemy);
   registerGamepadShootCallback(_shoot);
@@ -214,9 +170,8 @@ async function boot() {
     document.removeEventListener('splash-dismissed', _onGesture);
   };
   document.addEventListener('splash-dismissed', _onGesture);
-  document.addEventListener('click',      _onGesture);
-  document.addEventListener('keydown',    _onGesture);
-  document.addEventListener('touchstart', _onGesture, { once: true, passive: true });
+  document.addEventListener('click', _onGesture);
+  document.addEventListener('keydown', _onGesture);
 
 // ── Underwater fog ───────────────────────────────────────────────────────────
 let _wasSubmerged = false;
@@ -254,7 +209,6 @@ function _tickUnderwaterFog(submerged) {
     _lastTime = now;
 
     tickInputGuard();
-    tickGamepad();
     if (_playerReady) stepPhysics(dt);
     syncPhysicsReads();
     pollGamepad(dt);
@@ -348,7 +302,6 @@ async function loadGameConfig(url) {
   const oldMesh = getTerrainMesh();
   if (oldMesh) { try { oldMesh.dispose(); } catch(e) {} }
 
-  clearBoxColliders();   // dispose barrier meshes before physics reset
   resetPhysics();
 
   // Fetch config JSON
@@ -377,16 +330,16 @@ async function loadGameConfig(url) {
   const _hmaps = CONFIG.terrain.heightmaps;
   if (Array.isArray(_hmaps) && _hmaps.length > 0) {
     const _pick = _hmaps[Math.floor(Math.random() * _hmaps.length)];
-    // _pick may be a plain URL string or a rich object {url, environment, structures, ...}
+    // _pick may be a plain URL string or a rich object { url, environment, shelterCount, ... }
     if (typeof _pick === 'string') {
       CONFIG.terrain.heightmapUrl = _pick;
     } else {
-      CONFIG.terrain.heightmapUrl = _pick.url;
+      CONFIG.terrain.heightmapUrl = _pick.url ?? _pick.heightmap ?? null;
+      // Merge map-level overrides into terrain config
+      if (_pick.environment)   CONFIG.terrain.environment   = _pick.environment;
       if (_pick.shelterCount != null) CONFIG.terrain.shelterCount = _pick.shelterCount;
-      // Copy shaderLayers and environment types into CONFIG.terrain so terrainMesh can use them
-      if (_pick.environment?.shaderLayers) CONFIG.terrain.shaderLayers = _pick.environment.shaderLayers;
-      if (_pick.environment?.types?.length) CONFIG.terrain.environment = _pick.environment.types;
-      if (_pick.structures) CONFIG.structures = Object.assign({}, CONFIG.structures || {}, _pick.structures);
+      if (_pick.shaderLayers)  CONFIG.terrain.shaderLayers  = _pick.shaderLayers;
+      if (_pick.heightScale != null)  CONFIG.terrain.heightScale  = _pick.heightScale;
     }
     console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick)+1) + '/' + _hmaps.length + ':', _pick);
   }
@@ -400,34 +353,16 @@ async function loadGameConfig(url) {
   }
 
   if (CONFIG.terrain?.environment) {
-    // environment may be a string id, array of ids, or rich object {types:[...], shaderLayers:[...]}
-    let _envId = CONFIG.terrain.environment;
-    if (Array.isArray(_envId))          _envId = _envId[0];          // ['env_wetland'] → 'env_wetland'
-    if (typeof _envId === 'object')     _envId = _envId?.types?.[0] ?? _envId?.ids?.[0] ?? null;
-    if (_envId && typeof _envId === 'string') await loadEnvironment(_envId);
+    // environment may be a string, a plain array, or { types: [...] }
+    const _envVal = CONFIG.terrain.environment;
+    const _envArg = _envVal?.types ?? _envVal;   // unwrap { types: [...] } if needed
+    await loadEnvironment(_envArg);
   }
 
   await loadHeightmap(CONFIG.terrain.heightmapUrl || CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
   await buildTerrain(scene, CONFIG);
-  _buildTerrainBarriers(CONFIG.terrain);
   const terrainMesh = getTerrainMesh();
   // Material applied inside buildTerrain → _applyMaterial (node mat or fallback)
-  // Mobile fallback: node material snippet fetch can fail on mobile (CORS / no internet access to snippet API)
-  // Check after 4s — if mesh is still unshaded (no textures ready), swap to StandardMaterial
-  if (terrainMesh) {
-    setTimeout(() => {
-      const mat = terrainMesh.material;
-      const failed = !mat
-        || (mat.getClassName?.() === 'NodeMaterial' && !mat.isReady(terrainMesh));
-      if (failed) {
-        console.warn('[main] Terrain node material not ready — applying mobile fallback');
-        const fb = new BABYLON.StandardMaterial('terrainFallback', scene);
-        fb.diffuseColor = new BABYLON.Color3(0.35, 0.50, 0.22);
-        fb.specularColor = new BABYLON.Color3(0, 0, 0);
-        terrainMesh.material = fb;
-      }
-    }, 4000);
-  }
 
   // Build Rapier heightfield collider so player walks on terrain surface
   const _pixelData = getTerrainPixelData();
@@ -469,28 +404,6 @@ async function loadGameConfig(url) {
   _spawnEnemiesFromConfig();
 
   setLoadStatus('Ready!', 100);
-  // Expose loadGameConfig for level nav buttons in index.html
-  window._loadGameConfig = loadGameConfig;
-
-  // Live scene apply hooks for editor
-  window._applyFog = () => {
-    const f = CONFIG.fog; if (!f) return;
-    scene.fogEnabled = f.enabled !== false;
-    scene.fogMode    = BABYLON.Scene.FOGMODE_LINEAR;
-    scene.fogStart   = f.start   ?? 160;
-    scene.fogEnd     = f.end     ?? 520;
-    scene.fogDensity = f.density ?? 0.4;
-    if (f.color) scene.fogColor = new BABYLON.Color3(f.color.r ?? 0.7, f.color.g ?? 0.8, f.color.b ?? 0.9);
-  };
-  window._applyWaterY = () => {
-    const wm = scene.getMeshByName?.('waterPlane') ?? scene.getMeshByName?.('water');
-    if (wm) wm.position.y = CONFIG.water?.mesh?.position?.y ?? 5;
-  };
-  window._enemyCount = () => { try { return parseInt(document.getElementById('hud-enemies')?.textContent) || 0; } catch(e){ return 0; } };
-  // Expose terrain boundary for player.js clamp (10 units inside edge to give buffer)
-  const _th = CONFIG.terrain;
-  window._CONFIG_terrainHalf = Math.min(_th.sizeX || _th.size || 700, _th.sizeZ || _th.size || 700) / 2 - 10;
-
   // Expose water level and heightScale for minimap water overlay
   window._CONFIG_water_y    = CONFIG.water?.enabled ? (CONFIG.water?.mesh?.position?.y ?? null) : null;
   window._CONFIG_heightScale = CONFIG.terrain?.heightScale ?? 80;
@@ -509,9 +422,6 @@ async function loadGameConfig(url) {
 function _spawnEnemiesFromConfig() {
   const defs = CONFIG.enemies || [];
   for (const def of defs) {
-    // Skip disabled enemies or those with zero count
-    if (def.enabled === false || def.maxCount === 0) continue;
-
     // Merge CDN type def (audio, model, movingParts) into level-JSON def.
     // Level JSON picks the variant via def.variantId; falls back to first in list.
     const typeDefs = _enemyTypeDefs[def.type];
@@ -523,7 +433,6 @@ function _spawnEnemiesFromConfig() {
     if (merged.type === 'drone')         spawnDrones(merged);
     else if (merged.type === 'car')      spawnCars(merged);
     else if (merged.type === 'forklift') spawnForklifts(merged);
-    else console.warn(`[main] Unknown enemy type: ${merged.type}`);
   }
 }
 
@@ -565,8 +474,6 @@ async function _startAudio() {
   await initAudio();
   initSoundtrack();
 }
-// Expose for touchControls fire button — iOS needs audio init called from a touch gesture
-window._mtStartAudio = _startAudio;
 
 // ---- Export Game ----
 function _exportGame() {
