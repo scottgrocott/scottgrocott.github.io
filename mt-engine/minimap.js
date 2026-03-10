@@ -129,39 +129,62 @@ export function tickMinimap() {
     };
   }
 
+  // ── Icon drawing helpers ────────────────────────────────────────────────────
+  function _dot(x, y, radius, fill) {
+    // Drop shadow
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.85)';
+    ctx.shadowBlur  = 4;
+    ctx.shadowOffsetX = 1; ctx.shadowOffsetY = 1;
+    // White outline stroke
+    ctx.beginPath();
+    ctx.arc(x, y, radius + 1.5, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+    ctx.restore();
+    // Filled dot on top
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = fill;
+    ctx.fill();
+  }
+
+  function _tick(x, y, angle, len, color) {
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.75)';
+    ctx.shadowBlur  = 3;
+    ctx.shadowOffsetX = 1; ctx.shadowOffsetY = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.sin(angle) * len, y - Math.cos(angle) * len);
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+    ctx.lineWidth   = 2.5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.sin(angle) * len, y - Math.cos(angle) * len);
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // Enemy dots
   for (const e of getEnemies()) {
     if (e.dead || !e.mesh) continue;
     const ep = e.mesh.position;
     const mp = worldToMap(ep.x, ep.z);
-    ctx.beginPath();
-    ctx.arc(mp.x, mp.y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = e.type === 'drone' ? '#ff4444' : e.type === 'car' ? '#4488ff' : '#ffcc00';
-    ctx.fill();
-    // Direction tick
-    ctx.beginPath();
-    ctx.moveTo(mp.x, mp.y);
-    ctx.lineTo(mp.x + Math.sin(e.mesh.rotation.y) * 6, mp.y + Math.cos(e.mesh.rotation.y) * 6);
-    ctx.strokeStyle = ctx.fillStyle;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    const color = e.type === 'drone' ? '#ff4444' : e.type === 'car' ? '#4488ff' : '#ffcc00';
+    _dot(mp.x, mp.y, 3, color);
+    _tick(mp.x, mp.y, e.mesh.rotation.y, 6, color);
   }
 
   // Player dot (pulsing cyan)
   const pp = worldToMap(playerRig.position.x, playerRig.position.z);
   const r  = 4 + Math.sin(_pulse) * 1.5;
-  ctx.beginPath();
-  ctx.arc(pp.x, pp.y, r, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(100,255,220,${0.7 + Math.sin(_pulse)*0.3})`;
-  ctx.fill();
-
-  // Player direction
-  ctx.beginPath();
-  ctx.moveTo(pp.x, pp.y);
-  ctx.lineTo(pp.x + Math.sin(euler.y)*9, pp.y - Math.cos(euler.y)*9);  // negate Y to match flipped Z axis
-  ctx.strokeStyle = '#aaffee';
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  _dot(pp.x, pp.y, r, `rgba(100,255,220,${0.7 + Math.sin(_pulse)*0.3})`);
+  _tick(pp.x, pp.y, euler.y, 9, '#aaffee');
 
   // Border
   ctx.strokeStyle = '#2a4a2a';
