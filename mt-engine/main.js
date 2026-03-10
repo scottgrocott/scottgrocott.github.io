@@ -37,6 +37,8 @@ import { spawnCars, tickCars } from './enemies/cars.js';
 import { spawnForklifts, tickForklifts } from './enemies/forklifts.js';
 import { spawnCows, tickCows } from './enemies/cows.js';
 import { spawnATSTs, tickATSTs } from './enemies/atst.js';
+import { spawnBoats, tickBoats } from './enemies/boats.js';
+import { spawnSubmarines, tickSubmarines } from './enemies/submarines.js';
 import { tickExplosions } from './explosions.js';
 import { clearShelters, tickShelters } from './shelters/shelters.js';
 import { initAudio, toneReady, updateAudioListener } from './audio.js';
@@ -246,6 +248,8 @@ function _tickUnderwaterFog(submerged) {
     tickForklifts(dt);
     tickCows(dt);
     tickATSTs(dt);
+    tickBoats(dt);
+    tickSubmarines(dt);
     tickBullets(dt);
     tickExplosions(dt);
     tickSoundtrack();
@@ -261,12 +265,16 @@ function _tickUnderwaterFog(submerged) {
 }
 
 // ---- Config Load ----
-// Enemy type definitions fetched from CDN — keyed by type ('drone','car','forklift')
+// Enemy type definitions fetched from CDN — keyed by type
 const _enemyTypeDefs = {};
 const _ENEMY_DEF_URLS = {
-  drone:    'https://scottgrocott.github.io/mt-assets/enemies/drones.json',
-  car:      'https://scottgrocott.github.io/mt-assets/enemies/cars.json',
-  forklift: 'https://scottgrocott.github.io/mt-assets/enemies/forklifts.json',
+  drone:      'https://scottgrocott.github.io/mt-assets/enemies/drones.json',
+  car:        'https://scottgrocott.github.io/mt-assets/enemies/cars.json',
+  forklift:   'https://scottgrocott.github.io/mt-assets/enemies/forklifts.json',
+  cow:        'https://scottgrocott.github.io/mt-assets/enemies/cows.json',
+  atst:       'https://scottgrocott.github.io/mt-assets/enemies/atst.json',
+  boat:       'https://scottgrocott.github.io/mt-assets/enemies/boats.json',
+  submarine:  'https://scottgrocott.github.io/mt-assets/enemies/submarines.json',
 };
 
 async function _loadEnemyTypeDefs() {
@@ -454,8 +462,10 @@ function _spawnEnemiesFromConfig() {
     if (merged.type === 'drone')         spawnDrones(merged);
     else if (merged.type === 'car')      spawnCars(merged);
     else if (merged.type === 'forklift') spawnForklifts(merged);
-    else if (merged.type === 'cow')      spawnCows(merged);
-    else if (merged.type === 'atst')     spawnATSTs(merged);
+    else if (merged.type === 'cow')        spawnCows(merged);
+    else if (merged.type === 'atst')       spawnATSTs(merged);
+    else if (merged.type === 'boat')       spawnBoats(merged);
+    else if (merged.type === 'submarine')  spawnSubmarines(merged);
   }
 }
 
@@ -486,8 +496,10 @@ function _spawnEnemy() {
   if (def.type === 'drone')         spawnDrones({ ...def, maxCount: 1 });
   else if (def.type === 'car')      spawnCars({ ...def, maxCount: 1 });
   else if (def.type === 'forklift') spawnForklifts({ ...def, maxCount: 1 });
-  else if (def.type === 'cow')      spawnCows({ ...def, maxCount: 1 });
-  else if (def.type === 'atst')     spawnATSTs({ ...def, maxCount: 1 });
+  else if (def.type === 'cow')       spawnCows({ ...def, maxCount: 1 });
+  else if (def.type === 'atst')      spawnATSTs({ ...def, maxCount: 1 });
+  else if (def.type === 'boat')      spawnBoats({ ...def, maxCount: 1 });
+  else if (def.type === 'submarine') spawnSubmarines({ ...def, maxCount: 1 });
   hudSetStatus('Enemy spawned');
 }
 

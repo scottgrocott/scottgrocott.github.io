@@ -238,8 +238,8 @@
     {
       "_note": "DRONE — aerial patrol. Rises on spawn, hunts player when in range. To swap the whole model set '_full'. To swap only one part leave the others as empty string.",
       "type": "drone",
-      "enabled": true,
-      "maxCount": 3,
+      "enabled": false,
+      "maxCount": 0,
       "health": 60,
       "hitsToKill": 6,
       "respawnTime": 8,
@@ -253,8 +253,8 @@
     {
       "_note": "CAR — ground patrol. Wheels spin as it moves. Transitions patrol → chase → ram.",
       "type": "car",
-      "enabled": false,
-      "maxCount": 3,
+      "enabled": true,
+      "maxCount": 1,
       "health": 100,
       "hitsToKill": 8,
       "respawnTime": 10,

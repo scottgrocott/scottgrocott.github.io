@@ -1,39 +1,19 @@
 {
   "meta": {
-    "id": "level-1",
-    "title": "Drone Wars Level 1",
-    "subtitle": "Level 1 of 5",
+    "id": "level-3",
+    "title": "Metal Throne: Drone Wars Level 3",
+    "subtitle": "Level 3 of 3",
     "description": "Two patrol boats guard the inlet. Take them down.",
-    "total_levels": 5,
+    "total_levels": 3,
     "levels": [
-      {
-        "id": "level-1",
-        "title": "COASTAL PATROL",
-        "subtitle": "Level 1 of 5"
-      },
-      {
-        "id": "level-2",
-        "title": "THE DEEP",
-        "subtitle": "Level 2 of 5"
-      },
-      {
-        "id": "level-3",
-        "title": "BLOCKADE",
-        "subtitle": "Level 3 of 5"
-      },
-      {
-        "id": "level-4",
-        "title": "STORM FRONT",
-        "subtitle": "Level 4 of 5"
-      },
-      {
-        "id": "level-5",
-        "title": "LEVIATHAN",
-        "subtitle": "Level 5 of 5 \u2014 FINAL"
-      }
+      { "id": "level-1", "title": "First Level",  "subtitle": "Level 1 of 3" },
+      { "id": "level-2", "title": "Second Level", "subtitle": "Level 2 of 3" },
+      { "id": "level-3", "title": "Third Level",  "subtitle": "Level 3 of 3" }
     ]
   },
+
   "splash_screen": "<div class='social-links'><a href='https://x.com/scott_grocott' target='_blank'>X (Twitter)</a> <a href='https://github.com/scottgrocott' target='_blank'>GitHub</a></div>",
+
   "terrain": {
     "type": "heightmap",
     "size": 700,
@@ -44,126 +24,101 @@
     "shelterCount": 8,
     "heightmaps": [
       {
+        "_name": "The Bay",
+        "url": "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map6.png",
+        "shelterCount": 8,
+        "environment": {
+          "types": [
+            "env_wetland", "env_desert", "env_mediterranean",
+            "env_savanna", "env_temperate_forest",
+            "env_tropical_rainforest", "env_tundra"
+          ],
+          "shaderLayers": [
+            { "minElevation": 0,    "maxElevation": 0.3,  "color": "#1e3a10", "blend": "smooth" },
+            { "minElevation": 0.3,  "maxElevation": 0.65, "color": "#3a5c20", "blend": "smooth" },
+            { "minElevation": 0.65, "maxElevation": 1,    "color": "#606850", "blend": "smooth" }
+          ]
+        },
+        "structures": {
+          "fortresses": [
+            { "enabled": false, "name": "Northern Bastion", "position": { "x": 120, "y": 25, "z": -85  }, "rotation": 0   },
+            { "enabled": false, "name": "Marsh Fort",       "position": { "x": -80, "y": 20, "z": 120  }, "rotation": 90  },
+            { "enabled": false, "name": "Wetland Redoubt",  "position": { "x": 50,  "y": 30, "z": 180  }, "rotation": 180 }
+          ],
+          "villages": [
+            { "enabled": false, "name": "Reed Village", "position": { "x": -50, "y": 18, "z": -100 }, "rotation": 0   },
+            { "enabled": false, "name": "Fen Crossing", "position": { "x": 100, "y": 19, "z": 60   }, "rotation": 45  },
+            { "enabled": false, "name": "Bogside",      "position": { "x": -90, "y": 16, "z": 30   }, "rotation": 135 }
+          ],
+          "cities": [
+            { "enabled": false, "name": "Delta Port", "position": { "x": 0,   "y": 15, "z": 220  }, "rotation": 0  },
+            { "enabled": false, "name": "Marshgate",  "position": { "x": 200, "y": 15, "z": -180 }, "rotation": 90 }
+          ]
+        }
+      },
+      {
+        "_name": "Inner Sanctum",
+        "url": "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map5.png",
+        "shelterCount": 8,
+        "environment": {
+          "types": [
+            "env_wetland", "env_desert", "env_mediterranean",
+            "env_savanna", "env_temperate_forest",
+            "env_tropical_rainforest", "env_tundra"
+          ],
+          "shaderLayers": [
+            { "minElevation": 0,    "maxElevation": 0.3,  "color": "#1e3a10", "blend": "smooth" },
+            { "minElevation": 0.3,  "maxElevation": 0.65, "color": "#3a5c20", "blend": "smooth" },
+            { "minElevation": 0.65, "maxElevation": 1,    "color": "#606850", "blend": "smooth" }
+          ]
+        },
+        "structures": {
+          "fortresses": [
+            { "enabled": false, "name": "Northern Bastion", "position": { "x": 120, "y": 25, "z": -85  }, "rotation": 0   },
+            { "enabled": false, "name": "Marsh Fort",       "position": { "x": -80, "y": 20, "z": 120  }, "rotation": 90  },
+            { "enabled": false, "name": "Wetland Redoubt",  "position": { "x": 50,  "y": 30, "z": 180  }, "rotation": 180 }
+          ],
+          "villages": [
+            { "enabled": false, "name": "Reed Village", "position": { "x": -50, "y": 18, "z": -100 }, "rotation": 0   },
+            { "enabled": false, "name": "Fen Crossing", "position": { "x": 100, "y": 19, "z": 60   }, "rotation": 45  },
+            { "enabled": false, "name": "Bogside",      "position": { "x": -90, "y": 16, "z": 30   }, "rotation": 135 }
+          ],
+          "cities": [
+            { "enabled": false, "name": "Delta Port", "position": { "x": 0,   "y": 15, "z": 220  }, "rotation": 0  },
+            { "enabled": false, "name": "Marshgate",  "position": { "x": 200, "y": 15, "z": -180 }, "rotation": 90 }
+          ]
+        }
+      },
+      {
         "_name": "Wetland Valley",
         "url": "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map4.png",
         "shelterCount": 8,
         "environment": {
           "types": [
-            "env_wetland",
-            "env_desert",
-			"env_mediterranean",
-			"env_savanna",
-			"env_temperate_forest",
-			"env_tropical_rainforest",
-			"env_tundra"
+            "env_wetland", "env_desert", "env_mediterranean",
+            "env_savanna", "env_temperate_forest",
+            "env_tropical_rainforest", "env_tundra"
           ],
           "shaderLayers": [
-            {
-              "minElevation": 0,
-              "maxElevation": 0.3,
-              "color": "#1e3a10",
-              "blend": "smooth"
-            },
-            {
-              "minElevation": 0.3,
-              "maxElevation": 0.65,
-              "color": "#3a5c20",
-              "blend": "smooth"
-            },
-            {
-              "minElevation": 0.65,
-              "maxElevation": 1,
-              "color": "#606850",
-              "blend": "smooth"
-            }
+            { "minElevation": 0,    "maxElevation": 0.3,  "color": "#1e3a10", "blend": "smooth" },
+            { "minElevation": 0.3,  "maxElevation": 0.65, "color": "#3a5c20", "blend": "smooth" },
+            { "minElevation": 0.65, "maxElevation": 1,    "color": "#606850", "blend": "smooth" }
           ]
         },
         "structures": {
           "fortresses": [
-            {
-              "enabled": false,
-              "name": "Northern Bastion",
-              "position": {
-                "x": 120,
-                "y": 25,
-                "z": -85
-              },
-              "rotation": 0
-            },
-            {
-              "enabled": false,
-              "name": "Marsh Fort",
-              "position": {
-                "x": -80,
-                "y": 20,
-                "z": 120
-              },
-              "rotation": 90
-            },
-            {
-              "enabled": false,
-              "name": "Wetland Redoubt",
-              "position": {
-                "x": 50,
-                "y": 30,
-                "z": 180
-              },
-              "rotation": 180
-            }
+            { "enabled": false, "name": "Northern Bastion", "position": { "x": 120, "y": 25, "z": -85  }, "rotation": 0   },
+            { "enabled": false, "name": "Marsh Fort",       "position": { "x": -80, "y": 20, "z": 120  }, "rotation": 90  },
+            { "enabled": false, "name": "Wetland Redoubt",  "position": { "x": 50,  "y": 30, "z": 180  }, "rotation": 180 }
           ],
           "villages": [
-            {
-              "enabled": false,
-              "name": "Reed Village",
-              "position": {
-                "x": -50,
-                "y": 18,
-                "z": -100
-              },
-              "rotation": 0
-            },
-            {
-              "enabled": false,
-              "name": "Fen Crossing",
-              "position": {
-                "x": 100,
-                "y": 19,
-                "z": 60
-              },
-              "rotation": 45
-            },
-            {
-              "enabled": false,
-              "name": "Bogside",
-              "position": {
-                "x": -90,
-                "y": 16,
-                "z": 30
-              },
-              "rotation": 135
-            }
+            { "enabled": false, "name": "Reed Village", "position": { "x": -50, "y": 18, "z": -100 }, "rotation": 0   },
+            { "enabled": false, "name": "Fen Crossing", "position": { "x": 100, "y": 19, "z": 60   }, "rotation": 45  },
+            { "enabled": false, "name": "Bogside",      "position": { "x": -90, "y": 16, "z": 30   }, "rotation": 135 }
           ],
           "cities": [
-            {
-              "enabled": false,
-              "name": "Delta Port",
-              "position": {
-                "x": 0,
-                "y": 15,
-                "z": 220
-              },
-              "rotation": 0
-            },
-            {
-              "enabled": false,
-              "name": "Marshgate",
-              "position": {
-                "x": 200,
-                "y": 15,
-                "z": -180
-              },
-              "rotation": 90
-            }
+            { "enabled": false, "name": "Delta Port", "position": { "x": 0,   "y": 15, "z": 220  }, "rotation": 0  },
+            { "enabled": false, "name": "Marshgate",  "position": { "x": 200, "y": 15, "z": -180 }, "rotation": 90 }
           ]
         }
       },
@@ -172,122 +127,31 @@
         "url": "https://scottgrocott.github.io/mt-assets/heightmaps/drone-wars/v1/map2.png",
         "shelterCount": 6,
         "environment": {
-          "types":  [
-            "env_wetland",
-            "env_desert",
-			"env_mediterranean",
-			"env_savanna",
-			"env_temperate_forest",
-			"env_tropical_rainforest",
-			"env_tundra"
+          "types": [
+            "env_wetland", "env_desert", "env_mediterranean",
+            "env_savanna", "env_temperate_forest",
+            "env_tropical_rainforest", "env_tundra"
           ],
           "shaderLayers": [
-            {
-              "minElevation": 0,
-              "maxElevation": 0.4,
-              "color": "#c8a050",
-              "blend": "smooth"
-            },
-            {
-              "minElevation": 0.4,
-              "maxElevation": 0.75,
-              "color": "#a07838",
-              "blend": "smooth"
-            },
-            {
-              "minElevation": 0.75,
-              "maxElevation": 1,
-              "color": "#706858",
-              "blend": "smooth"
-            }
+            { "minElevation": 0,    "maxElevation": 0.4,  "color": "#c8a050", "blend": "smooth" },
+            { "minElevation": 0.4,  "maxElevation": 0.75, "color": "#a07838", "blend": "smooth" },
+            { "minElevation": 0.75, "maxElevation": 1,    "color": "#706858", "blend": "smooth" }
           ]
         },
         "structures": {
           "fortresses": [
-            {
-              "enabled": false,
-              "name": "Desert Bastion",
-              "position": {
-                "x": 140,
-                "y": 35,
-                "z": -90
-              },
-              "rotation": 45
-            },
-            {
-              "enabled": false,
-              "name": "Sand Rampart",
-              "position": {
-                "x": -160,
-                "y": 42,
-                "z": 140
-              },
-              "rotation": 225
-            },
-            {
-              "enabled": false,
-              "name": "Cliffhanger Stronghold",
-              "position": {
-                "x": 45,
-                "y": 65,
-                "z": 210
-              },
-              "rotation": 180
-            }
+            { "enabled": false, "name": "Desert Bastion",         "position": { "x": 140,  "y": 35, "z": -90  }, "rotation": 45  },
+            { "enabled": false, "name": "Sand Rampart",           "position": { "x": -160, "y": 42, "z": 140  }, "rotation": 225 },
+            { "enabled": false, "name": "Cliffhanger Stronghold", "position": { "x": 45,   "y": 65, "z": 210  }, "rotation": 180 }
           ],
           "villages": [
-            {
-              "enabled": false,
-              "name": "Desert Caravan",
-              "position": {
-                "x": -50,
-                "y": 22,
-                "z": -120
-              },
-              "rotation": 0
-            },
-            {
-              "enabled": false,
-              "name": "Dune Crossing",
-              "position": {
-                "x": 180,
-                "y": 28,
-                "z": 60
-              },
-              "rotation": 30
-            },
-            {
-              "enabled": false,
-              "name": "Oasis Town",
-              "position": {
-                "x": -100,
-                "y": 20,
-                "z": -15
-              },
-              "rotation": 90
-            }
+            { "enabled": false, "name": "Desert Caravan", "position": { "x": -50,  "y": 22, "z": -120 }, "rotation": 0  },
+            { "enabled": false, "name": "Dune Crossing",  "position": { "x": 180,  "y": 28, "z": 60   }, "rotation": 30 },
+            { "enabled": false, "name": "Oasis Town",     "position": { "x": -100, "y": 20, "z": -15  }, "rotation": 90 }
           ],
           "cities": [
-            {
-              "enabled": false,
-              "name": "Sandstone City",
-              "position": {
-                "x": 0,
-                "y": 25,
-                "z": 240
-              },
-              "rotation": 0
-            },
-            {
-              "enabled": false,
-              "name": "Industrial Supergrid",
-              "position": {
-                "x": 250,
-                "y": 20,
-                "z": -250
-              },
-              "rotation": 90
-            }
+            { "enabled": false, "name": "Sandstone City",       "position": { "x": 0,   "y": 25, "z": 240  }, "rotation": 0  },
+            { "enabled": false, "name": "Industrial Supergrid", "position": { "x": 250, "y": 20, "z": -250 }, "rotation": 90 }
           ]
         }
       },
@@ -297,237 +161,217 @@
         "shelterCount": 10,
         "environment": {
           "types": [
-            "env_wetland",
-            "env_desert",
-			"env_mediterranean",
-			"env_savanna",
-			"env_temperate_forest",
-			"env_tropical_rainforest",
-			"env_tundra"
+            "env_wetland", "env_desert", "env_mediterranean",
+            "env_savanna", "env_temperate_forest",
+            "env_tropical_rainforest", "env_tundra"
           ],
           "shaderLayers": [
-            {
-              "minElevation": 0,
-              "maxElevation": 0.25,
-              "color": "#1e3a10",
-              "blend": "smooth"
-            },
-            {
-              "minElevation": 0.25,
-              "maxElevation": 0.55,
-              "color": "#4a3820",
-              "blend": "smooth"
-            },
-            {
-              "minElevation": 0.55,
-              "maxElevation": 0.8,
-              "color": "#707068",
-              "blend": "smooth"
-            },
-            {
-              "minElevation": 0.8,
-              "maxElevation": 1,
-              "color": "#909090",
-              "blend": "smooth"
-            }
+            { "minElevation": 0,    "maxElevation": 0.25, "color": "#1e3a10", "blend": "smooth" },
+            { "minElevation": 0.25, "maxElevation": 0.55, "color": "#4a3820", "blend": "smooth" },
+            { "minElevation": 0.55, "maxElevation": 0.8,  "color": "#707068", "blend": "smooth" },
+            { "minElevation": 0.8,  "maxElevation": 1,    "color": "#909090", "blend": "smooth" }
           ]
         },
         "structures": {
           "fortresses": [
-            {
-              "enabled": false,
-              "name": "Highland Fort",
-              "position": {
-                "x": 100,
-                "y": 45,
-                "z": -70
-              },
-              "rotation": 0
-            },
-            {
-              "enabled": false,
-              "name": "Deep Gorge Fort",
-              "position": {
-                "x": -200,
-                "y": 50,
-                "z": 150
-              },
-              "rotation": 45
-            },
-            {
-              "enabled": false,
-              "name": "Ridge Stronghold",
-              "position": {
-                "x": 60,
-                "y": 60,
-                "z": 200
-              },
-              "rotation": 135
-            },
-            {
-              "enabled": false,
-              "name": "Eastern Rampart",
-              "position": {
-                "x": 180,
-                "y": 35,
-                "z": -30
-              },
-              "rotation": 90
-            }
+            { "enabled": false, "name": "Highland Fort",    "position": { "x": 100,  "y": 45, "z": -70  }, "rotation": 0   },
+            { "enabled": false, "name": "Deep Gorge Fort",  "position": { "x": -200, "y": 50, "z": 150  }, "rotation": 45  },
+            { "enabled": false, "name": "Ridge Stronghold", "position": { "x": 60,   "y": 60, "z": 200  }, "rotation": 135 },
+            { "enabled": false, "name": "Eastern Rampart",  "position": { "x": 180,  "y": 35, "z": -30  }, "rotation": 90  }
           ],
           "villages": [
-            {
-              "enabled": false,
-              "name": "Crossroads",
-              "position": {
-                "x": -110,
-                "y": 22,
-                "z": -15
-              },
-              "rotation": 0
-            },
-            {
-              "enabled": false,
-              "name": "River Bend",
-              "position": {
-                "x": 80,
-                "y": 28,
-                "z": 140
-              },
-              "rotation": 135
-            },
-            {
-              "enabled": false,
-              "name": "Hill Village",
-              "position": {
-                "x": -150,
-                "y": 40,
-                "z": 80
-              },
-              "rotation": 200
-            }
+            { "enabled": false, "name": "Crossroads",   "position": { "x": -110, "y": 22, "z": -15 }, "rotation": 0   },
+            { "enabled": false, "name": "River Bend",   "position": { "x": 80,   "y": 28, "z": 140 }, "rotation": 135 },
+            { "enabled": false, "name": "Hill Village", "position": { "x": -150, "y": 40, "z": 80  }, "rotation": 200 }
           ],
           "cities": [
-            {
-              "enabled": false,
-              "name": "Gridiron Downtown",
-              "position": {
-                "x": 0,
-                "y": 20,
-                "z": 250
-              },
-              "rotation": 0
-            },
-            {
-              "enabled": false,
-              "name": "Harbor District",
-              "position": {
-                "x": -200,
-                "y": 18,
-                "z": -50
-              },
-              "rotation": 45
-            }
+            { "enabled": false, "name": "Gridiron Downtown", "position": { "x": 0,    "y": 20, "z": 250 }, "rotation": 0  },
+            { "enabled": false, "name": "Harbor District",   "position": { "x": -200, "y": 18, "z": -50 }, "rotation": 45 }
           ]
         }
       }
     ]
   },
+
   "fog": {
     "enabled": true,
     "mode": "FOGMODE_LINEAR",
-    "color": {
-      "r": 0.62,
-      "g": 0.7,
-      "b": 0.75
-    },
+    "color": { "r": 0.62, "g": 0.7, "b": 0.75 },
     "density": 0.4,
     "start": 160,
     "end": 520
   },
+
   "underwater_fog": {
-    "r": 0.22,
-    "g": 0.44,
-    "b": 0.62,
+    "r": 0.22, "g": 0.44, "b": 0.62,
     "depth": 18,
     "_note": "depth=metres to full fog. Smaller=denser/deeper looking. Height set by water.mesh.position.y"
   },
+
   "water": {
     "enabled": true,
     "mesh": {
       "width": 700,
       "height": 700,
       "subdivisions": 3,
-      "position": {
-        "x": 0,
-        "y": 5,
-        "z": 0
-      }
+      "position": { "x": 0, "y": 5, "z": 0 }
     },
     "material": {
       "bumpTexture": "https://scottgrocott.github.io/mt-assets/terrain/environments/water.jpg",
       "windForce": 5,
-      "windDirection": {
-        "x": 1,
-        "y": 0.5
-      },
+      "windDirection": { "x": 1, "y": 0.5 },
       "waveHeight": 0.4,
       "bumpHeight": 0.1,
       "waveLength": 0.1,
       "waveSpeed": 20,
-      "waterColor": {
-        "r": 0.04,
-        "g": 0.28,
-        "b": 0.48
-      },
+      "waterColor":  { "r": 0.04, "g": 0.28, "b": 0.48 },
       "colorBlendFactor": 0.2,
-      "waterColor2": {
-        "r": 0.08,
-        "g": 0.38,
-        "b": 0.58
-      },
+      "waterColor2": { "r": 0.08, "g": 0.38, "b": 0.58 },
       "colorBlendFactor2": 0.2,
       "disableClipPlane": false,
       "renderTargetSize": 512
     }
   },
+
   "enemies": [
+
     {
-      "type": "boat",
-      "enabled": false,
-      "maxCount": 1,
-      "health": 80,
-      "hitsToKill": 8
-    },
-    {
-      "type": "submarine",
-      "enabled": false,
-      "maxCount": 1,
-      "health": 120,
-      "hitsToKill": 12
-    },
-    {
+      "_note": "DRONE — aerial patrol. Rises on spawn, hunts player when in range. To swap the whole model set '_full'. To swap only one part leave the others as empty string.",
       "type": "drone",
-      "enabled": true,
-      "maxCount": 1,
+      "enabled": false,
+      "maxCount": 3,
       "health": 60,
-      "hitsToKill": 6
+      "hitsToKill": 6,
+      "respawnTime": 8,
+      "overrides": {
+        "drone_body":  "",
+        "drone_rotor": "",
+        "_full":       ""
+      }
     },
+
     {
+      "_note": "CAR — ground patrol. Wheels spin as it moves. Transitions patrol → chase → ram.",
       "type": "car",
       "enabled": false,
-      "maxCount": 0,
+      "maxCount": 3,
       "health": 100,
-      "hitsToKill": 8
+      "hitsToKill": 8,
+      "respawnTime": 10,
+      "overrides": {
+        "car_body":  "",
+        "car_wheel": "",
+        "_full":     ""
+      }
     },
+
     {
+      "_note": "FORKLIFT — heavy slow ground enemy. Forks raise during ram state.",
       "type": "forklift",
+      "enabled": false,
+      "maxCount": 3,
+      "health": 150,
+      "hitsToKill": 12,
+      "respawnTime": 12,
+      "overrides": {
+        "forklift_body": "",
+        "forklift_fork": "",
+        "_full":         ""
+      }
+    },
+
+    {
+      "_note": "COW — quadruped. knockChance = chance per hit of tipping it. getUpChance = chance per second it stands back up. Double damage while tipped.",
+      "type": "cow",
+      "enabled": false,
+      "maxCount": 3,
+      "health": 80,
+      "hitsToKill": 8,
+      "respawnTime": 10,
+      "knockChance":   0.4,
+      "getUpChance":   0.35,
+      "getUpDuration": 1.2,
+      "detectRange":   40,
+      "patrolSpeed":   3.5,
+      "chaseSpeed":    7,
+      "ramSpeed":      12,
+      "overrides": {
+        "cow_body": "",
+        "cow_head": "",
+        "cow_leg":  "",
+        "_full":    ""
+      }
+    },
+
+    {
+      "_note": "AT-ST — bipedal walker. Shoot legs to slow it. Both legs at 0 HP tips it. Fires cannon burst in fireRange. legRegenRate = HP/sec leg regen while upright.",
+      "type": "atst",
+      "enabled": false,
+      "maxCount": 2,
+      "health": 120,
+      "hitsToKill": 12,
+      "respawnTime": 14,
+      "knockChance":   0.3,
+      "getUpChance":   0.25,
+      "getUpDuration": 1.8,
+      "detectRange":   55,
+      "fireRange":     30,
+      "fireCooldown":  1.8,
+      "patrolSpeed":   3,
+      "chaseSpeed":    6,
+      "legHP":         3,
+      "legRegenRate":  0.3,
+      "overrides": {
+        "atst_cab":    "",
+        "atst_leg":    "",
+        "atst_cannon": "",
+        "_full":       ""
+      }
+    },
+
+    {
+      "_note": "BOAT — surface patrol. Requires water.enabled=true. Circles player in attack range and fires torpedoes. Tilts and sinks on death.",
+      "type": "boat",
+      "enabled": false,
+      "maxCount": 2,
+      "health": 120,
+      "patrolSpeed":  4,
+      "chaseSpeed":   8,
+      "detectRange":  60,
+      "fireRange":    35,
+      "fireCooldown": 3.5,
+      "respawnTime":  14,
+      "overrides": {
+        "boat_hull":  "",
+        "boat_cabin": "",
+        "_full":      ""
+      }
+    },
+
+    {
+      "_note": "SUBMARINE — underwater ambush. Requires water.enabled=true. Patrols submerged, surfaces to fire torpedo burst, dives again. Only damageable while surfaced or surfacing. subDepth = metres below waterY while hidden.",
+      "type": "submarine",
       "enabled": false,
       "maxCount": 0,
       "health": 150,
-      "hitsToKill": 12
+      "patrolSpeed":     5,
+      "detectRange":     70,
+      "fireRange":       50,
+      "fireCooldown":    6,
+      "torpedoCount":    3,
+      "torpedoInterval": 0.5,
+      "subDepth":        8,
+      "lingerTime":      3.0,
+      "respawnTime":     18,
+      "overrides": {
+        "submarine_hull":  "",
+        "submarine_tower": "",
+        "_full":           ""
+      }
     }
+
   ],
+
   "weapons": [
     {
       "id": "basic_gun",
@@ -538,54 +382,26 @@
       "hitsToKill": 8
     }
   ],
+
   "scatterLayers": [
-    {
-      "category": "vegetation",
-      "density": 0.08,
-      "minElevation": 0,
-      "maxElevation": 0.5
-    },
-    {
-      "category": "rock",
-      "density": 0.03,
-      "minElevation": 0,
-      "maxElevation": 0.8
-    }
+    { "category": "vegetation", "density": 0.08, "minElevation": 0, "maxElevation": 0.5 },
+    { "category": "rock",       "density": 0.03, "minElevation": 0, "maxElevation": 0.8 }
   ],
+
   "audio": {
     "channels": {
-      "music": {
-        "muted": false,
-        "volume": -6
-      },
-      "env": {
-        "muted": false,
-        "volume": -8
-      },
-      "enemy": {
-        "muted": false,
-        "volume": -12
-      },
-      "sfx": {
-        "muted": false,
-        "volume": -4
-      }
+      "music": { "muted": false, "volume": -6  },
+      "env":   { "muted": false, "volume": -8  },
+      "enemy": { "muted": false, "volume": -12 },
+      "sfx":   { "muted": false, "volume": -4  }
     },
-    "outerZone": {
-      "radius": 280,
-      "track": "wind"
-    },
-    "midZone": {
-      "radius": 150,
-      "track": "adventure"
-    },
-    "innerZone": {
-      "radius": 60,
-      "track": "battle"
-    }
+    "outerZone": { "radius": 280, "track": "wind"      },
+    "midZone":   { "radius": 150, "track": "adventure" },
+    "innerZone": { "radius": 60,  "track": "battle"    }
   },
-  "shelters": [],
-  "ladders": [],
+
+  "shelters":  [],
+  "ladders":   [],
   "waypoints": [],
-  "assets": []
+  "assets":    []
 }

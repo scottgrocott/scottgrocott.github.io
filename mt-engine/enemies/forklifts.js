@@ -1,11 +1,12 @@
-// enemies/forklifts.js — ground forklift enemy (heavier, slower)
+// enemies/forklifts.js — ground forklift enemy (GLTF model)
 
 import { scene, shadowGenerator } from '../core.js';
-import { safeVec3 } from "../physics.js";
+import { physicsWorld, safeVec3 } from '../physics.js';
 import { EnemyBase, distToPlayer, getPlayerPos } from './enemyBase.js';
 import { getEnemies } from './enemyRegistry.js';
 import { getWaypoints } from '../flatnav.js';
 import { getTerrainHeightAt } from '../terrain/terrainMesh.js';
+import { loadEnemyModel, findNode, findPieces } from './enemyModels.js';
 
 const PATROL_SPEED  = 2.5;
 const CHASE_SPEED   = 4;
@@ -24,22 +25,45 @@ export function spawnForklifts(def) {
       : new BABYLON.Vector3((Math.random()-0.5)*60, 0.7, (Math.random()-0.5)*60);
 
     const enemy = new EnemyBase({
-      scene, type: 'forklift',
+      scene, rapierWorld: physicsWorld, type: 'forklift',
       speed: PATROL_SPEED, health: def.health ?? 150, spawnPos,
-      noVehicle: true,   // forklifts use manual tick, not YUKA steering
     });
 
-    enemy.state = 'patrol';
+    enemy.state          = 'patrol';
     enemy._waypointIndex = Math.floor(Math.random() * Math.max(1, groundWaypoints.length));
-    _buildForkliftMesh(enemy);
+    enemy._forkRaising   = false;
+    enemy._forkY         = 0.3;
+
+    _buildForkliftMesh(enemy, spawnPos, def.overrides);
     spawned.push(enemy);
   }
   return spawned;
 }
 
-function _buildForkliftMesh(enemy) {
+async function _buildForkliftMesh(enemy, spawnPos, overrides) {
+  const _savedPos = spawnPos?.clone() ?? new BABYLON.Vector3(0, 0.7, 0);
+  if (enemy.mesh) { try { enemy.mesh.dispose(); } catch(_) {} }
+
+  try {
+    const root = await loadEnemyModel(scene, 'forklift', {
+      position:  _savedPos,
+      shadowGen: shadowGenerator,
+      overrides: overrides ?? {},
+    });
+    enemy.mesh = root;
+    // Fork node — find the fork meshes; animate by moving them on Y
+    enemy._forkMeshes = findPieces(root, 'forklift_fork');
+    enemy._forkNode   = null; // forks animated directly in tick via _forkMeshes
+  } catch (e) {
+    console.warn('[forklifts] GLTF load failed, using procedural fallback:', e);
+    _buildForkliftMeshProc(enemy, _savedPos);
+  }
+}
+
+function _buildForkliftMeshProc(enemy, savedPos) {
   if (enemy.mesh) enemy.mesh.dispose();
   const root = new BABYLON.TransformNode('flRoot', scene);
+  root.position.copyFrom(savedPos);
   enemy.mesh = root;
 
   const body = BABYLON.MeshBuilder.CreateBox('flBody', { width:1.4, height:1.2, depth:2.0 }, scene);
@@ -53,6 +77,7 @@ function _buildForkliftMesh(enemy) {
   enemy._forkNode = new BABYLON.TransformNode('forkNode', scene);
   enemy._forkNode.parent = root;
   enemy._forkNode.position.set(0, 0.3, 1.1);
+  enemy._forkMeshes = [];
 
   for (const off of [{x:0.3},{x:-0.3}]) {
     const fork = BABYLON.MeshBuilder.CreateBox('fork', { width:0.12, height:0.08, depth:1.2 }, scene);
@@ -61,10 +86,8 @@ function _buildForkliftMesh(enemy) {
     const fmat = new BABYLON.StandardMaterial('forkMat', scene);
     fmat.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
     fork.material = fmat;
+    enemy._forkMeshes.push(fork);
   }
-
-  enemy._forkRaising = false;
-  enemy._forkY = 0.3;
 }
 
 export function tickForklifts(dt) {
@@ -83,9 +106,7 @@ function _tickForklift(enemy, dt, groundWaypoints) {
 
   const playerPos = getPlayerPos();
   const dPlayer   = distToPlayer({x:px, y:py, z:pz});
-
-  let targetX = px, targetZ = pz;
-  let spd = PATROL_SPEED;
+  let targetX = px, targetZ = pz, spd = PATROL_SPEED;
 
   switch (enemy.state) {
     case 'idle': { enemy.state = 'patrol'; break; }
@@ -116,6 +137,7 @@ function _tickForklift(enemy, dt, groundWaypoints) {
     }
   }
 
+  // Animate forks — either via TransformNode (procedural) or direct Y offset (GLTF)
   if (enemy._forkNode) {
     if (enemy._forkRaising) {
       enemy._forkY = Math.min(enemy._forkY + dt * 1.5, 1.8);
@@ -124,16 +146,24 @@ function _tickForklift(enemy, dt, groundWaypoints) {
     }
     enemy._forkNode.position.y = enemy._forkY;
     if (enemy.state !== 'ram') enemy._forkRaising = false;
+  } else if (enemy._forkMeshes?.length) {
+    // GLTF path: shift fork meshes on world Y directly
+    if (enemy._forkRaising) {
+      enemy._forkY = Math.min(enemy._forkY + dt * 1.5, 1.8);
+    } else {
+      enemy._forkY = Math.max(enemy._forkY - dt * 0.8, 0.3);
+    }
+    for (const m of enemy._forkMeshes) {
+      m.position.y = enemy._forkY;
+    }
+    if (enemy.state !== 'ram') enemy._forkRaising = false;
   }
 
   const dx = targetX - px, dz = targetZ - pz;
   const len = Math.sqrt(dx*dx + dz*dz);
   if (len > 0.5) {
     const nx = dx/len, nz = dz/len;
-    const npx = px + nx*spd*dt;
-    const npy = getTerrainHeightAt(px, pz) + 0.7;
-    const npz = pz + nz*spd*dt;
-    const safe = safeVec3(npx, npy, npz, 'forklift tick');
+    const safe = safeVec3(px + nx*spd*dt, getTerrainHeightAt(px, pz) + 0.7, pz + nz*spd*dt, 'forklift tick');
     if (safe) {
       enemy.body.setNextKinematicTranslation(safe);
       if (enemy.mesh) {

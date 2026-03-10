@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Metal Throne</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#000; overflow:hidden; font-family:'Courier New',monospace; }
+    #top-bar { position:fixed;top:0;left:0;right:0;z-index:10000;height:36px;
+      background:rgba(8,12,8,0.92);border-bottom:1px solid #2a3a2a;
+      display:flex;align-items:center;gap:12px;padding:0 12px; }
+    #top-bar button { background:#0e1e0e;border:1px solid #3a6a3a;color:#8aee8a;
+      font-family:inherit;font-size:11px;padding:3px 8px;cursor:pointer;border-radius:2px; }
+    #renderCanvas { width:100vw;height:100vh;display:block;touch-action:none; }
+    #hud { position:fixed;top:42px;left:12px;z-index:9000;color:#8aee8a;font-size:11px;
+      pointer-events:none;display:flex;flex-direction:column;gap:4px; }
+    #hud .hud-row { display:flex;gap:10px; }
+    #hud .hud-label { color:#4a7a4a; }
+    #crosshair { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:16px;height:16px;pointer-events:none;z-index:9000; }
+    #crosshair::before,#crosshair::after { content:'';position:absolute;background:rgba(138,238,138,0.8); }
+    #crosshair::before { width:2px;height:16px;left:7px;top:0; }
+    #crosshair::after  { width:16px;height:2px;top:7px;left:0; }
+    #loading-screen { position:fixed;inset:0;background:#000d00;z-index:99999;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      color:#8aee8a;font-family:'Courier New',monospace; }
+    #loading-screen .load-title { font-size:22px;letter-spacing:0.3em;margin-bottom:18px; }
+    #loading-screen .load-sub   { font-size:11px;color:#4a7a4a;letter-spacing:0.15em; }
+    #loading-bar-wrap { width:280px;height:4px;background:#1a2a1a;border-radius:2px;margin-top:18px; }
+    #loading-bar { height:4px;background:#4aee4a;border-radius:2px;width:0%;transition:width 0.3s; }
+    #minimap-canvas { position:fixed;top:35px;right:20px;z-index:8400;border:1px solid #2a4a2a;border-radius:2px;width:200px;height:200px;pointer-events:none; }
+  
+    #btn-play:hover { background:#1a3a1a; }
+    #level-nav button { background:#0a180a;border:1px solid #3a6a3a;color:#8aee8a;
+      font-family:'Courier New',monospace;font-size:10px;padding:6px 14px;
+      cursor:pointer;border-radius:2px;letter-spacing:0.08em; }
+    #level-nav button:hover { border-color:#4aee4a;color:#4aee4a; }
+  </style>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/yuka@0.7.8/build/yuka.min.js"></script>
+  <script src="https://cdn.babylonjs.com/havok/HavokPhysics_umd.js"></script>
+  <script>window.HK = HavokPhysics();</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <!-- Google Analytics GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EBGF4V165P"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-EBGF4V165P', { debug_mode: false });
+
+    // Helper — fire a GA4 event
+    window._gaEvent = function(name, params) {
+      if (typeof gtag === 'function') {
+        gtag('event', name, params || {});
+      } else {
+        // gtag script still loading — queue it
+        window.dataLayer.push({ event: name, ...(params || {}) });
+      }
+    };
+  </script>
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="load-title" id="splash-title">METAL THRONE</div>
+    <div id="splash-body" style="display:none;max-width:420px;text-align:center;font-size:11px;color:#6aaa6a;margin:10px 0 0;line-height:1.7;"></div>
+    <div class="load-sub" id="load-status">INITIALIZING...</div>
+    <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+    <button id="btn-play" style="display:none;margin-top:22px;background:#0e1e0e;border:1px solid #4aee4a;
+      color:#4aee4a;font-family:'Courier New',monospace;font-size:13px;letter-spacing:0.15em;
+      padding:10px 32px;cursor:pointer;border-radius:2px;">▶ PLAY</button>
+    <div id="level-nav" style="display:none;margin-top:14px;display:none;flex-wrap:wrap;
+      justify-content:center;gap:8px;max-width:360px;"></div>
+  </div>
+  <div id="top-bar">
+    <button id="btn-audio">🔊 Audio</button>
+    <button id="btn-help">? Help</button>
+  </div>
+  <canvas id="renderCanvas"></canvas>
+  <div id="crosshair"></div>
+  <div id="hud">
+    <div class="hud-row">
+      <span class="hud-label">HP</span><span id="hud-health">100</span>
+      <span class="hud-label">AMMO</span><span id="hud-ammo">∞</span>
+      <span class="hud-label">ENEMIES</span><span id="hud-enemies">0</span>
+    </div>
+    <div class="hud-row"><span class="hud-label">POS</span><span id="hud-pos">0,0,0</span></div>
+    <div class="hud-row"><span id="hud-status"></span></div>
+  </div>
+  <canvas id="minimap-canvas" width="110" height="110"></canvas>
+  <script>
+  // ── Engine loader ─────────────────────────────────────────────────────────
+  window._ENGINE_SRC = location.hostname === 'localhost'
+    ? 'http://localhost:83/mt-engine/main.js'
+    : 'https://scottgrocott.github.io/mt-engine/main.js';
+  const _s = document.createElement('script');
+  _s.type = 'module'; _s.src = window._ENGINE_SRC;
+  document.currentScript.after(_s);
+
+  // ── Splash helpers (called by main.js after level loads) ──────────────────
+  window._setSplashContent = function(title, body) {
+    // Rewrite <title> and splash heading for GA page tracking
+    const clean = (title || 'Metal Throne').replace(/<[^>]*>/g, '').trim();
+    document.title = clean + ' — Metal Throne';
+    window._gaEvent?.('page_view', { page_title: document.title, page_location: location.href });
+
+    const el = document.getElementById('splash-title');
+    if (el) el.textContent = clean;
+
+    const b = document.getElementById('splash-body');
+    if (b && body && body.trim()) { b.innerHTML = body; b.style.display = 'block'; }
+  };
+
+  window._splashShowPlay = function(levels) {
+    // Hide loading bar + status
+    document.getElementById('loading-bar-wrap').style.display = 'none';
+    document.getElementById('load-status').style.display = 'none';
+
+    // Show play button
+    const btn = document.getElementById('btn-play');
+    if (btn) btn.style.display = 'inline-block';
+
+    // Build level nav buttons if levels array provided
+    const nav = document.getElementById('level-nav');
+    if (nav && Array.isArray(levels) && levels.length > 1) {
+      nav.innerHTML = '';
+      levels.forEach(function(lvl, i) {
+        const b = document.createElement('button');
+        b.textContent = lvl.subtitle || ('Play Level ' + (i + 1));
+        b.addEventListener('click', function() {
+          window._gaEvent?.('select_level', { level_id: lvl.id, level_title: lvl.title });
+          if (window._loadGameConfig) window._loadGameConfig(lvl.id + '.json');
+        });
+        nav.appendChild(b);
+      });
+      // Restart button
+      const rb = document.createElement('button');
+      rb.textContent = '↺ Restart Game';
+      rb.addEventListener('click', function() {
+        // Delay reload so GA has time to flush the event hit
+        window._gaEvent?.('restart_game', { page_location: location.href });
+        setTimeout(() => location.reload(), 300);
+      });
+      nav.appendChild(rb);
+      nav.style.display = 'flex';
+    }
+  };
+
+  // ── Play button ───────────────────────────────────────────────────────────
+  function _dismissSplash() {
+    const screen = document.getElementById('loading-screen');
+    if (!screen || screen.style.display === 'none') return;
+    screen.style.display = 'none';
+    window._gaEvent?.('play_game', { page_title: document.title });
+    if (window.Tone?.start) window.Tone.start();
+    document.dispatchEvent(new CustomEvent('splash-dismissed'));
+    const canvas = document.getElementById('renderCanvas');
+    if (canvas && !('ontouchstart' in window)) canvas.requestPointerLock?.();
+  }
+
+  const _playBtn = document.getElementById('btn-play');
+  _playBtn.addEventListener('click', _dismissSplash);
+  _playBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (window.Tone?.start) window.Tone.start();
+    _dismissSplash();
+  }, { passive: false });
+</script>
+</body>
+</html>

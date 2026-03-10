@@ -1,320 +1,545 @@
-// enemies/submarines.js — underwater submarine enemy
-// Stays fully submerged or at water surface only. Never goes on land.
-// States:
-//   submerged  — prowls underwater, avoids seabed, counts down to periscope
-//   periscope  — rises to waterline, scans slowly for player
-//   surfaced   — player spotted, orbits at water surface
-//   sinking    — hit, rolls and descends, then respawns
+// enemies/submarines.js — submarine enemy
+//
+// FSM states:
+//   submerged  → invisible below waterY, patrolling toward player area
+//   surfacing  → rising from subDepth to waterY over ~2s, periscope appears first
+//   firing     → on surface, fires torpedo burst, lingers briefly
+//   diving     → sinks back below waterY
+//   sinking    → destroyed, falls to seabed, then respawns
+//
+// Visibility rules:
+//   submerged → mesh hidden (or translucent if player is underwater)
+//   periscope only visible during surfacing (periscopeOnly = true)
+//   fully visible once surfaced
+//
+// Torpedoes share the same _torpedoes pool and _fireTorpedo logic imported
+// from boats — but we keep submarines self-contained with their own impl
+// so the two files can be deployed independently.
 
 import { scene, shadowGenerator } from '../core.js';
-import { safeVec3 }               from '../physics.js';
+import { safeVec3 } from '../physics.js';
 import { EnemyBase, distToPlayer, getPlayerPos } from './enemyBase.js';
-import { getEnemies }              from './enemyRegistry.js';
-import { getWaypoints }            from '../flatnav.js';
-import { getTerrainHeightAt }      from '../terrain/terrainMesh.js';
-import { getWaterY }               from '../water.js';
-import { CONFIG }                   from '../config.js';
+import { getEnemies } from './enemyRegistry.js';
 
-const SUBMERGED_DEPTH = 5.5;
-const PERISCOPE_DEPTH = 0.6;
-const SURFACED_HEIGHT = 0.4;
-const TERRAIN_FLOOR   = 1.5;
-const PATROL_SPEED    = 3;
-const SURFACE_SPEED   = 6;
-const SCAN_INTERVAL   = 4.0;   // surface sooner
-const SCAN_DURATION   = 3.5;
-const DETECT_RANGE    = 38;
-const ORBIT_RADIUS    = 20;
-const PROBE_DIST      = 8;
-const STEER_ANGLE     = 0.7;
+import { getHeightAt } from '../terrain/heightmap.js';
+import { getWaterY } from '../water.js';
+import { CONFIG } from '../config.js';
+import { loadEnemyModel, findPieces } from './enemyModels.js';
 
-// ── Water-constrained steering (same algorithm as boats.js) ───────────────────
+// ── Defaults ──────────────────────────────────────────────────────────────────
+const D = {
+  PATROL_SPEED:    5,
+  SURFACE_SPEED:   2,
+  SUB_DEPTH:       8,      // metres below waterY while submerged
+  SURFACE_TIME:    2.2,    // seconds to rise to surface
+  DIVE_TIME:       1.8,    // seconds to submerge
+  LINGER_TIME:     3.0,    // seconds on surface after firing
+  DETECT_RANGE:    70,     // range at which sub detects player and surfaces
+  FIRE_RANGE:      50,
+  TORPEDO_COUNT:   3,      // torpedoes per burst
+  TORPEDO_INTERVAL:0.5,    // seconds between burst torpedoes
+  FIRE_COOLDOWN:   6,      // seconds between bursts
+  HEALTH:          150,
+  RESPAWN_TIME:    18,
+};
 
-function _isWater(x, z, wY) {
-  return getTerrainHeightAt(x, z) < wY - 0.5;
-}
+const TORP_SPEED  = 20;
+const TORP_LIFE   = 5.0;
+const TORP_RADIUS = 3.5;
+const TORP_DAMAGE = 30;
 
-function _waterSteer(px, pz, dx, dz, wY) {
-  const len = Math.sqrt(dx*dx + dz*dz);
-  if (len < 0.01) return { nx:0, nz:0 };
-  let nx = dx/len, nz = dz/len;
-  if (_isWater(px + nx*PROBE_DIST, pz + nz*PROBE_DIST, wY)) return { nx, nz };
-  for (let a = STEER_ANGLE; a <= Math.PI; a += STEER_ANGLE) {
-    const c = Math.cos(a), s = Math.sin(a);
-    const lx = nx*c - nz*s, lz = nx*s + nz*c;
-    if (_isWater(px + lx*PROBE_DIST, pz + lz*PROBE_DIST, wY)) return { nx:lx, nz:lz };
-    const rx = nx*c + nz*s, rz = -nx*s + nz*c;
-    if (_isWater(px + rx*PROBE_DIST, pz + rz*PROBE_DIST, wY)) return { nx:rx, nz:rz };
-  }
-  return { nx:0, nz:0 };
-}
-
-/** Nearest water-edge position toward a target — sub won't try to go on land */
-function _shorelineTarget(px, pz, tx, tz, wY) {
-  const dx = tx-px, dz = tz-pz;
-  const dist = Math.sqrt(dx*dx+dz*dz);
-  if (dist < 1) return { x:px, z:pz };
-  const steps = Math.min(40, Math.ceil(dist/3));
-  let lwx = px, lwz = pz;
-  for (let i = 1; i <= steps; i++) {
-    const f = i/steps;
-    const sx = px+dx*f, sz = pz+dz*f;
-    if (_isWater(sx, sz, wY)) { lwx=sx; lwz=sz; } else break;
-  }
-  return { x:lwx, z:lwz };
-}
+const _torpedoes = [];
 
 // ── Spawn ─────────────────────────────────────────────────────────────────────
-
 export function spawnSubmarines(def) {
-  const waterY = getWaterY();
-  if (waterY === null) { console.warn('[submarines] No water — skipping'); return []; }
+  let waterY = getWaterY();
+  if (waterY === null) waterY = CONFIG.water?.enabled ? (CONFIG.water?.mesh?.position?.y ?? null) : null;
+  console.log(`[submarines] spawnSubmarines called — waterY=${waterY} enabled=${def.enabled} maxCount=${def.maxCount}`);
+  if (waterY === null) {
+    console.warn('[submarines] No water in scene — skipping submarine spawn');
+    return [];
+  }
 
-  const count = def.maxCount || 2;
-  const wps   = getWaypoints('ground');
+  const count = def.maxCount || 1;
+  const waypoints = _waterWaypoints(waterY);
   const spawned = [];
 
-  const TERRAIN_HALF = (CONFIG?.terrain?.size ?? 700) / 2;
-  const PERIMETER_R  = TERRAIN_HALF * 0.82;
-
   for (let i = 0; i < count; i++) {
-    // Offset half a slot from boats so they don't stack
-    let baseAngle = (i / count) * Math.PI * 2 + (Math.PI / count);
-    let spawnX = 0, spawnZ = 0, found = false;
-    for (let attempt = 0; attempt < 36; attempt++) {
-      const tryAngle = baseAngle + (attempt * Math.PI / 18) + (Math.random() - 0.5) * 0.3;
-      const tx = Math.cos(tryAngle) * PERIMETER_R;
-      const tz = Math.sin(tryAngle) * PERIMETER_R;
-      if (_isWater(tx, tz, waterY)) { spawnX = tx; spawnZ = tz; found = true; break; }
-    }
-    if (!found) {
-      let r = PERIMETER_R;
-      spawnX = Math.cos(baseAngle) * r;
-      spawnZ = Math.sin(baseAngle) * r;
-      while (r > 20 && !_isWater(spawnX, spawnZ, waterY)) {
-        r -= 10; spawnX = Math.cos(baseAngle) * r; spawnZ = Math.sin(baseAngle) * r;
-      }
-    }
+    const wp = waypoints[i % waypoints.length];
+    const subY = waterY - (def.subDepth ?? D.SUB_DEPTH);
+    const spawnPos = new BABYLON.Vector3(wp.x, subY, wp.z);
 
     const enemy = new EnemyBase({
       scene,
-      type:        'submarine',
-      speed:       PATROL_SPEED,
-      health:      def.health ?? 120,
-      spawnPos:    new BABYLON.Vector3(spawnX, waterY - SUBMERGED_DEPTH, spawnZ),
-      noVehicle:   true,
-      respawnTime: 15,
+      type: 'submarine',
+      speed: D.PATROL_SPEED,
+      health: def.health ?? D.HEALTH,
+      spawnPos,
+      noVehicle: true,
     });
+
     enemy.state           = 'submerged';
-    enemy._scanTimer      = SCAN_INTERVAL * (0.3 + Math.random()*0.7);
-    enemy._scanElapsed    = 0;
-    enemy._waypointIndex  = i % Math.max(1, wps.length);
-    enemy._sinkY          = 0;
-    enemy._periscopeAngle = 0;
-    _buildSubMesh(enemy);
+    enemy._waypointIndex  = i % waypoints.length;
+    enemy._waypoints      = waypoints;
+    enemy._heading        = Math.random() * Math.PI * 2;
+    enemy._stateTimer     = 0;
+    enemy._fireBurstLeft  = 0;
+    enemy._fireBurstTimer = 0;
+    enemy._fireCooldown   = D.FIRE_COOLDOWN * Math.random();
+    enemy._subY           = subY;
+    enemy._cfg = {
+      patrolSpeed:    def.patrolSpeed    ?? D.PATROL_SPEED,
+      detectRange:    def.detectRange    ?? D.DETECT_RANGE,
+      fireRange:      def.fireRange      ?? D.FIRE_RANGE,
+      fireCooldown:   def.fireCooldown   ?? D.FIRE_COOLDOWN,
+      torpedoCount:   def.torpedoCount   ?? D.TORPEDO_COUNT,
+      torpedoInterval:def.torpedoInterval?? D.TORPEDO_INTERVAL,
+      subDepth:       def.subDepth       ?? D.SUB_DEPTH,
+      respawnTime:    def.respawnTime    ?? D.RESPAWN_TIME,
+      lingerTime:     def.lingerTime     ?? D.LINGER_TIME,
+    };
+
+    _buildSubMesh(enemy, spawnPos, def.overrides);
     spawned.push(enemy);
   }
   return spawned;
 }
 
-// ── Mesh ──────────────────────────────────────────────────────────────────────
+// ── GLTF mesh builder ─────────────────────────────────────────────────────────
+async function _buildSubMesh(enemy, spawnPos, overrides) {
+  const savedPos = spawnPos?.clone() ?? new BABYLON.Vector3(0, 0, 0);
 
-function _buildSubMesh(enemy) {
-  const _savedPos = enemy.mesh?.position?.clone() ?? new BABYLON.Vector3(0, 0, 0);
-  if (enemy.mesh) enemy.mesh.dispose();
-  const root = new BABYLON.TransformNode('subRoot', scene);
-  root.position.copyFrom(_savedPos);  // preserve spawn position
-  enemy.mesh = root;
-
-  const hull = BABYLON.MeshBuilder.CreateCylinder('subHull',
-    { diameter:1.4, height:6.0, tessellation:12 }, scene);
-  hull.parent = root; hull.rotation.x = Math.PI/2;
-  const hullMat = new BABYLON.StandardMaterial('subHullMat', scene);
-  hullMat.diffuseColor  = new BABYLON.Color3(0.18, 0.22, 0.18);
-  hullMat.emissiveColor = new BABYLON.Color3(0.02, 0.04, 0.02);
-  hull.material = hullMat;
-  if (shadowGenerator) shadowGenerator.addShadowCaster(hull);
-
-  const sail = BABYLON.MeshBuilder.CreateBox('subSail',
-    { width:0.7, height:1.1, depth:1.8 }, scene);
-  sail.parent = root; sail.position.set(0, 0.9, 0);
-  const sailMat = new BABYLON.StandardMaterial('subSailMat', scene);
-  sailMat.diffuseColor = new BABYLON.Color3(0.15, 0.19, 0.15);
-  sail.material = sailMat;
-  if (shadowGenerator) shadowGenerator.addShadowCaster(sail);
-
-  const scope = BABYLON.MeshBuilder.CreateCylinder('periscope',
-    { diameter:0.12, height:2.2, tessellation:6 }, scene);
-  scope.parent = sail; scope.position.set(0, 1.4, -0.2);
-  const scopeMat = new BABYLON.StandardMaterial('scopeMat', scene);
-  scopeMat.diffuseColor  = new BABYLON.Color3(0.4, 0.4, 0.35);
-  scope.material = scopeMat;
-
-  const eye = BABYLON.MeshBuilder.CreateSphere('scopeEye', { diameter:0.22, segments:4 }, scene);
-  eye.parent = scope; eye.position.y = 1.1;
-  const eyeMat = new BABYLON.StandardMaterial('eyeMat', scene);
-  eyeMat.emissiveColor = new BABYLON.Color3(0.1, 0.9, 0.1);
-  eye.material = eyeMat;
-
-  for (const side of [-1, 1]) {
-    const fin = BABYLON.MeshBuilder.CreateBox('fin',
-      { width:1.2, height:0.1, depth:0.5 }, scene);
-    fin.parent = hull; fin.position.set(side*1.3, 0, -1.5);
-    const finMat = new BABYLON.StandardMaterial('finMat', scene);
-    finMat.diffuseColor = new BABYLON.Color3(0.15, 0.18, 0.15);
-    fin.material = finMat;
+  const placeholder = enemy.mesh;
+  if (placeholder) {
+    placeholder.setEnabled(false);
+    placeholder.position.copyFrom(savedPos);
   }
 
-  enemy._sailMesh  = sail;
-  enemy._scopeMesh = scope;
-  enemy._eyeMesh   = eye;
+  let gltfOk = false;
+  try {
+    const root = await loadEnemyModel(scene, 'submarine', {
+      position:  savedPos,
+      shadowGen: shadowGenerator,
+      overrides: overrides ?? {},
+    });
+    enemy.mesh       = root;
+    enemy._periscope = findPieces(root, 'sub_periscope')[0] ?? null;
+    enemy._tower     = findPieces(root, 'sub_tower')[0]     ?? null;
+    // Submarines start hidden — they surface during FSM
+    root.setEnabled(false);
+    if (placeholder) try { placeholder.dispose(); } catch(_) {}
+    gltfOk = true;
+    console.log(`[submarines] mesh ready (GLTF) at`, savedPos.toString());
+  } catch (e) {
+    // GLTF unavailable
+  }
+
+  if (!gltfOk) {
+    if (placeholder) try { placeholder.dispose(); } catch(_) {}
+    _buildSubMeshProc(enemy, savedPos);
+    // Submarines start hidden
+    if (enemy.mesh) enemy.mesh.setEnabled(false);
+    console.log(`[submarines] mesh ready (procedural) at`, savedPos.toString());
+  }
+}
+
+function _buildSubMeshProc(enemy, savedPos) {
+  if (enemy.mesh) { try { enemy.mesh.dispose(); } catch(_) {} }
+  const root = new BABYLON.TransformNode('subRoot', scene);
+  root.position.copyFrom(savedPos);
+  enemy.mesh = root;
+
+  const SCOL = new BABYLON.Color3(0.12, 0.18, 0.22);
+
+  // Main tube (hull approximation)
+  const hull = BABYLON.MeshBuilder.CreateCylinder('subHull',
+    { diameter:1.7, height:5.5, tessellation:10 }, scene);
+  hull.parent = root;
+  hull.rotation.x = Math.PI / 2;
+  const hmat = new BABYLON.StandardMaterial('subHullMat', scene);
+  hmat.diffuseColor = SCOL;
+  hull.material = hmat;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(hull);
+
+  // Conning tower
+  const tower = BABYLON.MeshBuilder.CreateBox('subTower',
+    { width:0.7, height:1.4, depth:1.0 }, scene);
+  tower.parent = root;
+  tower.position.set(0, 0.85, -0.5);
+  const tmat = new BABYLON.StandardMaterial('subTowerMat', scene);
+  tmat.diffuseColor = new BABYLON.Color3(0.14, 0.20, 0.25);
+  tower.material = tmat;
+  enemy._tower = tower;
+
+  // Periscope
+  const scope = BABYLON.MeshBuilder.CreateCylinder('subPeriscope',
+    { diameter:0.10, height:1.8, tessellation:5 }, scene);
+  scope.parent = root;
+  scope.position.set(0, 1.8, -0.4);
+  const smat = new BABYLON.StandardMaterial('subScopeMat', scene);
+  smat.diffuseColor = new BABYLON.Color3(0.20, 0.22, 0.20);
+  scope.material = smat;
+  enemy._periscope = scope;
+
+  root.setEnabled(false);
 }
 
 // ── Tick ──────────────────────────────────────────────────────────────────────
-
 export function tickSubmarines(dt) {
-  const waterY = getWaterY();
+  let waterY = getWaterY();
+  if (waterY === null) waterY = CONFIG.water?.mesh?.position?.y ?? null;
   if (waterY === null) return;
   for (const e of getEnemies()) {
     if (e.type !== 'submarine' || e.dead) continue;
-    _tickSub(e, dt, waterY);
+    _tickSub(e, dt, waterY ?? 0);
   }
+  _tickTorpedoes(dt);
 }
 
 function _tickSub(enemy, dt, waterY) {
   if (!enemy.body) return;
   const t = enemy.body.translation();
-  let px = +t.x, py = +t.y, pz = +t.z;
-  if (isNaN(px)) return;
+  const px = +t.x, py = +t.y, pz = +t.z;
+  if (isNaN(px)||isNaN(py)||isNaN(pz)) return;
 
-  const terrainH  = getTerrainHeightAt(px, pz);
   const playerPos = getPlayerPos();
-  const dPlayer   = distToPlayer({ x:px, y:py, z:pz });
+  const dPlayer   = distToPlayer({x:px, y:waterY, z:pz}); // measure horiz distance
+  const cfg       = enemy._cfg;
+  const subY      = waterY - cfg.subDepth;
 
-  // ── Sinking ────────────────────────────────────────────────────────────────
-  if (enemy.state === 'sinking') {
-    enemy._sinkY = (enemy._sinkY||0) + 1.0 * dt;
-    enemy.mesh.position.set(px, waterY - SUBMERGED_DEPTH - enemy._sinkY, pz);
-    enemy.mesh.rotation.z += 1.0 * dt * 0.5;
-    if (enemy._sinkY > 12) {
-      enemy.dead = true;
-      enemy.mesh.setEnabled(false);
-      setTimeout(() => {
-        if (enemy.destroyed || window._levelComplete) return;
-        enemy._sinkY = 0;
-        enemy.mesh.rotation.set(0, enemy.mesh.rotation.y, 0);
-        enemy.mesh.setEnabled(true);
-        enemy.health = enemy.maxHealth;
-        enemy.dead   = false;
-        enemy.state  = 'submerged';
-        enemy._scanTimer = SCAN_INTERVAL;
-      }, (enemy.respawnTime??15)*1000);
-    }
-    return;
-  }
-
-  let targetX = px, targetY = py, targetZ = pz;
-  let moveXZ = true;
-  let spd = PATROL_SPEED;
+  enemy._stateTimer += dt;
 
   switch (enemy.state) {
 
+    // ── Submerged: invisible, patrol toward player area ──────────────────────
     case 'submerged': {
-      // Clamp depth: between seabed+floor and waterY-depth
-      const minY = Math.max(terrainH + TERRAIN_FLOOR, waterY - SUBMERGED_DEPTH - 3);
-      targetY = Math.min(waterY - SUBMERGED_DEPTH, Math.max(minY, py));
+      if (enemy.mesh) enemy.mesh.setEnabled(false);
 
-      // Navigate toward next waypoint, constrained to water
-      const wps = getWaypoints('ground');
-      if (wps.length > 0) {
-        const wp = wps[enemy._waypointIndex % wps.length];
-        const shore = _shorelineTarget(px, pz, wp.x, wp.z, waterY);
-        const dd = Math.sqrt((shore.x-px)**2 + (shore.z-pz)**2);
-        if (dd < 6) enemy._waypointIndex = (enemy._waypointIndex+1) % wps.length;
-        targetX = shore.x; targetZ = shore.z;
+      // Patrol toward player lazily when in range
+      if (dPlayer < cfg.detectRange) {
+        _steerToward(enemy, playerPos.x, playerPos.z, cfg.patrolSpeed, dt, subY);
+      } else {
+        // Patrol waypoints
+        const wp = enemy._waypoints[enemy._waypointIndex];
+        const dx = wp.x - px, dz = wp.z - pz;
+        if (Math.sqrt(dx*dx+dz*dz) < 8) {
+          enemy._waypointIndex = (enemy._waypointIndex+1) % enemy._waypoints.length;
+        } else {
+          _steerToward(enemy, wp.x, wp.z, cfg.patrolSpeed * 0.6, dt, subY);
+        }
       }
 
-      enemy._scanTimer -= dt;
-      if (enemy._scanTimer <= 0) {
-        enemy.state = 'periscope'; enemy._scanElapsed = 0;
-      }
-      break;
-    }
-
-    case 'periscope': {
-      // Rise to periscope depth, hold XZ
-      targetY = waterY - PERISCOPE_DEPTH;
-      targetX = px; targetZ = pz;
-      moveXZ  = false;
-
-      // Slow scan rotation
-      enemy._periscopeAngle = (enemy._periscopeAngle||0) + dt * 0.55;
-      enemy.mesh.rotation.y = enemy._periscopeAngle;
-
-      enemy._scanElapsed += dt;
-
-      // Detect player: horizontal range check (periscope can't see through terrain)
-      const hDist = Math.sqrt((px-playerPos.x)**2 + (pz-playerPos.z)**2);
-      // Detect player regardless of their Y — subs surface if player is overhead too
-      if (hDist < DETECT_RANGE) {
-        enemy.state = 'surfaced';
-        break;
-      }
-      if (enemy._scanElapsed >= SCAN_DURATION) {
-        enemy.state      = 'submerged';
-        enemy._scanTimer = SCAN_INTERVAL * (0.8 + Math.random()*0.6);
+      // Surface when close enough to fire
+      if (dPlayer < cfg.fireRange) {
+        enemy.state = 'surfacing';
+        enemy._stateTimer = 0;
+        enemy._surfaceStartY = subY;
       }
       break;
     }
 
-    case 'surfaced': {
-      targetY = waterY + SURFACED_HEIGHT;
-      spd     = SURFACE_SPEED;
+    // ── Surfacing: rise from subY to waterY ──────────────────────────────────
+    case 'surfacing': {
+      const frac = Math.min(enemy._stateTimer / D.SURFACE_TIME, 1.0);
+      const targetY = subY + (waterY - subY) * frac;
 
-      // Orbit the nearest shoreline point toward player (stays in water)
-      const shore = _shorelineTarget(px, pz, playerPos.x, playerPos.z, waterY);
-      const orbitAngle = Math.atan2(px - shore.x, pz - shore.z) + dt * 0.38;
-      targetX = shore.x + Math.sin(orbitAngle) * ORBIT_RADIUS;
-      targetZ = shore.z + Math.cos(orbitAngle) * ORBIT_RADIUS;
+      // Show mesh as it breaks surface (halfway up)
+      if (enemy.mesh) {
+        if (frac >= 0.5 && !enemy.mesh.isEnabled()) enemy.mesh.setEnabled(true);
+        enemy.mesh.position.set(px, targetY, pz);
+      }
+
+      const safe = safeVec3(px, targetY, pz, 'sub surfacing');
+      if (safe) enemy.body.setNextKinematicTranslation(safe);
+
+      if (frac >= 1.0) {
+        if (enemy.mesh) enemy.mesh.setEnabled(true);
+        enemy.state = 'firing';
+        enemy._stateTimer    = 0;
+        enemy._fireBurstLeft = cfg.torpedoCount;
+        enemy._fireBurstTimer = 0;
+        enemy._lingerTimer   = 0;
+      }
+      break;
+    }
+
+    // ── Firing: burst of torpedoes, then linger ───────────────────────────────
+    case 'firing': {
+      // Sync mesh to waterY surface
+      const safe = safeVec3(px, waterY, pz, 'sub firing');
+      if (safe) {
+        enemy.body.setNextKinematicTranslation(safe);
+        if (enemy.mesh) enemy.mesh.position.set(safe.x, waterY, safe.z);
+      }
 
       // Face player
-      const faceAng = Math.atan2(playerPos.x - px, playerPos.z - pz);
-      enemy.mesh.rotation.y += (faceAng - enemy.mesh.rotation.y) * 0.06;
+      const ang = Math.atan2(playerPos.x - px, playerPos.z - pz);
+      enemy._heading = ang;
+      if (enemy.mesh) enemy.mesh.rotation.y = ang;
 
-      if (dPlayer > DETECT_RANGE * 1.8) {
-        enemy.state = 'submerged'; enemy._scanTimer = SCAN_INTERVAL * 0.5;
+      // Fire burst
+      if (enemy._fireBurstLeft > 0) {
+        enemy._fireBurstTimer -= dt;
+        if (enemy._fireBurstTimer <= 0) {
+          _fireTorpedo(enemy, playerPos, waterY);
+          enemy._fireBurstLeft--;
+          enemy._fireBurstTimer = cfg.torpedoInterval;
+        }
+      } else {
+        // Burst done — linger then dive
+        enemy._lingerTimer = (enemy._lingerTimer ?? 0) + dt;
+        if (enemy._lingerTimer >= cfg.lingerTime) {
+          enemy.state = 'diving';
+          enemy._stateTimer = 0;
+          enemy._diveStartY = waterY;
+        }
+      }
+      break;
+    }
+
+    // ── Diving: sink back below waterY ───────────────────────────────────────
+    case 'diving': {
+      const frac = Math.min(enemy._stateTimer / D.DIVE_TIME, 1.0);
+      const targetY = waterY - (waterY - subY) * frac;
+
+      const safe = safeVec3(px, targetY, pz, 'sub diving');
+      if (safe) {
+        enemy.body.setNextKinematicTranslation(safe);
+        if (enemy.mesh) enemy.mesh.position.set(safe.x, safe.y, safe.z);
+      }
+
+      if (frac >= 1.0) {
+        if (enemy.mesh) enemy.mesh.setEnabled(false);
+        enemy.state = 'submerged';
+        enemy._stateTimer = 0;
+        // Cooldown before next surface
+        enemy._fireCooldown = cfg.fireCooldown;
+        // Reposition toward player area while submerged
+        _steerToward(enemy, playerPos.x, playerPos.z, cfg.patrolSpeed, 0, subY);
+      }
+      break;
+    }
+
+    // ── Sinking: destroyed, slowly falls ─────────────────────────────────────
+    case 'sinking': {
+      const sinkY = (enemy._sinkStartY ?? waterY) - enemy._stateTimer * 1.5;
+      const safe = safeVec3(px, sinkY, pz, 'sub sinking');
+      if (safe) {
+        enemy.body.setNextKinematicTranslation(safe);
+        if (enemy.mesh) {
+          enemy.mesh.position.set(safe.x, safe.y, safe.z);
+          enemy.mesh.rotation.z = Math.min(enemy._stateTimer * 0.5, 1.2);
+        }
+      }
+      if (enemy._stateTimer > 6) {
+        enemy.dead = true;
+        if (enemy.mesh) enemy.mesh.setEnabled(false);
+        setTimeout(() => _respawnSub(enemy, waterY), cfg.respawnTime * 1000);
       }
       break;
     }
   }
+}
 
-  // Terrain floor safety
-  const floorMin = terrainH + TERRAIN_FLOOR;
-  if (targetY < floorMin) targetY = floorMin;
+function _steerToward(enemy, tx, tz, speed, dt, targetY) {
+  if (!enemy.body) return;
+  const t = enemy.body.translation();
+  const px = +t.x, pz = +t.z;
+  const dx = tx - px, dz = tz - pz;
+  const len = Math.sqrt(dx*dx+dz*dz);
+  if (len < 0.5) return;
 
-  // ── Move ──────────────────────────────────────────────────────────────────
-  const dy  = targetY - py;
-  let   fnx = 0, fnz = 0;
+  const targetAngle = Math.atan2(dx/len, dz/len);
+  let diff = targetAngle - enemy._heading;
+  while (diff >  Math.PI) diff -= Math.PI * 2;
+  while (diff < -Math.PI) diff += Math.PI * 2;
+  enemy._heading += Math.sign(diff) * Math.min(Math.abs(diff), dt * 1.5);
 
-  if (moveXZ) {
-    const rdx = targetX - px, rdz = targetZ - pz;
-    const steered = _waterSteer(px, pz, rdx, rdz, waterY);
-    fnx = steered.nx; fnz = steered.nz;
+  if (dt === 0) {
+    if (enemy.mesh) enemy.mesh.rotation.y = enemy._heading;
+    return;
   }
 
-  const hSpd = spd * dt;
-  const vSpd = Math.min(Math.abs(dy), 3*dt) * Math.sign(dy);
-  const safe = safeVec3(px + fnx*hSpd, py + vSpd, pz + fnz*hSpd, 'sub tick');
+  // Terrain avoidance — probe ahead, deflect toward deeper water if land detected
+  const waterY = targetY + (enemy._cfg?.subDepth ?? 8); // approximate surface
+  const PROBE = speed * dt * 6;
+  const probeX = px + Math.sin(enemy._heading) * PROBE;
+  const probeZ = pz + Math.cos(enemy._heading) * PROBE;
+  if (getHeightAt(probeX, probeZ) >= waterY) {
+    const leftH  = getHeightAt(px + Math.sin(enemy._heading - 0.8) * PROBE,
+                                pz + Math.cos(enemy._heading - 0.8) * PROBE);
+    const rightH = getHeightAt(px + Math.sin(enemy._heading + 0.8) * PROBE,
+                                pz + Math.cos(enemy._heading + 0.8) * PROBE);
+    enemy._heading += (leftH < rightH) ? -dt * 3.5 : dt * 3.5;
+  }
+
+  const nx2 = px + Math.sin(enemy._heading)*speed*dt;
+  const nz2 = pz + Math.cos(enemy._heading)*speed*dt;
+  if (getHeightAt(nx2, nz2) >= waterY) return;  // hard block
+
+  const fwd = new BABYLON.Vector3(Math.sin(enemy._heading), 0, Math.cos(enemy._heading));
+  const safe = safeVec3(nx2, targetY, nz2, 'sub steer');
   if (safe) {
     enemy.body.setNextKinematicTranslation(safe);
-    // TransformNode must be synced manually
-    if (enemy.mesh) enemy.mesh.position.set(safe.x, safe.y, safe.z);
+    if (enemy.mesh) {
+      enemy.mesh.position.set(safe.x, safe.y, safe.z);
+      enemy.mesh.rotation.y = enemy._heading;
+    }
   }
+}
 
-  // Periscope eye glow
-  if (enemy._eyeMesh) {
-    const scan = enemy.state === 'periscope' || enemy.state === 'surfaced';
-    const p = scan ? (0.5 + 0.5*Math.sin(Date.now()*0.008)) : 0.1;
-    enemy._eyeMesh.material.emissiveColor.set(0.05, p, 0.05);
+// ── Torpedo ───────────────────────────────────────────────────────────────────
+function _fireTorpedo(enemy, playerPos, waterY) {
+  const ep = enemy.mesh?.position ?? enemy.body?.translation();
+  if (!ep) return;
+
+  const dx = playerPos.x - ep.x, dz = playerPos.z - ep.z;
+  const len = Math.sqrt(dx*dx+dz*dz) || 1;
+
+  const torp = BABYLON.MeshBuilder.CreateCylinder('subTorpedo',
+    { diameter:0.22, height:1.2, tessellation:6 }, scene);
+  torp.position.set(ep.x, waterY, ep.z);
+  torp.rotation.x = Math.PI / 2;
+  const tmat = new BABYLON.StandardMaterial('subTorpMat', scene);
+  tmat.diffuseColor  = new BABYLON.Color3(0.5, 0.6, 0.15);
+  tmat.emissiveColor = new BABYLON.Color3(0.25, 0.3, 0.0);
+  torp.material = tmat;
+
+  // Wake trail
+  const wake = new BABYLON.ParticleSystem('subTorpWake', 40, scene);
+  wake.emitter      = torp;
+  wake.minSize      = 0.3; wake.maxSize = 0.9;
+  wake.minLifeTime  = 0.4; wake.maxLifeTime = 1.0;
+  wake.emitRate     = 35;
+  wake.color1       = new BABYLON.Color4(0.7,0.9,1.0,0.6);
+  wake.color2       = new BABYLON.Color4(0.5,0.7,0.9,0.0);
+  wake.direction1   = new BABYLON.Vector3(-0.3,0.4,-0.2);
+  wake.direction2   = new BABYLON.Vector3( 0.3,0.8, 0.2);
+  wake.minEmitBox   = new BABYLON.Vector3(-0.1,0,-0.6);
+  wake.maxEmitBox   = new BABYLON.Vector3( 0.1,0,-0.6);
+  wake.updateSpeed  = 0.02;
+  wake.start();
+
+  _torpedoes.push({
+    mesh: torp, wake,
+    vx: (dx/len)*TORP_SPEED,
+    vz: (dz/len)*TORP_SPEED,
+    waterY,
+    life: TORP_LIFE,
+  });
+}
+
+function _tickTorpedoes(dt) {
+  const playerPos = getPlayerPos();
+  for (let i = _torpedoes.length - 1; i >= 0; i--) {
+    const tp = _torpedoes[i];
+    tp.life -= dt;
+    tp.mesh.position.x += tp.vx * dt;
+    tp.mesh.position.z += tp.vz * dt;
+    tp.mesh.position.y  = tp.waterY;
+    tp.mesh.rotation.y  = Math.atan2(tp.vx, tp.vz);
+
+    const dx = tp.mesh.position.x - playerPos.x;
+    const dz = tp.mesh.position.z - playerPos.z;
+    if (Math.sqrt(dx*dx+dz*dz) < TORP_RADIUS) {
+      window._playerTakeDamage?.(TORP_DAMAGE);
+      _killTorpedo(tp);
+      _torpedoes.splice(i, 1);
+      continue;
+    }
+
+    if (tp.life <= 0) {
+      _killTorpedo(tp);
+      _torpedoes.splice(i, 1);
+    }
   }
+}
+
+function _killTorpedo(tp) {
+  const pos = tp.mesh?.position?.clone();
+  try { tp.wake.stop(); tp.wake.dispose(); } catch(_) {}
+  try { tp.mesh.dispose(); } catch(_) {}
+  if (pos) _splash(pos);
+}
+
+function _splash(pos) {
+  const ps = new BABYLON.ParticleSystem('subSplash', 60, scene);
+  ps.emitter         = pos;
+  ps.minSize         = 0.4; ps.maxSize = 1.4;
+  ps.minLifeTime     = 0.4; ps.maxLifeTime = 1.4;
+  ps.emitRate        = 200;
+  ps.manualEmitCount = 60;
+  ps.color1          = new BABYLON.Color4(0.7,0.9,1.0,0.9);
+  ps.color2          = new BABYLON.Color4(0.5,0.7,0.9,0.0);
+  ps.direction1      = new BABYLON.Vector3(-4,6,-4);
+  ps.direction2      = new BABYLON.Vector3( 4,14, 4);
+  ps.gravity         = new BABYLON.Vector3(0,-18,0);
+  ps.updateSpeed     = 0.02;
+  ps.start();
+  setTimeout(() => { try { ps.dispose(); } catch(_) {} }, 2500);
+}
+
+// ── Hit ───────────────────────────────────────────────────────────────────────
+export function onSubmarineHit(enemy) {
+  if (enemy.dead || enemy.state === 'sinking' || enemy.state === 'submerged') return;
+  enemy.health = (enemy.health ?? D.HEALTH) - 25;
+  // Flash
+  if (enemy.mesh) {
+    for (const m of enemy.mesh.getChildMeshes?.(false) ?? []) {
+      if (m.material) {
+        m.material.emissiveColor = new BABYLON.Color3(0.7, 0.15, 0.0);
+        setTimeout(() => { if (m.material) m.material.emissiveColor = BABYLON.Color3.Black(); }, 120);
+      }
+    }
+  }
+  if (enemy.health <= 0) {
+    enemy.state = 'sinking';
+    enemy._stateTimer  = 0;
+    enemy._sinkStartY  = enemy.mesh?.position?.y ?? (getWaterY() ?? 0);
+    if (enemy.mesh) enemy.mesh.setEnabled(true);
+    // Explosion at surface
+    _splash(enemy.mesh?.position ?? { x:0, y:0, z:0 });
+  }
+}
+
+// ── Respawn ───────────────────────────────────────────────────────────────────
+function _respawnSub(enemy, waterY) {
+  const wps = _waterWaypoints(waterY);
+  const wp  = wps[Math.floor(Math.random() * wps.length)];
+  const subY = waterY - enemy._cfg.subDepth;
+  const spawnPos = new BABYLON.Vector3(wp.x, subY, wp.z);
+
+  enemy.dead           = false;
+  enemy.state          = 'submerged';
+  enemy._stateTimer    = 0;
+  enemy._fireCooldown  = enemy._cfg.fireCooldown;
+  enemy._fireBurstLeft = 0;
+  enemy.health         = D.HEALTH;
+  enemy._subY          = subY;
+
+  _buildSubMesh(enemy, spawnPos, null);
+  if (enemy.body) enemy.body.setNextKinematicTranslation({ x:wp.x, y:subY, z:wp.z });
+}
+
+// ── Waypoints ─────────────────────────────────────────────────────────────────
+function _waterWaypoints(waterY) {
+  const candidates = [];
+  const step = 40, half = 280;
+  for (let x = -half; x <= half; x += step) {
+    for (let z = -half; z <= half; z += step) {
+      if (getHeightAt(x, z) < waterY - 0.5) {
+        candidates.push({ x, y: waterY, z });
+      }
+    }
+  }
+  if (candidates.length >= 4) {
+    candidates.sort(() => Math.random() - 0.5);
+    return candidates.slice(0, 6);
+  }
+  const r = 60, n = 6;
+  return Array.from({length:n}, (_,i) => ({
+    x: Math.cos(2*Math.PI*i/n) * r,
+    y: waterY,
+    z: Math.sin(2*Math.PI*i/n) * r,
+  }));
 }

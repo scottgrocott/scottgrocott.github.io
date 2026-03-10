@@ -134,17 +134,36 @@ export function tickMinimap() {
     if (e.dead || !e.mesh) continue;
     const ep = e.mesh.position;
     const mp = worldToMap(ep.x, ep.z);
+
+    // Submarines: show even when submerged, but dimmer and smaller
+    const isSubmerged = e.type === 'submarine' && e.state === 'submerged';
+
+    const color =
+      e.type === 'drone'      ? '#ff4444' :
+      e.type === 'car'        ? '#4488ff' :
+      e.type === 'forklift'   ? '#ffaa00' :
+      e.type === 'cow'        ? '#ff88cc' :
+      e.type === 'atst'       ? '#cc44ff' :
+      e.type === 'boat'       ? '#00ccff' :
+      e.type === 'submarine'  ? '#0088aa' :
+                                '#ffcc00';
+
+    const dotR = isSubmerged ? 2 : 3;
+    ctx.globalAlpha = isSubmerged ? 0.4 : 1.0;
     ctx.beginPath();
-    ctx.arc(mp.x, mp.y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = e.type === 'drone' ? '#ff4444' : e.type === 'car' ? '#4488ff' : '#ffcc00';
+    ctx.arc(mp.x, mp.y, dotR, 0, Math.PI * 2);
+    ctx.fillStyle = color;
     ctx.fill();
-    // Direction tick
-    ctx.beginPath();
-    ctx.moveTo(mp.x, mp.y);
-    ctx.lineTo(mp.x + Math.sin(e.mesh.rotation.y) * 6, mp.y + Math.cos(e.mesh.rotation.y) * 6);
-    ctx.strokeStyle = ctx.fillStyle;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    // Direction tick (skip for submerged)
+    if (!isSubmerged) {
+      ctx.beginPath();
+      ctx.moveTo(mp.x, mp.y);
+      ctx.lineTo(mp.x + Math.sin(e.mesh.rotation.y) * 6, mp.y + Math.cos(e.mesh.rotation.y) * 6);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1.0;
   }
 
   // Player dot (pulsing cyan)

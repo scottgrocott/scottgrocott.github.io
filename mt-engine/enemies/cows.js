@@ -20,6 +20,7 @@ import { EnemyBase, distToPlayer, getPlayerPos } from './enemyBase.js';
 import { getEnemies } from './enemyRegistry.js';
 import { getWaypoints } from '../flatnav.js';
 import { getTerrainHeightAt } from '../terrain/terrainMesh.js';
+import { loadEnemyModel, findPieces, findNode } from './enemyModels.js';
 
 // ── Configurable defaults (all overridable from level JSON) ───────────────────
 const D = {
@@ -84,8 +85,8 @@ export function spawnCows(def) {
     enemy._legPhase      = 0;
     enemy._deadParts     = [];
 
-    _buildCowMesh(enemy);
-    _overrideTakeDamage(enemy);
+    _buildCowMesh(enemy, def.overrides).then(() => _overrideTakeDamage(enemy));
+    _overrideTakeDamage(enemy); // also set sync so damage works immediately
     spawned.push(enemy);
   }
   return spawned;
@@ -99,9 +100,33 @@ function _mat(color, emissiveScale = 0.08) {
   return m;
 }
 
-function _buildCowMesh(enemy) {
-  if (enemy.mesh) enemy.mesh.dispose();
+async function _buildCowMesh(enemy, overrides) {
+  if (enemy.mesh) { try { enemy.mesh.dispose(); } catch(_) {} }
 
+  try {
+    const root = await loadEnemyModel(scene, 'cow', {
+      shadowGen: shadowGenerator,
+      overrides: overrides ?? {},
+    });
+    enemy.mesh = root;
+
+    // Tilt node wraps the whole model for knock-over animation
+    const tilt = new BABYLON.TransformNode('cowTilt', scene);
+    // Re-parent all loaded children into the tilt node
+    for (const child of root.getChildMeshes(false).concat(root.getChildTransformNodes(false))) {
+      child.parent = tilt;
+    }
+    tilt.parent = root;
+    enemy._tiltNode = tilt;
+
+    // Bind leg nodes — each group of 3 pieces (upper/lower/hoof) per corner
+    enemy._legs = _bindCowLegs(root);
+    return;
+  } catch(e) {
+    console.warn('[cows] GLTF load failed, using procedural fallback:', e);
+  }
+
+  // ── Procedural fallback ───────────────────────────────────────────────────
   const root = new BABYLON.TransformNode('cowRoot_' + Date.now(), scene);
   enemy.mesh = root;
 
@@ -206,6 +231,29 @@ function _buildCowMesh(enemy) {
   tail.position.set(0, 0.85, -0.98);
   tail.rotation.x = -0.6;
   tail.material = _mat(COL_BODY);
+}
+
+// ── GLTF leg binding ─────────────────────────────────────────────────────────
+// Maps the 4 leg groups from GLTF mesh names to the _legs array format
+function _bindCowLegs(root) {
+  const legs = [];
+  const suffixes = ['FL','FR','RL','RR'];
+  for (const suf of suffixes) {
+    // Find the upper leg node — use its parent TransformNode as the pivot
+    const upper = root.getChildMeshes(false).find(m => m.name.includes(`cow_leg_upper_${suf}`));
+    if (!upper) continue;
+    // Create a pivot node at the upper leg position
+    const node = new BABYLON.TransformNode(`legPivot_${suf}`, scene);
+    node.parent = root;
+    if (upper.parent) node.position.copyFrom(upper.parent.position);
+    upper.parent = node;
+    const lower = root.getChildMeshes(false).find(m => m.name.includes(`cow_leg_lower_${suf}`));
+    const hoof  = root.getChildMeshes(false).find(m => m.name.includes(`cow_hoof_${suf}`));
+    if (lower) lower.parent = node;
+    if (hoof)  hoof.parent  = node;
+    legs.push({ node, isFront: suf.startsWith('F') });
+  }
+  return legs;
 }
 
 // ── takeDamage override ───────────────────────────────────────────────────────
@@ -392,9 +440,10 @@ function _startCowDeath(enemy) {
       try { m.dispose(); } catch (_) {}
     }
     enemy._deadParts = [];
-    _buildCowMesh(enemy);
-    _overrideTakeDamage(enemy);
-    enemy.mesh.setEnabled(true);
+    _buildCowMesh(enemy, null).then(() => {
+      _overrideTakeDamage(enemy);
+      enemy.mesh.setEnabled(true);
+    });
     enemy.health     = enemy.maxHealth;
     enemy.dead       = false;
     enemy.state      = 'patrol';

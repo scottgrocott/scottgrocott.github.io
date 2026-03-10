@@ -20,6 +20,7 @@ import { EnemyBase, distToPlayer, getPlayerPos } from './enemyBase.js';
 import { getEnemies } from './enemyRegistry.js';
 import { getWaypoints } from '../flatnav.js';
 import { getTerrainHeightAt } from '../terrain/terrainMesh.js';
+import { loadEnemyModel, findPieces, findNode } from './enemyModels.js';
 
 // ── Defaults ──────────────────────────────────────────────────────────────────
 const D = {
@@ -93,14 +94,63 @@ export function spawnATSTs(def) {
     // Leg HP — left and right tracked independently
     enemy._legHP = { L: cfg.legHP, R: cfg.legHP };
 
-    _buildATSTMesh(enemy);
-    _overrideTakeDamage(enemy);
+    _buildATSTMesh(enemy, def.overrides); // async — sets _overrideTakeDamage on completion
     spawned.push(enemy);
   }
   return spawned;
 }
 
 // ── Mesh builder ──────────────────────────────────────────────────────────────
+async function _buildATSTMesh_gltf(enemy, overrides) {
+  if (enemy.mesh) { try { enemy.mesh.dispose(); } catch(_) {} }
+  try {
+    const root = await loadEnemyModel(scene, 'atst', {
+      shadowGen: shadowGenerator,
+      overrides: overrides ?? {},
+    });
+    enemy.mesh = root;
+
+    // Tilt node for knock-over
+    const tilt = new BABYLON.TransformNode('atstTilt', scene);
+    for (const child of root.getChildMeshes(false).concat(root.getChildTransformNodes(false))) {
+      child.parent = tilt;
+    }
+    tilt.parent = root;
+    enemy._tiltNode = tilt;
+
+    // Bind named parts for animation
+    enemy._cannons  = findPieces(root, 'atst_barrel');
+    enemy._lensL    = findPieces(root, 'atst_pod_L')[0] ?? null;
+    enemy._lensR    = findPieces(root, 'atst_pod_R')[0] ?? null;
+    enemy._legNodes = _bindATSTLegs(root);
+    enemy._legMeshes = {
+      L: { thigh: findPieces(root,'atst_thigh_L')[0], shin: findPieces(root,'atst_shin_L')[0] },
+      R: { thigh: findPieces(root,'atst_thigh_R')[0], shin: findPieces(root,'atst_shin_R')[0] },
+    };
+    return true;
+  } catch(e) {
+    console.warn('[atst] GLTF load failed, using procedural fallback:', e);
+    return false;
+  }
+}
+
+function _bindATSTLegs(root) {
+  const nodes = {};
+  for (const side of ['L','R']) {
+    const thigh = root.getChildMeshes(false).find(m => m.name.includes(`atst_thigh_${side}`));
+    if (!thigh) continue;
+    const node = new BABYLON.TransformNode(`atstLegPivot_${side}`, scene);
+    node.parent = root;
+    if (thigh.parent) node.position.copyFrom(thigh.parent.position);
+    for (const part of ['thigh','knee','shin','foot']) {
+      const m = root.getChildMeshes(false).find(n => n.name.includes(`atst_${part}_${side}`));
+      if (m) m.parent = node;
+    }
+    nodes[side] = node;
+  }
+  return nodes;
+}
+
 function _mat(color, emissive = 0.08) {
   const m = new BABYLON.StandardMaterial('atm_' + Math.random(), scene);
   m.diffuseColor  = color.clone();
@@ -108,8 +158,16 @@ function _mat(color, emissive = 0.08) {
   return m;
 }
 
-function _buildATSTMesh(enemy) {
-  if (enemy.mesh) enemy.mesh.dispose();
+function _buildATSTMesh(enemy, overrides) {
+  // Try GLTF first; fall back to procedural if it fails
+  _buildATSTMesh_gltf(enemy, overrides).then(ok => {
+    if (!ok) _buildATSTMeshProc(enemy);
+    _overrideTakeDamage(enemy);
+  });
+}
+
+function _buildATSTMeshProc(enemy) {
+  if (enemy.mesh) { try { enemy.mesh.dispose(); } catch(_) {} }
 
   const root = new BABYLON.TransformNode('atstRoot_' + Date.now(), scene);
   enemy.mesh = root;
@@ -522,9 +580,7 @@ function _startATSTDeath(enemy) {
       try { m.dispose(); } catch (_) {}
     }
     enemy._deadParts = [];
-    _buildATSTMesh(enemy);
-    _overrideTakeDamage(enemy);
-    enemy.mesh.setEnabled(true);
+    _buildATSTMesh(enemy, null);
     enemy.health     = enemy.maxHealth;
     enemy.dead       = false;
     enemy.state      = 'patrol';
