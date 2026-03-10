@@ -128,11 +128,7 @@ function _buildOverlay() {
       background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,
       rgba(0,0,0,0.025) 3px,rgba(0,0,0,0.025) 4px);}
 
-    /* Mobile minimap — shrink only; position controlled by index.html */
-    #minimap-canvas{
-      width:110px !important;
-      height:110px !important;
-    }
+    /* minimap position/size owned by index.html — no override needed */
   `;
   document.head.appendChild(style);
 

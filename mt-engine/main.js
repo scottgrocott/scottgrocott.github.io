@@ -8,7 +8,9 @@ import {
   registerFreeCamCallback,
   registerSpawnEnemyCallback,
   setFreeCamActive,
+  keys,
 } from './input.js';
+import { initTouchControls } from './touchControls.js';
 import { tickInputGuard, suspendMouse, resumeMouse } from './inputGuard.js';
 import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider } from './physics.js';
 import { initPlayer, initPlayerBody, tickPlayer, toggleFreeCam, player, playerRig } from './player.js';
@@ -357,41 +359,22 @@ async function loadGameConfig(url) {
   }
 
   if (CONFIG.terrain?.environment) {
-    // environment may be an object { types: [...], shaderLayers: [...] }
-    // or a plain string/array of env_id strings.
     const _env = CONFIG.terrain.environment;
     if (_env && typeof _env === 'object' && !Array.isArray(_env)) {
-      // Hoist shaderLayers up to terrain config so _applyMaterial can read them
       if (_env.shaderLayers && !CONFIG.terrain.shaderLayers) {
         CONFIG.terrain.shaderLayers = _env.shaderLayers;
       }
-      // Pass types array (or fall back to whole object) to loadEnvironment
       await loadEnvironment(_env.types ?? _env);
     } else {
       await loadEnvironment(_env);
     }
   }
 
-  // If no environment loaded node materials, apply default dirt+rocks (flat=dirt, slope=rocks)
   if (!window._currentEnvNodeMats || (!window._currentEnvNodeMats.rocks && !window._currentEnvNodeMats.dirt)) {
     const _BASE = 'https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/';
     window._currentEnvNodeMats = {
-      rocks: {
-        url:            _BASE + 'node_mat_rock.jpg',
-        uScale:         2.0,  vScale:        2.0,
-        minSlope:       0.45, maxSlope:      1.0,
-        slopeFalloff:   0.15,
-        minHeight:     -50.0, maxHeight:    2000.0,
-        heightFalloff:  10.0,
-      },
-      dirt: {
-        url:            _BASE + 'node_mat_dirt.jpg',
-        uScale:         4.0,  vScale:        4.0,
-        minSlope:       0.0,  maxSlope:      0.55,
-        slopeFalloff:   0.15,
-        minHeight:     -50.0, maxHeight:    1500.0,
-        heightFalloff:  10.0,
-      },
+      rocks: { url: _BASE+'node_mat_rock.jpg', uScale:3.0, vScale:3.0, minSlope:0.55, maxSlope:1.0, slopeFalloff:0.20 },
+      dirt:  { url: _BASE+'node_mat_dirt.jpg', uScale:6.0, vScale:6.0, minSlope:0.0,  maxSlope:0.45, slopeFalloff:0.20 },
     };
     console.log('[main] Using default dirt+rock node materials');
   }
@@ -434,6 +417,7 @@ async function loadGameConfig(url) {
 
   const bounds = computeTerrainBounds(CONFIG.terrain);
   initMinimap(bounds);
+  initTouchControls(keys, null, _shoot);
 
   setLoadStatus('Spawning enemies', 88);
   await _loadEnemyTypeDefs();
@@ -461,8 +445,6 @@ function _spawnEnemiesFromConfig() {
   for (const def of defs) {
     if (def.enabled === false) continue;
     if ((def.maxCount ?? 1) <= 0) continue;
-    // Merge CDN type def (audio, model, movingParts) into level-JSON def.
-    // Level JSON picks the variant via def.variantId; falls back to first in list.
     const typeDefs = _enemyTypeDefs[def.type];
     const variantDef = typeDefs
       ? (def.variantId ? typeDefs.byId[def.variantId] : typeDefs.list[0])
@@ -498,13 +480,8 @@ function _freecam() {
 }
 
 function _spawnEnemy() {
-  const enabled = (CONFIG.enemies || []).filter(
-    d => d.enabled !== false && (d.maxCount ?? 1) > 0
-  );
-  if (!enabled.length) {
-    hudSetStatus('No enabled enemies in config');
-    return;
-  }
+  const enabled = (CONFIG.enemies || []).filter(d => d.enabled !== false && (d.maxCount ?? 1) > 0);
+  if (!enabled.length) { hudSetStatus('No enabled enemies in config'); return; }
   const def = enabled[Math.floor(Math.random() * enabled.length)];
   if (def.type === 'drone')         spawnDrones({ ...def, maxCount: 1 });
   else if (def.type === 'car')      spawnCars({ ...def, maxCount: 1 });
