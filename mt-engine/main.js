@@ -8,6 +8,7 @@ import {
   registerFreeCamCallback,
   registerSpawnEnemyCallback,
   setFreeCamActive,
+  keys,
 } from './input.js';
 import { tickInputGuard, suspendMouse, resumeMouse } from './inputGuard.js';
 import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider } from './physics.js';
@@ -16,6 +17,7 @@ import { initCockpit, tickCockpit, disposeCockpit } from './cockpit.js';
 import { tickHUD, hudSetStatus } from './hud.js';
 import { initLadders, tickLadders, clearLadders } from './ladders.js';
 import { initMinimap, tickMinimap } from './minimap.js';
+import { initTouchControls } from './touchControls.js';
 import { loadHeightmap } from './terrain/heightmap.js';
 import { buildTerrain, getTerrainMesh, getTerrainHeightAt, getTerrainPixelData, getTerrainVertexData, getTerrainSubdiv } from './terrain/terrainMesh.js';
 import { computeTerrainBounds } from './terrain/terrainBounds.js';
@@ -397,6 +399,7 @@ async function loadGameConfig(url) {
 
   const bounds = computeTerrainBounds(CONFIG.terrain);
   initMinimap(bounds);
+  initTouchControls(keys, null, _shoot);  // mobile overlay
 
   setLoadStatus('Spawning enemies', 88);
   await _loadEnemyTypeDefs();
