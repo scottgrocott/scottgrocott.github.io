@@ -50,6 +50,7 @@ export function spawnDrones(def) {
       if (this.health <= 0) {
         this.dead  = true;
         this.state = 'falling';
+        if (this.mesh) this.mesh.setEnabled(false); // hide instantly; _startFall re-shows for fall
         _startFall(this);
       }
     };
@@ -226,6 +227,7 @@ function _startFall(enemy) {
   enemy._fallT   = 0;
   enemy._smokeT  = 0;
   enemy._smokeSystems = [];
+  if (enemy.mesh) enemy.mesh.setEnabled(true);  // re-show for fall animation
 }
 
 function _tickFall(enemy, dt) {
@@ -268,6 +270,7 @@ function _tickFall(enemy, dt) {
     enemy.mesh.setEnabled(false);
     setTimeout(() => {
       if (window._levelComplete || enemy.destroyed) return;
+      if (enemy.state !== 'falling') return; // already respawned or re-killed
       enemy.mesh.rotation.set(0, 0, 0);
       const wp = enemy._waypoints?.[0];
       const rx = wp?.x ?? 0, rz = wp?.z ?? 0;
