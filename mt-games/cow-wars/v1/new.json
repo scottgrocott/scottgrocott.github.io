@@ -1,0 +1,42 @@
+
+
+{
+  "type": "cow",
+  "enabled": true,
+  "maxCount": 3,
+  "health": 80,
+  "hitsToKill": 8,
+  "respawnTime": 10,
+
+  "knockChance":   0.4,
+  "getUpChance":   0.35,
+  "getUpDuration": 1.2,
+
+  "detectRange":  40,
+  "patrolSpeed":  3.5,
+  "chaseSpeed":   7,
+  "ramSpeed":     12
+},
+
+{
+  "type": "atst",
+  "enabled": true,
+  "maxCount": 1,
+  "health": 120,
+  "hitsToKill": 12,
+  "respawnTime": 14,
+
+  "knockChance":   0.3,
+  "getUpChance":   0.25,
+  "getUpDuration": 1.8,
+
+  "detectRange":  55,
+  "fireRange":    30,
+  "fireCooldown": 1.8,
+
+  "patrolSpeed":  3,
+  "chaseSpeed":   6,
+
+  "legHP":        3,
+  "legRegenRate": 0.3
+}

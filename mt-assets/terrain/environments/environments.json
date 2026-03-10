@@ -45,34 +45,22 @@
         "villages": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/villages.json",
         "cities": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/cities.json",
         "fortresses": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/fortresses.json",
-        "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_rock.jpg",
-          "uScale": 2.0,
-          "vScale": 2.0,
-          "blendMode": "Normal",
-          "blendWeight": 1.0,
-          "blendSharpness": 4.0,
-          "minSlope": 0.45,
-          "maxSlope": 1.0,
-          "slopeFalloff": 0.15,
-          "minHeight": -50.0,
-          "maxHeight": 2000.0,
-          "heightFalloff": 10.0
-        },
-        "node_mat_dirt": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_dirt.jpg",
-          "uScale": 4.0,
-          "vScale": 4.0,
-          "blendMode": "Normal",
-          "blendWeight": 1.0,
-          "blendSharpness": 2.0,
-          "minSlope": 0.0,
-          "maxSlope": 0.55,
-          "slopeFalloff": 0.15,
-          "minHeight": -50.0,
-          "maxHeight": 1500.0,
-          "heightFalloff": 10.0
-        }
+"node_mat_dirt": {
+  "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_dirt.jpg",
+  "uScale": 6.0,
+  "vScale": 6.0,
+  "minSlope": 0.0,
+  "maxSlope": 0.45,
+  "slopeFalloff": 0.20
+},
+"node_mat_rocks": {
+  "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/node_mat_rock.jpg",
+  "uScale": 3.0,
+  "vScale": 3.0,
+  "minSlope": 0.55,
+  "maxSlope": 1.0,
+  "slopeFalloff": 0.20
+}
       }
     },
     {
@@ -255,33 +243,33 @@
         "villages": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/villages.json",
         "cities": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/cities.json",
         "fortresses": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/fortresses.json",
-        "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/node_mat_rock.jpg",
+         "node_mat_rocks": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
           "blendWeight": 1.0,
-          "blendSharpness": 4.0,
-          "minSlope": 0.45,
+          "blendSharpness": 5.0,
+          "minSlope": 0.4,
           "maxSlope": 1.0,
-          "slopeFalloff": 0.15,
+          "slopeFalloff": 0.1,
           "minHeight": -50.0,
           "maxHeight": 2000.0,
           "heightFalloff": 10.0
         },
         "node_mat_dirt": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/node_mat_dirt.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_dirt.jpg",
           "uScale": 4.0,
           "vScale": 4.0,
           "blendMode": "Normal",
           "blendWeight": 1.0,
-          "blendSharpness": 2.0,
+          "blendSharpness": 3.0,
           "minSlope": 0.0,
-          "maxSlope": 0.55,
-          "slopeFalloff": 0.15,
+          "maxSlope": 0.5,
+          "slopeFalloff": 0.1,
           "minHeight": -50.0,
-          "maxHeight": 1500.0,
-          "heightFalloff": 10.0
+          "maxHeight": 1200.0,
+          "heightFalloff": 15.0
         }
       }
     },
@@ -319,32 +307,32 @@
         "cities": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/cities.json",
         "fortresses": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/fortresses.json",
         "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/node_mat_rock.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
           "blendWeight": 1.0,
-          "blendSharpness": 4.0,
-          "minSlope": 0.45,
+          "blendSharpness": 5.0,
+          "minSlope": 0.4,
           "maxSlope": 1.0,
-          "slopeFalloff": 0.15,
+          "slopeFalloff": 0.1,
           "minHeight": -50.0,
           "maxHeight": 2000.0,
           "heightFalloff": 10.0
         },
         "node_mat_dirt": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tundra/node_mat_dirt.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_dirt.jpg",
           "uScale": 4.0,
           "vScale": 4.0,
           "blendMode": "Normal",
           "blendWeight": 1.0,
-          "blendSharpness": 2.0,
+          "blendSharpness": 3.0,
           "minSlope": 0.0,
-          "maxSlope": 0.55,
-          "slopeFalloff": 0.15,
+          "maxSlope": 0.5,
+          "slopeFalloff": 0.1,
           "minHeight": -50.0,
-          "maxHeight": 1500.0,
-          "heightFalloff": 10.0
+          "maxHeight": 1200.0,
+          "heightFalloff": 15.0
         }
       }
     },
@@ -386,33 +374,33 @@
         "villages": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/villages.json",
         "cities": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/cities.json",
         "fortresses": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/fortresses.json",
-        "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/node_mat_rock.jpg",
+         "node_mat_rocks": {
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
           "blendWeight": 1.0,
-          "blendSharpness": 4.0,
-          "minSlope": 0.45,
+          "blendSharpness": 5.0,
+          "minSlope": 0.4,
           "maxSlope": 1.0,
-          "slopeFalloff": 0.15,
+          "slopeFalloff": 0.1,
           "minHeight": -50.0,
           "maxHeight": 2000.0,
           "heightFalloff": 10.0
         },
         "node_mat_dirt": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/savanna/node_mat_dirt.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_dirt.jpg",
           "uScale": 4.0,
           "vScale": 4.0,
           "blendMode": "Normal",
           "blendWeight": 1.0,
-          "blendSharpness": 2.0,
+          "blendSharpness": 3.0,
           "minSlope": 0.0,
-          "maxSlope": 0.55,
-          "slopeFalloff": 0.15,
+          "maxSlope": 0.5,
+          "slopeFalloff": 0.1,
           "minHeight": -50.0,
-          "maxHeight": 1500.0,
-          "heightFalloff": 10.0
+          "maxHeight": 1200.0,
+          "heightFalloff": 15.0
         }
       }
     },
@@ -454,32 +442,32 @@
         "cities": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/cities.json",
         "fortresses": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/fortresses.json",
         "node_mat_rocks": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/node_mat_rock.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_rock.jpg",
           "uScale": 2.0,
           "vScale": 2.0,
           "blendMode": "Normal",
           "blendWeight": 1.0,
-          "blendSharpness": 4.0,
-          "minSlope": 0.45,
+          "blendSharpness": 5.0,
+          "minSlope": 0.4,
           "maxSlope": 1.0,
-          "slopeFalloff": 0.15,
+          "slopeFalloff": 0.1,
           "minHeight": -50.0,
           "maxHeight": 2000.0,
           "heightFalloff": 10.0
         },
         "node_mat_dirt": {
-          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/wetland/node_mat_dirt.jpg",
+          "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/node_mat_dirt.jpg",
           "uScale": 4.0,
           "vScale": 4.0,
           "blendMode": "Normal",
           "blendWeight": 1.0,
-          "blendSharpness": 2.0,
+          "blendSharpness": 3.0,
           "minSlope": 0.0,
-          "maxSlope": 0.55,
-          "slopeFalloff": 0.15,
+          "maxSlope": 0.5,
+          "slopeFalloff": 0.1,
           "minHeight": -50.0,
-          "maxHeight": 1500.0,
-          "heightFalloff": 10.0
+          "maxHeight": 1200.0,
+          "heightFalloff": 15.0
         }
       }
     }

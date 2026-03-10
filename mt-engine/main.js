@@ -8,7 +8,6 @@ import {
   registerFreeCamCallback,
   registerSpawnEnemyCallback,
   setFreeCamActive,
-  keys,
 } from './input.js';
 import { tickInputGuard, suspendMouse, resumeMouse } from './inputGuard.js';
 import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider } from './physics.js';
@@ -17,7 +16,6 @@ import { initCockpit, tickCockpit, disposeCockpit } from './cockpit.js';
 import { tickHUD, hudSetStatus } from './hud.js';
 import { initLadders, tickLadders, clearLadders } from './ladders.js';
 import { initMinimap, tickMinimap } from './minimap.js';
-import { initTouchControls } from './touchControls.js';
 import { loadHeightmap } from './terrain/heightmap.js';
 import { buildTerrain, getTerrainMesh, getTerrainHeightAt, getTerrainPixelData, getTerrainVertexData, getTerrainSubdiv } from './terrain/terrainMesh.js';
 import { computeTerrainBounds } from './terrain/terrainBounds.js';
@@ -35,6 +33,8 @@ import { clearEnemies } from './enemies/enemyRegistry.js';
 import { spawnDrones, tickDrones } from './enemies/drones.js';
 import { spawnCars, tickCars } from './enemies/cars.js';
 import { spawnForklifts, tickForklifts } from './enemies/forklifts.js';
+import { spawnCows, tickCows } from './enemies/cows.js';
+import { spawnATSTs, tickATSTs } from './enemies/atst.js';
 import { tickExplosions } from './explosions.js';
 import { clearShelters, tickShelters } from './shelters/shelters.js';
 import { initAudio, toneReady, updateAudioListener } from './audio.js';
@@ -242,6 +242,8 @@ function _tickUnderwaterFog(submerged) {
     tickDrones(dt);
     tickCars(dt);
     tickForklifts(dt);
+    tickCows(dt);
+    tickATSTs(dt);
     tickBullets(dt);
     tickExplosions(dt);
     tickSoundtrack();
@@ -332,18 +334,18 @@ async function loadGameConfig(url) {
   const _hmaps = CONFIG.terrain.heightmaps;
   if (Array.isArray(_hmaps) && _hmaps.length > 0) {
     const _pick = _hmaps[Math.floor(Math.random() * _hmaps.length)];
-    // _pick may be a plain URL string or a rich object { url, environment, shelterCount, ... }
-    if (typeof _pick === 'string') {
-      CONFIG.terrain.heightmapUrl = _pick;
+    if (_pick && typeof _pick === 'object') {
+      CONFIG.terrain.heightmapUrl = _pick.url ?? _pick.heightmapUrl ?? '';
+      const { url: _u, heightmapUrl: _hu, ...overrides } = _pick;
+      for (const [k, v] of Object.entries(overrides)) {
+        if (k === 'environment')   { CONFIG.terrain.environment = v; }
+        else if (k === 'shelterCount' && CONFIG.shelters) { CONFIG.shelters.count = v; }
+        else                       { CONFIG.terrain[k] = v; }
+      }
     } else {
-      CONFIG.terrain.heightmapUrl = _pick.url ?? _pick.heightmap ?? null;
-      // Merge map-level overrides into terrain config
-      if (_pick.environment)   CONFIG.terrain.environment   = _pick.environment;
-      if (_pick.shelterCount != null) CONFIG.terrain.shelterCount = _pick.shelterCount;
-      if (_pick.shaderLayers)  CONFIG.terrain.shaderLayers  = _pick.shaderLayers;
-      if (_pick.heightScale != null)  CONFIG.terrain.heightScale  = _pick.heightScale;
+      CONFIG.terrain.heightmapUrl = _pick;
     }
-    console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick)+1) + '/' + _hmaps.length + ':', _pick);
+    console.log('[main] Selected heightmap', (_hmaps.indexOf(_pick)+1) + '/' + _hmaps.length + ':', CONFIG.terrain.heightmapUrl);
   }
 
   // Prefix relative asset paths with ENGINE_ROOT
@@ -355,10 +357,43 @@ async function loadGameConfig(url) {
   }
 
   if (CONFIG.terrain?.environment) {
-    // environment may be a string, a plain array, or { types: [...] }
-    const _envVal = CONFIG.terrain.environment;
-    const _envArg = _envVal?.types ?? _envVal;   // unwrap { types: [...] } if needed
-    await loadEnvironment(_envArg);
+    // environment may be an object { types: [...], shaderLayers: [...] }
+    // or a plain string/array of env_id strings.
+    const _env = CONFIG.terrain.environment;
+    if (_env && typeof _env === 'object' && !Array.isArray(_env)) {
+      // Hoist shaderLayers up to terrain config so _applyMaterial can read them
+      if (_env.shaderLayers && !CONFIG.terrain.shaderLayers) {
+        CONFIG.terrain.shaderLayers = _env.shaderLayers;
+      }
+      // Pass types array (or fall back to whole object) to loadEnvironment
+      await loadEnvironment(_env.types ?? _env);
+    } else {
+      await loadEnvironment(_env);
+    }
+  }
+
+  // If no environment loaded node materials, apply default dirt+rocks (flat=dirt, slope=rocks)
+  if (!window._currentEnvNodeMats || (!window._currentEnvNodeMats.rocks && !window._currentEnvNodeMats.dirt)) {
+    const _BASE = 'https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/';
+    window._currentEnvNodeMats = {
+      rocks: {
+        url:            _BASE + 'node_mat_rock.jpg',
+        uScale:         2.0,  vScale:        2.0,
+        minSlope:       0.45, maxSlope:      1.0,
+        slopeFalloff:   0.15,
+        minHeight:     -50.0, maxHeight:    2000.0,
+        heightFalloff:  10.0,
+      },
+      dirt: {
+        url:            _BASE + 'node_mat_dirt.jpg',
+        uScale:         4.0,  vScale:        4.0,
+        minSlope:       0.0,  maxSlope:      0.55,
+        slopeFalloff:   0.15,
+        minHeight:     -50.0, maxHeight:    1500.0,
+        heightFalloff:  10.0,
+      },
+    };
+    console.log('[main] Using default dirt+rock node materials');
   }
 
   await loadHeightmap(CONFIG.terrain.heightmapUrl || CONFIG.terrain.heightmap, CONFIG.terrain.size, CONFIG.terrain.heightScale);
@@ -399,7 +434,6 @@ async function loadGameConfig(url) {
 
   const bounds = computeTerrainBounds(CONFIG.terrain);
   initMinimap(bounds);
-  initTouchControls(keys, null, _shoot);  // mobile overlay
 
   setLoadStatus('Spawning enemies', 88);
   await _loadEnemyTypeDefs();
@@ -425,11 +459,10 @@ async function loadGameConfig(url) {
 function _spawnEnemiesFromConfig() {
   const defs = CONFIG.enemies || [];
   for (const def of defs) {
-    // Skip explicitly disabled or zero-count enemy types
     if (def.enabled === false) continue;
     if ((def.maxCount ?? 1) <= 0) continue;
-
     // Merge CDN type def (audio, model, movingParts) into level-JSON def.
+    // Level JSON picks the variant via def.variantId; falls back to first in list.
     const typeDefs = _enemyTypeDefs[def.type];
     const variantDef = typeDefs
       ? (def.variantId ? typeDefs.byId[def.variantId] : typeDefs.list[0])
@@ -439,6 +472,8 @@ function _spawnEnemiesFromConfig() {
     if (merged.type === 'drone')         spawnDrones(merged);
     else if (merged.type === 'car')      spawnCars(merged);
     else if (merged.type === 'forklift') spawnForklifts(merged);
+    else if (merged.type === 'cow')      spawnCows(merged);
+    else if (merged.type === 'atst')     spawnATSTs(merged);
   }
 }
 
@@ -463,16 +498,19 @@ function _freecam() {
 }
 
 function _spawnEnemy() {
-  if (!CONFIG.enemies?.length) {
-    hudSetStatus('No enemies in config');
+  const enabled = (CONFIG.enemies || []).filter(
+    d => d.enabled !== false && (d.maxCount ?? 1) > 0
+  );
+  if (!enabled.length) {
+    hudSetStatus('No enabled enemies in config');
     return;
   }
-  const _enabledEnemies = CONFIG.enemies.filter(e => e.enabled !== false && (e.maxCount ?? 1) > 0);
-  if (!_enabledEnemies.length) { hudSetStatus('No enabled enemies in config'); return; }
-  const def = _enabledEnemies[Math.floor(Math.random() * _enabledEnemies.length)];
+  const def = enabled[Math.floor(Math.random() * enabled.length)];
   if (def.type === 'drone')         spawnDrones({ ...def, maxCount: 1 });
   else if (def.type === 'car')      spawnCars({ ...def, maxCount: 1 });
   else if (def.type === 'forklift') spawnForklifts({ ...def, maxCount: 1 });
+  else if (def.type === 'cow')      spawnCows({ ...def, maxCount: 1 });
+  else if (def.type === 'atst')     spawnATSTs({ ...def, maxCount: 1 });
   hudSetStatus('Enemy spawned');
 }
 
