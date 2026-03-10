@@ -108,5 +108,69 @@ document.addEventListener('keyup', (e) => {
   if (e.code in KEY_MAP) _base[KEY_MAP[e.code]] = false;
 });
 
+// ── Gamepad ───────────────────────────────────────────────────────────────────
+// Button indices (standard mapping): 0=A/Cross, 6=LT, 7=RT
+// Axes: 0=LS-X, 1=LS-Y, 2=RS-X, 3=RS-Y
+const GP_DEAD     = 0.15;
+const GP_LOOK_SPD = 0.045;
+let _gpShootHeld  = false;
+let _gpAHeld      = false;
+let _gpActive     = false;   // true once splash is dismissed
+
+// Activate gamepad only after splash is dismissed (avoids firing on page load)
+document.addEventListener('splash-dismissed', () => { _gpActive = true; });
+
+// Also allow gamepad A/Cross to dismiss the splash (checked separately below)
+export function tickGamepad() {
+  const pads = navigator.getGamepads?.();
+  if (!pads) return;
+  const gp = Array.from(pads).find(p => p);
+  if (!gp) return;
+
+  // ── Pre-splash: only watch A/Cross to dismiss ─────────────────────────────
+  if (!_gpActive) {
+    const aPressed = gp.buttons[0]?.pressed;
+    if (aPressed && !_gpAHeld) {
+      const screen = document.getElementById('loading-screen');
+      const btn    = document.getElementById('btn-play');
+      // Only trigger if play button is actually visible (level is loaded and ready)
+      if (screen && screen.style.display !== 'none' && btn && btn.style.display !== 'none') {
+        btn.click();
+      }
+    }
+    _gpAHeld = !!gp.buttons[0]?.pressed;
+    return;
+  }
+
+  // ── Post-splash: full gamepad control ─────────────────────────────────────
+
+  // Left stick → movement
+  const lx = Math.abs(gp.axes[0]) > GP_DEAD ? gp.axes[0] : 0;
+  const ly = Math.abs(gp.axes[1]) > GP_DEAD ? gp.axes[1] : 0;
+  _base.moveForward = ly < -GP_DEAD;
+  _base.moveBack    = ly >  GP_DEAD;
+  _base.moveLeft    = lx < -GP_DEAD;
+  _base.moveRight   = lx >  GP_DEAD;
+
+  // Right stick → look
+  const rx = Math.abs(gp.axes[2]) > GP_DEAD ? gp.axes[2] : 0;
+  const ry = Math.abs(gp.axes[3]) > GP_DEAD ? gp.axes[3] : 0;
+  if (rx !== 0 || ry !== 0) _applyLookDelta(rx * GP_LOOK_SPD, ry * GP_LOOK_SPD);
+
+  // RT (button 7) → shoot on each press edge; weapon cooldown controls repeat rate
+  const rtVal     = gp.buttons[7]?.value ?? 0;
+  const rtPressed = rtVal > 0.25 || !!gp.buttons[7]?.pressed;
+  if (rtPressed) _shootCallbacks.forEach(fn => fn()); // cooldown in weapon handles rate
+  _gpShootHeld = rtPressed;
+
+  // A / Cross → jump
+  const aPressed = !!gp.buttons[0]?.pressed;
+  if (aPressed && !_gpAHeld) {
+    _base.jump = true;
+    setTimeout(() => { _base.jump = false; }, 120);
+  }
+  _gpAHeld = aPressed;
+}
+
 // Re-export applyLookDelta so other modules can import it from here
 export { _applyLookDelta as applyLookDelta };

@@ -15,6 +15,7 @@ import {
 import { tickInputGuard, suspendMouse, resumeMouse } from './inputGuard.js';
 import { initPhysics, resetPhysics, stepPhysics, syncPhysicsReads, physicsReady, addTerrainCollider, addFlatGroundCollider, addBoxCollider, clearBoxColliders } from './physics.js';
 import { initPlayer, initPlayerBody, tickPlayer, toggleFreeCam, player, playerRig } from './player.js';
+import { tickGamepad } from './input.js';
 import { initCockpit, tickCockpit, disposeCockpit } from './cockpit.js';
 import { tickHUD, hudSetStatus } from './hud.js';
 import { initLadders, tickLadders, clearLadders } from './ladders.js';
@@ -253,6 +254,7 @@ function _tickUnderwaterFog(submerged) {
     _lastTime = now;
 
     tickInputGuard();
+    tickGamepad();
     if (_playerReady) stepPhysics(dt);
     syncPhysicsReads();
     pollGamepad(dt);
