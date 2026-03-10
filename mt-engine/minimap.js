@@ -6,7 +6,7 @@ import { CONFIG }    from './config.js';
 import { getTerrainHeightAt } from './terrain/terrainMesh.js';
 import { euler }      from './look.js';
 
-const SIZE = 220;
+const SIZE = 400;
 const canvas = document.getElementById('minimap-canvas');
 const ctx    = canvas.getContext('2d');
 
