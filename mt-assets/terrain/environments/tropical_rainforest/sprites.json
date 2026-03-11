@@ -1,9 +1,8 @@
 {
   "spriteSheets":[
-  
     {
       "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/veg1.png",
-	  "class":"veg",
+      "class": "veg",
       "layout": "grid",
       "columns": 3,
       "rows": 2,
@@ -18,9 +17,9 @@
         {"id": "plant_ginger_r1_c2", "x": 800, "y": 800, "w": 400, "h": 800}
       ]
     },
-	    {
+    {
       "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/trees1.png",
-	  "class":"tree",
+      "class": "tree",
       "layout": "grid",
       "columns": 4,
       "rows": 6,
@@ -37,7 +36,7 @@
     },
     {
       "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/trees2.png",
-	  "class":"tree",
+      "class": "tree",
       "layout": "grid",
       "columns": 9,
       "rows": 9,
@@ -54,6 +53,6 @@
         {"id": "img2_r7_c0", "x": 0, "y": 896, "w": 128, "h": 128}, {"id": "img2_r7_c1", "x": 128, "y": 896, "w": 128, "h": 128}, {"id": "img2_r7_c2", "x": 256, "y": 896, "w": 128, "h": 128}, {"id": "img2_r7_c3", "x": 384, "y": 896, "w": 128, "h": 128}, {"id": "img2_r7_c4", "x": 512, "y": 896, "w": 128, "h": 128}, {"id": "img2_r7_c5", "x": 640, "y": 896, "w": 128, "h": 128}, {"id": "img2_r7_c6", "x": 768, "y": 896, "w": 128, "h": 128}, {"id": "img2_r7_c7", "x": 896, "y": 896, "w": 128, "h": 128}, {"id": "img2_r7_c8", "x": 1024, "y": 896, "w": 128, "h": 128},
         {"id": "img2_r8_c0", "x": 0, "y": 1024, "w": 128, "h": 128}, {"id": "img2_r8_c1", "x": 128, "y": 1024, "w": 128, "h": 128}, {"id": "img2_r8_c2", "x": 256, "y": 1024, "w": 128, "h": 128}, {"id": "img2_r8_c3", "x": 384, "y": 1024, "w": 128, "h": 128}, {"id": "img2_r8_c4", "x": 512, "y": 1024, "w": 128, "h": 128}, {"id": "img2_r8_c5", "x": 640, "y": 1024, "w": 128, "h": 128}, {"id": "img2_r8_c6", "x": 768, "y": 1024, "w": 128, "h": 128}, {"id": "img2_r8_c7", "x": 896, "y": 1024, "w": 128, "h": 128}, {"id": "img2_r8_c8", "x": 1024, "y": 1024, "w": 128, "h": 128}
       ]
-    },
+    }
   ]
 }
