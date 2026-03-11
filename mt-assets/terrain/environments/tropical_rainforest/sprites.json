@@ -1,17 +1,19 @@
 {
   "spriteSheets":[
     {
-      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/veg1.jpg",
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/veg1.png",
       "layout": "grid",
-      "columns": 2,
+      "columns": 3,
       "rows": 2,
-      "cellWidth": 256,
-      "cellHeight": 256,
+      "cellWidth": 400,
+      "cellHeight": 800,
       "frames":[
-        {"id": "vine_r0_c0", "x": 0, "y": 0, "w": 256, "h": 256},
-        {"id": "vine_r0_c1", "x": 256, "y": 0, "w": 256, "h": 256},
-        {"id": "vine_r1_c0", "x": 0, "y": 256, "w": 256, "h": 256},
-        {"id": "vine_r1_c1", "x": 256, "y": 256, "w": 256, "h": 256}
+        {"id": "plant_bromeliad_r0_c0", "x": 0, "y": 0, "w": 400, "h": 800},
+        {"id": "plant_orchid_r0_c1", "x": 400, "y": 0, "w": 400, "h": 800},
+        {"id": "plant_monstera_r0_c2", "x": 800, "y": 0, "w": 400, "h": 800},
+        {"id": "plant_heliconia_r1_c0", "x": 0, "y": 800, "w": 400, "h": 800},
+        {"id": "plant_fern_r1_c1", "x": 400, "y": 800, "w": 400, "h": 800},
+        {"id": "plant_ginger_r1_c2", "x": 800, "y": 800, "w": 400, "h": 800}
       ]
     }
   ]
