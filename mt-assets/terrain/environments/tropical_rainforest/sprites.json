@@ -2,6 +2,7 @@
   "spriteSheets":[
     {
       "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/veg1.png",
+	  "class":"veg",
       "layout": "grid",
       "columns": 3,
       "rows": 2,

@@ -2,6 +2,7 @@
   "spriteSheets":[
     {
       "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/temperate_forest/trees1.png",
+	  "class":"tree",
       "layout": "grid",
       "columns": 2,
       "rows": 2,

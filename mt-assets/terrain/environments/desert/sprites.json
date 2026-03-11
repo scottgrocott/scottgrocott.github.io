@@ -2,6 +2,7 @@
   "spriteSheets":[
     {
       "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/cactus1.png",
+	  "class":"tree",
       "layout": "grid",
       "columns": 4,
       "rows": 5,
@@ -17,6 +18,7 @@
     },
     {
       "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/desert/veg1.png",
+	  "class":"veg",
       "layout": "grid",
       "columns": 4,
       "rows": 6,
