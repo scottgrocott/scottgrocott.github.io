@@ -1,7 +1,7 @@
 {
   "spriteSheets":[
     {
-      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/trees1.jpg",
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/trees1.png",
       "layout": "grid",
       "columns": 4,
       "rows": 6,
@@ -17,7 +17,7 @@
       ]
     },
     {
-      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/trees2.jpg",
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/trees2.png",
       "layout": "grid",
       "columns": 9,
       "rows": 9,
@@ -42,7 +42,7 @@
       "frames":[]
     },
     {
-      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/veg1.jpg",
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/veg1.png",
       "layout": "grid",
       "columns": 9,
       "rows": 10,
@@ -62,7 +62,7 @@
       ]
     },
     {
-      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/veg2.jpg",
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/veg2.png",
       "layout": "grid",
       "columns": 4,
       "rows": 6,
