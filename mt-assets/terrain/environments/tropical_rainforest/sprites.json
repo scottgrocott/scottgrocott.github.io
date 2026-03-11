@@ -18,7 +18,7 @@
       ]
     },
     {
-      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/trees1.png",
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/trees1.png",
       "class": "tree",
       "layout": "grid",
       "columns": 4,
@@ -35,7 +35,7 @@
       ]
     },
     {
-      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/mediterranean/trees2.png",
+      "url": "https://scottgrocott.github.io/mt-assets/terrain/environments/tropical_rainforest/trees2.png",
       "class": "tree",
       "layout": "grid",
       "columns": 9,
