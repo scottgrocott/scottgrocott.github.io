@@ -1,93 +1,27 @@
-[
-  {
-    "id": "patrol_car",
-    "label": "Patrol Car",
-    "type": "car",
-    "maxCount": 2,
-    "health": 100,
-    "model": {
-      "url": "https://example.com/assets/models/patrol_car.glb",
-      "scale": 1.0,
-      "yOffset": 0.0
-    },
-    "audio": {
-      "engine": "https://scottgrocott.github.io/mt-assets/enemies/engine.mp3",
-      "weapon": "https://example.com/assets/audio/car_shoot.ogg",
-      "crash":  "https://example.com/assets/audio/car_crash.ogg"
-    },
-    "movingParts": {
-      "wheels": [
-        { "name": "wheel_fl", "offset": { "x":  0.9, "y": 0.05, "z":  1.0 }, "spinAxis": "x", "steerable": true  },
-        { "name": "wheel_fr", "offset": { "x": -0.9, "y": 0.05, "z":  1.0 }, "spinAxis": "x", "steerable": true  },
-        { "name": "wheel_rl", "offset": { "x":  0.9, "y": 0.05, "z": -1.0 }, "spinAxis": "x", "steerable": false },
-        { "name": "wheel_rr", "offset": { "x": -0.9, "y": 0.05, "z": -1.0 }, "spinAxis": "x", "steerable": false }
-      ],
-      "body": { "name": "car_body", "offset": { "x": 0, "y": 0.35, "z": 0 } }
-    },
-    "behaviour": {
-      "patrolSpeed": 5, "chaseSpeed": 9, "ramSpeed": 14,
-      "detectRange": 38, "ramRange": 5
-    }
+{
+  "variantId": "hunter",
+  "displayName": "Deep Hunter Sub",
+  "type": "submarine",
+  "modelUrl": "https://scottgrocott.github.io/mt-assets/models/sub_hunter.glb",
+  "scale": 1.4,
+  "health": 195,
+  "maxSpeed": 11.5,
+  "turnSpeed": 1.1,
+  "detectionRange": 130,
+  "attackRange": 70,
+  "damage": 35,
+  "cooldownMax": 2.4,
+  "yOffset": -3.5,
+  "physicsShape": "box",
+  "physicsSize": [2.8, 2.2, 8.0],
+  "mass": 18,
+  "animations": ["swim", "idle", "torpedo_launch", "periscope"],
+  "sounds": {
+    "move": "sub_propeller",
+    "attack": "torpedo_launch",
+    "idle": "sub_sonar_ping"
   },
-  {
-    "id": "armoured_car",
-    "label": "Armoured Car",
-    "type": "car",
-    "maxCount": 1,
-    "health": 220,
-    "model": {
-      "url": "https://example.com/assets/models/armoured_car.glb",
-      "scale": 1.2,
-      "yOffset": 0.0
-    },
-    "audio": {
-      "engine": "https://scottgrocott.github.io/mt-assets/enemies/engine.mp3",
-      "weapon": "https://example.com/assets/audio/car_shoot.ogg",
-      "crash":  "https://example.com/assets/audio/car_crash.ogg"
-    },
-    "movingParts": {
-      "wheels": [
-        { "name": "wheel_fl", "offset": { "x":  1.0, "y": 0.05, "z":  1.1 }, "spinAxis": "x", "steerable": true  },
-        { "name": "wheel_fr", "offset": { "x": -1.0, "y": 0.05, "z":  1.1 }, "spinAxis": "x", "steerable": true  },
-        { "name": "wheel_rl", "offset": { "x":  1.0, "y": 0.05, "z": -1.1 }, "spinAxis": "x", "steerable": false },
-        { "name": "wheel_rr", "offset": { "x": -1.0, "y": 0.05, "z": -1.1 }, "spinAxis": "x", "steerable": false }
-      ],
-      "body": { "name": "car_body", "offset": { "x": 0, "y": 0.45, "z": 0 } },
-      "turret": { "name": "turret", "offset": { "x": 0, "y": 1.0, "z": 0.2 }, "rotateAxis": "y" }
-    },
-    "behaviour": {
-      "patrolSpeed": 3, "chaseSpeed": 6, "ramSpeed": 10,
-      "detectRange": 50, "ramRange": 6
-    }
-  },
-  {
-    "id": "buggy",
-    "label": "Buggy",
-    "type": "car",
-    "maxCount": 4,
-    "health": 60,
-    "model": {
-      "url": "https://example.com/assets/models/buggy.glb",
-      "scale": 0.85,
-      "yOffset": 0.0
-    },
-    "audio": {
-      "engine": "https://scottgrocott.github.io/mt-assets/enemies/engine.mp3",
-      "weapon": "https://example.com/assets/audio/car_shoot.ogg",
-      "crash":  "https://example.com/assets/audio/car_crash.ogg"
-    },
-    "movingParts": {
-      "wheels": [
-        { "name": "wheel_fl", "offset": { "x":  0.75, "y": 0.1, "z":  0.8 }, "spinAxis": "x", "steerable": true  },
-        { "name": "wheel_fr", "offset": { "x": -0.75, "y": 0.1, "z":  0.8 }, "spinAxis": "x", "steerable": true  },
-        { "name": "wheel_rl", "offset": { "x":  0.75, "y": 0.1, "z": -0.8 }, "spinAxis": "x", "steerable": false },
-        { "name": "wheel_rr", "offset": { "x": -0.75, "y": 0.1, "z": -0.8 }, "spinAxis": "x", "steerable": false }
-      ],
-      "body": { "name": "buggy_body", "offset": { "x": 0, "y": 0.3, "z": 0 } }
-    },
-    "behaviour": {
-      "patrolSpeed": 7, "chaseSpeed": 13, "ramSpeed": 18,
-      "detectRange": 35, "ramRange": 4
-    }
-  }
-]
+  "navType": "underwater",
+  "waterAvoid": false,
+  "colorTint": "#003366"
+}
