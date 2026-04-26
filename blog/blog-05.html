@@ -73,7 +73,7 @@
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
-                        <p>Until now, the <em>Metal Throne</em> hub existed as a single, massive <code>.glb</code> file. While great for visualization, a monolithic model is a nightmare for gameplay. You can't easily animate a single tank, you can't calculate per-building collisions, and the browser has to render the whole thing at once. Today, I broke the monolith.</p>
+                        <p>Until now, the <a href="https://scottgrocott.github.io/metal_throne/"><strong>Metal Throne</strong></a> hub existed as a single, massive <code>.glb</code> file. While great for visualization, a monolithic model is a nightmare for gameplay. You can't easily animate a single tank, you can't calculate per-building collisions, and the browser has to render the whole thing at once. Today, I broke the monolith.</p>
 
                         <h2 class="section-heading">The 0,0,0 Workflow</h2>
                         <p>In Blender, I isolated every building, fuel tank, and green pathway. To make them modular, I moved each individual object to the world origin (0,0,0) before exporting. This ensures that when they are loaded into A-Frame, their "pivot point" is exactly where I expect it to be.</p>
