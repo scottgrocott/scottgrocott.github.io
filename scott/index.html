@@ -13,7 +13,6 @@
     --text: #e6e8ec;
     --muted: #8a93a3;
     --accent: #4f8cff;
-    --accent-2: #85bb65;
     --rumble: #85c742;
     --youtube: #ff0033;
   }
@@ -85,14 +84,34 @@
     background: var(--panel-2);
     border-color: var(--accent);
   }
-  .card img {
+
+  .thumb-wrap {
+    position: relative;
     width: 110px;
     height: 62px;
-    object-fit: cover;
-    border-radius: 4px;
     flex-shrink: 0;
     background: #000;
+    border-radius: 4px;
+    overflow: hidden;
   }
+  .thumb-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Rumble-only fallback when there's no YouTube thumb available */
+  .thumb-wrap.placeholder {
+    background: linear-gradient(135deg, #2a3a18 0%, #4a6324 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d4ed9e;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
   .card .meta { min-width: 0; flex: 1; }
   .card .title {
     font-size: 13px;

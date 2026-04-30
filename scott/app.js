@@ -1,10 +1,14 @@
 // Video browser — reads videos.json (NDJSON: one JSON object per line)
 // and lets you watch each one via YouTube or Rumble embed.
+//
+// Thumbnails come from YouTube's public CDN (i.ytimg.com) since the
+// thumb URLs in videos.json are stale. For the rare video without a
+// yt_id, we show a styled "RUMBLE" placeholder instead.
 
 let videos = [];
 let filtered = [];
 let currentIndex = -1;
-let currentSource = 'youtube'; // default preference
+let currentSource = 'youtube';
 
 const $list = document.getElementById('list');
 const $search = document.getElementById('search');
@@ -38,6 +42,36 @@ async function load() {
   }
 }
 
+// ---------- Thumbnails ----------
+// YouTube thumbnail tiers. mqdefault (320x180) is the most reliable for
+// uploaded videos — it's almost always present and at the right aspect
+// ratio. hqdefault (480x360) is a 4:3 letterbox so we avoid it.
+function youtubeThumb(ytId) {
+  return `https://i.ytimg.com/vi/${encodeURIComponent(ytId)}/mqdefault.jpg`;
+}
+
+// YouTube returns a 120x90 gray placeholder image for unavailable videos.
+// We detect that by checking naturalWidth on load — real mqdefault is 320 wide.
+function attachThumb(imgEl, wrapEl, video) {
+  if (!video.yt_id) {
+    showPlaceholder(wrapEl);
+    return;
+  }
+  imgEl.onload = () => {
+    if (imgEl.naturalWidth < 200) {
+      // YouTube's "video unavailable" placeholder
+      showPlaceholder(wrapEl);
+    }
+  };
+  imgEl.onerror = () => showPlaceholder(wrapEl);
+  imgEl.src = youtubeThumb(video.yt_id);
+}
+
+function showPlaceholder(wrapEl) {
+  wrapEl.classList.add('placeholder');
+  wrapEl.innerHTML = 'RUMBLE';
+}
+
 // ---------- Render list ----------
 function render() {
   $count.textContent = `${filtered.length} of ${videos.length}`;
@@ -46,18 +80,21 @@ function render() {
     return;
   }
 
-  // Build DOM (faster than innerHTML for hundreds of nodes with images)
   const frag = document.createDocumentFragment();
   filtered.forEach((v) => {
     const card = document.createElement('div');
     card.className = 'card';
     card.dataset.id = v._id?.$oid || v.rumble_id;
 
+    const wrap = document.createElement('div');
+    wrap.className = 'thumb-wrap';
+
     const img = document.createElement('img');
     img.loading = 'lazy';
-    img.src = v.thumb || '';
     img.alt = '';
-    img.onerror = () => { img.style.visibility = 'hidden'; };
+    wrap.appendChild(img);
+
+    attachThumb(img, wrap, v);
 
     const meta = document.createElement('div');
     meta.className = 'meta';
@@ -83,7 +120,7 @@ function render() {
 
     meta.appendChild(title);
     meta.appendChild(ids);
-    card.appendChild(img);
+    card.appendChild(wrap);
     card.appendChild(meta);
 
     card.addEventListener('click', () => select(videos.indexOf(v)));
@@ -112,13 +149,11 @@ function select(idx) {
 
   $title.textContent = v.title || '(untitled)';
 
-  // Update toggle button availability
   const ytBtn = $toggle.querySelector('[data-src="youtube"]');
   const rbBtn = $toggle.querySelector('[data-src="rumble"]');
   ytBtn.disabled = !v.yt_id;
   rbBtn.disabled = !v.rumble_id;
 
-  // Pick source: keep current preference if available, else fall back
   let src = currentSource;
   if (src === 'youtube' && !v.yt_id) src = 'rumble';
   if (src === 'rumble' && !v.rumble_id) src = 'youtube';
@@ -126,7 +161,6 @@ function select(idx) {
   setSource(src);
   highlightActive();
 
-  // Scroll the active card into view if it's offscreen
   const activeCard = $list.querySelector('.card.active');
   if (activeCard) activeCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
@@ -152,7 +186,6 @@ function setSource(src) {
     return;
   }
 
-  // Replace iframe (creating a new one is the simplest way to stop previous playback)
   $player.innerHTML = '';
   const iframe = document.createElement('iframe');
   iframe.className = 'player-frame';
