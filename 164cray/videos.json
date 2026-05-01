@@ -1,6 +1,46 @@
 [
   {
     "_id": {
+      "$oid": "3f391b5c-88f9-4d97-8940-b3c74002f751"
+    },
+    "title": "Mountain City Outskirts S02E19",
+    "rumble_id": "v4zb1s7",
+    "yt_id": "3yP9k5swO40",
+    "url_slug": "mountain-city-outskirts-s02e19",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "65e0f075-6179-4a3c-b417-115c1a1985d6"
+    },
+    "title": "Mountain City Outskirts S02E20",
+    "rumble_id": "v4zbw1f",
+    "yt_id": "TWaVDJNi1JI",
+    "url_slug": "mountain-city-outskirts-s02e20",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "94368ec5-31e3-41ae-b2f3-cf1bbc7b44f9"
+    },
+    "title": "Mountain City Outskirts S02E21",
+    "rumble_id": "v4zgrq0",
+    "yt_id": "GwmTwziDKmY",
+    "url_slug": "mountain-city-outskirts-s02e21",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "88585e13-47af-44eb-9972-97ff13631014"
+    },
+    "title": "Mountain City Outskirts S02E22",
+    "rumble_id": "v5qk135",
+    "yt_id": "h69eOpbiuAE",
+    "url_slug": "mountain-city-outskirts-s02e22",
+    "html": ""
+  },
+  {
+    "_id": {
       "$oid": "8dc2dfd6-36f5-40a9-b23a-c64fe5c7fd21"
     },
     "title": "Mountain City Outskirts S02E23",
