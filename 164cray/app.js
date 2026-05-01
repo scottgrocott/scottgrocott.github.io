@@ -1,4 +1,4 @@
-// Video browser — reads videos.json (NDJSON: one JSON object per line)
+// Video browser — reads videos.json (a JSON array of video records)
 // and lets you watch each one via YouTube or Rumble embed.
 //
 // Thumbnails come from YouTube's public CDN (i.ytimg.com) since the
@@ -22,14 +22,11 @@ async function load() {
   try {
     const res = await fetch('/164cray/videos.json');
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    videos = text
-      .split('\n')
-      .filter(l => l.trim())
-      .map(l => {
-        try { return JSON.parse(l); } catch { return null; }
-      })
-      .filter(Boolean);
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+      throw new Error('videos.json is not a JSON array');
+    }
+    videos = data;
     filtered = videos.slice();
     render();
   } catch (err) {
