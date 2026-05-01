@@ -1,6 +1,16 @@
 [
   {
     "_id": {
+      "$oid": "b82339d9-e826-4800-a398-f4473c2b8bfd"
+    },
+    "title": "Mountain City Outskirts S02E18",
+    "rumble_id": "v4yz8x2",
+    "yt_id": "BykZTF8djD0",
+    "url_slug": "mountain-city-outskirts-s02e18",
+    "html": ""
+  },
+  {
+    "_id": {
       "$oid": "3f391b5c-88f9-4d97-8940-b3c74002f751"
     },
     "title": "Mountain City Outskirts S02E19",
