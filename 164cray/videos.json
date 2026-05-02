@@ -1,4 +1,64 @@
-[
+[ 
+{
+    "_id": {
+      "$oid": "c8a1f168-c559-4456-8c3b-16c7cb359201"
+    },
+    "title": "Mountain City Outskirts S01E02",
+    "rumble_id": "v3ee3ve",
+    "yt_id": "3-oHxGGaoQU",
+    "url_slug": "mountain-city-outskirts-s01e02",
+    "html": ""
+  },
+{
+    "_id": {
+      "$oid": "cf2c6cd7-8cf6-46d0-8c17-5fb316a013ef"
+    },
+    "title": "Mountain City Outskirts S01E03",
+    "rumble_id": "v3eeipq",
+    "yt_id": "PIEQ_AMABms",
+    "url_slug": "mountain-city-outskirts-s01e03",
+    "html": ""
+  },
+ {
+    "_id": {
+      "$oid": "eed63a4b-0fa2-4dd3-bcc9-5684b092036c"
+    },
+    "title": "Mountain City Outskirts S01E04",
+    "rumble_id": "v3eonyg",
+    "yt_id": "bmRCef_OUlg",
+    "url_slug": "mountain-city-outskirts-s01e04",
+    "html": ""
+  },
+ {
+    "_id": {
+      "$oid": "0784df39-4fa4-442c-a36b-0b1b66d9bf65"
+    },
+    "title": "Mountain City Outskirts S01E05",
+    "rumble_id": "v3fc99i",
+    "yt_id": "B_HBvmxm0cI",
+    "url_slug": "mountain-city-outskirts-s01e05",
+    "html": ""
+  },
+ {
+    "_id": {
+      "$oid": "14b247db-4d43-4f69-8e53-478ed796897b"
+    },
+    "title": "Mountain City Outskirts S01E06",
+    "rumble_id": "v3fcy2s",
+    "yt_id": "SPUNPn1Muzk",
+    "url_slug": "mountain-city-outskirts-s01e06",
+    "html": ""
+  },
+ {
+    "_id": {
+      "$oid": "600a7b6f-68c5-426f-a217-2cc8ce8c15bb"
+    },
+    "title": "Mountain City Outskirts S01E07",
+    "rumble_id": "v3fe3qk",
+    "yt_id": "q-sse6uUlhQ",
+    "url_slug": "mountain-city-outskirts-s01e07",
+    "html": ""
+  },
  {
     "_id": {
       "$oid": "644176db-4b6d-4831-84b1-790d071a75e3"
@@ -3643,10 +3703,10 @@
     "_id": {
       "$oid": "64d1d8ca773e31b05607b877"
     },
-    "title": "Mountain City Outskirts - 01",
+    "title": "Mountain City Outskirts S01E01",
     "rumble_id": "v2s8kr2",
     "yt_id": "UuruP9tmNws",
-    "url_slug": "bvLlvD-mco01--diecast-diorama-joyin",
+    "url_slug": "mountain-city-outskirts-S01E01",
     "html": ""
   },
   {
