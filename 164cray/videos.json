@@ -1,6 +1,86 @@
 [
   {
     "_id": {
+      "$oid": "6f3a67fa-b6ae-44bb-9c91-1d7476426435"
+    },
+    "title": "Mountain City Outskirts S01E36",
+    "rumble_id": "v3pp4nv",
+    "yt_id": "PPFnlPujMH4",
+    "url_slug": "mountain-city-outskirts-s01e36",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "a289cd3b-0eef-468c-872a-08a2340da770"
+    },
+    "title": "Mountain City Outskirts S01E37",
+    "rumble_id": "v3ppwyo",
+    "yt_id": "CK2GXHaKKFs",
+    "url_slug": "mountain-city-outskirts-s01e37",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "1b833398-2d29-4aca-83a1-23cbaad9667e"
+    },
+    "title": "Mountain City Outskirts S01E38",
+    "rumble_id": "v3pqhkk",
+    "yt_id": "fTyWpMjucAE",
+    "url_slug": "mountain-city-outskirts-s01e38",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "e6a822c5-7602-4091-9e02-8f374086fb6d"
+    },
+    "title": "Mountain City Outskirts S01E39",
+    "rumble_id": "v3q6q8w",
+    "yt_id": "MZlAcYWunD0",
+    "url_slug": "mountain-city-outskirts-s01e39",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "98f2e0c4-2e95-41ec-b985-91c3a8369667"
+    },
+    "title": "Mountain City Outskirts S01E40",
+    "rumble_id": "v3q6v65",
+    "yt_id": "6IzM5nLUDzw",
+    "url_slug": "mountain-city-outskirts-s01e40",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "39000e4d-48c7-4bc6-a6c9-a7a426d0d753"
+    },
+    "title": "Mountain City Outskirts S01E41",
+    "rumble_id": "v3q6zji",
+    "yt_id": "tBIRgNTq6mA",
+    "url_slug": "mountain-city-outskirts-s01e41",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "c3f0fe39-42f6-453a-9114-bc9d51c9c070"
+    },
+    "title": "Mountain City Outskirts S01E42",
+    "rumble_id": "v3q7988",
+    "yt_id": "OKvxNWGvw18",
+    "url_slug": "mountain-city-outskirts-s01e42",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "cc0aa711-b0d5-4a5e-9f71-4966eeb6b91b"
+    },
+    "title": "Mountain City Outskirts S01E43",
+    "rumble_id": "v3qdqcb",
+    "yt_id": "v6o1iMF_vgI",
+    "url_slug": "mountain-city-outskirts-s01e43",
+    "html": ""
+  },
+  {
+    "_id": {
       "$oid": "a0bb2c8e-fb02-43cb-b5fa-1476e18bdaae"
     },
     "title": "Radio C.R.A.Y. 01",
