@@ -12,6 +12,7 @@ let currentSource = 'youtube';
 
 const $list = document.getElementById('list');
 const $search = document.getElementById('search');
+const $collection = document.getElementById('collection');
 const $count = document.getElementById('count');
 const $title = document.getElementById('title');
 const $player = document.getElementById('player');
@@ -200,6 +201,15 @@ $search.addEventListener('input', () => {
     ? videos.filter(v => (v.title || '').toLowerCase().includes(q))
     : videos.slice();
   render();
+});
+
+// ---------- Collection filter ----------
+// Picking a collection populates the search field with its value and runs
+// the same search logic — so the user can still see/edit the active filter
+// in the search box, and clearing the box clears the filter.
+$collection.addEventListener('change', () => {
+  $search.value = $collection.value;
+  $search.dispatchEvent(new Event('input'));
 });
 
 // ---------- Toggle clicks ----------

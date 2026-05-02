@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>1:64 Cray! Video Browser</title>
+<title>Video Browser</title>
 <style>
   :root {
     --bg: #0f1115;
@@ -48,7 +48,7 @@
     text-transform: uppercase;
     color: var(--muted);
   }
-  #search {
+  #search, #collection {
     width: 100%;
     background: var(--panel-2);
     border: 1px solid var(--border);
@@ -57,8 +57,20 @@
     border-radius: 6px;
     font-size: 14px;
     outline: none;
+    font-family: inherit;
   }
-  #search:focus { border-color: var(--accent); }
+  #search:focus, #collection:focus { border-color: var(--accent); }
+  #collection {
+    margin-bottom: 8px;
+    cursor: pointer;
+    /* Custom caret since we hide the native one */
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%238a93a3' d='M6 8L0 0h12z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+  }
   .count {
     margin-top: 6px;
     font-size: 11px;
@@ -217,6 +229,14 @@
   <aside>
     <div class="sidebar-header">
       <h1><a href="/"><img src="/assets/img/164_logo.png" alt="164Cray" class="img-fluid" style="max-height: 100px;"></a></h1>
+      <select id="collection" aria-label="Filter by collection">
+        <option value="">All Collections</option>
+        <option value="Outskirts S01">Mountain City Outskirts S01</option>
+        <option value="Outskirts S02">Mountain City Outskirts S02</option>
+        <option value="Radio">Radio C.R.A.Y.</option>
+        <option value="hotwheels">Hot Wheels</option>
+        <option value="Matchbox">Matchbox</option>
+      </select>
       <input id="search" type="search" placeholder="Search titles…" />
       <div class="count" id="count"></div>
     </div>
