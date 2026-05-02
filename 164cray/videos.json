@@ -1,6 +1,76 @@
 [
   {
     "_id": {
+      "$oid": "a0bb2c8e-fb02-43cb-b5fa-1476e18bdaae"
+    },
+    "title": "Radio C.R.A.Y. 01",
+    "rumble_id": "v4zreeh",
+    "yt_id": "HXJO20jY85o",
+    "url_slug": "radio-cray-01",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "28493a42-b5a1-4e3b-b436-688696dcecdd"
+    },
+    "title": "Radio C.R.A.Y. 02",
+    "rumble_id": "v51145z",
+    "yt_id": "VX1hyF3oOCk",
+    "url_slug": "radio-cray-02",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "15606f80-b4d1-4b01-89fe-be4f34fb2ecc"
+    },
+    "title": "Radio C.R.A.Y. 03",
+    "rumble_id": "v522x20",
+    "yt_id": "j3YefPrShjE",
+    "url_slug": "radio-cray-03",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "8b93d410-a99f-4d06-bbef-586c37b2a614"
+    },
+    "title": "Radio C.R.A.Y. 04",
+    "rumble_id": "v52paa4",
+    "yt_id": "aDkDdA2ZXyI",
+    "url_slug": "radio-cray-04",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "fa7d48de-9c17-4c1d-a602-27a227ffb80c"
+    },
+    "title": "Radio C.R.A.Y. 05",
+    "rumble_id": "v55bl7x",
+    "yt_id": "MxLyyEUj76k",
+    "url_slug": "radio-cray-05",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "ae576a55-df58-4f22-9648-e502ae3075c0"
+    },
+    "title": "Radio C.R.A.Y. 06",
+    "rumble_id": "v55rxl7",
+    "yt_id": "Jl830C-Rp7I",
+    "url_slug": "radio-cray-06",
+    "html": ""
+  },
+  {
+    "_id": {
+      "$oid": "f454c412-4891-4aa1-9753-1665926aa847"
+    },
+    "title": "Radio C.R.A.Y. 07",
+    "rumble_id": "v57mxqh",
+    "yt_id": "1U0rc3DpmBw",
+    "url_slug": "radio-cray-07",
+    "html": ""
+  },
+  {
+    "_id": {
       "$oid": "854ff9ca-7c66-4a9e-a3f7-b6bdea1d4c56"
     },
     "title": "Mountain City Outskirts S02E01",
