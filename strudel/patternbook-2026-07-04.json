@@ -1,0 +1,42 @@
+[
+  {
+    "id": "l4qjg7n",
+    "title": "test",
+    "tags": [],
+    "desc": "this is a test",
+    "code": "setcps(95/60/4)\n\nstack(\n\n  // Kick\n  s(\"bd ~ ~ bd bd ~ ~ ~\")\n    .gain(1.2),\n\n  // Snare\n  s(\"~ ~ sd ~ ~ ~ sd ~\")\n    .gain(1.1),\n\n  // Hi-hats\n  s(\"hh hh hh hh hh hh hh hh\")\n    .gain(0.45)\n    .sometimes(x=>x.fast(2)),\n\n  // Occasional crash\n  s(\"<~ ~ ~ ~> <~ ~ ~ ~> <~ ~ ~ ~> <cr ~ ~ ~>\")\n    .gain(0.8)\n\n)"
+  },
+  {
+    "id": "seed-pop-1",
+    "title": "Pop song — full arrangement",
+    "tags": [
+      "pop",
+      "melodic",
+      "chords"
+    ],
+    "desc": "I–V–vi–IV progression with supersaw chords and a bright lead.",
+    "code": "setcpm(120/4)\n\nstack(\n  sound(\"bd*2 ~ bd ~\").bank(\"RolandTR909\").gain(0.9),\n  sound(\"~ sd ~ sd\").bank(\"RolandTR909\").gain(0.8),\n  sound(\"hh*8\").bank(\"RolandTR909\").gain(0.4).pan(sine.range(0.3,0.7)),\n\n  note(\"c2 c2 a1 f1\").sound(\"sawtooth\").lpf(800).gain(0.7).room(0.2),\n\n  note(\"<[c4,e4,g4] [g3,b3,d4] [a3,c4,e4] [f3,a3,c4]>\")\n    .sound(\"supersaw\").lpf(sine.range(600,2000).slow(8))\n    .gain(0.5).room(0.4).attack(0.05),\n\n  note(\"e5 g5 c6 g5 ~ a5 g5 e5\")\n    .sound(\"triangle\").gain(0.45)\n    .delay(0.3).delaytime(0.25).room(0.3).slow(2)\n)"
+  },
+  {
+    "id": "seed-prog-1",
+    "title": "Prog rock drum kit",
+    "tags": [
+      "drums",
+      "prog",
+      "rock"
+    ],
+    "desc": "Full kit: syncopated kick, ghost-note snare, tom fills, ride swap.",
+    "code": "setcpm(140/4)\n\nstack(\n  sound(\"bd ~ bd bd ~ bd ~ ~\").bank(\"LinnDrum\").gain(1),\n  sound(\"~ ~ sd ~ [~ sd] ~ sd ~\").bank(\"LinnDrum\").gain(0.85),\n  sound(\"hh*16\").bank(\"LinnDrum\").gain(saw.range(0.3,0.6).fast(4)),\n  sound(\"~ ~ ~ oh ~ ~ oh ~\").bank(\"LinnDrum\").gain(0.5),\n  sound(\"~ ~ ~ ~ ~ ~ ~ [lt mt ht]\").bank(\"LinnDrum\").gain(0.7).slow(4),\n  sound(\"cr ~ ~ ~ ~ ~ ~ ~\").bank(\"LinnDrum\").gain(0.6).slow(2),\n  sound(\"rd*8\").bank(\"LinnDrum\").gain(0.4).mask(\"<0 0 1 1>\")\n)"
+  },
+  {
+    "id": "seed-midi-1",
+    "title": "MIDI out to Carla rack",
+    "tags": [
+      "midi",
+      "live",
+      "hardware"
+    ],
+    "desc": "Route parts to separate MIDI channels for a Carla synth rack. Edit the port name to match your system.",
+    "code": "// patch Strudel's MIDI out to Carla in qpwgraph first\n// then confirm the port name below (often \"Midi Through\" on Linux)\n\nsetcpm(120/4)\n\nstack(\n  note(\"c2 c2 g1 a1\").midichan(1),       // slot 1 — bass synth\n  note(\"<c4 e4 g4>\").slow(2).midichan(2), // slot 2 — pad\n  note(\"e5 g5 c6 g5\").midichan(3)         // slot 3 — lead\n).midi(\"Midi Through\")"
+  }
+]

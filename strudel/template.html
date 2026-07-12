@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patternbook — Strudel Template Library</title>
+<style>
+  /* ---- design tokens ---------------------------------------------------- */
+  :root{
+    --bg:        #14131a;   /* deep aubergine-black, warmer than pure IDE grey */
+    --panel:     #1d1b25;
+    --panel-2:   #242231;
+    --edge:      #332f42;
+    --ink:       #e7e3f4;   /* off-white with a violet cast */
+    --ink-dim:   #9d97b5;
+    --ink-faint: #6a6482;
+    --amber:     #ffb454;   /* signature accent: CRT phosphor amber */
+    --amber-dim: #c98b39;
+    --mint:      #6fe0b0;   /* second accent for "copied" confirmation */
+    --pink:      #ff7597;
+    --radius:    10px;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--mono); font-size:15px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none !important; animation:none !important;}
+  }
+
+  /* ---- header ----------------------------------------------------------- */
+  header{
+    padding:34px 28px 26px; border-bottom:1px solid var(--edge);
+    background:
+      repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.012) 3px 4px),
+      linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
+  }
+  .brand{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;}
+  .brand h1{
+    margin:0; font-size:30px; font-weight:700; letter-spacing:-.5px;
+    color:var(--ink);
+  }
+  .brand h1 .blink{color:var(--amber); animation:blink 1.1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .tag{color:var(--ink-dim); font-size:13.5px;}
+  .sub{margin:10px 0 0; color:var(--ink-faint); font-size:13px; max-width:60ch;}
+
+  /* ---- toolbar ---------------------------------------------------------- */
+  .toolbar{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    padding:16px 28px; border-bottom:1px solid var(--edge);
+    position:sticky; top:0; z-index:20;
+    background:rgba(20,19,26,.86); backdrop-filter:blur(8px);
+  }
+  .search{
+    flex:1 1 240px; min-width:180px; background:var(--panel-2);
+    border:1px solid var(--edge); border-radius:8px; padding:9px 12px;
+    color:var(--ink); font-family:var(--mono); font-size:13.5px;
+  }
+  .search:focus{outline:2px solid var(--amber-dim); outline-offset:1px;}
+  .search::placeholder{color:var(--ink-faint);}
+  select.filter{
+    background:var(--panel-2); border:1px solid var(--edge); border-radius:8px;
+    padding:9px 12px; color:var(--ink); font-family:var(--mono); font-size:13px;
+  }
+  button{font-family:var(--mono); cursor:pointer;}
+  .btn-add{
+    background:var(--amber); color:#241a05; border:none; border-radius:8px;
+    padding:9px 16px; font-size:13.5px; font-weight:700;
+  }
+  .btn-add:hover{background:#ffc06e;}
+  .btn-add:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+  .btn-ghost.tb{
+    background:transparent; border:1px solid var(--edge); color:var(--ink-dim);
+    border-radius:8px; padding:9px 14px; font-size:13px;
+  }
+  .btn-ghost.tb:hover{color:var(--ink); border-color:var(--ink-faint);}
+  .btn-ghost.tb:focus-visible{outline:2px solid var(--amber-dim); outline-offset:1px;}
+
+  /* ---- layout ----------------------------------------------------------- */
+  main{padding:26px 28px 80px; max-width:1180px; margin:0 auto;}
+  .count{color:var(--ink-faint); font-size:12px; margin:0 0 18px; letter-spacing:.04em; text-transform:uppercase;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:20px;}
+
+  /* ---- snippet card ----------------------------------------------------- */
+  .card{
+    background:var(--panel); border:1px solid var(--edge); border-radius:var(--radius);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .card-head{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    padding:14px 16px 10px;
+  }
+  .card-title{margin:0; font-size:15.5px; font-weight:700; color:var(--ink);}
+  .card-meta{margin:4px 0 0; font-size:11.5px; color:var(--ink-faint);}
+  .chip{
+    display:inline-block; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--amber); border:1px solid var(--amber-dim); border-radius:20px;
+    padding:2px 9px; white-space:nowrap;
+  }
+  .card-actions{display:flex; gap:6px;}
+  .icon-btn{
+    background:transparent; border:1px solid var(--edge); color:var(--ink-dim);
+    border-radius:6px; padding:4px 8px; font-size:11px;
+  }
+  .icon-btn:hover{border-color:var(--ink-faint); color:var(--ink);}
+  .icon-btn.danger:hover{border-color:var(--pink); color:var(--pink);}
+
+  .desc{padding:0 16px 10px; margin:0; color:var(--ink-dim); font-size:12.5px;}
+
+  /* ---- code block ------------------------------------------------------- */
+  .code-wrap{position:relative; margin:0 12px 12px; border-radius:8px; overflow:hidden; border:1px solid var(--edge);}
+  .code-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--panel-2); padding:6px 10px; border-bottom:1px solid var(--edge);
+  }
+  .dots{display:flex; gap:6px;}
+  .dots i{width:10px; height:10px; border-radius:50%; display:block;}
+  .dots i:nth-child(1){background:#ff5f57;}
+  .dots i:nth-child(2){background:#febc2e;}
+  .dots i:nth-child(3){background:#28c840;}
+  .copy-btn{
+    background:transparent; border:1px solid var(--edge); color:var(--ink-dim);
+    border-radius:6px; padding:3px 12px; font-size:11.5px; font-weight:600;
+    letter-spacing:.03em; transition:all .15s;
+  }
+  .copy-btn:hover{border-color:var(--amber-dim); color:var(--amber);}
+  .copy-btn:focus-visible{outline:2px solid var(--amber-dim); outline-offset:1px;}
+  .copy-btn.copied{border-color:var(--mint); color:var(--mint); background:rgba(111,224,176,.08);}
+  pre{
+    margin:0; padding:14px 16px; overflow-x:auto; background:#100f16;
+    font-size:13px; line-height:1.65; color:#d7d2ea; tab-size:2;
+  }
+  pre code{font-family:var(--mono); white-space:pre;}
+  /* lightweight token coloring applied by JS */
+  .t-fn{color:var(--amber);}
+  .t-str{color:var(--mint);}
+  .t-num{color:var(--pink);}
+  .t-com{color:var(--ink-faint); font-style:italic;}
+  .t-punc{color:var(--ink-dim);}
+
+  /* ---- empty state ------------------------------------------------------ */
+  .empty{
+    border:1px dashed var(--edge); border-radius:var(--radius); padding:48px 24px;
+    text-align:center; color:var(--ink-faint); grid-column:1/-1;
+  }
+  .empty b{color:var(--ink-dim); display:block; margin-bottom:6px; font-size:15px;}
+
+  /* ---- modal ------------------------------------------------------------ */
+  .overlay{
+    position:fixed; inset:0; background:rgba(8,7,12,.72); backdrop-filter:blur(3px);
+    display:none; align-items:flex-start; justify-content:center; padding:40px 16px; z-index:50;
+    overflow-y:auto;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--panel); border:1px solid var(--edge); border-radius:12px;
+    width:100%; max-width:640px; padding:24px;
+  }
+  .modal h2{margin:0 0 4px; font-size:18px;}
+  .modal p.hint{margin:0 0 18px; color:var(--ink-faint); font-size:12.5px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12px; color:var(--ink-dim); margin-bottom:5px; letter-spacing:.03em;}
+  .field input, .field textarea{
+    width:100%; background:var(--panel-2); border:1px solid var(--edge); border-radius:7px;
+    padding:9px 11px; color:var(--ink); font-family:var(--mono); font-size:13px;
+  }
+  .field input:focus, .field textarea:focus{outline:2px solid var(--amber-dim); outline-offset:1px;}
+  .field textarea{min-height:180px; resize:vertical; line-height:1.6;}
+  .modal-actions{display:flex; gap:10px; justify-content:flex-end; margin-top:8px;}
+  .btn-ghost{background:transparent; border:1px solid var(--edge); color:var(--ink-dim); border-radius:8px; padding:9px 16px; font-size:13px;}
+  .btn-ghost:hover{color:var(--ink); border-color:var(--ink-faint);}
+  .btn-save{background:var(--amber); color:#241a05; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:700;}
+  .btn-save:hover{background:#ffc06e;}
+
+  /* toast */
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--panel-2); border:1px solid var(--mint); color:var(--mint);
+    padding:10px 20px; border-radius:8px; font-size:13px; opacity:0; pointer-events:none;
+    transition:all .25s; z-index:60;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  footer{padding:28px; text-align:center; color:var(--ink-faint); font-size:11.5px; border-top:1px solid var(--edge);}
+  footer a{color:var(--amber-dim); text-decoration:none;}
+  footer a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Patternbook<span class="blink">_</span></h1>
+    <span class="tag">// a Strudel template library</span>
+  </div>
+  <p class="sub">Your personal shelf of live-coding patterns. Everything saves to this browser. Click <b style="color:var(--amber)">copy</b> on any block to grab it, then paste into strudel.cc.</p>
+</header>
+
+<div class="toolbar">
+  <input id="search" class="search" type="search" placeholder="search title, tag, or code…" aria-label="Search snippets">
+  <select id="filter" class="filter" aria-label="Filter by tag"><option value="">all tags</option></select>
+  <button class="btn-add" id="addBtn">+ new pattern</button>
+  <button class="btn-ghost tb" id="exportBtn">export .json</button>
+  <button class="btn-ghost tb" id="importBtn">import</button>
+  <input type="file" id="importFile" accept="application/json,.json" hidden>
+</div>
+
+<main>
+  <p class="count" id="count"></p>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  Stored locally in your browser · <a href="https://strudel.cc" target="_blank" rel="noopener">strudel.cc</a> · export via your browser's dev tools if you want a backup
+</footer>
+
+<!-- add / edit modal -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">New pattern</h2>
+    <p class="hint">Give it a name, a tag or two, and paste the Strudel code.</p>
+    <div class="field">
+      <label for="f-title">Title</label>
+      <input id="f-title" type="text" placeholder="e.g. Prog rock drum kit">
+    </div>
+    <div class="field">
+      <label for="f-tags">Tags (comma separated)</label>
+      <input id="f-tags" type="text" placeholder="e.g. drums, midi, live">
+    </div>
+    <div class="field">
+      <label for="f-desc">Description (optional)</label>
+      <input id="f-desc" type="text" placeholder="one line about what it does">
+    </div>
+    <div class="field">
+      <label for="f-code">Strudel code</label>
+      <textarea id="f-code" spellcheck="false" placeholder='stack(&#10;  sound("bd sd"),&#10;  note("c e g")&#10;)'></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelBtn">Cancel</button>
+      <button class="btn-save" id="saveBtn">Save pattern</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script>
+const STORE_KEY = 'patternbook.v1';
+const SEED_URL  = '/strudel/patterns.json';   // starter patterns fetched on first load
+
+/* ---- state -------------------------------------------------------------- */
+let snippets = [];
+let editingId = null;
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(snippets)); }
+
+/* Load order:
+   1. If localStorage already has a saved library, use it.
+   2. Otherwise fetch patterns.json for the starter set and save it.
+   3. If the fetch fails (e.g. file:// with a strict browser), fall back
+      to an empty library so the page still works. */
+async function boot(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw){ snippets = JSON.parse(raw); }
+    else{
+      const res = await fetch(SEED_URL, {cache:'no-store'});
+      if(!res.ok) throw new Error('fetch failed');
+      snippets = await res.json();
+      save();
+    }
+  }catch(e){
+    snippets = [];
+    console.warn('Could not load starter patterns:', e);
+    toast('Starter patterns need patterns.json alongside this file');
+  }
+  refreshFilter();
+  render();
+}
+
+/* ---- tiny syntax highlighter (Strudel/JS flavored) ---------------------- */
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function highlight(code){
+  let out = esc(code);
+  // comments
+  out = out.replace(/(\/\/[^\n]*)/g, '<span class="t-com">$1</span>');
+  // strings (double + single) — skip if already inside a comment span
+  out = out.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, m =>
+    m.includes('t-com') ? m : `<span class="t-str">${m}</span>`);
+  // numbers
+  out = out.replace(/\b(\d+\.?\d*)\b/g, '<span class="t-num">$1</span>');
+  // function-ish identifiers followed by (
+  out = out.replace(/\b([a-zA-Z_]\w*)(?=\s*\()/g, '<span class="t-fn">$1</span>');
+  return out;
+}
+
+/* ---- render ------------------------------------------------------------- */
+const grid   = document.getElementById('grid');
+const countEl= document.getElementById('count');
+const filterEl=document.getElementById('filter');
+const searchEl=document.getElementById('search');
+
+function allTags(){
+  const s = new Set();
+  snippets.forEach(x => x.tags.forEach(t => s.add(t)));
+  return [...s].sort();
+}
+function refreshFilter(){
+  const cur = filterEl.value;
+  filterEl.innerHTML = '<option value="">all tags</option>' +
+    allTags().map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+  filterEl.value = cur;
+}
+
+function render(){
+  const q = searchEl.value.trim().toLowerCase();
+  const tag = filterEl.value;
+  const list = snippets.filter(s => {
+    const inTag = !tag || s.tags.includes(tag);
+    const hay = (s.title + ' ' + s.tags.join(' ') + ' ' + s.desc + ' ' + s.code).toLowerCase();
+    return inTag && (!q || hay.includes(q));
+  });
+
+  countEl.textContent = `${list.length} pattern${list.length===1?'':'s'}` +
+    (snippets.length!==list.length ? ` of ${snippets.length}` : '');
+
+  if(!list.length){
+    grid.innerHTML = `<div class="empty"><b>Nothing here yet.</b>${
+      snippets.length ? 'No pattern matches your search.' : 'Hit “+ new pattern” to add your first snippet.'
+    }</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(s => `
+    <article class="card">
+      <div class="card-head">
+        <div>
+          <h3 class="card-title">${esc(s.title)}</h3>
+          <p class="card-meta">${s.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join(' ')}</p>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" data-edit="${s.id}" aria-label="Edit ${esc(s.title)}">edit</button>
+          <button class="icon-btn danger" data-del="${s.id}" aria-label="Delete ${esc(s.title)}">del</button>
+        </div>
+      </div>
+      ${s.desc ? `<p class="desc">${esc(s.desc)}</p>` : ''}
+      <div class="code-wrap">
+        <div class="code-bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <button class="copy-btn" data-copy="${s.id}">copy</button>
+        </div>
+        <pre><code>${highlight(s.code)}</code></pre>
+      </div>
+    </article>
+  `).join('');
+}
+
+/* ---- copy --------------------------------------------------------------- */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 1600);
+}
+async function copyCode(id, btn){
+  const snip = snippets.find(s => s.id === id);
+  if(!snip) return;
+  try{
+    await navigator.clipboard.writeText(snip.code);
+  }catch(e){
+    // fallback for non-secure contexts
+    const ta = document.createElement('textarea');
+    ta.value = snip.code; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  btn.textContent = 'copied ✓'; btn.classList.add('copied');
+  toast('Copied to clipboard');
+  setTimeout(()=>{ btn.textContent='copy'; btn.classList.remove('copied'); }, 1400);
+}
+
+/* ---- modal -------------------------------------------------------------- */
+const overlay = document.getElementById('overlay');
+const fTitle=document.getElementById('f-title'), fTags=document.getElementById('f-tags'),
+      fDesc=document.getElementById('f-desc'), fCode=document.getElementById('f-code');
+
+function openModal(snip){
+  editingId = snip ? snip.id : null;
+  document.getElementById('modalTitle').textContent = snip ? 'Edit pattern' : 'New pattern';
+  fTitle.value = snip ? snip.title : '';
+  fTags.value  = snip ? snip.tags.join(', ') : '';
+  fDesc.value  = snip ? snip.desc : '';
+  fCode.value  = snip ? snip.code : '';
+  overlay.classList.add('open');
+  fTitle.focus();
+}
+function closeModal(){ overlay.classList.remove('open'); editingId=null; }
+
+function saveModal(){
+  const title = fTitle.value.trim();
+  const code  = fCode.value;
+  if(!title){ fTitle.focus(); toast('Give it a title first'); return; }
+  if(!code.trim()){ fCode.focus(); toast('Paste some code first'); return; }
+  const tags = fTags.value.split(',').map(t=>t.trim()).filter(Boolean);
+  const desc = fDesc.value.trim();
+
+  if(editingId){
+    const s = snippets.find(x=>x.id===editingId);
+    Object.assign(s, {title, tags, desc, code});
+  }else{
+    snippets.unshift({ id: uid(), title, tags, desc, code });
+  }
+  save(); refreshFilter(); render(); closeModal();
+  toast(editingId ? 'Pattern updated' : 'Pattern saved');
+}
+
+/* ---- events ------------------------------------------------------------- */
+document.getElementById('addBtn').addEventListener('click', ()=>openModal(null));
+document.getElementById('cancelBtn').addEventListener('click', closeModal);
+document.getElementById('saveBtn').addEventListener('click', saveModal);
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && overlay.classList.contains('open')) closeModal(); });
+searchEl.addEventListener('input', render);
+filterEl.addEventListener('change', render);
+
+grid.addEventListener('click', e=>{
+  const c = e.target.closest('[data-copy]');
+  const ed= e.target.closest('[data-edit]');
+  const dl= e.target.closest('[data-del]');
+  if(c) copyCode(c.dataset.copy, c);
+  if(ed) openModal(snippets.find(s=>s.id===ed.dataset.edit));
+  if(dl){
+    const s = snippets.find(x=>x.id===dl.dataset.del);
+    if(confirm(`Delete “${s.title}”? This can't be undone.`)){
+      snippets = snippets.filter(x=>x.id!==dl.dataset.del);
+      save(); refreshFilter(); render();
+    }
+  }
+});
+
+/* ---- export / import ---------------------------------------------------- */
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const stamp = new Date().toISOString().slice(0,10);
+  const blob = new Blob([JSON.stringify(snippets, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `patternbook-${stamp}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast(`Exported ${snippets.length} pattern${snippets.length===1?'':'s'}`);
+});
+
+const importFile = document.getElementById('importFile');
+document.getElementById('importBtn').addEventListener('click', ()=>importFile.click());
+importFile.addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(!Array.isArray(data)) throw new Error('not an array');
+      // normalize + ensure ids, keep only known fields
+      const clean = data.map(d => ({
+        id: d.id || uid(),
+        title: String(d.title || 'Untitled'),
+        tags: Array.isArray(d.tags) ? d.tags.map(String) : [],
+        desc: String(d.desc || ''),
+        code: String(d.code || '')
+      }));
+      const mode = snippets.length
+        ? (confirm(`Import ${clean.length} pattern(s)?\n\nOK = merge with your current library\nCancel = replace it entirely`) ? 'merge' : 'replace')
+        : 'replace';
+      if(mode === 'merge'){
+        const ids = new Set(snippets.map(s=>s.id));
+        clean.forEach(c => { if(ids.has(c.id)) c.id = uid(); });
+        snippets = [...clean, ...snippets];
+      }else{
+        snippets = clean;
+      }
+      save(); refreshFilter(); render();
+      toast(`Imported ${clean.length} pattern${clean.length===1?'':'s'}`);
+    }catch(err){
+      toast('That file isn\'t a valid pattern export');
+      console.error(err);
+    }
+    importFile.value = '';
+  };
+  reader.readAsText(file);
+});
+
+/* ---- boot --------------------------------------------------------------- */
+boot();
+</script>
+</body>
+</html>

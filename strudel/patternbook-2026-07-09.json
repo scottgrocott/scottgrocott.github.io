@@ -1,0 +1,49 @@
+[
+  {
+    "id": "5j7ggxv",
+    "title": "melody 1",
+    "tags": [],
+    "desc": "this is a test of the stack method for making tracks",
+    "code": "setcpm(120/4)\n\n$drums:stack(\n  sound(\"bd*2 ~ bd ~\").bank(\"RolandTR909\").gain(0.9),\n  sound(\"~ sd ~ sd\").bank(\"RolandTR909\").gain(0.8),\n  sound(\"hh*8\").bank(\"RolandTR909\").gain(0.4).pan(sine.range(0.3,0.7)),\n\n)\n\n$chords:stack(\n\n  note(\"<[c4,e4,g4] [g3,b3,d4] [a3,c4,e4] [f3,a3,c4]>\")\n    .sound(\"gm_ocarina\").lpf(sine.range(600,2000).slow(8))\n    .gain(0.4).room(0.4).attack(0.05),\n\n\n)\n\n$melody:stack(\n\n\n  note(\"e5 g5 c6 g5 ~ a5 g5 e5\")\n    .sound(\"gm_string_ensemble_1\").gain(0.35)//gm_string_ensemble_1,gm_soprano_sax\n    .delay(0.3).delaytime(0.25).room(0.3).slow(2)\n)\n\n$bass:stack(\n note(\"c2 c2 a1 f1\").sound(\"gm_electric_bass_finger\").gain(0.9),\n\n)"
+  },
+  {
+    "id": "l4qjg7n",
+    "title": "test",
+    "tags": [],
+    "desc": "this is a test",
+    "code": "setcpm(120/4)\nconst DRUMS = \"dmx\"\nconst DRUMS2 = \"akaixr10\"\nconst BASS = \"gm_lead_8_bass_lead:2\"\nconst KEYS = \"piano\"\n$drum_track:stack(\n  sound(\"bd ~ bd bd ~ bd ~ ~\").bank(DRUMS).gain(.5),\n  sound(\"~ ~ sd ~ [~ sd] ~ sd ~\").bank(DRUMS).gain(0.6).room(.5),\n  sound(\"hh hh hh - hh hh - hh\").bank(DRUMS).gain(saw.range(0.3,0.6).slow(4)),\n  sound(\"~ ~ ~ oh ~ ~ oh ~\").bank(DRUMS).gain(0.5),\n  sound(\"~ ~ ~ ~ ~ ~ ~ [[lt lt lt]lt mt ht]\").bank(DRUMS2).gain(0.2).slow(4),\n  sound(\"cr ~ ~ ~ ~ ~ ~ ~\").bank(DRUMS).gain(0.6).slow(2),\n  //sound(\"rd*8\").bank(DRUMS).gain(0.4)\n).gain(0.3)\n_$verse:stack(\n note(\"C2*4\").sound(BASS).gain(1),\n  note(\"0 2 4 <[6,8] [7,9]>\").scale(\"C:ionian\").sound(KEYS).delay(.0)\n\n)\n$chorus:stack(\n note(\"D1*8\").sound(BASS).gain(1),\nnote(\"0 2 4 <[6 8] [7,9]>\").scale(\"D:dorian\").sound(KEYS).delay(.0)\n)\n\n/*\nDRUMS\nakaixr10\ndmx\n\nBASS\ngm_acoustic_bass(4) \ngm_bassoon(4) \ngm_contrabass(3) \ngm_electric_bass_finger(4) \ngm_electric_bass_pick(5) \ngm_fretless_bass(2) \ngm_lead_8_bass_lead(5) \ngm_slap_bass_1(4) \ngm_slap_bass_2(4) \ngm_synth_bass_1(9) \ngm_synth_bass_2(7)\n\n\n*/"
+  },
+  {
+    "id": "seed-pop-1",
+    "title": "Pop song — full arrangement",
+    "tags": [
+      "pop",
+      "melodic",
+      "chords"
+    ],
+    "desc": "I–V–vi–IV progression with supersaw chords and a bright lead.",
+    "code": "setcpm(120/4)\n\nstack(\n  sound(\"bd*2 ~ bd ~\").bank(\"RolandTR909\").gain(0.9),\n  sound(\"~ sd ~ sd\").bank(\"RolandTR909\").gain(0.8),\n  sound(\"hh*8\").bank(\"RolandTR909\").gain(0.4).pan(sine.range(0.3,0.7)),\n\n  note(\"c2 c2 a1 f1\").sound(\"sawtooth\").lpf(800).gain(0.7).room(0.2),\n\n  note(\"<[c4,e4,g4] [g3,b3,d4] [a3,c4,e4] [f3,a3,c4]>\")\n    .sound(\"supersaw\").lpf(sine.range(600,2000).slow(8))\n    .gain(0.5).room(0.4).attack(0.05),\n\n  note(\"e5 g5 c6 g5 ~ a5 g5 e5\")\n    .sound(\"triangle\").gain(0.45)\n    .delay(0.3).delaytime(0.25).room(0.3).slow(2)\n)"
+  },
+  {
+    "id": "seed-prog-1",
+    "title": "Prog rock drum kit",
+    "tags": [
+      "drums",
+      "prog",
+      "rock"
+    ],
+    "desc": "Full kit: syncopated kick, ghost-note snare, tom fills, ride swap.",
+    "code": "setcpm(120/4)\nconst DRUMS = \"compurhythm1000\"\n$drum_track:stack(\n  sound(\"bd ~ bd bd ~ bd ~ ~\").bank(DRUMS).gain(1),\n  sound(\"~ ~ sd ~ [~ sd] ~ sd ~\").bank(DRUMS).gain(0.85).room(.5),\n  sound(\"hh*8\").bank(DRUMS).gain(saw.range(0.3,0.6).slow(4)),\n  sound(\"~ ~ ~ oh ~ ~ oh ~\").bank(DRUMS).gain(0.5),\n  sound(\"~ ~ ~ ~ ~ ~ ~ [lt mt ht]\").bank(DRUMS).gain(0.7).slow(4),\n  sound(\"cr ~ ~ ~ ~ ~ ~ ~\").bank(DRUMS).gain(0.6).slow(2),\n  sound(\"rd*8\").bank(DRUMS).gain(0.4).mask(\"<0 0>\")\n)"
+  },
+  {
+    "id": "seed-midi-1",
+    "title": "MIDI out to Carla rack",
+    "tags": [
+      "midi",
+      "live",
+      "hardware"
+    ],
+    "desc": "Route parts to separate MIDI channels for a Carla synth rack. Edit the port name to match your system.",
+    "code": "// patch Strudel's MIDI out to Carla in qpwgraph first\n// then confirm the port name below (often \"Midi Through\" on Linux)\n\nsetcpm(120/4)\n\nstack(\n  note(\"c2 c2 g1 a1\").midichan(1),       // slot 1 — bass synth\n  note(\"<c4 e4 g4>\").slow(2).midichan(2), // slot 2 — pad\n  note(\"e5 g5 c6 g5\").midichan(3)         // slot 3 — lead\n).midi(\"Midi Through\")"
+  }
+]
