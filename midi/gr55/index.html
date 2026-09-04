@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIDI Song Presets</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #1a1a1e;
+    color: #e6e6ea;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 10px 16px;
+    background: #24242a;
+    border-bottom: 1px solid #34343c;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 16px; margin: 0; margin-right: auto; font-weight: 600; }
+  label { font-size: 13px; color: #9a9aa6; }
+  select {
+    background: #2e2e36;
+    color: #e6e6ea;
+    border: 1px solid #44444e;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  #status { font-size: 12px; padding: 3px 8px; border-radius: 4px; background: #3a2a2a; color: #ff9c9c; }
+  #status.ok { background: #223a2a; color: #9cffb0; }
+  main { flex: 1; display: flex; min-height: 0; }
+  #list {
+    width: 300px;
+    border-right: 1px solid #34343c;
+    overflow-y: auto;
+    background: #202026;
+  }
+  .preset {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #2c2c34;
+  }
+  .preset:hover { background: #2a2a32; }
+  .preset.active { background: #3457d5; }
+  .preset .title { font-weight: 600; font-size: 15px; }
+  .preset .artist { font-size: 12px; color: #9a9aa6; }
+  .preset.active .artist { color: #cdd6ff; }
+  #lyrics {
+    flex: 1;
+    padding: 28px 36px;
+    overflow-y: auto;
+    line-height: 1.6;
+    font-size: 18px;
+  }
+  .lyricBody { white-space: pre-wrap; }
+  .lyricBody p { white-space: normal; margin: 0 0 1em; }
+  .lyricBody a { color: #7a9cff; }
+  .lyricBody img { max-width: 100%; height: auto; }
+  #lyrics h2 { margin: 0 0 4px; font-size: 26px; }
+  #lyrics .by { color: #9a9aa6; font-size: 15px; margin-bottom: 24px; }
+  #lyrics .pc { font-size: 12px; color: #7a7a86; margin-bottom: 20px; }
+  .empty { color: #6a6a76; }
+</style>
+</head>
+<body>
+<header>
+  <h1>MIDI Song Presets</h1>
+  <label>Output:</label>
+  <select id="midiOut"><option>Loading…</option></select>
+  <span id="status">MIDI not ready</span>
+</header>
+<main>
+  <div id="list"></div>
+  <div id="lyrics"><p class="empty">Select a song from the left.</p></div>
+</main>
+
+<script>
+let midiAccess = null, midiOutput = null, songs = [];
+const outSel = document.getElementById('midiOut');
+const statusEl = document.getElementById('status');
+const listEl = document.getElementById('list');
+const lyricsEl = document.getElementById('lyrics');
+
+function setStatus(msg, ok) {
+  statusEl.textContent = msg;
+  statusEl.className = ok ? 'ok' : '';
+}
+
+async function initMIDI() {
+  if (!navigator.requestMIDIAccess) {
+    setStatus('Web MIDI not supported (use Chrome/Edge)', false);
+    return;
+  }
+  try {
+    midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+    refreshOutputs();
+    midiAccess.onstatechange = refreshOutputs;
+  } catch (e) {
+    setStatus('MIDI access denied', false);
+  }
+}
+
+function refreshOutputs() {
+  const outputs = [...midiAccess.outputs.values()];
+  outSel.innerHTML = '';
+  if (!outputs.length) {
+    outSel.innerHTML = '<option>No MIDI outputs</option>';
+    midiOutput = null;
+    setStatus('No MIDI outputs found', false);
+    return;
+  }
+  outputs.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.id;
+    opt.textContent = o.name;
+    outSel.appendChild(opt);
+  });
+  selectOutput(outputs[0].id);
+}
+
+function selectOutput(id) {
+  midiOutput = midiAccess.outputs.get(id);
+  outSel.value = id;
+  setStatus('Ready: ' + (midiOutput ? midiOutput.name : ''), true);
+}
+
+outSel.addEventListener('change', e => selectOutput(e.target.value));
+
+function sendProgramChanges(pcs) {
+  if (!midiOutput) { setStatus('No MIDI output selected', false); return; }
+  pcs.forEach(pc => {
+    const ch = Math.max(1, Math.min(16, pc.channel)) - 1; // 0-indexed
+    const prog = Math.max(0, Math.min(127, pc.program));
+    midiOutput.send([0xC0 | ch, prog]);
+  });
+  setStatus(`Sent ${pcs.length} program change(s)`, true);
+}
+
+/* ---------- Safe HTML subset for lyrics ---------- */
+const ALLOWED_TAGS = ['B','STRONG','I','EM','U','S','BR','P','DIV','SPAN','H3','H4',
+  'UL','OL','LI','BLOCKQUOTE','SMALL','MARK','SUP','SUB','HR','A','IMG'];
+const ALLOWED_ATTR = { '*': ['style','class'], 'A': ['href','title'], 'IMG': ['src','alt','width','height'] };
+const SAFE_STYLE = /^(color|background-color|font-size|font-weight|font-style|text-align|text-decoration|letter-spacing|line-height|margin|margin-top|margin-bottom|padding|opacity)\s*:\s*[^;{}()]+$/i;
+
+function sanitizeHTML(html) {
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html;
+  const walk = node => {
+    [...node.childNodes].forEach(child => {
+      if (child.nodeType === 1) { // element
+        if (!ALLOWED_TAGS.includes(child.tagName)) {
+          // unwrap: keep children, drop the tag
+          while (child.firstChild) node.insertBefore(child.firstChild, child);
+          node.removeChild(child);
+          return;
+        }
+        const allowed = (ALLOWED_ATTR['*'] || []).concat(ALLOWED_ATTR[child.tagName] || []);
+        [...child.attributes].forEach(attr => {
+          const name = attr.name.toLowerCase();
+          if (name.startsWith('on') || !allowed.includes(name)) { child.removeAttribute(attr.name); return; }
+          const val = attr.value.trim();
+          if (name === 'style') {
+            const clean = val.split(';').map(s => s.trim()).filter(s => s && SAFE_STYLE.test(s)).join('; ');
+            if (clean) child.setAttribute('style', clean); else child.removeAttribute('style');
+          } else if (name === 'href' || name === 'src') {
+            if (/^\s*(javascript|data|vbscript):/i.test(val)) child.removeAttribute(attr.name);
+          }
+        });
+        if (child.tagName === 'A') { child.setAttribute('target','_blank'); child.setAttribute('rel','noopener noreferrer'); }
+        walk(child);
+      } else if (child.nodeType === 8) { // comment
+        node.removeChild(child);
+      }
+    });
+  };
+  walk(tpl.content);
+  return tpl.innerHTML;
+}
+
+function renderList() {
+  listEl.innerHTML = '';
+  songs.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'preset';
+    div.dataset.idx = i;
+    div.innerHTML = `<div class="title"></div><div class="artist"></div>`;
+    div.querySelector('.title').textContent = s.title;
+    div.querySelector('.artist').textContent = s.artist || '';
+    div.addEventListener('click', () => selectSong(i));
+    listEl.appendChild(div);
+  });
+}
+
+function selectSong(i) {
+  document.querySelectorAll('.preset').forEach(p =>
+    p.classList.toggle('active', +p.dataset.idx === i));
+  const s = songs[i];
+  const pcs = s.programChanges || [];
+  sendProgramChanges(pcs);
+  const pcText = pcs.map(p => `ch${p.channel}→#${p.program}`).join('  ');
+  lyricsEl.innerHTML = '';
+  const h2 = document.createElement('h2'); h2.textContent = s.title;
+  const by = document.createElement('div'); by.className = 'by'; by.textContent = s.artist || '';
+  const pc = document.createElement('div'); pc.className = 'pc'; pc.textContent = pcText;
+  const body = document.createElement('div'); body.className = 'lyricBody';
+  body.innerHTML = sanitizeHTML(s.lyrics || '');
+  lyricsEl.append(h2, by, pc, body);
+}
+
+async function loadContent() {
+  try {
+    const res = await fetch('/midi/gr55/content.json');
+    const data = await res.json();
+    songs = data.songs || [];
+    renderList();
+  } catch (e) {
+    listEl.innerHTML = '<div class="preset"><div class="artist">Could not load content.json</div></div>';
+  }
+}
+
+initMIDI();
+loadContent();
+</script>
+</body>
+</html>
